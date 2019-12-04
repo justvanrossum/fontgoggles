@@ -58,7 +58,7 @@ setup(
     data_files=dataFiles,
     app=[f"{appName}.py"],
     options=dict(py2app=dict(
-        iconfile="Resources/fontgoggles.icns",
+        # iconfile="Resources/fontgoggles.icns",
         plist=infoplist,
         excludes=[
             "scipy",
