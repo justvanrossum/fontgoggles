@@ -1,0 +1,72 @@
+import sys
+from distutils.core import setup
+import py2app
+import os
+import shutil
+import datetime
+import glob
+
+
+infoplist = dict(
+    CFBundleDocumentTypes = [
+        dict(
+            CFBundleTypeExtensions = ["ufo"],
+            CFBundleTypeName = "Unified Font Object",
+            CFBundleTypeRole = "Viewer",
+            LSTypeIsPackage = True,
+        ),
+        dict(
+            CFBundleTypeExtensions = ["ttf", "otf", "woff", "woff2", "otc", "ttc", "dfont"],
+            CFBundleTypeName = "OpenType Font",
+            CFBundleTypeRole = "Viewer",
+        ),
+        # dict(
+        #     CFBundleTypeExtensions = ["glyphs"],
+        #     CFBundleTypeName = "GlyphsApp Source File",
+        #     CFBundleTypeRole = "Viewer",
+        # ),
+        dict(
+            CFBundleTypeExtensions = ["designspace"],
+            CFBundleTypeName = "Designspace File",
+            CFBundleTypeRole = "Viewer",
+        ),
+        dict(
+            CFBundleTypeExtensions = ["*"],
+            CFBundleTypeName = "Any File",
+            CFBundleTypeRole = "Viewer",
+        ),
+    ],
+    CFBundleName = "FontGoggles",
+    CFBundleIdentifier = "com.google.fonts.FontGoggles",
+    LSMinimumSystemVersion = "10.10",
+    CFBundleShortVersionString = "0.1a",
+    CFBundleVersion = "0.1a",
+    CFBundleIconFile="fontgoggles.icns",
+    NSHumanReadableCopyright = f"Copyright © {datetime.datetime.now().year} Just van Rossum.\nAll rights reserved.",
+    NSPrincipalClass="NSApplication",
+    ATSApplicationFontsPath="Fonts/",
+)
+
+dataFiles = [
+        'Resources/English.lproj',
+        'Resources/Fonts',
+] + glob.glob("Resources/*.pdf")
+
+appName = "FontGoggles"
+
+setup(
+    data_files=dataFiles,
+    app=[f"{appName}.py"],
+    options=dict(py2app=dict(
+        iconfile="Resources/fontgoggles.icns",
+        plist=infoplist,
+        excludes=[
+            "scipy",
+            "matplotlib",
+            "PIL",
+            "pygame",
+            "wx",
+            "test",
+            ],
+    )),
+)
