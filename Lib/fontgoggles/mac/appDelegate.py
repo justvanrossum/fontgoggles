@@ -1,7 +1,12 @@
 import os
-from AppKit import , NSDocumentController, NSMenu, NSMenuItem
+from AppKit import , NSDocumentController
 from Foundation import NSObject, NSURL
 from ..misc.decorators import suppressAndLogException
+
+
+def sniffFontType(path):
+    # stub
+    return True
 
 
 class FGAppDelegate(NSObject):
@@ -28,14 +33,11 @@ class FGAppDelegate(NSObject):
             self.filesToOpen = None
             if not filesToOpen:
                 return
-            # doc = TMProjectDocument.alloc().initWithSourceFiles_(filesToOpen)
-            #doc.updateChangeCount_(1)
-            # docController.addDocument_(doc)
-            # doc.makeWindowControllers()
-            project = Project()
-            docController = NSDocumentController.sharedDocumentController()
-            for path in sorted(filesToOpen):
-                project.addSourcePath(path)
-                url = NSURL.fileURLWithPath_(path)
-                docController.noteNewRecentDocumentURL_(url)
-            self.windowController = ProjectWindowController(project)
+            print(filesToOpen)
+            # project = Project()
+            # docController = NSDocumentController.sharedDocumentController()
+            # for path in sorted(filesToOpen):
+            #     project.addSourcePath(path)
+            #     url = NSURL.fileURLWithPath_(path)
+            #     docController.noteNewRecentDocumentURL_(url)
+            # self.windowController = ProjectWindowController(project)
