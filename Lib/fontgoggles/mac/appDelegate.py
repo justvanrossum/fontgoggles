@@ -1,5 +1,5 @@
 import os
-from AppKit import , NSDocumentController
+from AppKit import NSDocumentController
 from Foundation import NSObject, NSURL
 from ..misc.decorators import suppressAndLogException
 
