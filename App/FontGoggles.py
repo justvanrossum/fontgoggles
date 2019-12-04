@@ -2,7 +2,7 @@ import asyncio
 from corefoundationasyncio import CoreFoundationEventLoop
 
 # Make sure these classes are loaded
-from fontgoggles.mac.projectDocument import FGProjectDocument
+# from fontgoggles.mac.projectDocument import FGProjectDocument
 from fontgoggles.mac.appDelegate import FGAppDelegate
 
 
