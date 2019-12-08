@@ -38,18 +38,11 @@ class RectTree(NamedTuple):
         bounds = unionRect(left[0], right[0])
         return cls(bounds, None, left, right)
     
-    def iterIntersecting(self, targetBounds: Rectangle):
+    def iterIntersections(self, targetBounds: Rectangle):
         if not hasIntersection(self.bounds, targetBounds):
             return
         if self.leaf is not None:
             yield self.leaf
         else:
-            yield from self.left.iterIntersecting(targetBounds)
-            yield from self.right.iterIntersecting(targetBounds)
-
-
-if __name__ == "__main__":
-    rectangles = [(100, 100, 200, 200), (150, 150, 250, 250), (300, 200, 400, 250)]
-    tree = RectTree.fromSeq([(r, i) for i, r in enumerate(rectangles)])
-    for x in tree.iterIntersecting((10, 10, 250, 190)):
-        print(x)
+            yield from self.left.iterIntersections(targetBounds)
+            yield from self.right.iterIntersections(targetBounds)
