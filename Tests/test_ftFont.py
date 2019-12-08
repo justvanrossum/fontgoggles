@@ -1,6 +1,7 @@
 import pathlib
 import pytest
-from fontTools.pens.recordingPen import RecordingPen
+from fontTools.pens.recordingPen import RecordingPen, RecordingPointPen
+from fontTools.ttLib import TTFont
 from fontgoggles.misc.ftFont import FTFont
 
 
@@ -12,14 +13,20 @@ def getFontPath(fileName):
 
 
 def test_getOutline():
-    f = FTFont.fromPath(getFontPath("IBMPlexSans-Regular.otf"))
-    pen = RecordingPen()
-    f.drawGlyphToPen("bar", pen)
-    expected = [
-        ('moveTo', ((191, -138),)),
-        ('lineTo', ((191, 760),)),
-        ('lineTo', ((123, 760),)),
-        ('lineTo', ((123, -138),)),
-        ('closePath', ()),
-    ]
-    assert pen.value == expected
+    p = getFontPath("IBMPlexSans-Regular.ttf")
+    ftf = FTFont.fromPath(p)
+    ttf = TTFont(p, lazy=True)
+    ttfGlyphSet = ttf.getGlyphSet()
+
+    for glyphName in ["a", "B", "O", "period"]:
+        refPen = RecordingPen()
+        ttfGlyphSet[glyphName].draw(refPen)
+        pen = RecordingPen()
+        ftf.drawGlyphToPen(glyphName, pen)
+        assert pen.value == refPen.value
+
+        refPen = RecordingPointPen()
+        ttfGlyphSet[glyphName].drawPoints(refPen)
+        pen = RecordingPointPen()
+        ftf.drawGlyphToPointPen(glyphName, pen)
+        assert pen.value == refPen.value
