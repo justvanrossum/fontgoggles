@@ -16,14 +16,14 @@ class FGAppDelegate(NSObject):
     def applicationShouldOpenUntitledFile_(self, app):
         return False
 
-    def application_openFiles_(self, app, files):
-        self.queueFilesForOpening_(files)
-
-    def queueFilesForOpening_(self, fileNames):
+    def application_openFiles_(self, app, fileNames):
         if self.filesToOpen is None:
             self.filesToOpen = list(fileNames)
         else:
             self.filesToOpen.extend(fileNames)
+        # When the user drops multiple files on the app, application_openFiles_
+        # is sometimes called multiple times. Let's delay a bit and see if
+        # more files came in in the meantime.
         self.performSelector_withObject_afterDelay_("openQueuedFiles", None, 0.2)
 
     @suppressAndLogException
