@@ -4,6 +4,7 @@ corefoundationasyncio
 py2app
 numpy
 pytest
+freetype-py
 uharfbuzz
 python-bidi
 git+https://github.com/robotools/vanilla
