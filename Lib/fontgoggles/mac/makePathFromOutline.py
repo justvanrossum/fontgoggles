@@ -4,14 +4,26 @@ import pathlib
 
 import freetype
 import objc
+import Foundation
 
 
-_libPath = pathlib.Path(__file__).resolve().parent / "makePathFromOutline.dylib"
-_lib = ctypes.cdll.LoadLibrary(_libPath)
+_libName = "makePathFromOutline.dylib"
+_mainBundle = Foundation.NSBundle.mainBundle()
+_searchFolders = [
+    pathlib.Path(__file__).resolve().parent,
+    pathlib.Path(_mainBundle.privateFrameworksURL().path()),
+]
 
-_makePathFromOutline = _lib.makePathFromOutline
-_makePathFromOutline.argtypes = [ctypes.POINTER(freetype.ft_structs.FT_Outline)]
-_makePathFromOutline.restype = ctypes.c_void_p
+for _folder in _searchFolders:
+    _libPath = _folder / _libName
+    if _libPath.exists():
+        _lib = ctypes.cdll.LoadLibrary(_libPath)
+        _makePathFromOutline = _lib.makePathFromOutline
+        _makePathFromOutline.argtypes = [ctypes.POINTER(freetype.ft_structs.FT_Outline)]
+        _makePathFromOutline.restype = ctypes.c_void_p
+        break
+else:
+    _makePathFromOutline = None
 
 
 def makePathFromOutline(outline):
