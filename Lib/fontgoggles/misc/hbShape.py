@@ -81,6 +81,7 @@ class Shaper:
         self._funcs.set_nominal_glyph_func(_getGlyphIDFunc, self)
 
         if getAdvanceWidth is None:
+            # TODO: this is wrong for var fonts, we should not set a width func at all
             def _getAdvanceWidth(hmtx, glyphName):
                 return hmtx[glyphName][0]
             getAdvanceWidth = functools.partial(_getAdvanceWidth, self._ttFont["hmtx"])
