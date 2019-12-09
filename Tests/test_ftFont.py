@@ -12,12 +12,14 @@ def getFontPath(fileName):
     return testRoot / "data" / fileName
 
 
-def test_getOutline():
-    p = getFontPath("IBMPlexSans-Regular.ttf")
-    ftf = FTFont.fromPath(p)
+def _getFonts(fileName):
+    p = getFontPath(fileName)
     ttf = TTFont(p, lazy=True)
-    ttfGlyphSet = ttf.getGlyphSet()
+    return FTFont.fromPath(p), ttf.getGlyphSet()
 
+
+def test_getDrawToPen():
+    ftf, ttfGlyphSet = _getFonts("IBMPlexSans-Regular.ttf")
     for glyphName in ["a", "B", "O", "period"]:
         refPen = RecordingPen()
         ttfGlyphSet[glyphName].draw(refPen)
@@ -25,6 +27,10 @@ def test_getOutline():
         ftf.drawGlyphToPen(glyphName, pen)
         assert pen.value == refPen.value
 
+
+def test_getDrawToPointPen():
+    ftf, ttfGlyphSet = _getFonts("IBMPlexSans-Regular.ttf")
+    for glyphName in ["a", "B", "O", "period"]:
         refPen = RecordingPointPen()
         ttfGlyphSet[glyphName].drawPoints(refPen)
         pen = RecordingPointPen()
