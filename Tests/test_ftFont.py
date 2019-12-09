@@ -1,8 +1,10 @@
 import pathlib
 import pytest
 from fontTools.pens.recordingPen import RecordingPen, RecordingPointPen
+from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.ttLib import TTFont
 from fontgoggles.misc.ftFont import FTFont
+import Quartz
 
 
 testRoot = pathlib.Path(__file__).resolve().parent
@@ -36,3 +38,17 @@ def test_getDrawToPointPen():
         pen = RecordingPointPen()
         ftf.drawGlyphToPointPen(glyphName, pen)
         assert pen.value == refPen.value
+
+
+def _comparePaths(path1, path2):
+    return Quartz.CGPathEqualToPath(path1.CGPath(), path2.CGPath())
+
+
+def test_getPlatformPath():
+    ftf, ttfGlyphSet = _getFonts("IBMPlexSans-Regular.ttf")
+
+    for glyphName in ["a", "B", "O", "period", "bar", "aring"]:
+        p = ftf.getPlatformPath(glyphName)
+        pen = CocoaPen(ttfGlyphSet)
+        ttfGlyphSet[glyphName].draw(pen)
+        assert _comparePaths(p, pen.path)

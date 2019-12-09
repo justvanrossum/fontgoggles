@@ -2,6 +2,7 @@ import io
 from fontTools.ttLib import TTFont
 from fontTools.pens.pointPen import PointToSegmentPen
 import freetype
+from ..mac.makePathFromOutline import makePathFromOutline
 
 
 class FTFont:
@@ -58,5 +59,8 @@ class FTFont:
     def drawGlyphToPen(self, glyphName, pen):
         self.drawGlyphToPointPen(glyphName, PointToSegmentPen(pen))
 
-    def getPlatformOutline(self, glyphName, getOutlineFunc):
-        XXX
+    def getPlatformPath(self, glyphName):
+        glyphID = self._ttFont.getGlyphID(glyphName)
+        face = self._ftFace
+        face.load_glyph(glyphID, freetype.FT_LOAD_NO_SCALE)
+        return makePathFromOutline(face.glyph.outline._FT_Outline)
