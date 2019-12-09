@@ -1,5 +1,4 @@
 import ctypes
-import functools
 import pathlib
 
 import freetype
