@@ -4,22 +4,35 @@ import vanilla
 
 class AligningScrollView(vanilla.ScrollView):
 
-    """ScrollView aligning its document view according to the `hAlign` and `vAlign` parameters.
+    """ScrollView aligning its document view according to the `hAlign` and `vAlign`
+    parameters.
+
     `hAlign` can be "left" (default), "center" or "right"
     `vAlign` can be "top" (default), "center" or "bottom"
     """
 
-    def __init__(self, posSize, documentView, hAlign="left", vAlign="top"):
+    def __init__(self, posSize, documentView, hAlign="left", vAlign="top",
+                 drawBackground=True, minMagnification=None, maxMagnification=None,
+                 borderType=AppKit.NSBezelBorder, clipview=None):
         self._docRef = [documentView]
         if hasattr(documentView, "_nsObject"):
             x, y, w, h = documentView._posSize
             assert x == 0 and y == 0, "posSize x and y must be 0 in document view"
             assert w > 0 and h > 0, "posSize w and h must be positive in document view"
             documentView = documentView._nsObject
-        clipView = _AligningScrollView_ClipView(hAlign, vAlign)
         documentView.setFrame_(((0, 0), (w, h)))
+        if clipview is None:
+            clipView = _AligningScrollView_ClipView(hAlign, vAlign)
         super().__init__(posSize, documentView, clipView=clipView)
-
+        clipView.setDrawsBackground_(drawBackground)  # Must be called _after_ super()
+        scrollView = self._nsObject
+        scrollView.setBorderType_(borderType)
+        if maxMagnification is not None:
+            scrollView.setAllowsMagnification_(True)
+            scrollView.setMaxMagnification_(maxMagnification)
+        if minMagnification is not None:
+            scrollView.setAllowsMagnification_(True)
+            scrollView.setMinMagnification_(minMagnification)
 
 
 class _AligningScrollView_ClipView(AppKit.NSClipView):
