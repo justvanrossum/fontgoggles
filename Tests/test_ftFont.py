@@ -44,11 +44,11 @@ def _comparePaths(path1, path2):
     return Quartz.CGPathEqualToPath(path1.CGPath(), path2.CGPath())
 
 
-def test_getPlatformPath():
+def test_getOutlinePath():
     ftf, ttfGlyphSet = _getFonts("IBMPlexSans-Regular.ttf")
 
     for glyphName in ["a", "B", "O", "period", "bar", "aring"]:
-        p = ftf.getPlatformPath(glyphName)
+        p = ftf.getOutlinePath(glyphName)
         pen = CocoaPen(ttfGlyphSet)
         ttfGlyphSet[glyphName].draw(pen)
         assert _comparePaths(p, pen.path)

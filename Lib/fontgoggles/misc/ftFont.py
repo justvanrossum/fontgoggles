@@ -59,7 +59,7 @@ class FTFont:
     def drawGlyphToPen(self, glyphName, pen):
         self.drawGlyphToPointPen(glyphName, PointToSegmentPen(pen))
 
-    def getPlatformPath(self, glyphName):
+    def getOutlinePath(self, glyphName):
         glyphID = self._ttFont.getGlyphID(glyphName)
         face = self._ftFace
         face.load_glyph(glyphID, freetype.FT_LOAD_NO_SCALE)
