@@ -56,6 +56,9 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         view = self.documentView()
         viewFrame = view.frame()
 
+        # TODO: this does not work well together with magnification, at least not
+        # When the document view is a vanilla group.
+
         if view is not None:
             if rect.size.width > viewFrame.size.width:
                 if self.hAlign == "center":
