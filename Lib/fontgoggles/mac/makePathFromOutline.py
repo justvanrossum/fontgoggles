@@ -26,4 +26,10 @@ else:
 
 
 def makePathFromOutline(outline):
-    return objc.objc_object(c_void_p=_makePathFromOutline(outline))
+    path = objc.objc_object(c_void_p=_makePathFromOutline(outline))
+    # Not sure why, but the path object comes back with a retain count too many.
+    # In _makePathFromOutline(), we do [[NSBezierPath alloc] init], so that's one.
+    # We pretty much take over that reference, but I think objc.objc_object()
+    # assumes it needs to own it, too.
+    path.release()
+    return path
