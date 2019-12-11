@@ -80,9 +80,8 @@ class BaseFont:
                                       script=script)
         await asyncio.sleep(0)
         glyphNames = (gi.name for gi in glyphPositioning)
-        paths = []
-        async for path in self.getOutlinePaths(glyphNames, variations, colorLayers):
-            paths.append(path)
+        paths = [path async for path in
+                 self.getOutlinePaths(glyphNames, variations, colorLayers)]
         return zip(glyphPositioning, paths)
 
     def shape(self, text, *, features, variations, direction, language, script):
