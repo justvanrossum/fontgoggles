@@ -1,4 +1,4 @@
-from typing import Any, NamedTuple, Sequence, Tuple, Union
+from typing import Any, NamedTuple, Optional, Sequence, Tuple, Union
 from fontTools.misc.arrayTools import unionRect
 
 
@@ -21,6 +21,8 @@ class RectTree(NamedTuple):
     """Given a sorted list of (rectangle, object) items, build a tree structure
     that allows to efficiently find objects that overlap with a target rectangle.
 
+    Use the RectTree.fromSeq() class method to build a tree.
+
     This implementation is targeted towards a more or less one-dimensional layout
     of the objects, for example a line of glyphs. The direction of the layout is
     not important, but it's most efficient to sort the objects along the intended
@@ -32,8 +34,8 @@ class RectTree(NamedTuple):
 
     bounds: Rectangle
     leaf: Any
-    left: "RectTree"
-    right: "RectTree"
+    left: Optional["RectTree"]
+    right: Optional["RectTree"]
 
     @classmethod
     def fromSeq(cls, seq: Sequence):
