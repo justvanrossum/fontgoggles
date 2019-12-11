@@ -23,6 +23,12 @@ class RectTree(NamedTuple):
 
     Use the RectTree.fromSeq() class method to build a tree.
 
+    The tree.iterIntersections(targetRect) method iterates over the set of objects
+    that overlap with targetRect (in order of the original sequence).
+
+    The tree.firstIntersection(targetRect) method returns the first overlapping
+    object or None.
+
     This implementation is targeted towards a more or less one-dimensional layout
     of the objects, for example a line of glyphs. The direction of the layout is
     not important, but it's most efficient to sort the objects along the intended
@@ -30,6 +36,8 @@ class RectTree(NamedTuple):
     horizontally should be sorted horizontally (although right to left or left to
     right won't make a difference). The output of, say, hb-shape will do just
     fine, regardless of whether the layout is horizontal or vertical.
+
+    Rectangles here have the form (xMin, yMin, xMax, yMax).
     """
 
     bounds: Rectangle
