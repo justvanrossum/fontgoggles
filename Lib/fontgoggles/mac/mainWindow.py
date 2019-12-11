@@ -71,9 +71,9 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
         scaleFactor = self.scaleFactor
         x -= 10
+        y -= 300 * scaleFactor
         x /= scaleFactor
         y /= scaleFactor
-        y -= 300
         for x in self._rectTree.iterIntersections((x, y, x, y)):
             print(x, self._glyphs[x][0])
 
@@ -93,9 +93,8 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         height = self.frame().size.height
 
         AppKit.NSColor.blackColor().set()
-        translate(10, 0)
+        translate(10, self.scaleFactor * 300)
         scale(self.scaleFactor)
-        translate(0, 300)
         for gi, outline in self._glyphs:
             outline.fill()
             translate(gi.ax, gi.ay)
