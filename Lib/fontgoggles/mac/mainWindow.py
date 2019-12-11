@@ -105,6 +105,27 @@ class FontItem(Group):
         self.glyphLineTest._nsObject.setNeedsDisplay_(True)
 
 
+_textAlignments = dict(
+    left=AppKit.NSTextAlignmentLeft,
+    center=AppKit.NSTextAlignmentCenter,
+    right=AppKit.NSTextAlignmentRight,
+)
+
+_textLineBreakModes = dict(
+    wordwrap=AppKit.NSLineBreakByWordWrapping,
+    charwrap=AppKit.NSLineBreakByCharWrapping,
+    clipping=AppKit.NSLineBreakByClipping,
+    trunchead=AppKit.NSLineBreakByTruncatingHead,
+    trunctail=AppKit.NSLineBreakByTruncatingTail,
+    truncmiddle=AppKit.NSLineBreakByTruncatingMiddle,
+)
+
+def textCell(align="left", lineBreakMode="wordwrap"):
+    cell = AppKit.NSTextFieldCell.alloc().init()
+    cell.setAlignment_(_textAlignments[align])
+    cell.setLineBreakMode_(_textLineBreakModes[lineBreakMode])
+    return cell
+
 class FontGogglesMainController:
 
     def __init__(self, fontPaths):
@@ -116,22 +137,11 @@ class FontGogglesMainController:
         fontListGroup = Group((0, 0, 0, 0))
         sidebarGroup = Group((-sidebarWidth, 0, sidebarWidth, 0))
 
-        font = AppKit.NSFont.fontWithName_size_("IBMPlexMono", 13)
-        leftAlignCell = AppKit.NSTextFieldCell.alloc().init()
-        leftAlignCell.setAlignment_(AppKit.NSTextAlignmentLeft)
-        leftAlignCell.setFont_(font)
-        leftAlignCell.setLineBreakMode_(AppKit.NSLineBreakByTruncatingTail)
-        rightAlignCell = AppKit.NSTextFieldCell.alloc().init()
-        rightAlignCell.setAlignment_(AppKit.NSTextAlignmentRight)
-        rightAlignCell.setFont_(font)
-        centerAlignCell = AppKit.NSTextFieldCell.alloc().init()
-        centerAlignCell.setAlignment_(AppKit.NSTextAlignmentCenter)
-        centerAlignCell.setFont_(font)
         columnDescriptions = [
-            dict(title="index", width=34, cell=rightAlignCell),
-            dict(title="char", width=34, typingSensitive=True, cell=centerAlignCell),
-            dict(title="unicode", width=60, cell=rightAlignCell),
-            dict(title="unicode name", key="unicodeName", cell=leftAlignCell),
+            dict(title="index", width=34, cell=textCell("right")),
+            dict(title="char", width=34, typingSensitive=True, cell=textCell("center")),
+            dict(title="unicode", width=60, cell=textCell("right")),
+            dict(title="unicode name", key="unicodeName", cell=textCell("left", "truncmiddle")),
         ]
         self.unicodeList = List((0, 0, 0, 0), [],
                 columnDescriptions=columnDescriptions,
