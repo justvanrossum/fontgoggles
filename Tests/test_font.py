@@ -30,20 +30,26 @@ openFontsTestData = [
         ['kern', 'rvrn'],
         ['DFLT'],
         [],
-        [
-            {'defaultValue': 0.0,
-             'maxValue': 1000.0,
-             'minValue': 0.0,
-             'name': 'Width',
-             'tag': 'wdth'},
-            {'defaultValue': 0.0,
-             'maxValue': 1000.0,
-             'minValue': 0.0,
-             'name': 'Weight',
-             'tag': 'wght'},
+        [{'defaultValue': 0.0,
+          'maxValue': 1000.0,
+          'minValue': 0.0,
+          'name': 'Width',
+          'tag': 'wdth'},
+         {'defaultValue': 0.0,
+          'maxValue': 1000.0,
+          'minValue': 0.0,
+          'name': 'Weight',
+          'tag': 'wght'},
         ],
-        "HI", ["H", "I"]),
+        "HI", ["H", "I.narrow"]),
+    ("NotoNastaliqUrdu-Regular.ttf",
+        ['ccmp', 'curs', 'fina', 'init', 'isol', 'mark', 'medi', 'mkmk', 'rlig'],
+        ['DFLT', 'arab', 'latn'],
+        [],
+        [],
+        "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
 ]
+
 @pytest.mark.parametrize("fileName,features,scripts,languages,axes,text,glyphNames",
                          openFontsTestData)
 @pytest.mark.asyncio
@@ -61,5 +67,4 @@ async def test_openFonts(fileName,
         assert font.languages == languages
         assert font.axes == axes
         run = await font.getGlyphRun(text)
-        glyphNames = [gi.name for gi, outline in run]
-        assert glyphNames == glyphNames
+        assert [gi.name for gi, outline in run] == glyphNames
