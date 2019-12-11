@@ -40,6 +40,11 @@ def translate(dx, dy):
     t.concat()
 
 
+def nsRectFromRect(rect):
+    xMin, yMin, xMax, yMax = rect
+    return (xMin, yMin), (xMax - xMin, yMax - yMin)
+
+
 def rectFromNSRect(nsRect):
     # To .misc.rectangle?
     (x, y), (w, h) = nsRect
@@ -50,6 +55,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     _glyphs = None
     _rectTree = None
+    _selection = None
 
     def isOpaque(self):
         return True
@@ -64,8 +70,11 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
                 bounds = offsetRect(rectFromNSRect(outline.controlPointBounds()), x + gi.dx, y + gi.dy)
                 rectList.append(bounds)
                 rectIndexList.append((bounds, index))
+            else:
+                rectList.append(None)
             x += gi.ax
             y += gi.ay
+        assert len(rectList) == len(self._glyphs)
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._rectList = rectList
 
@@ -78,8 +87,21 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         y -= dy
         x /= scaleFactor
         y /= scaleFactor
-        for r, x in self._rectTree.iterIntersections((x, y, x, y)):
-            print(x, self._glyphs[x][0])
+        rect, index = self._rectTree.firstIntersection((x, y, x, y))
+        if rect is not None:
+            if self._selection is None:
+                self._selection = set()
+            newSelection = {index}
+            if newSelection == self._selection:
+                newSelection = set()  # deselect
+            diffSelection = self._selection ^ newSelection
+            self._selection = newSelection
+            for index in diffSelection:
+                rect = self._rectList[index]
+                if rect is None:
+                    continue
+                rect = offsetRect(scaleRect(rect, scaleFactor, scaleFactor), dx, dy)
+                self.setNeedsDisplayInRect_(nsRectFromRect(rect))
 
     @property
     def scaleFactor(self):
@@ -113,8 +135,13 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         tx = ty = 0
         for index, (gi, outline) in enumerate(self._glyphs):
             if index in indices:
+                selected = self._selection and index in self._selection
+                if selected:
+                    AppKit.NSColor.redColor().set()
                 translate(tx, ty)
                 outline.fill()
+                if selected:
+                    AppKit.NSColor.blackColor().set()
                 tx = ty = 0
             tx += gi.ax
             ty += gi.ay
