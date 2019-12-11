@@ -2,16 +2,6 @@ from typing import Any, NamedTuple, Optional, Sequence, Tuple, Union
 from fontTools.misc.arrayTools import unionRect
 
 
-def hasIntersection(rect1, rect2):
-    """Return a boolean. If the input rectangles intersect, return
-    True, return False if the input rectangles do not intersect.
-    """
-    (xMin1, yMin1, xMax1, yMax1) = rect1
-    (xMin2, yMin2, xMax2, yMax2) = rect2
-    return ((xMin1 < xMax2 and xMax1 > xMin2) and
-            (yMin1 < yMax2 and yMax1 > yMin2))
-
-
 Number = Union[int, float]
 Rectangle = Tuple[Number, Number, Number, Number]  # xMin, yMin, xMax, yMax
 
@@ -72,3 +62,13 @@ class RectTree(NamedTuple):
         for item in self.iterIntersections(targetBounds):
             return item
         return default
+
+
+def hasIntersection(rect1, rect2):
+    """Return a boolean. If the input rectangles intersect, return
+    True, return False if the input rectangles do not intersect.
+    """
+    (xMin1, yMin1, xMax1, yMax1) = rect1
+    (xMin2, yMin2, xMax2, yMax2) = rect2
+    return ((xMin1 < xMax2 and xMax1 > xMin2) and
+            (yMin1 < yMax2 and yMax1 > yMin2))
