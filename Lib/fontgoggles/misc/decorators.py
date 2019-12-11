@@ -15,6 +15,25 @@ def asyncTask(func):
     return createFuncTask
 
 
+def asyncTaskAutoCancel(func):
+    """Wraps an async method into a regular method, that will schedule
+    the async function as a task. If this task has previously been scheduled
+    and has not yet run, it will be cancelled. So a newly scheduled task
+    overrides an older one.
+    """
+    taskAttributeName = f"_{func.__name__}_autoCancelTask"
+    @functools.wraps(func)
+    def createFuncTask(self, *args, **kwargs):
+        oldTask = getattr(self, taskAttributeName, None)
+        if oldTask is not None:
+            oldTask.cancel()
+        coro = func(self, *args, **kwargs)
+        task = asyncio.create_task(coro)
+        setattr(self, taskAttributeName, task)
+        return task
+    return createFuncTask
+
+
 def suppressAndLogException(func):
     """Wraps a method or function into a try/except, logging any errors while
     silencing them. This is handy for debugging Cocoa methods, which often
