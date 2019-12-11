@@ -87,8 +87,8 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         y -= dy
         x /= scaleFactor
         y /= scaleFactor
-        rect, index = self._rectTree.firstIntersection((x, y, x, y))
-        if rect is not None:
+        index = self._rectTree.firstIntersection((x, y, x, y))
+        if index is not None:
             if self._selection is None:
                 self._selection = set()
             newSelection = {index}
@@ -126,7 +126,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         invScale = 1 / self.scaleFactor
         rect = rectFromNSRect(rect)
         rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
-        indices = set(i for r, i in self._rectTree.iterIntersections(rect))
+        indices = set(i for i in self._rectTree.iterIntersections(rect))
 
         translate(dx, dy)
         scale(self.scaleFactor)

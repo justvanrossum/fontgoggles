@@ -42,7 +42,7 @@ class RectTree(NamedTuple):
         if not hasIntersection(self.bounds, targetBounds):
             return
         if self.leaf is not None:
-            yield self.bounds, self.leaf
+            yield self.leaf
         else:
             yield from self.left.iterIntersections(targetBounds)
             yield from self.right.iterIntersections(targetBounds)
@@ -50,4 +50,4 @@ class RectTree(NamedTuple):
     def firstIntersection(self, targetBounds: Rectangle, default=None):
         for item in self.iterIntersections(targetBounds):
             return item
-        return None, default
+        return default
