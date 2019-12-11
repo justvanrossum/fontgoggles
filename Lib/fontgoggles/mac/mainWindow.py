@@ -58,13 +58,16 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         self._glyphs = glyphs
         x = y = 0
         rectList = []
+        rectIndexList = []
         for index, (gi, outline) in enumerate(self._glyphs):
             if outline.elementCount():
                 bounds = offsetRect(rectFromNSRect(outline.controlPointBounds()), x + gi.dx, y + gi.dy)
-                rectList.append((bounds, index))
+                rectList.append(bounds)
+                rectIndexList.append((bounds, index))
             x += gi.ax
             y += gi.ay
-        self._rectTree = RectTree.fromSeq(rectList)
+        self._rectTree = RectTree.fromSeq(rectIndexList)
+        self._rectList = rectList
 
     @suppressAndLogException
     def mouseDown_(self, event):
@@ -75,7 +78,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         y -= dy
         x /= scaleFactor
         y /= scaleFactor
-        for x in self._rectTree.iterIntersections((x, y, x, y)):
+        for r, x in self._rectTree.iterIntersections((x, y, x, y)):
             print(x, self._glyphs[x][0])
 
     @property
@@ -101,16 +104,20 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         invScale = 1 / self.scaleFactor
         rect = rectFromNSRect(rect)
         rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
-        indices = set(i for i in self._rectTree.iterIntersections(rect))
+        indices = set(i for r, i in self._rectTree.iterIntersections(rect))
 
         translate(dx, dy)
         scale(self.scaleFactor)
 
         AppKit.NSColor.blackColor().set()
+        tx = ty = 0
         for index, (gi, outline) in enumerate(self._glyphs):
             if index in indices:
+                translate(tx, ty)
                 outline.fill()
-                translate(gi.ax, gi.ay)
+                tx = ty = 0
+            tx += gi.ax
+            ty += gi.ay
 
 
 class GlyphLine(Group):
