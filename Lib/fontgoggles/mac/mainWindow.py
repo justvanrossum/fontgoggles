@@ -116,11 +116,22 @@ class FontGogglesMainController:
         fontListGroup = Group((0, 0, 0, 0))
         sidebarGroup = Group((-sidebarWidth, 0, sidebarWidth, 0))
 
+        font = AppKit.NSFont.fontWithName_size_("IBMPlexMono", 13)
+        leftAlignCell = AppKit.NSTextFieldCell.alloc().init()
+        leftAlignCell.setAlignment_(AppKit.NSTextAlignmentLeft)
+        leftAlignCell.setFont_(font)
+        leftAlignCell.setLineBreakMode_(AppKit.NSLineBreakByTruncatingTail)
+        rightAlignCell = AppKit.NSTextFieldCell.alloc().init()
+        rightAlignCell.setAlignment_(AppKit.NSTextAlignmentRight)
+        rightAlignCell.setFont_(font)
+        centerAlignCell = AppKit.NSTextFieldCell.alloc().init()
+        centerAlignCell.setAlignment_(AppKit.NSTextAlignmentCenter)
+        centerAlignCell.setFont_(font)
         columnDescriptions = [
-            dict(title="index", width=34),
-            dict(title="char", width=34, typingSensitive=True),
-            dict(title="unicode", width=60),
-            dict(title="unicode name", key="unicodeName"),
+            dict(title="index", width=34, cell=rightAlignCell),
+            dict(title="char", width=34, typingSensitive=True, cell=centerAlignCell),
+            dict(title="unicode", width=60, cell=rightAlignCell),
+            dict(title="unicode name", key="unicodeName", cell=leftAlignCell),
         ]
         self.unicodeList = List((0, 0, 0, 0), [],
                 columnDescriptions=columnDescriptions,
