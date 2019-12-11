@@ -9,8 +9,8 @@ def asyncTask(func):
     object, that can be cancelled.
     """
     @functools.wraps(func)
-    def createFuncTask(*args):
-        coro = func(*args)
+    def createFuncTask(*args, **kwargs):
+        coro = func(*args, **kwargs)
         return asyncio.create_task(coro)
     return createFuncTask
 
