@@ -29,8 +29,6 @@ class RectTree(NamedTuple):
             raise ValueError("can't build a RectTree from an empty list")
         if len(seq) == 1:
             bounds, leaf = seq[0]
-            if leaf is None:
-                raise ValueError("leaf values can't be None")
             return cls(bounds, leaf, None, None)
         mid = len(seq) // 2
         left = cls.fromSeq(seq[:mid])
@@ -41,7 +39,8 @@ class RectTree(NamedTuple):
     def iterIntersections(self, targetBounds: Rectangle):
         if not hasIntersection(self.bounds, targetBounds):
             return
-        if self.leaf is not None:
+        if self.left is None:
+            assert self.right is None
             yield self.leaf
         else:
             yield from self.left.iterIntersections(targetBounds)
