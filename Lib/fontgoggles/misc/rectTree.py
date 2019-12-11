@@ -59,9 +59,7 @@ class RectTree(NamedTuple):
             yield from self.right.iterIntersections(targetBounds)
 
     def firstIntersection(self, targetBounds: Rectangle, default=None):
-        for item in self.iterIntersections(targetBounds):
-            return item
-        return default
+        return next(self.iterIntersections(targetBounds), default)
 
 
 def hasIntersection(rect1, rect2):
