@@ -13,7 +13,7 @@ def hasIntersection(rect1, rect2):
 
 
 Number = Union[int, float]
-Rectangle = Tuple[Number, Number, Number, Number]
+Rectangle = Tuple[Number, Number, Number, Number]  # xMin, yMin, xMax, yMax
 
 
 class RectTree(NamedTuple):
