@@ -3,7 +3,7 @@ import pathlib
 import unicodedata
 from vanilla import *
 from fontgoggles.mac.aligningScrollView import AligningScrollView
-from fontgoggles.misc.decorators import asyncTask
+from fontgoggles.misc.decorators import asyncTaskAutoCancel
 
 
 fontItemNameTemplate = "fontItem_{index}"
@@ -27,14 +27,11 @@ class FontItem(Group):
         super().__init__(posSize)
         self.filePath = TextBox((10, 0, 0, 17), f"{fontPath}", sizeStyle="regular")
         self.dummyTest = TextBox((10, 17, 0, 0))
-        self._setTextTask = None
 
     def setText(self, txt):
-        if self._setTextTask is not None and not self._setTextTask.done():
-            self._setTextTask.cancel()
-        self._setTextTask = self.simulateSlowness(txt)
+        self.simulateSlowness(txt)
 
-    @asyncTask
+    @asyncTaskAutoCancel
     async def simulateSlowness(self, txt):
         await asyncio.sleep(0.25 * random())
         self.dummyTest.set(txt)
@@ -77,7 +74,6 @@ class FontGogglesMainController:
         self.w.mainSplitView = mainSplitView
         self.w.sidebarGroup = sidebarGroup
         self.w.open()
-        self.updateUnicodeListTask = None
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
 
     def iterFontItems(self):
@@ -89,11 +85,9 @@ class FontGogglesMainController:
         txt = sender.get()
         for fontItem in self.iterFontItems():
             fontItem.setText(txt)
-        if self.updateUnicodeListTask is not None and not self.updateUnicodeListTask.done():
-            self.updateUnicodeListTask.cancel()
-        self.updateUnicodeListTask = self.updateUnicodeList(txt)
+        self.updateUnicodeList(txt)
 
-    @asyncTask
+    @asyncTaskAutoCancel
     async def updateUnicodeList(self, txt):
         # add a slight delay, so we won't do a lot of work when there's fast typing
         await asyncio.sleep(0.1)
