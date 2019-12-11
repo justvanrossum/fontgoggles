@@ -56,3 +56,7 @@ testTargets = [
 def test_rectTree_intersections(targetRect, expectedIndices):
     tree = RectTree.fromSeq([(b, i) for i, b in enumerate(testBoundsSequence)])
     assert list(tree.iterIntersections(targetRect)) == expectedIndices
+    if expectedIndices:
+        assert tree.firstIntersection(targetRect) == expectedIndices[0]
+    else:
+        assert tree.firstIntersection(targetRect) is None
