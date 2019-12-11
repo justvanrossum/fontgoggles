@@ -30,3 +30,85 @@ def suppressAndLogException(func):
         except:
             logging.exception(func.__name__)
     return wrapper
+
+
+_NotFoundToken = object()
+
+
+class readOnlyCachedProperty:
+
+    """
+        >>> class Foo:
+        ...     @readOnlyCachedProperty
+        ...     def calcOnce(self):
+        ...         print("calculating")
+        ...         return 123
+        ...
+        >>> f = Foo()
+        >>> f.calcOnce
+        calculating
+        123
+        >>> f.calcOnce
+        123
+        >>> del f.calcOnce
+        Traceback (most recent call last):
+            ...
+        AttributeError: calcOnce is read-only
+        >>> f.calcOnce = 134
+        Traceback (most recent call last):
+            ...
+        AttributeError: calcOnce is read-only
+    """
+
+    def __init__(self, func):
+        self.func = func
+        self.name = func.__name__
+
+    def __get__(self, obj, cls=None):
+        if obj is None:
+            return self
+        value = obj.__dict__.get(self.name, _NotFoundToken)
+        if value is _NotFoundToken:
+            value = self.func(obj)
+            obj.__dict__[self.name] = value
+        return value
+
+    def __set__(self, obj, value):
+        raise AttributeError(f"{self.name} is read-only")
+
+    def __delete__(self, obj):
+        raise AttributeError(f"{self.name} is read-only")
+
+
+class cachedProperty(readOnlyCachedProperty):
+
+    """
+        >>> class Foo:
+        ...     @cachedProperty
+        ...     def calcOnce(self):
+        ...         print("calculating")
+        ...         return 123
+        ...
+        >>> f = Foo()
+        >>> f.calcOnce
+        calculating
+        123
+        >>> f.calcOnce
+        123
+        >>> del f.calcOnce
+        >>> f.calcOnce
+        calculating
+        123
+        >>> del f.calcOnce
+        >>> del f.calcOnce
+        >>> f.calcOnce = 134
+        >>> f.calcOnce
+        134
+    """
+
+    def __set__(self, obj, value):
+        obj.__dict__[self.name] = value
+
+    def __delete__(self, obj):
+        if self.name in obj.__dict__:
+            del obj.__dict__[self.name]
