@@ -56,9 +56,11 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         if not self._glyphs:
             return
 
+        height = self.frame().size.height
+
         AppKit.NSColor.blackColor().set()
         translate(10, 0)
-        scale(0.07)
+        scale(0.7 * height / 1000)
         translate(0, 300)
         for gi, outline in self._glyphs:
             outline.fill()
@@ -74,7 +76,7 @@ fontItemNameTemplate = "fontItem_{index}"
 
 def fontGroup(fontPaths, width):
     grp = Group((0, 0, width, 900))
-    itemHeight = 100
+    itemHeight = 150
     y = 0
     for index, fontPath in enumerate(fontPaths):
         fontItemName = fontItemNameTemplate.format(index=index)
@@ -92,13 +94,11 @@ class FontItem(Group):
         self.glyphLineTest = GlyphLine((0, 0, 0, 0))
         self.filePath = TextBox((10, 0, 0, 17), f"{fontPath}", sizeStyle="regular")
         self.font = None
-        # self.dummyTest = TextBox((10, 17, 0, 0))
 
     @asyncTaskAutoCancel
     async def setText(self, txt):
         if self.font is None:
             return
-        # self.dummyTest.set(txt)
         glyphs = await self.font.getGlyphRun(txt)
         glyphs = list(glyphs)
         self.glyphLineTest._nsObject._glyphs = glyphs
