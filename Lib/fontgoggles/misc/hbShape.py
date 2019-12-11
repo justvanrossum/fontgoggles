@@ -123,7 +123,7 @@ class HBShape:
 
         buf = hb.Buffer.create()
         if isinstance(text, str):
-            buf.add_str(text)
+            buf.add_str(str(text))  # add_str() does not accept str subclasses
         else:
             codePoints = []
             for char in text:
