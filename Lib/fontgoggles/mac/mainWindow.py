@@ -77,6 +77,8 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         assert len(rectList) == len(self._glyphs)
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._rectList = rectList
+        self._selection = set()
+        self.setNeedsDisplay_(True)
 
     @suppressAndLogException
     def mouseDown_(self, event):
@@ -180,7 +182,6 @@ class FontItem(Group):
         glyphs = self.font.getGlyphRun(txt)
         glyphs = list(glyphs)
         self.glyphLineTest._nsObject.setGlyphs_(glyphs)
-        self.glyphLineTest._nsObject.setNeedsDisplay_(True)
 
 
 _textAlignments = dict(
@@ -231,7 +232,7 @@ class FontGogglesMainController:
         self._textEntry = EditText((10, 10, -10, 25), initialText, callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
         self._fontGroup = fontGroup(fontPaths, 3000)
-        fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=False, borderType=0)
+        fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         paneDescriptors = [
             dict(view=unicodeListGroup, identifier="pane1", canCollapse=False,
@@ -274,7 +275,7 @@ class FontGogglesMainController:
             async for font in openFonts(fontPath):
                 await asyncio.sleep(0)
                 fontItem.font = font
-                fontItem.setText(str(self._textEntry.get()))
+                fontItem.setText(self._textEntry.get())
 
     def iterFontItems(self):
         for index in range(len(self.fontPaths)):
@@ -292,7 +293,7 @@ class FontGogglesMainController:
                 # time to unblock the event loop
                 await asyncio.sleep(0)
                 t = time.time()
-        self.updateUnicodeList(txt, delay=0.1)
+        self.updateUnicodeList(txt, delay=0.05)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, txt, delay=0):
