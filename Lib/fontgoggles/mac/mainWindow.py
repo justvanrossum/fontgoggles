@@ -81,6 +81,10 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         self.setNeedsDisplay_(True)
 
     @suppressAndLogException
+    def magnifyWithEvent_(self, event):
+        print(event)
+
+    @suppressAndLogException
     def mouseDown_(self, event):
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
         scaleFactor = self.scaleFactor
