@@ -26,9 +26,6 @@ def ClassNameIncrementer(clsName, bases, dct):
     return type(clsName, bases, dct)
 
 
-
-# -------------------
-
 def scale(scaleX, scaleY=None):
     t = AppKit.NSAffineTransform.alloc().init()
     if scaleY is None:
