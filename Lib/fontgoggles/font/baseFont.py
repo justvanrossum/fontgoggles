@@ -46,15 +46,15 @@ class BaseFont:
 
     @readOnlyCachedProperty
     def features(self):
-        return self.shaper.getFeatures("GSUB") + self.shaper.getFeatures("GPOS")
+        return sorted(set(self.shaper.getFeatures("GSUB") + self.shaper.getFeatures("GPOS")))
 
     @readOnlyCachedProperty
     def languages(self):
-        return self.shaper.getLanguages("GSUB") + self.shaper.getLanguages("GPOS")
+        return sorted(set(self.shaper.getLanguages("GSUB") + self.shaper.getLanguages("GPOS")))
 
     @readOnlyCachedProperty
     def scripts(self):
-        return self.shaper.getScripts("GSUB") + self.shaper.getScripts("GPOS")
+        return sorted(set(self.shaper.getScripts("GSUB") + self.shaper.getScripts("GPOS")))
 
     @readOnlyCachedProperty
     def axes(self):
@@ -65,7 +65,7 @@ class BaseFont:
         axes = []
         for axis in fvar.axes:
             axisDict = dict(tag=axis.axisTag,
-                            name=name.getName(axis.nameID, 3, 1),
+                            name=str(name.getName(axis.axisNameID, 3, 1)),
                             minValue=axis.minValue,
                             defaultValue=axis.defaultValue,
                             maxValue=axis.maxValue)
