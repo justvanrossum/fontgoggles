@@ -1,6 +1,6 @@
 import pathlib
 import pytest
-from fontgoggles.misc.hbShape import Shaper
+from fontgoggles.misc.hbShape import HBShape
 
 
 testRoot = pathlib.Path(__file__).resolve().parent
@@ -23,6 +23,6 @@ ibmPlexTestStrings = [
 
 @pytest.mark.parametrize("testString,features,expectedGlyphNames", ibmPlexTestStrings)
 def test_shape_latin(testString, features, expectedGlyphNames):
-    s = Shaper.fromPath(getFontPath("IBMPlexSans-Regular.ttf"))
+    s = HBShape.fromPath(getFontPath("IBMPlexSans-Regular.ttf"))
     glyphs = s.shape(testString, features=features)
     assert [g.name for g in glyphs] == expectedGlyphNames

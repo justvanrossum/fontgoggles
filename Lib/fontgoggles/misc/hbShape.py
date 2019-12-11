@@ -49,7 +49,7 @@ def _getAdvanceWidthFunc(font, glyphID, shaper):
     return width
 
 
-class Shaper:
+class HBShape:
 
     @classmethod
     def fromPath(cls, path, **kwargs):
