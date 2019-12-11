@@ -94,7 +94,8 @@ class FontGogglesMainController:
         uniListData = []
         for index, char in enumerate(txt):
             uniListData.append(
-                dict(index=index, char=char, unicode=f"U+{ord(char):04X}", unicodeName=unicodedata.name(char, "?"))
+                dict(index=index, char=char, unicode=f"U+{ord(char):04X}",
+                     unicodeName=unicodedata.name(char, "?"))
             )
         self.unicodeList.set(uniListData)
 
