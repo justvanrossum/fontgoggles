@@ -95,6 +95,7 @@ class FontGogglesMainController:
 
     @asyncTask
     async def updateUnicodeList(self, txt):
+        # add a slight delay, so we won't do a lot of work when there's fast typing
         await asyncio.sleep(0.1)
         uniListData = []
         for index, char in enumerate(txt):
