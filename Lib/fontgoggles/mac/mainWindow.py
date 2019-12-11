@@ -1,6 +1,7 @@
 import asyncio
 import pathlib
 import unicodedata
+import time
 import AppKit
 import objc
 from vanilla import *
@@ -202,10 +203,17 @@ class FontGogglesMainController:
             fontItemName = fontItemNameTemplate.format(index=index)
             yield getattr(self._fontGroup, fontItemName)
 
-    def textEntryCallback(self, sender):
+    @asyncTaskAutoCancel
+    async def textEntryCallback(self, sender):
         txt = sender.get()
+        t = time.time()
         for fontItem in self.iterFontItems():
             fontItem.setText(txt)
+            elapsed = time.time() - t
+            if elapsed > 0.01:
+                # time to unblock the event loop
+                await asyncio.sleep(0)
+                t = time.time()
         self.updateUnicodeList(txt, delay=0.1)
 
     @asyncTaskAutoCancel
