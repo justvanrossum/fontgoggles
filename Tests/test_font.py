@@ -15,25 +15,51 @@ def test_sniffFontType():
     assert sniffFontType(fontPath) == "ttf"
 
 
+openFontsTestData = [
+    ("IBMPlexSans-Regular.ttf",
+        ['aalt', 'ccmp', 'dnom', 'frac', 'kern', 'liga',
+         'mark', 'numr', 'ordn', 'salt', 'sinf', 'ss01',
+         'ss02', 'ss03', 'ss04', 'ss05', 'subs', 'sups',
+         'zero',
+         ],
+        ['DFLT', 'cyrl', 'grek', 'latn'],
+        [],
+        [],
+        "Kofi", ["K", "o", "fi"]),
+    ("MutatorSans.ttf",
+        ['kern', 'rvrn'],
+        ['DFLT'],
+        [],
+        [
+            {'defaultValue': 0.0,
+             'maxValue': 1000.0,
+             'minValue': 0.0,
+             'name': 'Width',
+             'tag': 'wdth'},
+            {'defaultValue': 0.0,
+             'maxValue': 1000.0,
+             'minValue': 0.0,
+             'name': 'Weight',
+             'tag': 'wght'},
+        ],
+        "HI", ["H", "I"]),
+]
+@pytest.mark.parametrize("fileName,features,scripts,languages,axes,text,glyphNames",
+                         openFontsTestData)
 @pytest.mark.asyncio
-async def test_openFonts():
-    fontPath = getFontPath("IBMPlexSans-Regular.ttf")
-    features = [
-        'aalt', 'ccmp', 'dnom', 'frac', 'liga', 'numr',
-        'ordn', 'salt', 'sinf', 'ss01', 'ss02', 'ss03',
-        'ss04', 'ss05', 'subs', 'sups', 'zero', 'kern',
-        'mark',
-    ]
-    scripts = [
-        'DFLT', 'cyrl', 'grek', 'latn', 'DFLT', 'cyrl',
-        'grek', 'latn',
-    ]
-    languages = []
+async def test_openFonts(fileName,
+                         features,
+                         scripts,
+                         languages,
+                         axes,
+                         text,
+                         glyphNames):
+    fontPath = getFontPath(fileName)
     async for font in openFonts(fontPath):
         assert font.features == features
         assert font.scripts == scripts
         assert font.languages == languages
-        assert font.axes == []
-        run = await font.getGlyphRun("Kofi")
+        assert font.axes == axes
+        run = await font.getGlyphRun(text)
         glyphNames = [gi.name for gi, outline in run]
-        assert glyphNames == ["K", "o", "fi"]
+        assert glyphNames == glyphNames
