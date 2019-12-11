@@ -113,7 +113,6 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
                 translate(gi.ax, gi.ay)
 
 
-
 class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
 
