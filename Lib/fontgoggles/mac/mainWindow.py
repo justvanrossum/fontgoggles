@@ -2,8 +2,9 @@ import asyncio
 import pathlib
 import unicodedata
 from vanilla import *
+from fontgoggles.font import openFonts
 from fontgoggles.mac.aligningScrollView import AligningScrollView
-from fontgoggles.misc.decorators import asyncTaskAutoCancel
+from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel
 
 
 fontItemNameTemplate = "fontItem_{index}"
@@ -26,15 +27,18 @@ class FontItem(Group):
     def __init__(self, posSize, fontPath):
         super().__init__(posSize)
         self.filePath = TextBox((10, 0, 0, 17), f"{fontPath}", sizeStyle="regular")
+        self.font = None
         self.dummyTest = TextBox((10, 17, 0, 0))
 
-    def setText(self, txt):
-        self.simulateSlowness(txt)
-
     @asyncTaskAutoCancel
-    async def simulateSlowness(self, txt):
+    async def setText(self, txt):
+        if self.font is None:
+            return
         await asyncio.sleep(0.25 * random())
         self.dummyTest.set(txt)
+        glyphs = await self.font.getGlyphRun(txt)
+        for g, o in glyphs:
+            print(g)
 
 
 class FontGogglesMainController:
@@ -59,7 +63,8 @@ class FontGogglesMainController:
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
         unicodeListGroup.unicodeList = self.unicodeList
 
-        fontListGroup.textEntry = EditText((10, 10, -10, 25), callback=self.textEntryCallback)
+        self._textEntry = EditText((10, 10, -10, 25), callback=self.textEntryCallback)
+        fontListGroup.textEntry = self._textEntry
         self._fontGroup = fontGroup(fontPaths, 1000)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=False, borderType=0)
 
@@ -75,6 +80,15 @@ class FontGogglesMainController:
         self.w.sidebarGroup = sidebarGroup
         self.w.open()
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
+        self.loadFonts()
+
+    @asyncTask
+    async def loadFonts(self):
+        for fontPath, fontItem in zip(self.fontPaths, self.iterFontItems()):
+            async for font in openFonts(fontPath):
+                await asyncio.sleep(0)
+                fontItem.font = font
+                fontItem.setText(str(self._textEntry.get()))
 
     def iterFontItems(self):
         for index in range(len(self.fontPaths)):
