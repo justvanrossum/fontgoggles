@@ -5,9 +5,11 @@ import time
 import AppKit
 import objc
 from vanilla import *
+from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.font import openFonts
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
+from fontgoggles.misc.rectTree import RectTree
 
 
 def ClassNameIncrementer(clsName, bases, dct):
@@ -40,14 +42,48 @@ def translate(dx, dy):
     t.translateXBy_yBy_(dx, dy)
     t.concat()
 
-# -------------------
+
+def rectFromNSRect(nsRect):
+    # To .misc.rectangle?
+    (x, y), (w, h) = nsRect
+    return x, y, x + w, y + h
+
 
 class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     _glyphs = None
+    _rectTree = None
 
     def isOpaque(self):
         return True
+
+    def setGlyphs_(self, glyphs):
+        self._glyphs = glyphs
+        x = y = 0
+        rectList = []
+        for index, (gi, outline) in enumerate(self._glyphs):
+            if outline.elementCount():
+                bounds = offsetRect(rectFromNSRect(outline.controlPointBounds()), x + gi.dx, y + gi.dy)
+                rectList.append((bounds, index))
+            x += gi.ax
+            y += gi.ay
+        self._rectTree = RectTree.fromSeq(rectList)
+
+    @suppressAndLogException
+    def mouseDown_(self, event):
+        x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
+        scaleFactor = self.scaleFactor
+        x -= 10
+        x /= scaleFactor
+        y /= scaleFactor
+        y -= 300
+        for x in self._rectTree.iterIntersections((x, y, x, y)):
+            print(x, self._glyphs[x][0])
+
+    @property
+    def scaleFactor(self):
+        height = self.frame().size.height
+        return 0.7 * height / 1000
 
     @suppressAndLogException
     def drawRect_(self, rect):
@@ -61,7 +97,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
         AppKit.NSColor.blackColor().set()
         translate(10, 0)
-        scale(0.7 * height / 1000)
+        scale(self.scaleFactor)
         translate(0, 300)
         for gi, outline in self._glyphs:
             outline.fill()
@@ -101,7 +137,7 @@ class FontItem(Group):
             return
         glyphs = self.font.getGlyphRun(txt)
         glyphs = list(glyphs)
-        self.glyphLineTest._nsObject._glyphs = glyphs
+        self.glyphLineTest._nsObject.setGlyphs_(glyphs)
         self.glyphLineTest._nsObject.setNeedsDisplay_(True)
 
 
