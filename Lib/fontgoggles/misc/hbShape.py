@@ -104,7 +104,7 @@ class Shaper:
         except KeyError:
             return default
 
-    def shape(self, text, features=None, variations=None,
+    def shape(self, text, *, features=None, variations=None,
               direction=None, language=None, script=None):
         if features is None:
             features = {}
