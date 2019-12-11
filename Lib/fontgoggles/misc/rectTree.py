@@ -18,6 +18,18 @@ Rectangle = Tuple[Number, Number, Number, Number]
 
 class RectTree(NamedTuple):
 
+    """Given a sorted list of (rectangle, object) items, build a tree structure
+    that allows to efficiently find objects that overlap with a target rectangle.
+
+    This implementation is targeted towards a more or less one-dimensional layout
+    of the objects, for example a line of glyphs. The direction of the layout is
+    not important, but it's most efficient to sort the objects along the intended
+    direction. For example, a sequence of glyph bounding boxes that are layed out
+    horizontally should be sorted horizontally (although right to left or left to
+    right won't make a difference). The output of, say, hb-shape will do just
+    fine, regardless of whether the layout is horizontal or vertical.
+    """
+
     bounds: Rectangle
     leaf: Any
     left: "RectTree"
