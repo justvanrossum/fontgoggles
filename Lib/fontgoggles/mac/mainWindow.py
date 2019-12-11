@@ -70,8 +70,9 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     def mouseDown_(self, event):
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
         scaleFactor = self.scaleFactor
-        x -= 10
-        y -= 300 * scaleFactor
+        dx, dy = self.offset
+        x -= dx
+        y -= dy
         x /= scaleFactor
         y /= scaleFactor
         for x in self._rectTree.iterIntersections((x, y, x, y)):
@@ -82,6 +83,11 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         height = self.frame().size.height
         return 0.7 * height / 1000
 
+    @property
+    def offset(self):
+        height = self.frame().size.height
+        return 10, 0.25 * height
+
     @suppressAndLogException
     def drawRect_(self, rect):
         AppKit.NSColor.whiteColor().set()
@@ -90,14 +96,21 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         if not self._glyphs:
             return
 
-        height = self.frame().size.height
+        dx, dy = self.offset
+
+        invScale = 1 / self.scaleFactor
+        rect = rectFromNSRect(rect)
+        rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
+        indices = set(i for i in self._rectTree.iterIntersections(rect))
+
+        translate(dx, dy)
+        scale(self.scaleFactor)
 
         AppKit.NSColor.blackColor().set()
-        translate(10, self.scaleFactor * 300)
-        scale(self.scaleFactor)
-        for gi, outline in self._glyphs:
-            outline.fill()
-            translate(gi.ax, gi.ay)
+        for index, (gi, outline) in enumerate(self._glyphs):
+            if index in indices:
+                outline.fill()
+                translate(gi.ax, gi.ay)
 
 
 
