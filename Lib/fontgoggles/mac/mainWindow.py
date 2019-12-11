@@ -95,8 +95,7 @@ class FontItem(Group):
         self.filePath = TextBox((10, 0, 0, 17), f"{fontPath}", sizeStyle="regular")
         self.font = None
 
-    @asyncTaskAutoCancel
-    async def setText(self, txt):
+    def setText(self, txt):
         if self.font is None:
             return
         glyphs = self.font.getGlyphRun(txt)
@@ -207,12 +206,13 @@ class FontGogglesMainController:
         txt = sender.get()
         for fontItem in self.iterFontItems():
             fontItem.setText(txt)
-        self.updateUnicodeList(txt)
+        self.updateUnicodeList(txt, delay=0.1)
 
     @asyncTaskAutoCancel
-    async def updateUnicodeList(self, txt):
-        # add a slight delay, so we won't do a lot of work when there's fast typing
-        await asyncio.sleep(0.1)
+    async def updateUnicodeList(self, txt, delay=0):
+        if delay:
+            # add a slight delay, so we won't do a lot of work when there's fast typing
+            await asyncio.sleep(delay)
         uniListData = []
         for index, char in enumerate(txt):
             uniListData.append(
