@@ -11,7 +11,7 @@ class RectTree(NamedTuple):
     """Given a sorted list of (rectangle, object) items, build a tree structure
     that allows to efficiently find objects that overlap with a target rectangle.
 
-    Use the RectTree.fromSeq() class method to build a tree.
+    Use the RectTree.fromSeq(seq) class method to build a tree.
 
     The tree.iterIntersections(targetRect) method iterates over the set of objects
     that overlap with targetRect (in order of the original sequence).
