@@ -78,6 +78,7 @@ class FontGogglesMainController:
         self.w.sidebarGroup = sidebarGroup
         self.w.open()
         self.updateUnicodeListTask = None
+        self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
 
     def iterFontItems(self):
         for index in range(len(self.fontPaths)):
@@ -94,7 +95,7 @@ class FontGogglesMainController:
 
     @asyncTask
     async def updateUnicodeList(self, txt):
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(0.1)
         uniListData = []
         for index, char in enumerate(txt):
             uniListData.append(
