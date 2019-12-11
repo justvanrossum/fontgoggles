@@ -36,7 +36,7 @@ class RectTree(NamedTuple):
     right: Optional["RectTree"]
 
     @classmethod
-    def fromSeq(cls, seq: Sequence):
+    def fromSeq(cls, seq: Sequence[Tuple[Rectangle, Any]]):
         if len(seq) < 1:
             raise ValueError("can't build a RectTree from an empty list")
         if len(seq) == 1:
