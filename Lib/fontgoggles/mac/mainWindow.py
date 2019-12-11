@@ -169,6 +169,26 @@ class FontGogglesMainController:
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
         self.updateUnicodeList(self._textEntry.get())
         self.loadFonts()
+        # self.testResizeFontItems()
+
+    @asyncTask
+    async def testResizeFontItems(self):
+        await asyncio.sleep(2)
+        itemSize = 150
+        for i in range(50):
+            itemSize *= 1.015
+            itemSize = round(itemSize)
+            self.resizeFontItems(itemSize)
+            await asyncio.sleep(0.0)
+
+    def resizeFontItems(self, itemHeight):
+        posY = 0
+        for fontItem in self.iterFontItems():
+            x, y, w, h = fontItem.getPosSize()
+            fontItem.setPosSize((x, posY, w, itemHeight))
+            posY += itemHeight
+        x, y, w, h = self._fontGroup.getPosSize()
+        self._fontGroup.setPosSize((x, y, w, posY))
 
     @asyncTask
     async def loadFonts(self):
