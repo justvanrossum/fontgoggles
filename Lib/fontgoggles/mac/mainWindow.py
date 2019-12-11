@@ -1,10 +1,73 @@
 import asyncio
 import pathlib
 import unicodedata
+import AppKit
+import objc
 from vanilla import *
 from fontgoggles.font import openFonts
 from fontgoggles.mac.aligningScrollView import AligningScrollView
-from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel
+from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
+
+
+def ClassNameIncrementer(clsName, bases, dct):
+    import objc
+    orgName = clsName
+    counter = 0
+    while True:
+        try:
+            objc.lookUpClass(clsName)
+        except objc.nosuchclass_error:
+            break
+        counter += 1
+        clsName = orgName + str(counter)
+    return type(clsName, bases, dct)
+
+
+
+# -------------------
+
+def scale(scaleX, scaleY=None):
+    t = AppKit.NSAffineTransform.alloc().init()
+    if scaleY is None:
+        t.scaleBy_(scaleX)
+    else:
+        t.scaleXBy_yBy_(scaleX, scaleY)
+    t.concat()
+
+def translate(dx, dy):
+    t = AppKit.NSAffineTransform.alloc().init()
+    t.translateXBy_yBy_(dx, dy)
+    t.concat()
+
+# -------------------
+
+class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
+
+    _glyphs = None
+
+    def isOpaque(self):
+        return True
+
+    @suppressAndLogException
+    def drawRect_(self, rect):
+        AppKit.NSColor.whiteColor().set()
+        AppKit.NSRectFill(rect)
+
+        if not self._glyphs:
+            return
+
+        AppKit.NSColor.blackColor().set()
+        translate(10, 0)
+        scale(0.07)
+        translate(0, 300)
+        for gi, outline in self._glyphs:
+            outline.fill()
+            translate(gi.ax, gi.ay)
+
+
+
+class GlyphLine(Group):
+    nsViewClass = FGGlyphLineView
 
 
 fontItemNameTemplate = "fontItem_{index}"
@@ -26,19 +89,20 @@ class FontItem(Group):
 
     def __init__(self, posSize, fontPath):
         super().__init__(posSize)
+        self.glyphLineTest = GlyphLine((0, 0, 0, 0))
         self.filePath = TextBox((10, 0, 0, 17), f"{fontPath}", sizeStyle="regular")
         self.font = None
-        self.dummyTest = TextBox((10, 17, 0, 0))
+        # self.dummyTest = TextBox((10, 17, 0, 0))
 
     @asyncTaskAutoCancel
     async def setText(self, txt):
         if self.font is None:
             return
-        await asyncio.sleep(0.25 * random())
-        self.dummyTest.set(txt)
+        # self.dummyTest.set(txt)
         glyphs = await self.font.getGlyphRun(txt)
-        for g, o in glyphs:
-            print(g)
+        glyphs = list(glyphs)
+        self.glyphLineTest._nsObject._glyphs = glyphs
+        self.glyphLineTest._nsObject.setNeedsDisplay_(True)
 
 
 class FontGogglesMainController:
@@ -65,7 +129,7 @@ class FontGogglesMainController:
 
         self._textEntry = EditText((10, 10, -10, 25), callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
-        self._fontGroup = fontGroup(fontPaths, 1000)
+        self._fontGroup = fontGroup(fontPaths, 3000)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=False, borderType=0)
 
         paneDescriptors = [
