@@ -60,3 +60,9 @@ def test_rectTree_intersections(targetRect, expectedIndices):
         assert tree.firstIntersection(targetRect) == expectedIndices[0]
     else:
         assert tree.firstIntersection(targetRect) == None
+
+
+def test_empty_rectTree():
+    tree = RectTree.fromSeq([])
+    assert list(tree.iterIntersections((0, 0, 1000, 1000))) == []
+    assert tree.firstIntersection((0, 0, 1000, 1000)) is None
