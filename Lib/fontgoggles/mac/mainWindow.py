@@ -99,7 +99,7 @@ class FontItem(Group):
     async def setText(self, txt):
         if self.font is None:
             return
-        glyphs = await self.font.getGlyphRun(txt)
+        glyphs = self.font.getGlyphRun(txt)
         glyphs = list(glyphs)
         self.glyphLineTest._nsObject._glyphs = glyphs
         self.glyphLineTest._nsObject.setNeedsDisplay_(True)
@@ -131,6 +131,8 @@ class FontGogglesMainController:
     def __init__(self, fontPaths):
         self.fontPaths = fontPaths
 
+        initialText = "ABC abc 0123 :;?"
+
         sidebarWidth = 300
         unicodeListGroup = Group((0, 0, 0, 0))
 
@@ -148,7 +150,7 @@ class FontGogglesMainController:
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
         unicodeListGroup.unicodeList = self.unicodeList
 
-        self._textEntry = EditText((10, 10, -10, 25), callback=self.textEntryCallback)
+        self._textEntry = EditText((10, 10, -10, 25), initialText, callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
         self._fontGroup = fontGroup(fontPaths, 3000)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=False, borderType=0)
@@ -165,6 +167,7 @@ class FontGogglesMainController:
         self.w.sidebarGroup = sidebarGroup
         self.w.open()
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
+        self.updateUnicodeList(self._textEntry.get())
         self.loadFonts()
 
     @asyncTask
