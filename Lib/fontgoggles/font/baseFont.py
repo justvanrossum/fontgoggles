@@ -37,8 +37,8 @@ class BaseFont:
     async def _getFontData(self):
         raise NotImplementedError()
 
-    def _getShaper(self):
-        raise NotImplementedError()
+    def _getShaper(self, fontData):
+        return HBShape(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
 
     @readOnlyCachedProperty
     def colorPalettes(self):
@@ -112,9 +112,6 @@ class OTFFont(BaseFont):
     async def _getFontData(self):
         with open(self.fontPath, "rb") as f:
             return f.read()
-
-    def _getShaper(self, fontData):
-        return HBShape(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
 
     def _getOutlinePath(self, glyphName, colorLayers):
         outline = self.ftFont.getOutlinePath(glyphName)
