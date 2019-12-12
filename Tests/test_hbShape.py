@@ -26,3 +26,9 @@ def test_shape_latin(testString, features, expectedGlyphNames):
     s = HBShape.fromPath(getFontPath("IBMPlexSans-Regular.ttf"))
     glyphs = s.shape(testString, features=features)
     assert [g.name for g in glyphs] == expectedGlyphNames
+
+
+def test_shape_GlyphInfo_repr():
+    s = HBShape.fromPath(getFontPath("IBMPlexSans-Regular.ttf"))
+    glyphs = s.shape("a")
+    assert repr(glyphs[0]) == "GlyphInfo(gid=4, name='a', cluster=0, dx=0, dy=0, ax=534, ay=0)"
