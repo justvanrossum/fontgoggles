@@ -100,11 +100,11 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
             diffSelection = self._selection ^ newSelection
             self._selection = newSelection
             for index in diffSelection:
-                rect = self._rectList[index]
-                if rect is None:
+                bounds = self._glyphs[index].bounds
+                if bounds is None:
                     continue
-                rect = offsetRect(scaleRect(rect, scaleFactor, scaleFactor), dx, dy)
-                self.setNeedsDisplayInRect_(nsRectFromRect(rect))
+                bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
+                self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
 
     @property
     def scaleFactor(self):
