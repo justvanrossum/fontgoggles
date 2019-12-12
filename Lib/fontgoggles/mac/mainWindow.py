@@ -134,16 +134,16 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         scale(self.scaleFactor)
 
         AppKit.NSColor.blackColor().set()
-        tx = ty = 0
+        lastPosX = lastPosY = 0
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
             selected = self._selection and index in self._selection
             if selected:
                 AppKit.NSColor.redColor().set()
             posX, posY = gi.pos
-            with savedState():
-                translate(posX, posY)
-                gi.path.fill()
+            translate(posX - lastPosX, posY - lastPosY)
+            lastPosX, lastPosY = posX, posY
+            gi.path.fill()
             if selected:
                 AppKit.NSColor.blackColor().set()
 
