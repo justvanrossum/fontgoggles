@@ -34,10 +34,18 @@ def scale(scaleX, scaleY=None):
         t.scaleXBy_yBy_(scaleX, scaleY)
     t.concat()
 
+
 def translate(dx, dy):
     t = AppKit.NSAffineTransform.alloc().init()
     t.translateXBy_yBy_(dx, dy)
     t.concat()
+
+
+class savedState:
+    def __enter__(self):
+        AppKit.NSGraphicsContext.saveGraphicsState()
+    def __exit__(self, type, value, traceback):
+        AppKit.NSGraphicsContext.restoreGraphicsState()
 
 
 def nsRectFromRect(rect):
@@ -63,20 +71,8 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     def setGlyphs_(self, glyphs):
         self._glyphs = glyphs
         x = y = 0
-        rectList = []
-        rectIndexList = []
-        for index, gi in enumerate(self._glyphs):
-            if gi.path.elementCount():
-                bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), x + gi.dx, y + gi.dy)
-                rectList.append(bounds)
-                rectIndexList.append((bounds, index))
-            else:
-                rectList.append(None)
-            x += gi.ax
-            y += gi.ay
-        assert len(rectList) == len(self._glyphs)
+        rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
         self._rectTree = RectTree.fromSeq(rectIndexList)
-        self._rectList = rectList
         self._selection = set()
         self.setNeedsDisplay_(True)
 
@@ -132,25 +128,23 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         invScale = 1 / self.scaleFactor
         rect = rectFromNSRect(rect)
         rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
-        indices = set(i for i in self._rectTree.iterIntersections(rect))
 
         translate(dx, dy)
         scale(self.scaleFactor)
 
         AppKit.NSColor.blackColor().set()
         tx = ty = 0
-        for index, gi in enumerate(self._glyphs):
-            if index in indices:
-                selected = self._selection and index in self._selection
-                if selected:
-                    AppKit.NSColor.redColor().set()
-                translate(tx, ty)
+        for index in self._rectTree.iterIntersections(rect):
+            gi = self._glyphs[index]
+            selected = self._selection and index in self._selection
+            if selected:
+                AppKit.NSColor.redColor().set()
+            posX, posY = gi.pos
+            with savedState():
+                translate(posX, posY)
                 gi.path.fill()
-                if selected:
-                    AppKit.NSColor.blackColor().set()
-                tx = ty = 0
-            tx += gi.ax
-            ty += gi.ay
+            if selected:
+                AppKit.NSColor.blackColor().set()
 
 
 class GlyphLine(Group):
@@ -183,7 +177,22 @@ class FontItem(Group):
     def setText(self, txt):
         if self.font is None:
             return
-        self.glyphLineTest._nsObject.setGlyphs_(self.font.getGlyphRun(txt))
+        glyphs = self.font.getGlyphRun(txt)
+        x, y = addPositioningAndBounds(glyphs)
+        self.glyphLineTest._nsObject.setGlyphs_(glyphs)
+
+
+def addPositioningAndBounds(glyphs):
+    x = y = 0
+    for gi in glyphs:
+        gi.pos = posX, posY = x + gi.dx, y + gi.dy
+        if gi.path.elementCount():
+            gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), posX, posY)
+        else:
+            gi.bounds = None
+        x += gi.ax
+        y += gi.ay
+    return x, y
 
 
 _textAlignments = dict(
