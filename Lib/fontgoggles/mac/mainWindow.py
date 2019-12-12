@@ -174,6 +174,7 @@ class GlyphLine(Group):
 class FontGroup(Group):
     nsViewClass = FGFontGroupView
 
+
 fontItemNameTemplate = "fontItem_{index}"
 
 def buildFontGroup(fontPaths, width):
