@@ -78,10 +78,6 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         self.setNeedsDisplay_(True)
 
     @suppressAndLogException
-    def magnifyWithEvent_(self, event):
-        print(event)
-
-    @suppressAndLogException
     def mouseDown_(self, event):
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
         scaleFactor = self.scaleFactor
@@ -164,14 +160,24 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
                 AppKit.NSColor.blackColor().set()
 
 
+class FGFontGroupView(AppKit.NSView, metaclass=ClassNameIncrementer):
+
+    @suppressAndLogException
+    def magnifyWithEvent_(self, event):
+        print(self, event)
+
+
 class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
 
 
+class FontGroup(Group):
+    nsViewClass = FGFontGroupView
+
 fontItemNameTemplate = "fontItem_{index}"
 
 def buildFontGroup(fontPaths, width):
-    grp = Group((0, 0, width, 900))
+    grp = FontGroup((0, 0, width, 900))
     itemHeight = 150
     y = 0
     for index, fontPath in enumerate(fontPaths):
