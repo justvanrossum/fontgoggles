@@ -1,19 +1,24 @@
 import io
 import functools
-from typing import NamedTuple
 from fontTools.ttLib import TTFont
 import uharfbuzz as hb
 
 
-class GlyphInfo(NamedTuple):
+class GlyphInfo:
 
-    gid: int
-    name: str
-    cluster: int
-    dx: int
-    dy: int
-    ax: int
-    ay: int
+    def __init__(self, gid, name, cluster, dx, dy, ax, ay):
+        self.gid = gid
+        self.name = name
+        self.cluster = cluster
+        self.dx = dx
+        self.dy = dy
+        self.ax = ax
+        self.ay = ay
+
+    def __repr__(self):
+        args = (f"{a}={repr(getattr(self, a))}"
+                    for a in ["gid", "name", "cluster", "dx", "dy", "ax", "ay"])
+        return f"{self.__class__.__name__}({', '.join(args)})"
 
 
 charToGlyphIDBias = 0x80000000
