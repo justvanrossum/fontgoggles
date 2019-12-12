@@ -29,6 +29,10 @@ def asyncTaskAutoCancel(func):
             oldTask.cancel()
         coro = func(self, *args, **kwargs)
         task = asyncio.create_task(coro)
+        def _done_callback(task):
+            if task.exception() is not None:
+                task.print_stack()
+        task.add_done_callback(_done_callback)
         setattr(self, taskAttributeName, task)
         return task
     return createFuncTask
