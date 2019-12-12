@@ -172,6 +172,7 @@ class GlyphLine(Group):
 
 
 class FontGroup(Group):
+
     nsViewClass = FGFontGroupView
 
     def iterFontItems(self):
@@ -217,6 +218,8 @@ class FontItem(Group):
         self.font = None
 
     def setText(self, txt):
+        # TODO: FontItem should _not_ be responsible for shaping/setting, but
+        # should simply receive a line of glyphs.
         if self.font is None:
             return
         glyphs, (finalX, finalY) = getGlyphRun(self.font, txt)
