@@ -316,13 +316,17 @@ class FontGogglesMainController:
             self._fontGroup.resizeFontItems(itemSize)
             await asyncio.sleep(0.0)
 
-    @asyncTask
-    async def loadFonts(self):
+    async def _loadFont(self, fontPath, fontItem):
+        async for font in openFonts(fontPath):
+            # await asyncio.sleep(0)
+            fontItem.font = font
+            fontItem.setText(self._textEntry.get())
+            break  # XXX
+
+    def loadFonts(self):
         for fontPath, fontItem in zip(self.fontPaths, self.iterFontItems()):
-            async for font in openFonts(fontPath):
-                await asyncio.sleep(0)
-                fontItem.font = font
-                fontItem.setText(self._textEntry.get())
+            coro = self._loadFont(fontPath, fontItem)
+            asyncio.create_task(coro)
 
     def iterFontItems(self):
         return self._fontGroup.iterFontItems()
