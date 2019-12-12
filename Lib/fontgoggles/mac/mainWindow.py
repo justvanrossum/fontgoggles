@@ -164,7 +164,7 @@ class FGFontGroupView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     @suppressAndLogException
     def magnifyWithEvent_(self, event):
-        print(self, event)
+        print(self, self.vanillaWrapper(), event)
 
 
 class GlyphLine(Group):
@@ -173,6 +173,24 @@ class GlyphLine(Group):
 
 class FontGroup(Group):
     nsViewClass = FGFontGroupView
+
+    def iterFontItems(self):
+        index = 0
+        while True:
+            item = getattr(self, fontItemNameTemplate.format(index=index), None)
+            if item is None:
+                break
+            yield item
+            index += 1
+
+    def resizeFontItems(self, itemHeight):
+        posY = 0
+        for fontItem in self.iterFontItems():
+            x, y, w, h = fontItem.getPosSize()
+            fontItem.setPosSize((x, posY, w, itemHeight))
+            posY += itemHeight
+        x, y, w, h = self.getPosSize()
+        self.setPosSize((x, y, w, posY))
 
 
 fontItemNameTemplate = "fontItem_{index}"
@@ -292,17 +310,8 @@ class FontGogglesMainController:
         for i in range(50):
             itemSize *= 1.015
             itemSize = round(itemSize)
-            self.resizeFontItems(itemSize)
+            self._fontGroup.resizeFontItems(itemSize)
             await asyncio.sleep(0.0)
-
-    def resizeFontItems(self, itemHeight):
-        posY = 0
-        for fontItem in self.iterFontItems():
-            x, y, w, h = fontItem.getPosSize()
-            fontItem.setPosSize((x, posY, w, itemHeight))
-            posY += itemHeight
-        x, y, w, h = self._fontGroup.getPosSize()
-        self._fontGroup.setPosSize((x, y, w, posY))
 
     @asyncTask
     async def loadFonts(self):
@@ -313,9 +322,7 @@ class FontGogglesMainController:
                 fontItem.setText(self._textEntry.get())
 
     def iterFontItems(self):
-        for index in range(len(self.fontPaths)):
-            fontItemName = fontItemNameTemplate.format(index=index)
-            yield getattr(self._fontGroup, fontItemName)
+        return self._fontGroup.iterFontItems()
 
     @asyncTaskAutoCancel
     async def textEntryCallback(self, sender):
