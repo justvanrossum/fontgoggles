@@ -171,7 +171,7 @@ class FontItem(Group):
 
     def __init__(self, posSize, fontPath):
         super().__init__(posSize)
-        self.glyphLineTest = GlyphLine((0, 0, 0, 0))
+        self.glyphLine = GlyphLine((0, 0, 0, 0))
         self.filePath = TextBox((10, 0, 0, 17), f"{fontPath}", sizeStyle="regular")
         self.font = None
 
@@ -179,7 +179,7 @@ class FontItem(Group):
         if self.font is None:
             return
         glyphs, (finalX, finalY) = getGlyphRun(self.font, txt)
-        self.glyphLineTest._nsObject.setGlyphs_(glyphs)
+        self.glyphLine._nsObject.setGlyphs_(glyphs)
 
 
 def getGlyphRun(font, txt, **kwargs):
