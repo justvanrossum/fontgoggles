@@ -287,8 +287,6 @@ class FontGogglesMainController:
 
         self._textEntry = EditText((10, 10, -10, 25), initialText, callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
-        self._fontGroup = buildFontGroup(fontPaths, 3000)
-        fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         paneDescriptors = [
             dict(view=unicodeListGroup, identifier="pane1", canCollapse=False,
@@ -296,6 +294,9 @@ class FontGogglesMainController:
             dict(view=fontListGroup, identifier="pane2", canCollapse=False),
         ]
         mainSplitView = SplitView((0, 0, -sidebarWidth, 0), paneDescriptors, dividerStyle=None)
+
+        self._fontGroup = buildFontGroup(fontPaths, 3000)
+        fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         self.w = Window((800, 500), "FontGoggles", minSize=(200, 500), autosaveName="FontGogglesWindow")
         self.w.mainSplitView = mainSplitView
