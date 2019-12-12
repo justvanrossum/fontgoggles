@@ -170,7 +170,7 @@ class GlyphLine(Group):
 
 fontItemNameTemplate = "fontItem_{index}"
 
-def fontGroup(fontPaths, width):
+def buildFontGroup(fontPaths, width):
     grp = Group((0, 0, width, 900))
     itemHeight = 150
     y = 0
@@ -259,7 +259,7 @@ class FontGogglesMainController:
 
         self._textEntry = EditText((10, 10, -10, 25), initialText, callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
-        self._fontGroup = fontGroup(fontPaths, 3000)
+        self._fontGroup = buildFontGroup(fontPaths, 3000)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         paneDescriptors = [
