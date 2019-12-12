@@ -90,7 +90,21 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         y -= dy
         x /= scaleFactor
         y /= scaleFactor
-        index = self._rectTree.firstIntersection((x, y, x, y))
+
+        indices = list(self._rectTree.iterIntersections((x, y, x, y)))
+        if not indices:
+            return
+        if len(indices) == 1:
+            index = indices[0]
+        else:
+            for index in indices:
+                gi = self._glyphs[index]
+                posX, posY = gi.pos
+                if gi.path.containsPoint_((x - posX, y - posY)):
+                    break
+            else:
+                index = indices[0]
+
         if index is not None:
             if self._selection is None:
                 self._selection = set()
@@ -323,6 +337,7 @@ class FontGogglesMainController:
 
 if __name__ == "__main__":
     fonts = [
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Italic.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Bold.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-ExtraLight.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Light.ttf',
@@ -330,6 +345,7 @@ if __name__ == "__main__":
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Regular.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-SemiBold.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Text.ttf',
-        '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Thin.ttf']
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Thin.ttf',
+    ]
     fonts = [pathlib.Path(p) for p in fonts]
     FontGogglesMainController(fonts)
