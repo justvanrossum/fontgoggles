@@ -65,9 +65,9 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         x = y = 0
         rectList = []
         rectIndexList = []
-        for index, (gi, outline) in enumerate(self._glyphs):
-            if outline.elementCount():
-                bounds = offsetRect(rectFromNSRect(outline.controlPointBounds()), x + gi.dx, y + gi.dy)
+        for index, gi in enumerate(self._glyphs):
+            if gi.path.elementCount():
+                bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), x + gi.dx, y + gi.dy)
                 rectList.append(bounds)
                 rectIndexList.append((bounds, index))
             else:
@@ -139,13 +139,13 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
         AppKit.NSColor.blackColor().set()
         tx = ty = 0
-        for index, (gi, outline) in enumerate(self._glyphs):
+        for index, gi in enumerate(self._glyphs):
             if index in indices:
                 selected = self._selection and index in self._selection
                 if selected:
                     AppKit.NSColor.redColor().set()
                 translate(tx, ty)
-                outline.fill()
+                gi.path.fill()
                 if selected:
                     AppKit.NSColor.blackColor().set()
                 tx = ty = 0
@@ -183,9 +183,7 @@ class FontItem(Group):
     def setText(self, txt):
         if self.font is None:
             return
-        glyphs = self.font.getGlyphRun(txt)
-        glyphs = list(glyphs)
-        self.glyphLineTest._nsObject.setGlyphs_(glyphs)
+        self.glyphLineTest._nsObject.setGlyphs_(self.font.getGlyphRun(txt))
 
 
 _textAlignments = dict(

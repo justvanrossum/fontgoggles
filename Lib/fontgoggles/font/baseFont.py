@@ -75,13 +75,13 @@ class BaseFont:
     def getGlyphRun(self, txt, *, features=None, variations=None,
                           direction=None, language=None, script=None,
                           colorLayers=False):
-        glyphPositioning = self.shape(txt, features=features, variations=variations,
-                                      direction=direction, language=language,
-                                      script=script)
-        glyphNames = (gi.name for gi in glyphPositioning)
-        paths = [path for path in
-                 self.getOutlinePaths(glyphNames, variations, colorLayers)]
-        return zip(glyphPositioning, paths)
+        glyphInfo = self.shape(txt, features=features, variations=variations,
+                               direction=direction, language=language,
+                               script=script)
+        glyphNames = (gi.name for gi in glyphInfo)
+        for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, variations, colorLayers)):
+            glyph.path = path
+        return glyphInfo
 
     def shape(self, text, *, features, variations, direction, language, script):
         return self.shaper.shape(text, features=features, variations=variations,

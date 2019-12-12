@@ -67,4 +67,4 @@ async def test_openFonts(fileName,
         assert font.languages == languages
         assert font.axes == axes
         run = font.getGlyphRun(text)
-        assert [gi.name for gi, outline in run] == glyphNames
+        assert [gi.name for gi in run] == glyphNames
