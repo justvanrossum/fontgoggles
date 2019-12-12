@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import pathlib
 import unicodedata
 import time
@@ -41,11 +42,11 @@ def translate(dx, dy):
     t.concat()
 
 
-class savedState:
-    def __enter__(self):
-        AppKit.NSGraphicsContext.saveGraphicsState()
-    def __exit__(self, type, value, traceback):
-        AppKit.NSGraphicsContext.restoreGraphicsState()
+@contextlib.contextmanager
+def savedState():
+    AppKit.NSGraphicsContext.saveGraphicsState()
+    yield
+    AppKit.NSGraphicsContext.restoreGraphicsState()
 
 
 def nsRectFromRect(rect):
