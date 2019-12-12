@@ -196,9 +196,8 @@ class FontGroup(Group):
 
 fontItemNameTemplate = "fontItem_{index}"
 
-def buildFontGroup(fontPaths, width):
+def buildFontGroup(fontPaths, width, itemHeight):
     grp = FontGroup((0, 0, width, 900))
-    itemHeight = 150
     y = 0
     for index, fontPath in enumerate(fontPaths):
         fontItemName = fontItemNameTemplate.format(index=index)
@@ -261,10 +260,15 @@ def textCell(align="left", lineBreakMode="wordwrap"):
     cell.setLineBreakMode_(_textLineBreakModes[lineBreakMode])
     return cell
 
-class FontGogglesMainController:
+
+class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
+
+    def __new__(cls, fontPaths):
+        return cls.alloc().init()
 
     def __init__(self, fontPaths):
         self.fontPaths = fontPaths
+        self.itemHeight = 150
 
         initialText = "ABC abc 0123 :;?"
 
@@ -295,13 +299,14 @@ class FontGogglesMainController:
         ]
         mainSplitView = SplitView((0, 0, -sidebarWidth, 0), paneDescriptors, dividerStyle=None)
 
-        self._fontGroup = buildFontGroup(fontPaths, 3000)
+        self._fontGroup = buildFontGroup(fontPaths, 3000, self.itemHeight)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         self.w = Window((800, 500), "FontGoggles", minSize=(200, 500), autosaveName="FontGogglesWindow")
         self.w.mainSplitView = mainSplitView
         self.w.sidebarGroup = sidebarGroup
         self.w.open()
+        self.w._window.setWindowController_(self)
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
         self.updateUnicodeList(self._textEntry.get())
         self.loadFonts()
@@ -317,6 +322,7 @@ class FontGogglesMainController:
             self._fontGroup.resizeFontItems(itemSize)
             await asyncio.sleep(0.0)
 
+    @objc.python_method
     async def _loadFont(self, fontPath, fontItem):
         async for font in openFonts(fontPath):
             # await asyncio.sleep(0)
@@ -358,6 +364,13 @@ class FontGogglesMainController:
             )
         self.unicodeList.set(uniListData)
 
+    def zoomIn_(self, event):
+        self.itemHeight = min(1000, round(self.itemHeight * (2 ** (1/3))))
+        self._fontGroup.resizeFontItems(self.itemHeight)
+
+    def zoomOut_(self, event):
+        self.itemHeight = max(50, round(self.itemHeight / (2 ** (1/3))))
+        self._fontGroup.resizeFontItems(self.itemHeight)
 
 if __name__ == "__main__":
     fonts = [
@@ -372,4 +385,4 @@ if __name__ == "__main__":
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Thin.ttf',
     ]
     fonts = [pathlib.Path(p) for p in fonts]
-    FontGogglesMainController(fonts)
+    x = FGMainController(fonts)
