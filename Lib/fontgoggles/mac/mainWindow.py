@@ -213,7 +213,8 @@ class FontItem(Group):
     def __init__(self, posSize, fontPath):
         super().__init__(posSize)
         self.glyphLine = GlyphLine((0, 0, 0, 0))
-        self.filePath = TextBox((10, 0, 0, 17), f"{fontPath}", sizeStyle="regular")
+        self.filePath = TextBox((10, 0, 0, 17), f"{fontPath.name}", sizeStyle="regular")
+        self.filePath._nsObject.setToolTip_(str(fontPath))
         self.font = None
 
     def setText(self, txt):
