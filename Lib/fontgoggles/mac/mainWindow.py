@@ -97,6 +97,8 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         if len(indices) == 1:
             index = indices[0]
         else:
+            # There are multiple candidates. Let's do point-inside testing,
+            # and take the first hit, if any. Fall back to the first.
             for index in indices:
                 gi = self._glyphs[index]
                 posX, posY = gi.pos
