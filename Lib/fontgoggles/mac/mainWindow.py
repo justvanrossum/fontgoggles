@@ -178,12 +178,12 @@ class FontItem(Group):
     def setText(self, txt):
         if self.font is None:
             return
-        glyphs = self.font.getGlyphRun(txt)
-        x, y = addPositioningAndBounds(glyphs)
+        glyphs, (finalX, finalY) = getGlyphRun(self.font, txt)
         self.glyphLineTest._nsObject.setGlyphs_(glyphs)
 
 
-def addPositioningAndBounds(glyphs):
+def getGlyphRun(font, txt, **kwargs):
+    glyphs = font.getGlyphRun(txt, **kwargs)
     x = y = 0
     for gi in glyphs:
         gi.pos = posX, posY = x + gi.dx, y + gi.dy
@@ -193,7 +193,7 @@ def addPositioningAndBounds(glyphs):
             gi.bounds = None
         x += gi.ax
         y += gi.ay
-    return x, y
+    return glyphs, (x, y)
 
 
 _textAlignments = dict(
