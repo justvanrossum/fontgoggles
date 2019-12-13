@@ -169,8 +169,8 @@ class FontItem(Group):
 
     def __init__(self, posSize, fontKey):
         super().__init__(posSize)
-        self.glyphLine = GlyphLine((0, 0, 0, 0))
-        self.filePath = TextBox((10, 0, 0, 17), "", sizeStyle="regular")
+        self.glyphLineView = GlyphLine((0, 0, 0, 0))
+        self.fileNameLabel = TextBox((10, 0, 0, 17), "", sizeStyle="regular")
         self.setFontKey(fontKey)
 
     def setFontKey(self, fontKey):
@@ -178,11 +178,11 @@ class FontItem(Group):
         fileNameLabel = f"{fontPath.name}"
         if fontNumber:
             fileNameLabel += f"#{fontNumber}"
-        self.filePath.set(fileNameLabel)
-        self.filePath._nsObject.setToolTip_(str(fontPath))
+        self.fileNameLabel.set(fileNameLabel)
+        self.fileNameLabel._nsObject.setToolTip_(str(fontPath))
 
     def setGlyphs(self, glyphs):
-        self.glyphLine._nsObject.setGlyphs_(glyphs)
+        self.glyphLineView._nsObject.setGlyphs_(glyphs)
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
