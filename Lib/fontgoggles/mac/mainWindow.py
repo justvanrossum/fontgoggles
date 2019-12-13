@@ -7,7 +7,7 @@ import AppKit
 import objc
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
-from fontgoggles.font import openFonts
+from fontgoggles.font import getOpener
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.rectTree import RectTree
@@ -325,11 +325,13 @@ class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer
 
     @objc.python_method
     async def _loadFont(self, fontPath, fontItem):
-        async for font in openFonts(fontPath):
-            # await asyncio.sleep(0)
-            fontItem.font = font
-            fontItem.setText(self._textEntry.get())
-            break  # XXX
+        # TODO this has to go through the Project
+        numFonts, opener = getOpener(fontPath)
+        assert numFonts == 1
+        font, fontData = await opener(fontPath, 0)
+        await asyncio.sleep(0)
+        fontItem.font = font
+        fontItem.setText(self._textEntry.get())
 
     def loadFonts(self):
         for fontPath, fontItem in zip(self.fontPaths, self.iterFontItems()):

@@ -1,6 +1,6 @@
 import pathlib
 import pytest
-from fontgoggles.font import openFonts, sniffFontType
+from fontgoggles.font import getOpener, sniffFontType
 
 
 testRoot = pathlib.Path(__file__).resolve().parent
@@ -61,10 +61,13 @@ async def test_openFonts(fileName,
                          text,
                          glyphNames):
     fontPath = getFontPath(fileName)
-    async for font in openFonts(fontPath):
-        assert font.features == features
-        assert font.scripts == scripts
-        assert font.languages == languages
-        assert font.axes == axes
-        run = font.getGlyphRun(text)
-        assert [gi.name for gi in run] == glyphNames
+    numFonts, opener = getOpener(fontPath)
+    assert numFonts == 1
+    font, fontData = await opener(fontPath, 0)
+    assert fontData is not None
+    assert font.features == features
+    assert font.scripts == scripts
+    assert font.languages == languages
+    assert font.axes == axes
+    run = font.getGlyphRun(text)
+    assert [gi.name for gi in run] == glyphNames

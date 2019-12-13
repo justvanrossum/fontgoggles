@@ -1,32 +1,44 @@
 import os
 
 
-async def openOTF(fontPath):
-    from .baseFont import OTFFont
-    yield await OTFFont.fromPath(fontPath)
-
-
-
-async def openFonts(path):
-    fontType = sniffFontType(path)
-    opener = fontOpeners.get(fontType)
-    if opener is not None:
-        async for x in opener(path):
-            yield x
-        # yield opener(path)
-
-
-fontOpeners = {
-    "ttf": openOTF,
-    "otf": openOTF,
-    "woff": openOTF,
-    "woff2": openOTF,
-}
+def getOpener(path):
+    openerKey = sniffFontType(path)
+    assert openerKey is not None
+    numFontsFunc, openerFunc = fontOpeners[openerKey]
+    return numFontsFunc(path), openerFunc
 
 
 def sniffFontType(path):
     assert path.is_file()
-    fontType = path.suffix.lower().lstrip(".")
-    if fontType not in fontOpeners:
+    openerKey = path.suffix.lower().lstrip(".")
+    if openerKey not in fontOpeners:
         return None
-    return fontType
+    return openerKey
+
+
+async def openOTF(fontPath, fontNumber, fontData=None):
+    from .baseFont import OTFFont
+    if fontData is not None:
+        font = OTFFont(fontData, fontNumber)
+    else:
+        font = OTFFont.fromPath(fontPath, fontNumber)
+        fontData = font.fontData
+    return (font, fontData)
+
+
+def numFontsOTF(path):
+    return 1
+
+
+def numFontsTTC(path):
+    raise NotImplementedError
+
+
+fontOpeners = {
+    "ttf":   (numFontsOTF, openOTF),
+    "otf":   (numFontsOTF, openOTF),
+    "woff":  (numFontsOTF, openOTF),
+    "woff2": (numFontsOTF, openOTF),
+    "ttc":   (numFontsTTC, openOTF),
+    "otc":   (numFontsTTC, openOTF),
+}

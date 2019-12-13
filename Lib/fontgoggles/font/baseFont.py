@@ -8,37 +8,12 @@ from ..misc.ftFont import FTFont
 
 class BaseFont:
 
-    # TODO: how to load from .ttc
-
-    @classmethod
-    async def fromPath(cls, fontPath):
-        self = cls(fontPath)
-        await self._async_init()
-        return self
-
-    def __init__(self, fontPath):
-        self.fontPath = fontPath
-        self.fontNumber = 0  # TODO .ttc/.otc
+    def __init__(self):
         self._outlinePaths = [{}, {}]  # cache for (outline, colorLayers) objects
         self._currentVarLocation = None  # used to determine whether to purge the outline cache
 
-    async def _async_init(self):
-        fontData = await self._getFontData()
-        await self._loadWithFontData(fontData)
-
-    async def _loadWithFontData(self, fontData):
-        ff = io.BytesIO(fontData)
-        self.ttFont = TTFont(ff, fontNumber=self.fontNumber, lazy=True)
-        self.shaper = self._getShaper(fontData)
-
     def close(self):
         pass
-
-    async def _getFontData(self):
-        raise NotImplementedError()
-
-    def _getShaper(self, fontData):
-        return HBShape(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
 
     @readOnlyCachedProperty
     def colorPalettes(self):
@@ -105,13 +80,21 @@ class BaseFont:
 
 class OTFFont(BaseFont):
 
-    async def _loadWithFontData(self, fontData):
-        await super()._loadWithFontData(fontData)
-        self.ftFont = FTFont(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
+    @classmethod
+    def fromPath(cls, fontPath, fontNumber, fontData=None):
+        if fontData is None:
+            with open(fontPath, "rb") as f:
+                fontData = f.read()
+        self = cls(fontData, fontNumber)
+        return self
 
-    async def _getFontData(self):
-        with open(self.fontPath, "rb") as f:
-            return f.read()
+    def __init__(self, fontData, fontNumber):
+        super().__init__()
+        self.fontData = fontData
+        f = io.BytesIO(fontData)
+        self.ttFont = TTFont(f, fontNumber=fontNumber, lazy=True)
+        self.ftFont = FTFont(fontData, fontNumber=fontNumber, ttFont=self.ttFont)
+        self.shaper = HBShape(fontData, fontNumber=fontNumber, ttFont=self.ttFont)
 
     def _getOutlinePath(self, glyphName, colorLayers):
         outline = self.ftFont.getOutlinePath(glyphName)
