@@ -16,7 +16,7 @@ def _getThreadPool():
 def _getProcessPool():
     global _processPool
     if _processPool is None:
-        _processPool = concurrent.futures.ThreadPoolExecutor(max_workers=5)
+        _processPool = concurrent.futures.ProcessPoolExecutor(max_workers=5)
     return _processPool
 
 
