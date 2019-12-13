@@ -378,6 +378,7 @@ class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer
         self.itemHeight = max(50, round(self.itemHeight / (2 ** (1/3))))
         self._fontGroup.resizeFontItems(self.itemHeight)
 
+
 if __name__ == "__main__":
     proj = Project()
     paths = [
