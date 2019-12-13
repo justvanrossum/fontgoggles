@@ -11,7 +11,6 @@ def getOpener(fontPath:PathLike):
 def sniffFontType(fontPath:PathLike):
     if not isinstance(fontPath, PathLike):
         raise TypeError("fontPath must be a Path(-like) object")
-    assert fontPath.is_file()
     openerKey = fontPath.suffix.lower().lstrip(".")
     if openerKey not in fontOpeners:
         return None
@@ -26,6 +25,14 @@ async def openOTF(fontPath:PathLike, fontNumber:int, fontData=None):
         font = OTFFont.fromPath(fontPath, fontNumber)
         fontData = font.fontData
     return (font, fontData)
+
+
+async def openUFO(fontPath:PathLike, fontNumber:int, fontData=None):
+    from .ufoFont import UFOFont
+    assert fontData is None  # dummy
+    font = UFOFont(fontPath)
+    await font.load()
+    return (font, None)
 
 
 def numFontsOne(fontPath:PathLike):
@@ -44,6 +51,8 @@ fontOpeners = {
     "otf":   (numFontsOne, openOTF),
     "woff":  (numFontsOne, openOTF),
     "woff2": (numFontsOne, openOTF),
+    "ufo":   (numFontsOne, openUFO),
+    "ufos":  (numFontsOne, openUFO),
     "ttc":   (numFontsTTC, openOTF),
     "otc":   (numFontsTTC, openOTF),
 }
