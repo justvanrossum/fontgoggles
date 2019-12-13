@@ -33,3 +33,5 @@ async def test_project_loadFont():
     fontPath = getFontPath("IBMPlexSans-Regular.ttf")
     pr.addFont(fontPath, 0)
     await pr.loadFont(fontPath, 0)
+    with pytest.raises(TypeError):
+        pr.addFont("a string", 0)
