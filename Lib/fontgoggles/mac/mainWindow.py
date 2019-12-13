@@ -128,9 +128,22 @@ class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
 
 
+fontItemNameTemplate = "fontItem_{index}"
+
+
 class FontGroup(Group):
 
     nsViewClass = FGFontGroupView
+
+    def __init__(self, fontKeys, width, itemHeight):
+        super().__init__((0, 0, width, 900))
+        y = 0
+        for index, fontKey in enumerate(fontKeys):
+            fontItemName = fontItemNameTemplate.format(index=index)
+            fontItem = FontItem((0, y, 0, itemHeight), fontKey)
+            setattr(self, fontItemName, fontItem)
+            y += itemHeight
+        self.setPosSize((0, 0, width, y))
 
     def iterFontItems(self):
         index = 0
@@ -149,20 +162,6 @@ class FontGroup(Group):
             posY += itemHeight
         x, y, w, h = self.getPosSize()
         self.setPosSize((x, y, w, posY))
-
-
-fontItemNameTemplate = "fontItem_{index}"
-
-def buildFontGroup(fontKeys, width, itemHeight):
-    grp = FontGroup((0, 0, width, 900))
-    y = 0
-    for index, fontKey in enumerate(fontKeys):
-        fontItemName = fontItemNameTemplate.format(index=index)
-        fontItem = FontItem((0, y, 0, itemHeight), fontKey)
-        setattr(grp, fontItemName, fontItem)
-        y += itemHeight
-    grp.setPosSize((0, 0, width, y))
-    return grp
 
 
 class FontItem(Group):
@@ -224,7 +223,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         ]
         mainSplitView = SplitView((0, 0, -sidebarWidth, 0), paneDescriptors, dividerStyle=None)
 
-        self._fontGroup = buildFontGroup(self.fontKeys, 3000, self.itemHeight)
+        self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         self.w = Window((800, 500), "FontGoggles", minSize=(200, 500), autosaveName="FontGogglesWindow")
