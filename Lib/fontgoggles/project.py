@@ -21,13 +21,13 @@ class Project:
         self.fonts[path, fontNumber] = None
 
     def getFont(self, path:pathlib.Path, fontNumber:int,
-                default=_RAISE_NOT_LOADED_ERROR):
+                notLoadedDefault=_RAISE_NOT_LOADED_ERROR):
         font = self.fonts[path, fontNumber]
         if font is None:
-            if default is _RAISE_NOT_LOADED_ERROR:
+            if notLoadedDefault is _RAISE_NOT_LOADED_ERROR:
                 raise ValueError("font is not loaded")
             else:
-                return None
+                return notLoadedDefault
         return font
 
     async def loadFont(self, path:pathlib.Path, fontNumber:int,
