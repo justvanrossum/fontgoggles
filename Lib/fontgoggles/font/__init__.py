@@ -1,4 +1,4 @@
-import os
+from os import PathLike
 
 
 def getOpener(path):
