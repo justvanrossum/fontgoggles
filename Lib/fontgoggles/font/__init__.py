@@ -31,7 +31,10 @@ def numFontsOTF(path):
 
 
 def numFontsTTC(path):
-    raise NotImplementedError
+    from fontTools.ttLib.sfnt import readTTCHeader
+    with open(path, "rb") as f:
+        header = readTTCHeader(f)
+    return header.numFonts
 
 
 fontOpeners = {

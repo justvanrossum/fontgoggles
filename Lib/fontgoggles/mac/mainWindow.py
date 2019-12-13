@@ -7,6 +7,7 @@ import AppKit
 import objc
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
+from fontgoggles.font import getOpener
 from fontgoggles.project import Project
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
@@ -335,5 +336,8 @@ if __name__ == "__main__":
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Thin.ttf',
     ]
     for path in paths:
-        proj.addFont(pathlib.Path(path), 0)
+        path = pathlib.Path(path)
+        numFonts, opener = getOpener(path)
+        for i in range(numFonts(path)):
+            proj.addFont(path, i)
     controller = FGMainWindowController(proj)
