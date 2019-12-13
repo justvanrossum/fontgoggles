@@ -392,5 +392,5 @@ if __name__ == "__main__":
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Thin.ttf',
     ]
     for path in paths:
-        proj.addFont(path, 0)
+        proj.addFont(pathlib.Path(path), 0)
     x = FGMainController(proj)

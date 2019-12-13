@@ -18,7 +18,7 @@ class Project:
         return iter(self.fonts)
 
     def addFont(self, path:PathLike, fontNumber:int):
-        assert isinstance(path, PathLike)
+        assert isinstance(path, PathLike), "path must be a Path(-like) object."
         self.fonts[path, fontNumber] = None
 
     def getFont(self, path:PathLike, fontNumber:int,
