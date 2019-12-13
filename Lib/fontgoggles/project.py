@@ -39,6 +39,9 @@ class Project:
         self.fonts[path, fontNumber] = font
 
     async def loadFonts(self):
+        # Note that this method cannot not load fonts concurrently, and
+        # should be seen as a lazy convenience method, good enough for
+        # testing.
         sharableFontData = {}
         for (path, fontNumber) in self.fonts:
             await self.loadFont(path, fontNumber, sharableFontData)
