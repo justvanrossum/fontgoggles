@@ -16,6 +16,10 @@ class BaseFont:
         pass
 
     @readOnlyCachedProperty
+    def unitsPerEm(self):
+        return self.ttFont["head"].unitsPerEm
+
+    @readOnlyCachedProperty
     def colorPalettes(self):
         return [[(0, 0, 0, 1)]]  # default palette [[(r, g, b, a)]]  
 

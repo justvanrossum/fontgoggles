@@ -25,8 +25,9 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     def isOpaque(self):
         return True
 
-    def setGlyphs_endPos_(self, glyphs, endPos):
+    def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
         self._glyphs = glyphs
+        self.unitsPerEm = unitsPerEm
         x = y = 0
         rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
         self._rectTree = RectTree.fromSeq(rectIndexList)
@@ -79,7 +80,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     @property
     def scaleFactor(self):
         height = self.frame().size.height
-        return 0.7 * height / 1000
+        return 0.7 * height / self.unitsPerEm
 
     @property
     def offset(self):
@@ -181,8 +182,8 @@ class FontItem(Group):
         self.fileNameLabel.set(fileNameLabel)
         self.fileNameLabel._nsObject.setToolTip_(str(fontPath))
 
-    def setGlyphs(self, glyphs, endPos):
-        self.glyphLineView._nsObject.setGlyphs_endPos_(glyphs, endPos)
+    def setGlyphs(self, glyphs, endPos, unitsPerEm):
+        self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
@@ -284,7 +285,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if font is None:
             return
         glyphs, endPos = getGlyphRun(font, txt)
-        fontItem.setGlyphs(glyphs, endPos)
+        fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, txt, delay=0):
