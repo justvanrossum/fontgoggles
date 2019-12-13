@@ -265,7 +265,7 @@ def textCell(align="left", lineBreakMode="wordwrap"):
     return cell
 
 
-class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
+class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
 
     def __new__(cls, project):
         return cls.alloc().init()
@@ -394,4 +394,4 @@ if __name__ == "__main__":
     ]
     for path in paths:
         proj.addFont(pathlib.Path(path), 0)
-    x = FGMainController(proj)
+    controller = FGMainWindowController(proj)
