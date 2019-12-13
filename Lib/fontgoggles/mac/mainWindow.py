@@ -9,55 +9,10 @@ from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.project import Project
 from fontgoggles.mac.aligningScrollView import AligningScrollView
+from fontgoggles.mac.drawing import *
+from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.rectTree import RectTree
-
-
-def ClassNameIncrementer(clsName, bases, dct):
-    import objc
-    orgName = clsName
-    counter = 0
-    while True:
-        try:
-            objc.lookUpClass(clsName)
-        except objc.nosuchclass_error:
-            break
-        counter += 1
-        clsName = orgName + str(counter)
-    return type(clsName, bases, dct)
-
-
-def scale(scaleX, scaleY=None):
-    t = AppKit.NSAffineTransform.alloc().init()
-    if scaleY is None:
-        t.scaleBy_(scaleX)
-    else:
-        t.scaleXBy_yBy_(scaleX, scaleY)
-    t.concat()
-
-
-def translate(dx, dy):
-    t = AppKit.NSAffineTransform.alloc().init()
-    t.translateXBy_yBy_(dx, dy)
-    t.concat()
-
-
-@contextlib.contextmanager
-def savedState():
-    AppKit.NSGraphicsContext.saveGraphicsState()
-    yield
-    AppKit.NSGraphicsContext.restoreGraphicsState()
-
-
-def nsRectFromRect(rect):
-    xMin, yMin, xMax, yMax = rect
-    return (xMin, yMin), (xMax - xMin, yMax - yMin)
-
-
-def rectFromNSRect(nsRect):
-    # To .misc.rectangle?
-    (x, y), (w, h) = nsRect
-    return x, y, x + w, y + h
 
 
 class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
@@ -226,28 +181,6 @@ class FontItem(Group):
         self.glyphLine._nsObject.setGlyphs_(glyphs)
 
 
-_textAlignments = dict(
-    left=AppKit.NSTextAlignmentLeft,
-    center=AppKit.NSTextAlignmentCenter,
-    right=AppKit.NSTextAlignmentRight,
-)
-
-_textLineBreakModes = dict(
-    wordwrap=AppKit.NSLineBreakByWordWrapping,
-    charwrap=AppKit.NSLineBreakByCharWrapping,
-    clipping=AppKit.NSLineBreakByClipping,
-    trunchead=AppKit.NSLineBreakByTruncatingHead,
-    trunctail=AppKit.NSLineBreakByTruncatingTail,
-    truncmiddle=AppKit.NSLineBreakByTruncatingMiddle,
-)
-
-def textCell(align="left", lineBreakMode="wordwrap"):
-    cell = AppKit.NSTextFieldCell.alloc().init()
-    cell.setAlignment_(_textAlignments[align])
-    cell.setLineBreakMode_(_textLineBreakModes[lineBreakMode])
-    return cell
-
-
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
 
     def __new__(cls, project):
@@ -267,10 +200,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         sidebarGroup = Group((-sidebarWidth, 0, sidebarWidth, 0))
 
         columnDescriptions = [
-            dict(title="index", width=34, cell=textCell("right")),
-            dict(title="char", width=34, typingSensitive=True, cell=textCell("center")),
-            dict(title="unicode", width=60, cell=textCell("right")),
-            dict(title="unicode name", key="unicodeName", cell=textCell("left", "truncmiddle")),
+            dict(title="index", width=34, cell=makeTextCell("right")),
+            dict(title="char", width=34, typingSensitive=True, cell=makeTextCell("center")),
+            dict(title="unicode", width=60, cell=makeTextCell("right")),
+            dict(title="unicode name", key="unicodeName", cell=makeTextCell("left", "truncmiddle")),
         ]
         self.unicodeList = List((0, 0, 0, 0), [],
                 columnDescriptions=columnDescriptions,
