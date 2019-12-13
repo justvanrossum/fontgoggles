@@ -31,6 +31,9 @@ class UFOFont(BaseFont):
         fb = FontBuilder(self.info.unitsPerEm)
         fb.setupGlyphOrder(glyphOrder)
         fb.setupCharacterMap(cmap)
+        features = self.reader.readFeatures()
+        if features:
+            fb.addOpenTypeFeatures(features, self._fontPath)
         strm = io.BytesIO()
         fb.save(strm)
         self.ttFont = fb.font

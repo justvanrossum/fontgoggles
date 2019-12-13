@@ -49,8 +49,8 @@ openFontsTestData = [
         [],
         "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
     ("MutatorSansBoldWide.ufo",
-        [],
-        [],
+        ['ss01'],
+        ['DFLT'],
         [],
         [],
         "HIi", ["H", "I", ".notdef"])

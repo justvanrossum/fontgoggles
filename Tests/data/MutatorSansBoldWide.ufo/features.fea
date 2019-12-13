@@ -1,1 +1,6 @@
 # this is the feature from BoldWide
+
+feature ss01 {
+    sub I by I.narrow;
+    sub J by J.narrow;
+} ss01;
