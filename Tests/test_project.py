@@ -35,3 +35,5 @@ async def test_project_loadFont():
     await pr.loadFont(fontPath, 0)
     with pytest.raises(TypeError):
         pr.addFont("a string", 0)
+    font = pr.getFont(fontPath, 0)
+    assert font.axes == []  # simple check to see if we have a font at all
