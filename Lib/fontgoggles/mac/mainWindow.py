@@ -172,7 +172,14 @@ class FontItem(Group):
         super().__init__(posSize)
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.fileNameLabel = TextBox((10, 0, 0, 17), "", sizeStyle="regular")
+        self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
+
+    def setIsLoading(self, isLoading):
+        if isLoading:
+            self.progressSpinner.start()
+        else:
+            self.progressSpinner.stop()
 
     def setFontKey(self, fontKey):
         fontPath, fontNumber = fontKey
@@ -250,14 +257,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     async def _loadFont(self, fontKey, fontItem):
+        print(f"start loading at {time.time() - self._startLoading:.4f} seconds")
+        fontItem.setIsLoading(True)
         fontPath, fontNumber = fontKey
         await self.project.loadFont(fontPath, fontNumber)
         font = self.project.getFont(fontPath, fontNumber)
+        self._loadCounter += 1
+        print(f"loaded {self._loadCounter} fonts in {time.time() - self._startLoading:.4f} seconds")
+        fontItem.setIsLoading(False)
         await asyncio.sleep(0)
         txt = self._textEntry.get()
         self.setFontItemText(fontKey, fontItem, txt)
 
     def loadFonts(self):
+        self._startLoading = time.time()
+        self._loadCounter = 0
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
             coro = self._loadFont(fontKey, fontItem)
             asyncio.create_task(coro)
@@ -337,6 +351,22 @@ if __name__ == "__main__":
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Text.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Thin.ttf',
     ]
+
+    plex = [
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Bold Condensed Italic.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Bold Condensed.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Bold Italic.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Bold.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Condensed Italic.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Condensed.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Italic.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Regular.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Thin Condensed Italic.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Thin Condensed.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Thin Italic.ufo',
+        '/Users/just/code/git/ibm_plex/IBM-Plex-Sans-Variable/sources/IBM Plex Sans Var-Thin.ufo',
+    ]
+
     for path in paths:
         path = pathlib.Path(path)
         numFonts, opener = getOpener(path)
