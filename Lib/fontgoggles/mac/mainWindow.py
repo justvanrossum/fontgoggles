@@ -7,7 +7,7 @@ import AppKit
 import objc
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
-from fontgoggles.font import getOpener
+from fontgoggles.project import Project
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.rectTree import RectTree
@@ -196,12 +196,12 @@ class FontGroup(Group):
 
 fontItemNameTemplate = "fontItem_{index}"
 
-def buildFontGroup(fontPaths, width, itemHeight):
+def buildFontGroup(fontKeys, width, itemHeight):
     grp = FontGroup((0, 0, width, 900))
     y = 0
-    for index, fontPath in enumerate(fontPaths):
+    for index, (fontPath, fontNumber) in enumerate(fontKeys):
         fontItemName = fontItemNameTemplate.format(index=index)
-        fontItem = FontItem((0, y, 0, itemHeight), fontPath)
+        fontItem = FontItem((0, y, 0, itemHeight), fontPath, fontNumber)
         setattr(grp, fontItemName, fontItem)
         y += itemHeight
     grp.setPosSize((0, 0, width, y))
@@ -210,10 +210,13 @@ def buildFontGroup(fontPaths, width, itemHeight):
 
 class FontItem(Group):
 
-    def __init__(self, posSize, fontPath):
+    def __init__(self, posSize, fontPath, fontNumber):
         super().__init__(posSize)
         self.glyphLine = GlyphLine((0, 0, 0, 0))
-        self.filePath = TextBox((10, 0, 0, 17), f"{fontPath.name}", sizeStyle="regular")
+        fileNameLabel = f"{fontPath.name}"
+        if fontNumber:
+            fileNameLabel += f"#{fontNumber}"
+        self.filePath = TextBox((10, 0, 0, 17), fileNameLabel, sizeStyle="regular")
         self.filePath._nsObject.setToolTip_(str(fontPath))
         self.font = None
 
@@ -264,11 +267,12 @@ def textCell(align="left", lineBreakMode="wordwrap"):
 
 class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
 
-    def __new__(cls, fontPaths):
+    def __new__(cls, project):
         return cls.alloc().init()
 
-    def __init__(self, fontPaths):
-        self.fontPaths = fontPaths
+    def __init__(self, project):
+        self.project = project
+        self.fontKeys = list(self.project.iterFontKeys())
         self.itemHeight = 150
 
         initialText = "ABC abc 0123 :;?"
@@ -300,7 +304,7 @@ class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer
         ]
         mainSplitView = SplitView((0, 0, -sidebarWidth, 0), paneDescriptors, dividerStyle=None)
 
-        self._fontGroup = buildFontGroup(fontPaths, 3000, self.itemHeight)
+        self._fontGroup = buildFontGroup(self.fontKeys, 3000, self.itemHeight)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         self.w = Window((800, 500), "FontGoggles", minSize=(200, 500), autosaveName="FontGogglesWindow")
@@ -324,18 +328,17 @@ class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer
             await asyncio.sleep(0.0)
 
     @objc.python_method
-    async def _loadFont(self, fontPath, fontItem):
-        # TODO this has to go through the Project
-        numFonts, opener = getOpener(fontPath)
-        assert numFonts(fontPath) == 1
-        font, fontData = await opener(fontPath, 0)
+    async def _loadFont(self, fontKey, fontItem):
+        fontPath, fontNumber = fontKey
+        await self.project.loadFont(fontPath, fontNumber)
+        font = self.project.getFont(fontPath, fontNumber)
         await asyncio.sleep(0)
         fontItem.font = font
         fontItem.setText(self._textEntry.get())
 
     def loadFonts(self):
-        for fontPath, fontItem in zip(self.fontPaths, self.iterFontItems()):
-            coro = self._loadFont(fontPath, fontItem)
+        for fontKey, fontItem in zip(self.project.iterFontKeys(), self.iterFontItems()):
+            coro = self._loadFont(fontKey, fontItem)
             asyncio.create_task(coro)
 
     def iterFontItems(self):
@@ -376,7 +379,8 @@ class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer
         self._fontGroup.resizeFontItems(self.itemHeight)
 
 if __name__ == "__main__":
-    fonts = [
+    proj = Project()
+    paths = [
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Italic.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Bold.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-ExtraLight.ttf',
@@ -387,5 +391,6 @@ if __name__ == "__main__":
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Text.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Thin.ttf',
     ]
-    fonts = [pathlib.Path(p) for p in fonts]
-    x = FGMainController(fonts)
+    for path in paths:
+        proj.addFont(path, 0)
+    x = FGMainController(proj)

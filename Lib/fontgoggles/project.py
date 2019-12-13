@@ -1,4 +1,4 @@
-import pathlib
+from os import PathLike
 from typing import Dict, Optional, Tuple, Union
 from .font import getOpener
 from .font.baseFont import BaseFont
@@ -9,7 +9,7 @@ _RAISE_NOT_LOADED_ERROR = object()
 
 class Project:
 
-    fonts: Dict[Tuple[pathlib.Path,int], Optional[BaseFont]]
+    fonts: Dict[Tuple[PathLike,int], Optional[BaseFont]]
 
     def __init__(self):
         self.fonts = {}
@@ -17,10 +17,11 @@ class Project:
     def iterFontKeys(self):
         return iter(self.fonts)
 
-    def addFont(self, path:pathlib.Path, fontNumber:int):
+    def addFont(self, path:PathLike, fontNumber:int):
+        assert isinstance(path, PathLike)
         self.fonts[path, fontNumber] = None
 
-    def getFont(self, path:pathlib.Path, fontNumber:int,
+    def getFont(self, path:PathLike, fontNumber:int,
                 notLoadedDefault=_RAISE_NOT_LOADED_ERROR):
         font = self.fonts[path, fontNumber]
         if font is None:
@@ -30,7 +31,7 @@ class Project:
                 return notLoadedDefault
         return font
 
-    async def loadFont(self, path:pathlib.Path, fontNumber:int,
+    async def loadFont(self, path:PathLike, fontNumber:int,
                        sharableFontData:dict=None):
         font = self.fonts[path, fontNumber]
         if font is not None:
