@@ -69,7 +69,6 @@ class HBShape:
         self._fontNumber = fontNumber
         self.face = hb.Face(fontData, fontNumber)
         self.font = hb.Font(self.face)
-        self._funcs = hb.FontFuncs.create()
 
         if ttFont is None:
             f = io.BytesIO(self._fontData)
@@ -77,15 +76,12 @@ class HBShape:
         self._ttFont = ttFont
         self.glyphOrder = ttFont.getGlyphOrder()
 
-        if getGlyphNameFromCodePoint is None:
+        if getGlyphNameFromCodePoint is None and getAdvanceWidth is not None:
             def _getGlyphNameFromCodePoint(cmap, codePoint):
                 return cmap.get(codePoint)
             getGlyphNameFromCodePoint = functools.partial(_getGlyphNameFromCodePoint, self._ttFont.getBestCmap())
-        self.getGlyphNameFromCodePoint = getGlyphNameFromCodePoint
 
-        self._funcs.set_nominal_glyph_func(_getGlyphIDFunc, self)
-
-        if getAdvanceWidth is None:
+        if getAdvanceWidth is None and getGlyphNameFromCodePoint is not None:
             # TODO: this is wrong for var fonts, we should not set a width func at all
             # TODO: the problem seems to be we need to set all funcs, or the ones we
             # don't set will misbehave. We currently go through hoops to support glyph
@@ -94,9 +90,16 @@ class HBShape:
             def _getAdvanceWidth(hmtx, glyphName):
                 return hmtx[glyphName][0]
             getAdvanceWidth = functools.partial(_getAdvanceWidth, self._ttFont["hmtx"])
+
+        self.getGlyphNameFromCodePoint = getGlyphNameFromCodePoint
         self.getAdvanceWidth = getAdvanceWidth
 
-        self._funcs.set_glyph_h_advance_func(_getAdvanceWidthFunc, self)
+        if getGlyphNameFromCodePoint is not None and getAdvanceWidth is not None:
+            self._funcs = hb.FontFuncs.create()
+            self._funcs.set_nominal_glyph_func(_getGlyphIDFunc, self)
+            self._funcs.set_glyph_h_advance_func(_getAdvanceWidthFunc, self)
+        else:
+            self._funcs = None
 
     def getFeatures(self, tag):
         return hb.ot_layout_language_get_feature_tags(self.face, tag)

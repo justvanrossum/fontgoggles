@@ -13,7 +13,7 @@ def getFontPath(fileName):
 ibmPlexTestStrings = [
     # test string, features, expected glyphs
     ("Type",     dict(),           ["T", "y", "p", "e"]),
-    (["aring"],  dict(),           ["aring"]),  # glyph name input
+    # (["aring"],  dict(),           ["aring"]),  # glyph name input
     ([ord("å")], dict(),           ["aring"]),  # unicode code points input
     ("fierce",   dict(),           ["fi", "e", "r", "c", "e"]),
     ("fierce",   dict(liga=False), ["f", "i", "e", "r", "c", "e"]),
