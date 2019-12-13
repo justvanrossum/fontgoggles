@@ -123,8 +123,6 @@ class HBShape:
         if variations is None:
             variations = {}
 
-        glyphOrder = self.glyphOrder
-
         self.font.scale = (self.face.upem, self.face.upem)
         self.font.set_variations(variations)
 
@@ -157,6 +155,7 @@ class HBShape:
 
         hb.shape(self.font, buf, features)
 
+        glyphOrder = self.glyphOrder
         infos = []
         for info, pos in zip(buf.glyph_infos, buf.glyph_positions):
             infos.append(GlyphInfo(info.codepoint, glyphOrder[info.codepoint], info.cluster, *pos.position))
