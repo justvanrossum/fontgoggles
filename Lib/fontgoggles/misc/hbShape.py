@@ -87,6 +87,10 @@ class HBShape:
 
         if getAdvanceWidth is None:
             # TODO: this is wrong for var fonts, we should not set a width func at all
+            # TODO: the problem seems to be we need to set all funcs, or the ones we
+            # don't set will misbehave. We currently go through hoops to support glyph
+            # name input, but if that is not needed we can skip the advance with func,
+            # too.
             def _getAdvanceWidth(hmtx, glyphName):
                 return hmtx[glyphName][0]
             getAdvanceWidth = functools.partial(_getAdvanceWidth, self._ttFont["hmtx"])
