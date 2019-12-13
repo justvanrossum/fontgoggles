@@ -18,12 +18,12 @@ def sniffFontType(path:PathLike):
     return openerKey
 
 
-async def openOTF(fontPath:PathLike, fontNumber:int, fontData=None):
+async def openOTF(path:PathLike, fontNumber:int, fontData=None):
     from .baseFont import OTFFont
     if fontData is not None:
         font = OTFFont(fontData, fontNumber)
     else:
-        font = OTFFont.fromPath(fontPath, fontNumber)
+        font = OTFFont.fromPath(path, fontNumber)
         fontData = font.fontData
     return (font, fontData)
 
