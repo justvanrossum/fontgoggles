@@ -226,20 +226,6 @@ class FontItem(Group):
         self.glyphLine._nsObject.setGlyphs_(glyphs)
 
 
-def getGlyphRun(font, txt, **kwargs):
-    glyphs = font.getGlyphRun(txt, **kwargs)
-    x = y = 0
-    for gi in glyphs:
-        gi.pos = posX, posY = x + gi.dx, y + gi.dy
-        if gi.path.elementCount():
-            gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), posX, posY)
-        else:
-            gi.bounds = None
-        x += gi.ax
-        y += gi.ay
-    return glyphs, (x, y)
-
-
 _textAlignments = dict(
     left=AppKit.NSTextAlignmentLeft,
     center=AppKit.NSTextAlignmentCenter,
@@ -383,6 +369,20 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def zoomOut_(self, event):
         self.itemHeight = max(50, round(self.itemHeight / (2 ** (1/3))))
         self._fontGroup.resizeFontItems(self.itemHeight)
+
+
+def getGlyphRun(font, txt, **kwargs):
+    glyphs = font.getGlyphRun(txt, **kwargs)
+    x = y = 0
+    for gi in glyphs:
+        gi.pos = posX, posY = x + gi.dx, y + gi.dy
+        if gi.path.elementCount():
+            gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), posX, posY)
+        else:
+            gi.bounds = None
+        x += gi.ax
+        y += gi.ay
+    return glyphs, (x, y)
 
 
 if __name__ == "__main__":
