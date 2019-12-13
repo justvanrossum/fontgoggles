@@ -9,6 +9,8 @@ def getOpener(path):
 
 
 def sniffFontType(path):
+    if not isinstance(path, PathLike):
+        raise TypeError("path must be a Path(-like) object")
     assert path.is_file()
     openerKey = path.suffix.lower().lstrip(".")
     if openerKey not in fontOpeners:
