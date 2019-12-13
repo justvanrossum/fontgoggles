@@ -48,6 +48,12 @@ openFontsTestData = [
         [],
         [],
         "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
+    ("MutatorSansBoldWide.ufo",
+        [],
+        [],
+        [],
+        [],
+        "HIi", ["H", "I", ".notdef"])
 ]
 
 @pytest.mark.parametrize("fileName,features,scripts,languages,axes,text,glyphNames",
@@ -64,7 +70,6 @@ async def test_openFonts(fileName,
     numFonts, opener = getOpener(fontPath)
     assert numFonts(fontPath) == 1
     font, fontData = await opener(fontPath, 0)
-    assert fontData is not None
     assert font.features == features
     assert font.scripts == scripts
     assert font.languages == languages
