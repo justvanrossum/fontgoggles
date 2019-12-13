@@ -1,14 +1,14 @@
 from os import PathLike
 
 
-def getOpener(path):
+def getOpener(path:PathLike):
     openerKey = sniffFontType(path)
     assert openerKey is not None
     numFontsFunc, openerFunc = fontOpeners[openerKey]
     return numFontsFunc, openerFunc
 
 
-def sniffFontType(path):
+def sniffFontType(path:PathLike):
     if not isinstance(path, PathLike):
         raise TypeError("path must be a Path(-like) object")
     assert path.is_file()
@@ -18,7 +18,7 @@ def sniffFontType(path):
     return openerKey
 
 
-async def openOTF(fontPath, fontNumber, fontData=None):
+async def openOTF(fontPath:PathLike, fontNumber:int, fontData=None):
     from .baseFont import OTFFont
     if fontData is not None:
         font = OTFFont(fontData, fontNumber)
@@ -28,11 +28,11 @@ async def openOTF(fontPath, fontNumber, fontData=None):
     return (font, fontData)
 
 
-def numFontsOTF(path):
+def numFontsOTF(path:PathLike):
     return 1
 
 
-def numFontsTTC(path):
+def numFontsTTC(path:PathLike):
     from fontTools.ttLib.sfnt import readTTCHeader
     with open(path, "rb") as f:
         header = readTTCHeader(f)
