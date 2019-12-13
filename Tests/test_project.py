@@ -17,6 +17,8 @@ async def test_project_loadFonts():
     pr.addFont(fontPath, 0)
     with pytest.raises(ValueError):
         font = pr.getFont(fontPath, 0)
+    font = pr.getFont(fontPath, 0, None)
+    assert font is None
     await pr.loadFonts()
     font = pr.getFont(fontPath, 0)
     assert font.axes == []  # simple check to see if we have a font at all

@@ -4,6 +4,9 @@ from .font import getOpener
 from .font.baseFont import BaseFont
 
 
+_RAISE_NOT_LOADED_ERROR = object()
+
+
 class Project:
 
     fonts: Dict[Tuple[pathlib.Path,int], Optional[BaseFont]]
@@ -17,10 +20,14 @@ class Project:
     def addFont(self, path:pathlib.Path, fontNumber:int):
         self.fonts[path, fontNumber] = None
 
-    def getFont(self, path:pathlib.Path, fontNumber:int):
+    def getFont(self, path:pathlib.Path, fontNumber:int,
+                default=_RAISE_NOT_LOADED_ERROR):
         font = self.fonts[path, fontNumber]
         if font is None:
-            raise ValueError("font is not loaded")
+            if default is _RAISE_NOT_LOADED_ERROR:
+                raise ValueError("font is not loaded")
+            else:
+                return None
         return font
 
     async def loadFont(self, path:pathlib.Path, fontNumber:int,
