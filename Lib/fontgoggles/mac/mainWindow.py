@@ -79,6 +79,8 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     @suppressAndLogException
     def mouseDown_(self, event):
+        if self._rectTree is None:
+            return
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
         scaleFactor = self.scaleFactor
         dx, dy = self.offset
@@ -223,14 +225,6 @@ class FontItem(Group):
     def setGlyphs(self, glyphs):
         self.glyphLine._nsObject.setGlyphs_(glyphs)
 
-    def setText(self, txt):
-        # TODO: FontItem should _not_ be responsible for shaping/setting, but
-        # should simply receive a line of glyphs.
-        if self.font is None:
-            return
-        glyphs, (finalX, finalY) = getGlyphRun(self.font, txt)
-        self.setGlyphs(glyphs)
-
 
 def getGlyphRun(font, txt, **kwargs):
     glyphs = font.getGlyphRun(txt, **kwargs)
@@ -336,7 +330,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         await self.project.loadFont(fontPath, fontNumber)
         font = self.project.getFont(fontPath, fontNumber)
         await asyncio.sleep(0)
-        fontItem.font = font  # XXXX
         txt = self._textEntry.get()
         self.setFontItemText(fontKey, fontItem, txt)
 
@@ -363,8 +356,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def setFontItemText(self, fontKey, fontItem, txt):
-        # TODO do shaping etc here and call fontItem.setGlyphs()
-        fontItem.setText(txt)
+        fontPath, fontNumber = fontKey
+        font = self.project.getFont(fontPath, fontNumber, None)
+        if font is None:
+            return
+        glyphs, (finalX, finalY) = getGlyphRun(font, txt)
+        fontItem.setGlyphs(glyphs)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, txt, delay=0):
