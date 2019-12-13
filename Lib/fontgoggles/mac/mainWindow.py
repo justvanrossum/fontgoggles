@@ -24,7 +24,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     def isOpaque(self):
         return True
 
-    def setGlyphs_(self, glyphs):
+    def setGlyphs_endPos_(self, glyphs, endPos):
         self._glyphs = glyphs
         x = y = 0
         rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
@@ -180,8 +180,8 @@ class FontItem(Group):
         self.fileNameLabel.set(fileNameLabel)
         self.fileNameLabel._nsObject.setToolTip_(str(fontPath))
 
-    def setGlyphs(self, glyphs):
-        self.glyphLineView._nsObject.setGlyphs_(glyphs)
+    def setGlyphs(self, glyphs, endPos):
+        self.glyphLineView._nsObject.setGlyphs_endPos_(glyphs, endPos)
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
@@ -282,8 +282,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
-        glyphs, (finalX, finalY) = getGlyphRun(font, txt)
-        fontItem.setGlyphs(glyphs)
+        glyphs, endPos = getGlyphRun(font, txt)
+        fontItem.setGlyphs(glyphs, endPos)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, txt, delay=0):
