@@ -49,11 +49,11 @@ openFontsTestData = [
         [],
         "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
     ("MutatorSansBoldWide.ufo",
-        ['ss01'],
+        ['calt', 'ss01'],
         ['DFLT'],
         [],
         [],
-        "HIi", ["H", "I", ".notdef"])
+        "HIiIII", ["H", "I", ".notdef", "I", "I.narrow", "I"])
 ]
 
 @pytest.mark.parametrize("fileName,features,scripts,languages,axes,text,glyphNames",

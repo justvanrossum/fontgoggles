@@ -31,6 +31,10 @@ class UFOFont(BaseFont):
         fb = FontBuilder(self.info.unitsPerEm)
         fb.setupGlyphOrder(glyphOrder)
         fb.setupCharacterMap(cmap)
+        # Without a 'post' table, the font will not contain the right glyph names,
+        # but that's ok if we pass our own ttf to HBShape, which will then be used
+        # to convert glyph IDs to glyph names.
+        # fb.setupPost()
         features = self.reader.readFeatures()
         if features:
             fb.addOpenTypeFeatures(features, self._fontPath)
@@ -38,7 +42,7 @@ class UFOFont(BaseFont):
         fb.save(strm)
         self.ttFont = fb.font
         fontData = strm.getvalue()
-        self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth)
+        self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
