@@ -263,6 +263,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @asyncTaskAutoCancel
     async def textEntryCallback(self, sender):
         txt = sender.get()
+        self.updateUnicodeList(txt, delay=0.05)
         t = time.time()
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
             self.setFontItemText(fontKey, fontItem, txt)
@@ -271,7 +272,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 # time to unblock the event loop
                 await asyncio.sleep(0)
                 t = time.time()
-        self.updateUnicodeList(txt, delay=0.05)
 
     @objc.python_method
     def setFontItemText(self, fontKey, fontItem, txt):
