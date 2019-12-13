@@ -325,6 +325,7 @@ def getGlyphRun(font, txt, **kwargs):
 if __name__ == "__main__":
     proj = Project()
     paths = [
+        '/Users/just/code/git/fontgoggles/Tests/data/MutatorSansBoldWide.ufo',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Italic.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-Bold.ttf',
         '/Users/just/code/git/ibm_plex/IBM-Plex-Serif/fonts/complete/ttf/IBMPlexSerif-ExtraLight.ttf',
