@@ -11,6 +11,9 @@ class Project:
     def __init__(self):
         self.fonts = {}
 
+    def iterFontKeys(self):
+        return iter(self.fonts)
+
     def addFont(self, path:pathlib.Path, fontNumber:int):
         self.fonts[path, fontNumber] = None
 
