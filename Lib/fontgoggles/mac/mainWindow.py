@@ -156,9 +156,9 @@ fontItemNameTemplate = "fontItem_{index}"
 def buildFontGroup(fontKeys, width, itemHeight):
     grp = FontGroup((0, 0, width, 900))
     y = 0
-    for index, (fontPath, fontNumber) in enumerate(fontKeys):
+    for index, fontKey in enumerate(fontKeys):
         fontItemName = fontItemNameTemplate.format(index=index)
-        fontItem = FontItem((0, y, 0, itemHeight), fontPath, fontNumber)
+        fontItem = FontItem((0, y, 0, itemHeight), fontKey)
         setattr(grp, fontItemName, fontItem)
         y += itemHeight
     grp.setPosSize((0, 0, width, y))
@@ -167,15 +167,19 @@ def buildFontGroup(fontKeys, width, itemHeight):
 
 class FontItem(Group):
 
-    def __init__(self, posSize, fontPath, fontNumber):
+    def __init__(self, posSize, fontKey):
         super().__init__(posSize)
         self.glyphLine = GlyphLine((0, 0, 0, 0))
+        self.filePath = TextBox((10, 0, 0, 17), "", sizeStyle="regular")
+        self.setFontKey(fontKey)
+
+    def setFontKey(self, fontKey):
+        fontPath, fontNumber = fontKey
         fileNameLabel = f"{fontPath.name}"
         if fontNumber:
             fileNameLabel += f"#{fontNumber}"
-        self.filePath = TextBox((10, 0, 0, 17), fileNameLabel, sizeStyle="regular")
+        self.filePath.set(fileNameLabel)
         self.filePath._nsObject.setToolTip_(str(fontPath))
-        self.font = None
 
     def setGlyphs(self, glyphs):
         self.glyphLine._nsObject.setGlyphs_(glyphs)
