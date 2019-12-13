@@ -3,9 +3,11 @@ import logging
 import re
 from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.fontBuilder import FontBuilder
+from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from .baseFont import BaseFont
 from ..misc.hbShape import HBShape
+from ..misc.runInPool import runInProcessPool
 
 
 class UFOFont(BaseFont):
@@ -27,21 +29,10 @@ class UFOFont(BaseFont):
             glyph = NotDefGlyph(self.info.unitsPerEm)
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
-        cmap = _getCharacterMapping(self._fontPath, self.glyphSet)
-        fb = FontBuilder(self.info.unitsPerEm)
-        fb.setupGlyphOrder(glyphOrder)
-        fb.setupCharacterMap(cmap)
-        # Without a 'post' table, the font will not contain the right glyph names,
-        # but that's ok if we pass our own ttf to HBShape, which will then be used
-        # to convert glyph IDs to glyph names.
-        # fb.setupPost()
-        features = self.reader.readFeatures()
-        if features:
-            fb.addOpenTypeFeatures(features, self._fontPath)
-        strm = io.BytesIO()
-        fb.save(strm)
-        self.ttFont = fb.font
-        fontData = strm.getvalue()
+
+        fontData = await runInProcessPool(compileMinimumFont, self._fontPath)
+        f = io.BytesIO(fontData)
+        self.ttFont = TTFont(f, lazy=True)
         self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
@@ -122,3 +113,35 @@ def _getCharacterMapping(ufoPath, glyphSet):
         logger = logging.getLogger("fontgoggles.font.ufoFont")
         logger.warning("Some code points in '%s' are assigned to multiple glyphs: %s", ufoPath, sorted(duplicateUnicodes))
     return cmap
+
+
+def compileMinimumFont(ufoPath):
+    """Compile the source UFO to a TTF with the smallest amount of tables
+    needed to let HarfBuzz do its work. That would be 'cmap', 'post' and
+    whatever OTL tables are needed for the features. Return the compiled
+    font data.
+
+    This function may do some redundant work (eg. we need an UFOReader
+    elsewhere, too), but having a picklable argument and return value
+    allows us to run it in a separate process, enabling parallelism.
+    """
+    reader = UFOReader(ufoPath)
+    glyphSet = reader.getGlyphSet()
+    info = UFOInfo()
+    reader.readInfo(info)
+
+    glyphOrder = sorted(glyphSet.keys())  # no need for the "real" glyph order
+    if ".notdef" not in glyphOrder:
+        # We need a .notdef glyph, so let's make one.
+        glyphOrder.insert(0, ".notdef")
+    cmap = _getCharacterMapping(ufoPath, glyphSet)
+    fb = FontBuilder(info.unitsPerEm)
+    fb.setupGlyphOrder(glyphOrder)
+    fb.setupCharacterMap(cmap)
+    fb.setupPost()  # This makes sure we store the glyph names
+    features = reader.readFeatures()
+    if features:
+        fb.addOpenTypeFeatures(features, ufoPath)
+    strm = io.BytesIO()
+    fb.save(strm)
+    return strm.getvalue()
