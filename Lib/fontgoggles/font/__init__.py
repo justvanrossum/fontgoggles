@@ -28,7 +28,7 @@ async def openOTF(fontPath:PathLike, fontNumber:int, fontData=None):
     return (font, fontData)
 
 
-def numFontsOTF(fontPath:PathLike):
+def numFontsOne(fontPath:PathLike):
     return 1
 
 
@@ -40,10 +40,10 @@ def numFontsTTC(fontPath:PathLike):
 
 
 fontOpeners = {
-    "ttf":   (numFontsOTF, openOTF),
-    "otf":   (numFontsOTF, openOTF),
-    "woff":  (numFontsOTF, openOTF),
-    "woff2": (numFontsOTF, openOTF),
+    "ttf":   (numFontsOne, openOTF),
+    "otf":   (numFontsOne, openOTF),
+    "woff":  (numFontsOne, openOTF),
+    "woff2": (numFontsOne, openOTF),
     "ttc":   (numFontsTTC, openOTF),
     "otc":   (numFontsTTC, openOTF),
 }
