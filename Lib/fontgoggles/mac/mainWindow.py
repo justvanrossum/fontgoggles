@@ -327,7 +327,7 @@ class FGMainController(AppKit.NSWindowController, metaclass=ClassNameIncrementer
     async def _loadFont(self, fontPath, fontItem):
         # TODO this has to go through the Project
         numFonts, opener = getOpener(fontPath)
-        assert numFonts == 1
+        assert numFonts(fontPath) == 1
         font, fontData = await opener(fontPath, 0)
         await asyncio.sleep(0)
         fontItem.font = font

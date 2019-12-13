@@ -39,7 +39,7 @@ class Project:
             sharableFontData = {}
         fontData = sharableFontData.get(path)
         numFonts, opener = getOpener(path)
-        assert fontNumber < numFonts
+        assert fontNumber < numFonts(path)
         font, fontData = await opener(path, fontNumber, fontData)
         if fontData is not None:
             sharableFontData[path] = fontData

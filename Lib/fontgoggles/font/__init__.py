@@ -5,7 +5,7 @@ def getOpener(path):
     openerKey = sniffFontType(path)
     assert openerKey is not None
     numFontsFunc, openerFunc = fontOpeners[openerKey]
-    return numFontsFunc(path), openerFunc
+    return numFontsFunc, openerFunc
 
 
 def sniffFontType(path):
