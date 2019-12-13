@@ -220,13 +220,16 @@ class FontItem(Group):
         self.filePath._nsObject.setToolTip_(str(fontPath))
         self.font = None
 
+    def setGlyphs(self, glyphs):
+        self.glyphLine._nsObject.setGlyphs_(glyphs)
+
     def setText(self, txt):
         # TODO: FontItem should _not_ be responsible for shaping/setting, but
         # should simply receive a line of glyphs.
         if self.font is None:
             return
         glyphs, (finalX, finalY) = getGlyphRun(self.font, txt)
-        self.glyphLine._nsObject.setGlyphs_(glyphs)
+        self.setGlyphs(glyphs)
 
 
 def getGlyphRun(font, txt, **kwargs):
@@ -333,8 +336,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         await self.project.loadFont(fontPath, fontNumber)
         font = self.project.getFont(fontPath, fontNumber)
         await asyncio.sleep(0)
-        fontItem.font = font
-        fontItem.setText(self._textEntry.get())
+        fontItem.font = font  # XXXX
+        txt = self._textEntry.get()
+        self.setFontItemText(fontKey, fontItem, txt)
 
     def loadFonts(self):
         for fontKey, fontItem in zip(self.project.iterFontKeys(), self.iterFontItems()):
@@ -348,14 +352,19 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     async def textEntryCallback(self, sender):
         txt = sender.get()
         t = time.time()
-        for fontItem in self.iterFontItems():
-            fontItem.setText(txt)
+        for fontKey, fontItem in zip(self.project.iterFontKeys(), self.iterFontItems()):
+            self.setFontItemText(fontKey, fontItem, txt)
             elapsed = time.time() - t
             if elapsed > 0.01:
                 # time to unblock the event loop
                 await asyncio.sleep(0)
                 t = time.time()
         self.updateUnicodeList(txt, delay=0.05)
+
+    @objc.python_method
+    def setFontItemText(self, fontKey, fontItem, txt):
+        # TODO do shaping etc here and call fontItem.setGlyphs()
+        fontItem.setText(txt)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, txt, delay=0):
