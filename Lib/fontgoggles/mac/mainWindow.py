@@ -320,7 +320,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.setFontItemText(fontKey, fontItem, txt)
 
     def loadFonts(self):
-        for fontKey, fontItem in zip(self.project.iterFontKeys(), self.iterFontItems()):
+        for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
             coro = self._loadFont(fontKey, fontItem)
             asyncio.create_task(coro)
 
@@ -331,7 +331,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     async def textEntryCallback(self, sender):
         txt = sender.get()
         t = time.time()
-        for fontKey, fontItem in zip(self.project.iterFontKeys(), self.iterFontItems()):
+        for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
             self.setFontItemText(fontKey, fontItem, txt)
             elapsed = time.time() - t
             if elapsed > 0.01:
