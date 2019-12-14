@@ -53,14 +53,14 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
             index = indices[0]
         else:
             # There are multiple candidates. Let's do point-inside testing,
-            # and take the first hit, if any. Fall back to the first.
-            for index in indices:
+            # and take the last hit, if any. Fall back to the last.
+            for index in reversed(indices):
                 gi = self._glyphs[index]
                 posX, posY = gi.pos
                 if gi.path.containsPoint_((x - posX, y - posY)):
                     break
             else:
-                index = indices[0]
+                index = indices[-1]
 
         if index is not None:
             if self._selection is None:
