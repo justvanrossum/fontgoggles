@@ -256,11 +256,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             await asyncio.sleep(0.0)
 
     @objc.python_method
-    async def _loadFont(self, fontKey, fontItem):
+    async def _loadFont(self, fontKey, fontItem, sharableFontData):
         print(f"start loading at {time.time() - self._startLoading:.4f} seconds")
         fontItem.setIsLoading(True)
         fontPath, fontNumber = fontKey
-        await self.project.loadFont(fontPath, fontNumber)
+        await self.project.loadFont(fontPath, fontNumber, sharableFontData=sharableFontData)
         font = self.project.getFont(fontPath, fontNumber)
         self._loadCounter += 1
         print(f"loaded {self._loadCounter} fonts in {time.time() - self._startLoading:.4f} seconds")
@@ -272,8 +272,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def loadFonts(self):
         self._startLoading = time.time()
         self._loadCounter = 0
+        sharableFontData = {}
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
-            coro = self._loadFont(fontKey, fontItem)
+            coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData)
             asyncio.create_task(coro)
 
     def iterFontItems(self):
