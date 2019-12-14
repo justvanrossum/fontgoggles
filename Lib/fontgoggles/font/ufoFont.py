@@ -1,6 +1,8 @@
+from contextlib import redirect_stdout, redirect_stderr
 import io
 import logging
 import re
+import sys
 from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont
@@ -30,7 +32,9 @@ class UFOFont(BaseFont):
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
 
-        fontData = await runInProcessPool(compileMinimumFont, self._fontPath)
+        fontData, output = await runInProcessPool(compileMinimumFont_captureOutput, self._fontPath)
+        if output:
+            print(output, file=sys.stderr)
         f = io.BytesIO(fontData)
         self.ttFont = TTFont(f, lazy=True)
         self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
@@ -113,6 +117,13 @@ def _getCharacterMapping(ufoPath, glyphSet):
         logger = logging.getLogger("fontgoggles.font.ufoFont")
         logger.warning("Some code points in '%s' are assigned to multiple glyphs: %s", ufoPath, sorted(duplicateUnicodes))
     return cmap
+
+
+def compileMinimumFont_captureOutput(ufoPath):
+    f = io.StringIO()
+    with redirect_stdout(f), redirect_stderr(f):
+        data = compileMinimumFont(ufoPath)
+    return data, f.getvalue()
 
 
 def compileMinimumFont(ufoPath):
