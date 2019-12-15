@@ -214,7 +214,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.populateUnicodeListGroup(unicodeListGroup)
 
-        self._textEntry = EditText((10, 10, -10, 25), initialText, callback=self.textEntryCallback)
+        self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
 
         columnDescriptions = [
@@ -226,7 +226,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(title="cluster", width=40, cell=makeTextCell("right")),
             dict(title="gid", width=40, cell=makeTextCell("right")),
         ]
-        self.glyphList = List((0, 36, 0, 0), [],
+        self.glyphList = List((0, 40, 0, 0), [],
                 columnDescriptions=columnDescriptions,
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
         glyphListGroup.glyphList = self.glyphList
@@ -252,7 +252,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
 
         self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
-        fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
+        fontListGroup.fontList = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         self.w = Window((800, 500), "FontGoggles", minSize=(200, 500), autosaveName="FontGogglesWindow")
         self.w.mainSplitView = mainSplitView
@@ -270,7 +270,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(title="unicode", width=60, cell=makeTextCell("right")),
             dict(title="unicode name", width=200, minWidth=200, key="unicodeName", cell=makeTextCell("left", "truncmiddle")),
         ]
-        self.unicodeList = List((0, 36, 0, 0), [],
+        self.unicodeList = List((0, 40, 0, 0), [],
                 columnDescriptions=columnDescriptions,
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
         group.bidiCheckBox = CheckBox((10, 8, -10, 20), "BiDi")
@@ -318,13 +318,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     async def _loadFont(self, fontKey, fontItem, sharableFontData, isSelectedFont):
-        print(f"start loading at {time.time() - self._startLoading:.4f} seconds")
+        # print(f"start loading at {time.time() - self._startLoading:.4f} seconds")
         fontItem.setIsLoading(True)
         fontPath, fontNumber = fontKey
         await self.project.loadFont(fontPath, fontNumber, sharableFontData=sharableFontData)
         font = self.project.getFont(fontPath, fontNumber)
         self._loadCounter += 1
-        print(f"loaded {self._loadCounter} fonts in {time.time() - self._startLoading:.4f} seconds")
+        # print(f"loaded {self._loadCounter} fonts in {time.time() - self._startLoading:.4f} seconds")
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
         txt = self._textEntry.get()
