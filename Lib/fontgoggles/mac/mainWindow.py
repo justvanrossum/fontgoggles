@@ -365,9 +365,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         glyphs, endPos = getGlyphRun(font, txt)
         if isSelectedFont:
-            glyphListData = [g.__dict__ for g in glyphs]
-            self.glyphList.set(glyphListData)
+            self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
+
+    @asyncTaskAutoCancel
+    async def updateGlyphList(self, glyphs, delay=0):
+        if delay:
+            # add a slight delay, so we won't do a lot of work when there's fast typing
+            await asyncio.sleep(delay)
+        glyphListData = [g.__dict__ for g in glyphs]
+        self.glyphList.set(glyphListData)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, txt, delay=0):
