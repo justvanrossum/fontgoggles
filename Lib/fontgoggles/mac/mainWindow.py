@@ -241,6 +241,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
         glyphListGroup.glyphList = self.glyphList
 
+        sidebarGroup.generalSettings, y = self.makeGeneralSettingsGroup()
+        sidebarGroup.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations"])
+
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="pane1", canCollapse=True,
                  size=215, resizeFlexibility=False),
@@ -268,6 +271,34 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
         self.updateUnicodeList(self._textEntry.get())
         self.loadFonts()
+
+    def makeGeneralSettingsGroup(self):
+        generalSettingsGroup = Group((0, 0, 0, 200))
+        y = 10
+        options = [
+            "Automatic, with BiDi",
+            "Automatic, without BiDi",
+            "Left-to-Right",
+            "Right-to-Left",
+            "Top-to-Bottom",
+            "Bottom-to-Top",
+        ]
+        generalSettingsGroup.directionLabel = TextBox((10, y, -10, 20), "Direction/orientation:")
+        y += 20
+        generalSettingsGroup.directionPopup = PopUpButton((10, y, -10, 20), options)
+        y += 30
+        options = [
+            "Automatic",
+            "Left", # Top
+            "Right", # Bottom
+            "Center",
+        ]
+        generalSettingsGroup.alignmentLabel = TextBox((10, y, -10, 20), "Visual alignment:")
+        y += 20
+        generalSettingsGroup.alignmentPopup = PopUpButton((10, y, -10, 20), options)
+        y += 30
+        generalSettingsGroup.setPosSize((0, 0, 0, y))
+        return generalSettingsGroup, y
 
     @objc.python_method
     async def _loadFont(self, fontKey, fontItem, sharableFontData, isSelectedFont):
