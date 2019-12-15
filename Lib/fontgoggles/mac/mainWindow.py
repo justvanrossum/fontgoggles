@@ -320,6 +320,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.setPosSize((0, 0, 0, y))
         return group
 
+    def loadFonts(self):
+        self._startLoading = time.time()
+        self._loadCounter = 0
+        sharableFontData = {}
+        firstKey = self.fontKeys[0] if self.fontKeys else None
+        for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
+            coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData,
+                                  isSelectedFont=fontKey==firstKey)
+            asyncio.create_task(coro)
+
     @objc.python_method
     async def _loadFont(self, fontKey, fontItem, sharableFontData, isSelectedFont):
         # print(f"start loading at {time.time() - self._startLoading:.4f} seconds")
@@ -333,16 +343,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontItem.setIsLoading(False)
         txt = self._textEntry.get()
         self.setFontItemText(fontKey, fontItem, txt, isSelectedFont)
-
-    def loadFonts(self):
-        self._startLoading = time.time()
-        self._loadCounter = 0
-        sharableFontData = {}
-        firstKey = self.fontKeys[0] if self.fontKeys else None
-        for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
-            coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData,
-                                  isSelectedFont=fontKey==firstKey)
-            asyncio.create_task(coro)
 
     def iterFontItems(self):
         return self._fontGroup.iterFontItems()
