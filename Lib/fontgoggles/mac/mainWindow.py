@@ -293,7 +293,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupGeneralSettingsGroup(self):
         group = Group((0, 0, 0, 0))
         y = 10
-        options = [
+        directionOptions = [
             "Automatic, with BiDi",
             "Automatic, without BiDi",
             "Left-to-Right",
@@ -301,20 +301,22 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             "Top-to-Bottom",
             "Bottom-to-Top",
         ]
-        group.directionLabel = TextBox((10, y, -10, 20), "Direction/orientation:")
-        y += 20
-        group.directionPopup = PopUpButton((10, y, -10, 20), options)
-        y += 30
+        group.directionPopUp = LabeledView(
+            (10, y, -10, 40), "Direction/orientation:",
+            PopUpButton, directionOptions,
+        )
+        y += 50
         alignmentOptionsHorizontal = [
             "Automatic",
             "Left", # Top
             "Right", # Bottom
             "Center",
         ]
-        group.alignmentLabel = TextBox((10, y, -10, 20), "Visual alignment:")
-        y += 20
-        group.alignmentPopup = PopUpButton((10, y, -10, 20), alignmentOptionsHorizontal)
-        y += 30
+        group.alignmentPopup = LabeledView(
+            (10, y, -10, 40), "Visual alignment:",
+            PopUpButton, alignmentOptionsHorizontal,
+        )
+        y += 50
         group.setPosSize((0, 0, 0, y))
         return group
 
@@ -398,6 +400,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def zoomOut_(self, event):
         self.itemHeight = max(50, round(self.itemHeight / (2 ** (1/3))))
         self._fontGroup.resizeFontItems(self.itemHeight)
+
+
+class LabeledView(Group):
+
+    def __init__(self, posSize, label, viewClass, *args, **kwargs):
+        super().__init__(posSize)
+        x, y, w, h = posSize
+        assert h > 0
+        self.label = TextBox((0, 0, 0, 0), label)
+        self.view = viewClass((0, 20, 0, 20), *args, **kwargs)
 
 
 def getGlyphRun(font, txt, **kwargs):
