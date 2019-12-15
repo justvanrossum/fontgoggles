@@ -204,8 +204,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.fontKeys = list(self.project.iterFontKeys())
         self.itemHeight = 150
 
-        initialText = "ABC abc 0123 :;?"
-
         sidebarWidth = 300
         unicodeListGroup = Group((0, 0, 0, 0))
         glyphListGroup = Group((0, 0, 0, 0))
@@ -214,9 +212,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.populateUnicodeListGroup(unicodeListGroup)
         self.populateGlyphListGroup(glyphListGroup)
-
-        self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
-        fontListGroup.textEntry = self._textEntry
+        self.populateFontListGroup(fontListGroup)
 
         sidebarGroup.generalSettings, y = self.makeGeneralSettingsGroup()
         sidebarGroup.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations", "Options"])
@@ -237,9 +233,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth, resizeFlexibility=False),
         ]
         mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
-
-        self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
-        fontListGroup.fontList = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True)
 
         self.w = Window((800, 500), "FontGoggles", minSize=(200, 500), autosaveName="FontGogglesWindow")
         self.w.mainSplitView = mainSplitView
@@ -283,7 +276,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def populateFontListGroup(self, group):
-        ...
+        initialText = "ABC abc 0123 :;?"
+        self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
+        self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
+        group.fontList = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True)
+        group.textEntry = self._textEntry
 
     @objc.python_method
     def populateSideBarGroup(self, group):
