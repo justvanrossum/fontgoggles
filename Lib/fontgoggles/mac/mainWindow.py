@@ -212,17 +212,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontListGroup = Group((0, 0, 0, 0))
         sidebarGroup = Group((0, 0, 0, 0))
 
-        columnDescriptions = [
-            # dict(title="index", width=34, cell=makeTextCell("right")),
-            dict(title="char", width=30, typingSensitive=True, cell=makeTextCell("center")),
-            dict(title="unicode", width=60, cell=makeTextCell("right")),
-            dict(title="unicode name", width=200, minWidth=200, key="unicodeName", cell=makeTextCell("left", "truncmiddle")),
-        ]
-        self.unicodeList = List((0, 36, 0, 0), [],
-                columnDescriptions=columnDescriptions,
-                allowsSorting=False, drawFocusRing=False, rowHeight=20)
-        unicodeListGroup.bidiCheckBox = CheckBox((10, 8, -10, 20), "BiDi")
-        unicodeListGroup.unicodeList = self.unicodeList
+        self.populateUnicodeListGroup(unicodeListGroup)
 
         self._textEntry = EditText((10, 10, -10, 25), initialText, callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
@@ -242,7 +232,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         glyphListGroup.glyphList = self.glyphList
 
         sidebarGroup.generalSettings, y = self.makeGeneralSettingsGroup()
-        sidebarGroup.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations"])
+        sidebarGroup.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations", "Options"])
 
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="pane1", canCollapse=True,
@@ -272,6 +262,32 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.updateUnicodeList(self._textEntry.get())
         self.loadFonts()
 
+    @objc.python_method
+    def populateUnicodeListGroup(self, group):
+        columnDescriptions = [
+            # dict(title="index", width=34, cell=makeTextCell("right")),
+            dict(title="char", width=30, typingSensitive=True, cell=makeTextCell("center")),
+            dict(title="unicode", width=60, cell=makeTextCell("right")),
+            dict(title="unicode name", width=200, minWidth=200, key="unicodeName", cell=makeTextCell("left", "truncmiddle")),
+        ]
+        self.unicodeList = List((0, 36, 0, 0), [],
+                columnDescriptions=columnDescriptions,
+                allowsSorting=False, drawFocusRing=False, rowHeight=20)
+        group.bidiCheckBox = CheckBox((10, 8, -10, 20), "BiDi")
+        group.unicodeList = self.unicodeList
+
+    @objc.python_method
+    def populateGlyphListGroup(self, group):
+        ...
+
+    @objc.python_method
+    def populateFontListGroup(self, group):
+        ...
+
+    @objc.python_method
+    def populateSideBarGroup(self, group):
+        ...
+
     def makeGeneralSettingsGroup(self):
         generalSettingsGroup = Group((0, 0, 0, 200))
         y = 10
@@ -287,7 +303,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y += 20
         generalSettingsGroup.directionPopup = PopUpButton((10, y, -10, 20), options)
         y += 30
-        options = [
+        alignmentOptionsHorizontal = [
             "Automatic",
             "Left", # Top
             "Right", # Bottom
@@ -295,7 +311,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         ]
         generalSettingsGroup.alignmentLabel = TextBox((10, y, -10, 20), "Visual alignment:")
         y += 20
-        generalSettingsGroup.alignmentPopup = PopUpButton((10, y, -10, 20), options)
+        generalSettingsGroup.alignmentPopup = PopUpButton((10, y, -10, 20), alignmentOptionsHorizontal)
         y += 30
         generalSettingsGroup.setPosSize((0, 0, 0, y))
         return generalSettingsGroup, y
