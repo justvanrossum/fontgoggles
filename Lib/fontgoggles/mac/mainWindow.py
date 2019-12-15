@@ -252,7 +252,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
 
         self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
-        fontListGroup.fontList = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
+        fontListGroup.fontList = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True)
 
         self.w = Window((800, 500), "FontGoggles", minSize=(200, 500), autosaveName="FontGogglesWindow")
         self.w.mainSplitView = mainSplitView
