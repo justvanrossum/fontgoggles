@@ -245,7 +245,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(view=fontListGroup, identifier="pane2", canCollapse=False,
                  size=200),
         ]
-        subSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle=None)
+        subSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
         paneDescriptors = [
             dict(view=unicodeListGroup, identifier="pane1", canCollapse=True,
                  size=100, resizeFlexibility=False),
@@ -253,7 +253,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(view=sidebarGroup, identifier="pane4", canCollapse=True,
                 size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth, resizeFlexibility=False),
         ]
-        mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle=None)
+        mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
 
         self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
