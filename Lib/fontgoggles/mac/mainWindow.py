@@ -213,25 +213,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         sidebarGroup = Group((0, 0, 0, 0))
 
         self.populateUnicodeListGroup(unicodeListGroup)
+        self.populateGlyphListGroup(glyphListGroup)
 
         self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
-
-        columnDescriptions = [
-            # dict(title="index", width=34, cell=makeTextCell("right")),
-            dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200, typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
-            dict(title="adv", key="ax", width=40, cell=makeTextCell("right")),  # XXX
-            dict(title="∆X", key="dx", width=40, cell=makeTextCell("right")),
-            dict(title="∆Y", key="dy", width=40, cell=makeTextCell("right")),
-            dict(title="cluster", width=40, cell=makeTextCell("right")),
-            dict(title="gid", width=40, cell=makeTextCell("right")),
-            # dummy filler column so "glyph" doesn't get to wide:
-            dict(title="", key="_dummy_", minWidth=0, maxWidth=1400),
-        ]
-        self.glyphList = List((0, 40, 0, 0), [],
-                columnDescriptions=columnDescriptions,
-                allowsSorting=False, drawFocusRing=False, rowHeight=20)
-        glyphListGroup.glyphList = self.glyphList
 
         sidebarGroup.generalSettings, y = self.makeGeneralSettingsGroup()
         sidebarGroup.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations", "Options"])
@@ -280,7 +265,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def populateGlyphListGroup(self, group):
-        ...
+        columnDescriptions = [
+            # dict(title="index", width=34, cell=makeTextCell("right")),
+            dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200, typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
+            dict(title="adv", key="ax", width=40, cell=makeTextCell("right")),  # XXX
+            dict(title="∆X", key="dx", width=40, cell=makeTextCell("right")),
+            dict(title="∆Y", key="dy", width=40, cell=makeTextCell("right")),
+            dict(title="cluster", width=40, cell=makeTextCell("right")),
+            dict(title="gid", width=40, cell=makeTextCell("right")),
+            # dummy filler column so "glyph" doesn't get to wide:
+            dict(title="", key="_dummy_", minWidth=0, maxWidth=1400),
+        ]
+        self.glyphList = List((0, 40, 0, 0), [],
+                columnDescriptions=columnDescriptions,
+                allowsSorting=False, drawFocusRing=False, rowHeight=20)
+        group.glyphList = self.glyphList
 
     @objc.python_method
     def populateFontListGroup(self, group):
