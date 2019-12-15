@@ -213,9 +213,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.populateUnicodeListGroup(unicodeListGroup)
         self.populateGlyphListGroup(glyphListGroup)
         self.populateFontListGroup(fontListGroup)
-
-        sidebarGroup.generalSettings, y = self.makeGeneralSettingsGroup()
-        sidebarGroup.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations", "Options"])
+        self.populateSidebarGroup(sidebarGroup)
 
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="pane1", canCollapse=True,
@@ -283,8 +281,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.textEntry = self._textEntry
 
     @objc.python_method
-    def populateSideBarGroup(self, group):
-        ...
+    def populateSidebarGroup(self, group):
+        group.generalSettings, y = self.makeGeneralSettingsGroup()
+        group.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations", "Options"])
 
     def makeGeneralSettingsGroup(self):
         generalSettingsGroup = Group((0, 0, 0, 200))
