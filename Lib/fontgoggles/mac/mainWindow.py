@@ -285,12 +285,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def setupSidebarGroup(self):
         group = Group((0, 0, 0, 0))
-        group.generalSettings, y = self.setupGeneralSettingsGroup()
-        group.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations", "Options"])
+        group.generalSettings = self.setupGeneralSettingsGroup()
+        x, y, w, h = group.generalSettings.getPosSize()
+        group.feaVarTabs = Tabs((0, h + 6, 0, 0), ["Features", "Variations", "Options"])
         return group
 
     def setupGeneralSettingsGroup(self):
-        generalSettingsGroup = Group((0, 0, 0, 200))
+        group = Group((0, 0, 0, 0))
         y = 10
         options = [
             "Automatic, with BiDi",
@@ -300,9 +301,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             "Top-to-Bottom",
             "Bottom-to-Top",
         ]
-        generalSettingsGroup.directionLabel = TextBox((10, y, -10, 20), "Direction/orientation:")
+        group.directionLabel = TextBox((10, y, -10, 20), "Direction/orientation:")
         y += 20
-        generalSettingsGroup.directionPopup = PopUpButton((10, y, -10, 20), options)
+        group.directionPopup = PopUpButton((10, y, -10, 20), options)
         y += 30
         alignmentOptionsHorizontal = [
             "Automatic",
@@ -310,12 +311,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             "Right", # Bottom
             "Center",
         ]
-        generalSettingsGroup.alignmentLabel = TextBox((10, y, -10, 20), "Visual alignment:")
+        group.alignmentLabel = TextBox((10, y, -10, 20), "Visual alignment:")
         y += 20
-        generalSettingsGroup.alignmentPopup = PopUpButton((10, y, -10, 20), alignmentOptionsHorizontal)
+        group.alignmentPopup = PopUpButton((10, y, -10, 20), alignmentOptionsHorizontal)
         y += 30
-        generalSettingsGroup.setPosSize((0, 0, 0, y))
-        return generalSettingsGroup, y
+        group.setPosSize((0, 0, 0, y))
+        return group
 
     @objc.python_method
     async def _loadFont(self, fontKey, fontItem, sharableFontData, isSelectedFont):
