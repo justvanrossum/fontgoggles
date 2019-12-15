@@ -207,15 +207,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         sidebarWidth = 300
         unicodeListGroup = Group((0, 0, 0, 0))
-
+        glyphListGroup = Group((0, 0, 0, 0))
         fontListGroup = Group((0, 0, 0, 0))
-        sidebarGroup = Group((-sidebarWidth, 0, sidebarWidth, 0))
+        sidebarGroup = Group((0, 0, 0, 0))
 
         columnDescriptions = [
-            dict(title="index", width=34, cell=makeTextCell("right")),
-            dict(title="char", width=34, typingSensitive=True, cell=makeTextCell("center")),
+            # dict(title="index", width=34, cell=makeTextCell("right")),
+            dict(title="char", width=30, typingSensitive=True, cell=makeTextCell("center")),
             dict(title="unicode", width=60, cell=makeTextCell("right")),
-            dict(title="unicode name", key="unicodeName", cell=makeTextCell("left", "truncmiddle")),
+            dict(title="unicode name", width=200, minWidth=200, key="unicodeName", cell=makeTextCell("left", "truncmiddle")),
         ]
         self.unicodeList = List((0, 0, 0, 0), [],
                 columnDescriptions=columnDescriptions,
@@ -225,19 +225,41 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._textEntry = EditText((10, 10, -10, 25), initialText, callback=self.textEntryCallback)
         fontListGroup.textEntry = self._textEntry
 
-        paneDescriptors = [
-            dict(view=unicodeListGroup, identifier="pane1", canCollapse=False,
-                 size=300, resizeFlexibility=False),
-            dict(view=fontListGroup, identifier="pane2", canCollapse=False),
+        columnDescriptions = [
+            # dict(title="index", width=34, cell=makeTextCell("right")),
+            dict(title="glyph", width=80, typingSensitive=True, cell=makeTextCell("left")),
+            dict(title="adv", width=40, cell=makeTextCell("right")),
+            dict(title="∆X", key="dx", width=40, cell=makeTextCell("right")),
+            dict(title="∆Y", key="dy", width=40, cell=makeTextCell("right")),
+            dict(title="cluster", width=40, cell=makeTextCell("right")),
+            dict(title="gid", width=40, cell=makeTextCell("right")),
         ]
-        mainSplitView = SplitView((0, 0, -sidebarWidth, 0), paneDescriptors, dividerStyle=None)
+        self.glyphList = List((0, 0, 0, 0), [],
+                columnDescriptions=columnDescriptions,
+                allowsSorting=False, drawFocusRing=False, rowHeight=20)
+        glyphListGroup.glyphList = self.glyphList
+
+        paneDescriptors = [
+            dict(view=glyphListGroup, identifier="pane1", canCollapse=True,
+                 size=200, resizeFlexibility=False),
+            dict(view=fontListGroup, identifier="pane2", canCollapse=False,
+                 size=200),
+        ]
+        subSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle=None)
+        paneDescriptors = [
+            dict(view=unicodeListGroup, identifier="pane1", canCollapse=True,
+                 size=100, resizeFlexibility=False),
+            dict(view=subSplitView, identifier="pane3", canCollapse=False),
+            dict(view=sidebarGroup, identifier="pane4", canCollapse=True,
+                size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth, resizeFlexibility=False),
+        ]
+        mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle=None)
 
         self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
         fontListGroup.fontList = AligningScrollView((0, 45, 0, 0), self._fontGroup, drawBackground=True, borderType=0)
 
         self.w = Window((800, 500), "FontGoggles", minSize=(200, 500), autosaveName="FontGogglesWindow")
         self.w.mainSplitView = mainSplitView
-        self.w.sidebarGroup = sidebarGroup
         self.w.open()
         self.w._window.setWindowController_(self)
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
