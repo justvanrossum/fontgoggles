@@ -219,12 +219,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         columnDescriptions = [
             # dict(title="index", width=34, cell=makeTextCell("right")),
-            dict(title="glyph", key="name", width=80, typingSensitive=True, cell=makeTextCell("left")),
+            dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200, typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
             dict(title="adv", key="ax", width=40, cell=makeTextCell("right")),  # XXX
             dict(title="∆X", key="dx", width=40, cell=makeTextCell("right")),
             dict(title="∆Y", key="dy", width=40, cell=makeTextCell("right")),
             dict(title="cluster", width=40, cell=makeTextCell("right")),
             dict(title="gid", width=40, cell=makeTextCell("right")),
+            # dummy filler column so "glyph" doesn't get to wide:
+            dict(title="", key="_dummy_", minWidth=0, maxWidth=1400),
         ]
         self.glyphList = List((0, 40, 0, 0), [],
                 columnDescriptions=columnDescriptions,
@@ -236,7 +238,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="pane1", canCollapse=True,
-                 size=215, resizeFlexibility=False),
+                 size=205, resizeFlexibility=False),
             dict(view=fontListGroup, identifier="pane2", canCollapse=False,
                  size=200),
         ]
