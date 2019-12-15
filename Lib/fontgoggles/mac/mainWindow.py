@@ -205,15 +205,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.itemHeight = 150
 
         sidebarWidth = 300
-        unicodeListGroup = Group((0, 0, 0, 0))
-        glyphListGroup = Group((0, 0, 0, 0))
-        fontListGroup = Group((0, 0, 0, 0))
-        sidebarGroup = Group((0, 0, 0, 0))
 
-        self.populateUnicodeListGroup(unicodeListGroup)
-        self.populateGlyphListGroup(glyphListGroup)
-        self.populateFontListGroup(fontListGroup)
-        self.populateSidebarGroup(sidebarGroup)
+        unicodeListGroup = self.setupUnicodeListGroup()
+        glyphListGroup = self.setupGlyphListGroup()
+        fontListGroup = self.setupFontListGroup()
+        sidebarGroup = self.setupSidebarGroup()
 
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="pane1", canCollapse=True,
@@ -241,7 +237,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.loadFonts()
 
     @objc.python_method
-    def populateUnicodeListGroup(self, group):
+    def setupUnicodeListGroup(self):
+        group = Group((0, 0, 0, 0))
         columnDescriptions = [
             # dict(title="index", width=34, cell=makeTextCell("right")),
             dict(title="char", width=30, typingSensitive=True, cell=makeTextCell("center")),
@@ -253,9 +250,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
         group.bidiCheckBox = CheckBox((10, 8, -10, 20), "BiDi")
         group.unicodeList = self.unicodeList
+        return group
 
     @objc.python_method
-    def populateGlyphListGroup(self, group):
+    def setupGlyphListGroup(self):
+        group = Group((0, 0, 0, 0))
         columnDescriptions = [
             # dict(title="index", width=34, cell=makeTextCell("right")),
             dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200, typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
@@ -271,21 +270,26 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 columnDescriptions=columnDescriptions,
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
         group.glyphList = self.glyphList
+        return group
 
     @objc.python_method
-    def populateFontListGroup(self, group):
+    def setupFontListGroup(self):
+        group = Group((0, 0, 0, 0))
         initialText = "ABC abc 0123 :;?"
         self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
         self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
         group.fontList = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True)
         group.textEntry = self._textEntry
+        return group
 
     @objc.python_method
-    def populateSidebarGroup(self, group):
-        group.generalSettings, y = self.makeGeneralSettingsGroup()
+    def setupSidebarGroup(self):
+        group = Group((0, 0, 0, 0))
+        group.generalSettings, y = self.setupGeneralSettingsGroup()
         group.feaVarTabs = Tabs((0, y + 6, 0, 0), ["Features", "Variations", "Options"])
+        return group
 
-    def makeGeneralSettingsGroup(self):
+    def setupGeneralSettingsGroup(self):
         generalSettingsGroup = Group((0, 0, 0, 200))
         y = 10
         options = [
