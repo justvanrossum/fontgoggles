@@ -227,8 +227,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         columnDescriptions = [
             # dict(title="index", width=34, cell=makeTextCell("right")),
-            dict(title="glyph", width=80, typingSensitive=True, cell=makeTextCell("left")),
-            dict(title="adv", width=40, cell=makeTextCell("right")),
+            dict(title="glyph", key="name", width=80, typingSensitive=True, cell=makeTextCell("left")),
+            dict(title="adv", key="ax", width=40, cell=makeTextCell("right")),  # XXX
             dict(title="∆X", key="dx", width=40, cell=makeTextCell("right")),
             dict(title="∆Y", key="dy", width=40, cell=makeTextCell("right")),
             dict(title="cluster", width=40, cell=makeTextCell("right")),
@@ -241,7 +241,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="pane1", canCollapse=True,
-                 size=200, resizeFlexibility=False),
+                 size=215, resizeFlexibility=False),
             dict(view=fontListGroup, identifier="pane2", canCollapse=False,
                  size=200),
         ]
@@ -267,7 +267,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.loadFonts()
 
     @objc.python_method
-    async def _loadFont(self, fontKey, fontItem, sharableFontData):
+    async def _loadFont(self, fontKey, fontItem, sharableFontData, isSelectedFont):
         print(f"start loading at {time.time() - self._startLoading:.4f} seconds")
         fontItem.setIsLoading(True)
         fontPath, fontNumber = fontKey
@@ -278,14 +278,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontItem.setIsLoading(False)
         await asyncio.sleep(0)
         txt = self._textEntry.get()
-        self.setFontItemText(fontKey, fontItem, txt)
+        self.setFontItemText(fontKey, fontItem, txt, isSelectedFont)
 
     def loadFonts(self):
         self._startLoading = time.time()
         self._loadCounter = 0
         sharableFontData = {}
+        firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
-            coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData)
+            coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData,
+                                  isSelectedFont=fontKey==firstKey)
             asyncio.create_task(coro)
 
     def iterFontItems(self):
@@ -296,8 +298,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         txt = sender.get()
         self.updateUnicodeList(txt, delay=0.05)
         t = time.time()
+        firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
-            self.setFontItemText(fontKey, fontItem, txt)
+            self.setFontItemText(fontKey, fontItem, txt, fontKey==firstKey)
             elapsed = time.time() - t
             if elapsed > 0.01:
                 # time to unblock the event loop
@@ -305,12 +308,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 t = time.time()
 
     @objc.python_method
-    def setFontItemText(self, fontKey, fontItem, txt):
+    def setFontItemText(self, fontKey, fontItem, txt, isSelectedFont):
         fontPath, fontNumber = fontKey
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
         glyphs, endPos = getGlyphRun(font, txt)
+        if isSelectedFont:
+            glyphListData = [g.__dict__ for g in glyphs]
+            self.glyphList.set(glyphListData)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
 
     @asyncTaskAutoCancel
