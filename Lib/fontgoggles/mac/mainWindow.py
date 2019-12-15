@@ -171,7 +171,8 @@ class FontItem(Group):
     def __init__(self, posSize, fontKey):
         super().__init__(posSize)
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
-        self.fileNameLabel = TextBox((10, 0, 0, 17), "", sizeStyle="regular")
+        self.fileNameLabel = TextBox((10, 0, 300, 17), "", sizeStyle="regular")
+        self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
 
@@ -275,8 +276,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber)
         self._loadCounter += 1
         print(f"loaded {self._loadCounter} fonts in {time.time() - self._startLoading:.4f} seconds")
-        fontItem.setIsLoading(False)
         await asyncio.sleep(0)
+        fontItem.setIsLoading(False)
         txt = self._textEntry.get()
         self.setFontItemText(fontKey, fontItem, txt, isSelectedFont)
 
