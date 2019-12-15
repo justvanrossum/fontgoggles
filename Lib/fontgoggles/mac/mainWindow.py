@@ -218,9 +218,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(title="unicode", width=60, cell=makeTextCell("right")),
             dict(title="unicode name", width=200, minWidth=200, key="unicodeName", cell=makeTextCell("left", "truncmiddle")),
         ]
-        self.unicodeList = List((0, 0, 0, 0), [],
+        self.unicodeList = List((0, 36, 0, 0), [],
                 columnDescriptions=columnDescriptions,
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
+        unicodeListGroup.bidiCheckBox = CheckBox((10, 8, -10, 20), "BiDi")
         unicodeListGroup.unicodeList = self.unicodeList
 
         self._textEntry = EditText((10, 10, -10, 25), initialText, callback=self.textEntryCallback)
@@ -235,7 +236,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(title="cluster", width=40, cell=makeTextCell("right")),
             dict(title="gid", width=40, cell=makeTextCell("right")),
         ]
-        self.glyphList = List((0, 0, 0, 0), [],
+        self.glyphList = List((0, 36, 0, 0), [],
                 columnDescriptions=columnDescriptions,
                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
         glyphListGroup.glyphList = self.glyphList
@@ -247,6 +248,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  size=200),
         ]
         subSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
+
         paneDescriptors = [
             dict(view=unicodeListGroup, identifier="pane1", canCollapse=True,
                  size=100, resizeFlexibility=False),
