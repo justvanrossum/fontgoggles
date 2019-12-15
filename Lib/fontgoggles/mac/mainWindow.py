@@ -243,17 +243,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
         self.updateUnicodeList(self._textEntry.get())
         self.loadFonts()
-        # self.testResizeFontItems()
-
-    @asyncTask
-    async def testResizeFontItems(self):
-        await asyncio.sleep(2)
-        itemSize = 150
-        for i in range(50):
-            itemSize *= 1.015
-            itemSize = round(itemSize)
-            self._fontGroup.resizeFontItems(itemSize)
-            await asyncio.sleep(0.0)
 
     @objc.python_method
     async def _loadFont(self, fontKey, fontItem, sharableFontData):
