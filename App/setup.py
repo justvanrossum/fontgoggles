@@ -37,7 +37,7 @@ infoplist = dict(
         ),
     ],
     CFBundleName = "FontGoggles",
-    CFBundleIdentifier = "com.google.fonts.FontGoggles",
+    CFBundleIdentifier = "com.github.googlefonts.FontGoggles",
     LSMinimumSystemVersion = "10.10",
     CFBundleShortVersionString = "0.1a",
     CFBundleVersion = "0.1a",
