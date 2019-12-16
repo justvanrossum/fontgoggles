@@ -26,8 +26,7 @@ testData = [
                       'length': 3,
                       'sor': 'L',
                       'start': 0,
-                      'type': 'L'}]),
-     }),
+                      'type': 'L'}])}),
     ("\u062D\u062A\u0649", "\u0649\u062A\u062D",
      {'base_dir': 'R',
       'base_level': 1,
@@ -50,8 +49,7 @@ testData = [
                       'length': 3,
                       'sor': 'R',
                       'start': 0,
-                      'type': 'AL'}]),
-    }),
+                      'type': 'AL'}])}),
     ("\u062D\u062A\u064912", "12\u0649\u062A\u062D",
      {'base_dir': 'R',
       'base_level': 1,
@@ -84,8 +82,7 @@ testData = [
                       'length': 5,
                       'sor': 'R',
                       'start': 0,
-                      'type': 'EN'}]),
-     }),
+                      'type': 'EN'}])}),
 ]
 
 
