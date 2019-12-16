@@ -21,6 +21,7 @@ ibmPlexTestStrings = [
     ("12/34",    dict(frac=True),  ['onesuperior', 'twosuperior', 'fraction', 'uni2083', 'uni2084']),
 ]
 
+
 @pytest.mark.parametrize("testString,features,expectedGlyphNames", ibmPlexTestStrings)
 def test_shape_latin(testString, features, expectedGlyphNames):
     s = HBShape.fromPath(getFontPath("IBMPlexSans-Regular.ttf"))

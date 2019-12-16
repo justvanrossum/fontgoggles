@@ -25,8 +25,9 @@ testValues = [
 ]
 
 testRects = [((xMin, yMin, xMax, yMax), xSects and ySects)
-                for xMin, xMax, xSects in testValues
-                    for yMin, yMax, ySects in testValues]
+             for xMin, xMax, xSects in testValues
+             for yMin, yMax, ySects in testValues]
+
 
 @pytest.mark.parametrize("testRect,expectedTruth", testRects)
 def test_hasIntersection(testRect, expectedTruth):
@@ -52,6 +53,7 @@ testTargets = [
     ((0, 10, 320, 20), [0, 1, 2, 3]),
 ]
 
+
 @pytest.mark.parametrize("targetRect,expectedIndices", testTargets)
 def test_rectTree_intersections(targetRect, expectedIndices):
     tree = RectTree.fromSeq([(b, i) for i, b in enumerate(testBoundsSequence)])
@@ -59,7 +61,7 @@ def test_rectTree_intersections(targetRect, expectedIndices):
     if expectedIndices:
         assert tree.firstIntersection(targetRect) == expectedIndices[0]
     else:
-        assert tree.firstIntersection(targetRect) == None
+        assert tree.firstIntersection(targetRect) is None
 
 
 def test_empty_rectTree():
