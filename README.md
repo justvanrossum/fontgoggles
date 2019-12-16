@@ -51,3 +51,5 @@ FontGoggles: Visual OTL Preview and QA
 	`$ python App/setup.py py2app`
 
 You'll find the built application in `App/dist/`
+
+Now you can drop some fonts onto the app, or a folder containing fonts.
