@@ -44,14 +44,13 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         self.hAlign = hAlign
         self.vAlign = vAlign
 
-
     def mouseDown_(self, event):
         # A click occured in the clipview, but outside the document view. Happens when it is
         # smaller than the clipview. Make the document view first responder.
         self.window().makeFirstResponder_(self.documentView())
 
     def constrainBoundsRect_(self, proposedClipViewBoundsRect):
-        # taken from https://stackoverflow.com/questions/22072105/how-do-you-get-nsscrollview-to-center-the-document-view-in-10-9-and-later
+        # Partially taken from https://stackoverflow.com/questions/22072105/
         rect = super().constrainBoundsRect_(proposedClipViewBoundsRect)
         view = self.documentView()
         viewFrame = view.frame()
