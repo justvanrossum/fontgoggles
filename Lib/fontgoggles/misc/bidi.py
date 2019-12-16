@@ -1,7 +1,8 @@
 from bidi.algorithm import (get_empty_storage, get_base_level, get_embedding_levels,
                             explicit_embed_and_overrides, resolve_weak_types,
                             resolve_neutral_types, resolve_implicit_levels,
-                            reorder_resolved_levels, apply_mirroring)
+                            reorder_resolved_levels, apply_mirroring,
+                            PARAGRAPH_LEVELS)
 
 
 # copied from bidi/algorthm.py and modified to be more useful for us.
