@@ -1,5 +1,5 @@
 from os import PathLike
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple
 from .font import getOpener
 from .font.baseFont import BaseFont
 
@@ -17,12 +17,12 @@ class Project:
     def iterFontKeys(self):
         return iter(self.fonts)
 
-    def addFont(self, path:PathLike, fontNumber:int):
+    def addFont(self, path: PathLike, fontNumber: int):
         if not isinstance(path, PathLike):
             raise TypeError("path must be a Path(-like) object")
         self.fonts[path, fontNumber] = None
 
-    def getFont(self, path:PathLike, fontNumber:int,
+    def getFont(self, path: PathLike, fontNumber: int,
                 notLoadedDefault=_RAISE_NOT_LOADED_ERROR):
         font = self.fonts[path, fontNumber]
         if font is None:
@@ -33,7 +33,7 @@ class Project:
         return font
 
     async def loadFont(self, path: PathLike, fontNumber: int,
-                       sharableFontData: dict=None):
+                       sharableFontData=None):
         font = self.fonts[path, fontNumber]
         if font is not None:
             return

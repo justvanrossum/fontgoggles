@@ -1,4 +1,3 @@
-import asyncio
 import io
 from fontTools.ttLib import TTFont
 from ..misc.decorators import readOnlyCachedProperty
@@ -21,7 +20,7 @@ class BaseFont:
 
     @readOnlyCachedProperty
     def colorPalettes(self):
-        return [[(0, 0, 0, 1)]]  # default palette [[(r, g, b, a)]]  
+        return [[(0, 0, 0, 1)]]  # default palette [[(r, g, b, a)]]
 
     @readOnlyCachedProperty
     def features(self):
@@ -52,8 +51,8 @@ class BaseFont:
         return axes
 
     def getGlyphRun(self, txt, *, features=None, variations=None,
-                          direction=None, language=None, script=None,
-                          colorLayers=False):
+                    direction=None, language=None, script=None,
+                    colorLayers=False):
         glyphInfo = self.shape(txt, features=features, variations=variations,
                                direction=direction, language=language,
                                script=script)
@@ -69,7 +68,7 @@ class BaseFont:
     def getOutlinePaths(self, glyphNames, variations, colorLayers=False):
         if self._currentVarLocation != variations:
             # purge outline cache
-            self._outlinePaths =[{}, {}]
+            self._outlinePaths = [{}, {}]
             self._currentVarLocation = variations
         for glyphName in glyphNames:
             outline = self._outlinePaths[colorLayers].get(glyphName)
