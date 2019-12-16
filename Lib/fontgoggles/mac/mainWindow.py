@@ -398,11 +398,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.unicodeList.set(uniListData)
 
     def zoomIn_(self, event):
-        self.itemHeight = min(1000, round(self.itemHeight * (2 ** (1/3))))
+        self.itemHeight = min(1000, round(self.itemHeight * (2 ** (1 / 3))))
         self._fontGroup.resizeFontItems(self.itemHeight)
 
     def zoomOut_(self, event):
-        self.itemHeight = max(50, round(self.itemHeight / (2 ** (1/3))))
+        self.itemHeight = max(50, round(self.itemHeight / (2 ** (1 / 3))))
         self._fontGroup.resizeFontItems(self.itemHeight)
 
 

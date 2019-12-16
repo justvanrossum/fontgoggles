@@ -48,7 +48,7 @@ class FTFont:
             for i in range(len(cPoints)):
                 if not cFlags[i] & 0x01:
                     segmentType = None
-                elif cFlags[i-1] & 0x01:
+                elif cFlags[i - 1] & 0x01:
                     segmentType = "line"
                 else:
                     segmentType = curveType

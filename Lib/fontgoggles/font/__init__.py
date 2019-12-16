@@ -64,12 +64,12 @@ def numFontsTTC(fontPath: PathLike):
 
 
 fontOpeners = {
-    "ttf":   (numFontsOne, openOTF),
-    "otf":   (numFontsOne, openOTF),
-    "woff":  (numFontsOne, openOTF),
+    "ttf": (numFontsOne, openOTF),
+    "otf": (numFontsOne, openOTF),
+    "woff": (numFontsOne, openOTF),
     "woff2": (numFontsOne, openOTF),
-    "ufo":   (numFontsOne, openUFO),
-    "ufos":  (numFontsOne, openUFO),
-    "ttc":   (numFontsTTC, openOTF),
-    "otc":   (numFontsTTC, openOTF),
+    "ufo": (numFontsOne, openUFO),
+    "ufos": (numFontsOne, openUFO),
+    "ttc": (numFontsTTC, openOTF),
+    "otc": (numFontsTTC, openOTF),
 }

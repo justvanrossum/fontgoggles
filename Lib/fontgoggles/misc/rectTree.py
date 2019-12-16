@@ -72,5 +72,4 @@ def hasIntersection(rect1, rect2):
     """
     (xMin1, yMin1, xMax1, yMax1) = rect1
     (xMin2, yMin2, xMax2, yMax2) = rect2
-    return ((xMin1 < xMax2 and xMax1 > xMin2) and
-            (yMin1 < yMax2 and yMax1 > yMin2))
+    return ((xMin1 < xMax2 and xMax1 > xMin2) and (yMin1 < yMax2 and yMax1 > yMin2))
