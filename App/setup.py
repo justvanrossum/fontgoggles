@@ -7,6 +7,9 @@ import datetime
 import glob
 
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))  # make our parent dir the current dir
+
+
 infoplist = dict(
     CFBundleDocumentTypes = [
         dict(
