@@ -6,11 +6,11 @@ import objc
 import Foundation
 
 
-_libName = "makePathFromOutline.dylib"
+_libName = "libmakePathFromOutline.dylib"
 _mainBundle = Foundation.NSBundle.mainBundle()
 _searchFolders = [
-    pathlib.Path(__file__).resolve().parent,
     pathlib.Path(_mainBundle.privateFrameworksURL().path()),
+    pathlib.Path(__file__).resolve().parent,
 ]
 
 for _folder in _searchFolders:
