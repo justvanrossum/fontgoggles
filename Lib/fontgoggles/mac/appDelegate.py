@@ -2,6 +2,7 @@ import os
 from AppKit import NSDocumentController
 from Foundation import NSObject, NSURL
 from ..misc.decorators import suppressAndLogException
+from .document import FGDocument
 
 
 def sniffFontType(path):
@@ -33,11 +34,16 @@ class FGAppDelegate(NSObject):
             self.filesToOpen = None
             if not filesToOpen:
                 return
-            print(filesToOpen)
-            # project = Project()
-            # docController = NSDocumentController.sharedDocumentController()
-            # for path in sorted(filesToOpen):
-            #     project.addSourcePath(path)
-            #     url = NSURL.fileURLWithPath_(path)
-            #     docController.noteNewRecentDocumentURL_(url)
-            # self.windowController = ProjectWindowController(project)
+
+            filesToOpen = sorted(filesToOpen)
+
+            docController = NSDocumentController.sharedDocumentController()
+            doc = FGDocument()
+            doc.addSourceFiles_(filesToOpen)
+            #doc.updateChangeCount_(1)
+            docController.addDocument_(doc)
+            doc.makeWindowControllers()
+
+            for path in filesToOpen:
+                url = NSURL.fileURLWithPath_(path)
+                docController.noteNewRecentDocumentURL_(url)
