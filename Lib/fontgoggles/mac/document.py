@@ -3,7 +3,7 @@ import AppKit
 
 from ..project import Project
 from .mainWindow import FGMainWindowController
-from ..font import getOpener, sniffFontType
+from ..font import iterFontPathsAndNumbers
 
 
 class FGDocument(AppKit.NSDocument):
@@ -15,19 +15,9 @@ class FGDocument(AppKit.NSDocument):
         self.project = Project()
 
     def addSourceFiles_(self, paths):
-        for path in paths:
-            path = pathlib.Path(path)
-            if sniffFontType(path) is None and path.is_dir():
-                for child in path.iterdir():
-                    if sniffFontType(child) is not None:
-                        self.addSourceFile_(child)
-            else:
-                self.addSourceFile_(path)
-
-    def addSourceFile_(self, path):
-        numFonts, opener = getOpener(path)
-        for i in range(numFonts(path)):
-            self.project.addFont(path, i)
+        paths = [pathlib.Path(path) for path in paths]
+        for fontPath, fontNumber in iterFontPathsAndNumbers(paths):
+            self.project.addFont(fontPath, fontNumber)
 
     def makeWindowControllers(self):
         controller = FGMainWindowController(self.project)

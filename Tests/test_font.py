@@ -1,6 +1,6 @@
 import pathlib
 import pytest
-from fontgoggles.font import getOpener, sniffFontType
+from fontgoggles.font import getOpener, iterFontPathsAndNumbers, sniffFontType
 
 
 testRoot = pathlib.Path(__file__).resolve().parent
@@ -76,3 +76,20 @@ async def test_openFonts(fileName,
     assert font.axes == axes
     run = font.getGlyphRun(text)
     assert [gi.name for gi in run] == glyphNames
+
+
+def test_iterFontPathsAndNumbers():
+    results = []
+    for fontPath, fontNumber in iterFontPathsAndNumbers([testRoot / "data"]):
+        results.append((fontPath.name, fontNumber))
+    # TODO: add .ttc test font
+    expectedResults = [
+        ('Amiri-Regular.ttf', 0),
+        ('IBMPlexSans-Regular.otf', 0),
+        ('IBMPlexSans-Regular.ttf', 0),
+        ('MutatorSans.ttf', 0),
+        ('MutatorSansBoldWide.ufo', 0),
+        ('NotoNastaliqUrdu-Regular.ttf', 0),
+        ('QuadTest-Regular.ttf', 0),
+    ]
+    assert results == expectedResults

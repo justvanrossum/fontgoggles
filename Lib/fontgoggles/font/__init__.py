@@ -17,6 +17,23 @@ def sniffFontType(fontPath:PathLike):
     return openerKey
 
 
+def iterFontPathsAndNumbers(paths:list):
+    for path in paths:
+        if sniffFontType(path) is None and path.is_dir():
+            for child in path.iterdir():
+                yield from iterFontNumbers(child)
+        else:
+            yield from iterFontNumbers(path)
+
+
+def iterFontNumbers(path):
+    if sniffFontType(path) is None:
+        return
+    numFonts, opener = getOpener(path)
+    for i in range(numFonts(path)):
+        yield path, i
+
+
 async def openOTF(fontPath:PathLike, fontNumber:int, fontData=None):
     from .baseFont import OTFFont
     if fontData is not None:
