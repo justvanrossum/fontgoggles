@@ -2,7 +2,6 @@ fonttools[ufo,lxml,woff,unicode,type1]
 pyobjc
 corefoundationasyncio
 py2app
-numpy
 pytest
 freetype-py
 uharfbuzz
