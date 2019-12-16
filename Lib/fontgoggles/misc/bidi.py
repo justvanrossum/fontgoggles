@@ -5,9 +5,22 @@ from bidi.algorithm import (get_empty_storage, get_base_level, get_embedding_lev
                             PARAGRAPH_LEVELS)
 
 
+def applyBiDi(text):
+    """Apply the BiDi algorithm to the input text, and return the display
+    string, and char index mappings for text_to_bidi and bidi_to_text.
+    """
+    storage, display = getBiDiInfo(text)
+    to_bidi = {}
+    from_bidi = {}
+    for index, char_info in enumerate(storage['chars']):
+        to_bidi[index] = char_info['index']
+        from_bidi[char_info['index']] = index
+    return display, to_bidi, from_bidi
+
+
 # copied from bidi/algorthm.py and modified to be more useful for us.
 
-def getBidiInfo(text, *, upper_is_rtl=False, base_dir=None, debug=False):
+def getBiDiInfo(text, *, upper_is_rtl=False, base_dir=None, debug=False):
     """
     Set `upper_is_rtl` to True to treat upper case chars as strong 'R'
     for debugging (default: False).
