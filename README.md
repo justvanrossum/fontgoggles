@@ -42,6 +42,10 @@ FontGoggles: Visual OTL Preview and QA
 
     (The latter step builds a required C library, that otherwise wouldn't get built in editable mode.)
 
+- Run some tests:
+
+	`$ pytest`
+
 - Build the application:
 
 	`$ python App/setup.py py2app`
