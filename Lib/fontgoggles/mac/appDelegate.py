@@ -1,13 +1,9 @@
 import os
 from AppKit import NSDocumentController
 from Foundation import NSObject, NSURL
+from ..font import sniffFontType
 from ..misc.decorators import suppressAndLogException
 from .document import FGDocument
-
-
-def sniffFontType(path):
-    # stub
-    return True
 
 
 class FGAppDelegate(NSObject):
@@ -40,7 +36,6 @@ class FGAppDelegate(NSObject):
             docController = NSDocumentController.sharedDocumentController()
             doc = FGDocument()
             doc.addSourceFiles_(filesToOpen)
-            #doc.updateChangeCount_(1)
             docController.addDocument_(doc)
             doc.makeWindowControllers()
 
