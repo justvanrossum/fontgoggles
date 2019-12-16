@@ -1,8 +1,5 @@
-import sys
 from distutils.core import setup
-import py2app
 import os
-import shutil
 import datetime
 import glob
 
@@ -13,39 +10,39 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))  # make our parent dir the 
 infoplist = dict(
     CFBundleDocumentTypes = [
         dict(
-            CFBundleTypeExtensions = ["ufo"],
-            CFBundleTypeName = "Unified Font Object",
-            CFBundleTypeRole = "Viewer",
-            LSTypeIsPackage = True,
+            CFBundleTypeExtensions=["ufo"],
+            CFBundleTypeName="Unified Font Object",
+            CFBundleTypeRole="Viewer",
+            LSTypeIsPackage=True,
         ),
         dict(
-            CFBundleTypeExtensions = ["ttf", "otf", "woff", "woff2", "otc", "ttc", "dfont"],
-            CFBundleTypeName = "OpenType Font",
-            CFBundleTypeRole = "Viewer",
+            CFBundleTypeExtensions=["ttf", "otf", "woff", "woff2", "otc", "ttc", "dfont"],
+            CFBundleTypeName="OpenType Font",
+            CFBundleTypeRole="Viewer",
         ),
         # dict(
-        #     CFBundleTypeExtensions = ["glyphs"],
-        #     CFBundleTypeName = "GlyphsApp Source File",
-        #     CFBundleTypeRole = "Viewer",
+        #     CFBundleTypeExtensions=["glyphs"],
+        #     CFBundleTypeName="GlyphsApp Source File",
+        #     CFBundleTypeRole="Viewer",
         # ),
         dict(
-            CFBundleTypeExtensions = ["designspace"],
-            CFBundleTypeName = "Designspace File",
-            CFBundleTypeRole = "Viewer",
+            CFBundleTypeExtensions=["designspace"],
+            CFBundleTypeName="Designspace File",
+            CFBundleTypeRole="Viewer",
         ),
         dict(
-            CFBundleTypeExtensions = ["*"],
-            CFBundleTypeName = "Any File",
-            CFBundleTypeRole = "Viewer",
+            CFBundleTypeExtensions=["*"],
+            CFBundleTypeName="Any File",
+            CFBundleTypeRole="Viewer",
         ),
     ],
-    CFBundleName = "FontGoggles",
-    CFBundleIdentifier = "com.github.googlefonts.FontGoggles",
-    LSMinimumSystemVersion = "10.10",
-    CFBundleShortVersionString = "0.1a",
-    CFBundleVersion = "0.1a",
+    CFBundleName="FontGoggles",
+    CFBundleIdentifier="com.github.googlefonts.FontGoggles",
+    LSMinimumSystemVersion="10.10",
+    CFBundleShortVersionString="0.1a",
+    CFBundleVersion="0.1a",
     CFBundleIconFile="fontgoggles.icns",
-    NSHumanReadableCopyright = f"Copyright © {datetime.datetime.now().year} Just van Rossum.\nAll rights reserved.",
+    NSHumanReadableCopyright=f"Copyright © {datetime.datetime.now().year} Just van Rossum.\nAll rights reserved.",
     NSPrincipalClass="NSApplication",
     # ATSApplicationFontsPath="Fonts/",
 )

@@ -2,8 +2,8 @@ import asyncio
 from corefoundationasyncio import CoreFoundationEventLoop
 
 # Make sure these classes are loaded
-from fontgoggles.mac.document import FGDocument
-from fontgoggles.mac.appDelegate import FGAppDelegate
+from fontgoggles.mac.document import FGDocument  # noqa: F401
+from fontgoggles.mac.appDelegate import FGAppDelegate  # noqa: F401
 
 
 if __name__ == "__main__":
