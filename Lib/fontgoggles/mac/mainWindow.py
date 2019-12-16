@@ -202,6 +202,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def __init__(self, project):
         self.project = project
         self.fontKeys = list(self.project.iterFontKeys())
+        self.allFeatureTags = set()
         self.itemHeight = 150
 
         sidebarWidth = 300
@@ -341,6 +342,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # print(f"loaded {self._loadCounter} fonts in {time.time() - self._startLoading:.4f} seconds")
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
+        self.allFeatureTags.update(font.features)
+        print(self.allFeatureTags)
         txt = self._textEntry.get()
         self.setFontItemText(fontKey, fontItem, txt, isSelectedFont)
 
