@@ -107,3 +107,5 @@ def test_applyBiDi(testString, expectedString, expectedToBiDi, expectedFromBiDi)
     assert display == expectedString
     assert toBiDi == expectedToBiDi
     assert fromBiDi == expectedFromBiDi
+    assert set(toBiDi) == set(range(len(toBiDi)))
+    assert set(toBiDi) == set(fromBiDi)
