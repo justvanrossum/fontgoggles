@@ -29,11 +29,13 @@ def asyncTaskAutoCancel(func):
             oldTask.cancel()
         coro = func(self, *args, **kwargs)
         task = asyncio.create_task(coro)
+
         def _done_callback(task):
             if task.cancelled():
                 return
             if task.exception() is not None:
                 task.print_stack()
+
         task.add_done_callback(_done_callback)
         setattr(self, taskAttributeName, task)
         return task
@@ -48,12 +50,14 @@ def suppressAndLogException(func):
     When an exception occurs, the decorated function will return None, so only
     use this decorator if returning None is a valid option.
     """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except:
+        except Exception:
             logging.exception(func.__name__)
+
     return wrapper
 
 

@@ -17,7 +17,7 @@ class GlyphInfo:
 
     def __repr__(self):
         args = (f"{a}={repr(getattr(self, a))}"
-                    for a in ["gid", "name", "cluster", "dx", "dy", "ax", "ay"])
+                for a in ["gid", "name", "cluster", "dx", "dy", "ax", "ay"])
         return f"{self.__class__.__name__}({', '.join(args)})"
 
 
@@ -161,11 +161,3 @@ class HBShape:
             infos.append(GlyphInfo(info.codepoint, glyphOrder[info.codepoint], info.cluster, *pos.position))
 
         return infos
-
-
-if __name__ == "__main__":
-    import sys
-    shaper = Shaper.fromPath(sys.argv[1])
-    txt = sys.argv[2]
-    for g in shaper.shape(txt):
-        print(g)

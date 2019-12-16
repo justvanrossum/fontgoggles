@@ -1,18 +1,14 @@
 import asyncio
-import contextlib
-import pathlib
 import unicodedata
 import time
 import AppKit
 import objc
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
-from fontgoggles.font import getOpener
-from fontgoggles.project import Project
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
-from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
+from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.rectTree import RectTree
 
 
@@ -28,7 +24,6 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
         self._glyphs = glyphs
         self.unitsPerEm = unitsPerEm
-        x = y = 0
         rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._selection = set()

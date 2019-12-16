@@ -48,7 +48,7 @@ class RectTree(NamedTuple):
         right = cls.fromSeq(seq[mid:])
         bounds = unionRect(left[0], right[0])
         return cls(bounds, None, left, right)
-    
+
     def iterIntersections(self, targetBounds: Rectangle):
         if self.bounds is None:
             # empty tree

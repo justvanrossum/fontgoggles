@@ -9,7 +9,7 @@ _RAISE_NOT_LOADED_ERROR = object()
 
 class Project:
 
-    fonts: Dict[Tuple[PathLike,int], Optional[BaseFont]]
+    fonts: Dict[Tuple[PathLike, int], Optional[BaseFont]]
 
     def __init__(self):
         self.fonts = {}
@@ -32,8 +32,8 @@ class Project:
                 return notLoadedDefault
         return font
 
-    async def loadFont(self, path:PathLike, fontNumber:int,
-                       sharableFontData:dict=None):
+    async def loadFont(self, path: PathLike, fontNumber: int,
+                       sharableFontData: dict=None):
         font = self.fonts[path, fontNumber]
         if font is not None:
             return
