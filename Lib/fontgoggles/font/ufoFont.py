@@ -7,6 +7,7 @@ from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
+from fontTools.ufoLib.glifLib import _fetchUnicodes as fetchUnicodes
 from .baseFont import BaseFont
 from ..misc.hbShape import HBShape
 from ..misc.runInPool import runInProcessPool

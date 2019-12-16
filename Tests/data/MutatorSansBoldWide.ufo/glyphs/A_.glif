@@ -2,6 +2,10 @@
 <glyph name="A" format="2">
   <advance width="1290"/>
   <unicode hex="0041"/>
+<!-- a commented-out section to verify our regex-based unicode fetcher falls
+     back to the proper parser when there are comments
+  <unicode hex="0061"/>
+   -->
   <outline>
     <contour>
       <point x="20" y="0" type="line"/>
