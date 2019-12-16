@@ -23,7 +23,7 @@ setup(
         'fontgoggles.mac',
         'fontgoggles.misc',
     ],
-    package_data={'': ['*.dylib']},
+    package_data={'fontgoggles.mac': ['*.dylib']},
     install_requires=[
     ],
     extras_require={
