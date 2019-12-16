@@ -1,5 +1,13 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+from distutils.command.install import install as _install
+from setuptools import setup
+import subprocess
+
+
+class install(_install):
+    def run(self):
+        subprocess.call(['./Turbo/build_lib.sh'])
+        _install.run(self)
 
 
 setup(
@@ -9,7 +17,13 @@ setup(
     author_email="justvanrossum@gmail.com",
     url="https://github.com/justvanrossum/fontgoggles",
     package_dir={"": "Lib"},
-    packages=find_packages("Lib"),
+    packages=[
+        'fontgoggles',
+        'fontgoggles.font',
+        'fontgoggles.mac',
+        'fontgoggles.misc',
+    ],
+    package_data={'': ['*.dylib']},
     install_requires=[
     ],
     extras_require={
@@ -19,4 +33,5 @@ setup(
     python_requires=">=3.7",
     classifiers=[
     ],
+    cmdclass={'install': install},
 )
