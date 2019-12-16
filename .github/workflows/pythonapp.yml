@@ -31,4 +31,5 @@ jobs:
         pytest
     - name: Build application
       run: |
-        python App/setup.py py2app
+        python -c "import sys; print('\n'.join(sys.path))"
+        # python App/setup.py py2app
