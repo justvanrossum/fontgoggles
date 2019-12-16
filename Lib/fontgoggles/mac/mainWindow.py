@@ -220,7 +220,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  size=100, resizeFlexibility=False),
             dict(view=subSplitView, identifier="pane3", canCollapse=False),
             dict(view=sidebarGroup, identifier="pane4", canCollapse=True,
-                size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth, resizeFlexibility=False),
+                 size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth,
+                 resizeFlexibility=False),
         ]
         mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
 
@@ -239,11 +240,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # dict(title="index", width=34, cell=makeTextCell("right")),
             dict(title="char", width=30, typingSensitive=True, cell=makeTextCell("center")),
             dict(title="unicode", width=60, cell=makeTextCell("right")),
-            dict(title="unicode name", width=200, minWidth=200, key="unicodeName", cell=makeTextCell("left", "truncmiddle")),
+            dict(title="unicode name", width=200, minWidth=200, key="unicodeName",
+                 cell=makeTextCell("left", "truncmiddle")),
         ]
         self.unicodeList = List((0, 40, 0, 0), [],
-                columnDescriptions=columnDescriptions,
-                allowsSorting=False, drawFocusRing=False, rowHeight=20)
+                                columnDescriptions=columnDescriptions,
+                                allowsSorting=False, drawFocusRing=False, rowHeight=20)
         group.bidiCheckBox = CheckBox((10, 8, -10, 20), "BiDi")
         group.unicodeList = self.unicodeList
         return group
@@ -253,7 +255,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         columnDescriptions = [
             # dict(title="index", width=34, cell=makeTextCell("right")),
-            dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200, typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
+            dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200,
+                 typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
             dict(title="adv", key="ax", width=40, cell=makeTextCell("right")),  # XXX
             dict(title="∆X", key="dx", width=40, cell=makeTextCell("right")),
             dict(title="∆Y", key="dy", width=40, cell=makeTextCell("right")),
@@ -263,8 +266,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(title="", key="_dummy_", minWidth=0, maxWidth=1400),
         ]
         self.glyphList = List((0, 40, 0, 0), [],
-                columnDescriptions=columnDescriptions,
-                allowsSorting=False, drawFocusRing=False, rowHeight=20)
+                              columnDescriptions=columnDescriptions,
+                              allowsSorting=False, drawFocusRing=False,
+                              rowHeight=20)
         group.glyphList = self.glyphList
         return group
 
@@ -304,8 +308,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y += 50
         alignmentOptionsHorizontal = [
             "Automatic",
-            "Left", # Top
-            "Right", # Bottom
+            "Left",   # Top
+            "Right",  # Bottom
             "Center",
         ]
         group.alignmentPopup = LabeledView(
@@ -322,8 +326,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         sharableFontData = {}
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
+            isSelectedFont = (fontKey == firstKey)
             coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData,
-                                  isSelectedFont=fontKey==firstKey)
+                                  isSelectedFont=isSelectedFont)
             asyncio.create_task(coro)
 
     @objc.python_method
@@ -352,7 +357,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         t = time.time()
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
-            self.setFontItemText(fontKey, fontItem, txt, fontKey==firstKey)
+            isSelectedFont = (fontKey == firstKey)
+            self.setFontItemText(fontKey, fontItem, txt, isSelectedFont=isSelectedFont)
             elapsed = time.time() - t
             if elapsed > 0.01:
                 # time to unblock the event loop
