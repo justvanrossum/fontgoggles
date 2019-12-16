@@ -18,7 +18,7 @@ class AligningScrollView(vanilla.ScrollView):
         if hasattr(documentView, "_nsObject"):
             x, y, w, h = documentView._posSize
             assert x == 0 and y == 0, "posSize x and y must be 0 in document view"
-            assert w > 0 and h > 0, "posSize w and h must be positive in document view"
+            assert w >= 0 and h >= 0, "posSize w and h must be positive in document view"
             documentView = documentView._nsObject
             documentView.setFrame_(((0, 0), (w, h)))
         if clipview is None:
