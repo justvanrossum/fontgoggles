@@ -17,7 +17,7 @@ class FGDocument(AppKit.NSDocument):
     def addSourceFiles_(self, paths):
         for path in paths:
             path = pathlib.Path(path)
-            if path.is_dir():
+            if sniffFontType(path) is None and path.is_dir():
                 for child in path.iterdir():
                     if sniffFontType(child) is not None:
                         self.addSourceFile_(child)
