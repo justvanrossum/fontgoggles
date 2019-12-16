@@ -9,7 +9,8 @@ import Foundation
 _libName = "libmakePathFromOutline.dylib"
 _mainBundle = Foundation.NSBundle.mainBundle()
 _searchFolders = [
-    pathlib.Path(_mainBundle.privateFrameworksURL().path()),
+    pathlib.Path(_mainBundle.resourcePath()),
+    pathlib.Path(_mainBundle.privateFrameworksPath()),
     pathlib.Path(__file__).resolve().parent,
 ]
 
