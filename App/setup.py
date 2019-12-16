@@ -2,6 +2,7 @@ from setuptools import setup
 import os
 import datetime
 import glob
+import fontgoggles.mac
 
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))  # make our parent dir the current dir
@@ -48,7 +49,7 @@ infoplist = dict(
 )
 
 dataFiles = [
-        '../Lib/fontgoggles/mac/libmakePathFromOutline.dylib',
+        os.path.join(os.path.dirname(fontgoggles.mac.__file__), "libmakePathFromOutline.dylib"),
         'Resources/English.lproj',
         # 'Resources/Fonts',
 ] + glob.glob("Resources/*.pdf")
