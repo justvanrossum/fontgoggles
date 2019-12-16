@@ -95,10 +95,12 @@ def test_getBiDiInfo_ltr(testString, expectedString, expectedInfo):
 
 testDataApplyBiDi = [
     ("Abc", "Abc",
-     {0: 0, 1: 1, 2: 2}, {0: 0, 1: 1, 2: 2}),
+     [0, 1, 2], [0, 1, 2]),
     ("\u062D\u062A\u064912", "12\u0649\u062A\u062D",
-     {0: 3, 1: 4, 2: 2, 3: 1, 4: 0}, {0: 4, 1: 3, 2: 2, 3: 0, 4: 1}),
+     [4, 3, 2, 0, 1], [3, 4, 2, 1, 0]),
 ]
+
+
 @pytest.mark.parametrize("testString,expectedString,expectedToBiDi,expectedFromBiDi", testDataApplyBiDi)
 def test_applyBiDi(testString, expectedString, expectedToBiDi, expectedFromBiDi):
     display, toBiDi, fromBiDi = applyBiDi(testString)
