@@ -20,7 +20,7 @@ def sniffFontType(fontPath: PathLike):
 def iterFontPathsAndNumbers(paths: list):
     for path in paths:
         if sniffFontType(path) is None and path.is_dir():
-            for child in path.iterdir():
+            for child in sorted(path.iterdir()):
                 yield from iterFontNumbers(child)
         else:
             yield from iterFontNumbers(path)
