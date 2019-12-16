@@ -7,7 +7,7 @@ from bidi.algorithm import (get_empty_storage, get_base_level, get_embedding_lev
 
 def applyBiDi(text):
     """Apply the BiDi algorithm to the input text, and return the display
-    string, and char index mappings for text_to_bidi and bidi_to_text.
+    string, and char index mappings for to_bidi and from_bidi.
     """
     storage, display = getBiDiInfo(text)
     from_bidi = [char_info['index'] for char_info in storage['chars']]
