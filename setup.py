@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-from distutils.command.install import install as _install
+from distutils.command.build import build as _build
 from setuptools import setup
 import subprocess
 
 
-class install(_install):
+class build(_build):
     def run(self):
-        subprocess.call(['./Turbo/build_lib.sh'])
-        _install.run(self)
+        # Build our C library
+        subprocess.check_call(['./Turbo/build_lib.sh'])
+        _build.run(self)
 
 
 setup(
@@ -33,5 +34,5 @@ setup(
     python_requires=">=3.7",
     classifiers=[
     ],
-    cmdclass={'install': install},
+    cmdclass={'build': build},
 )
