@@ -44,12 +44,13 @@ infoplist = dict(
     CFBundleIconFile="fontgoggles.icns",
     NSHumanReadableCopyright = f"Copyright © {datetime.datetime.now().year} Just van Rossum.\nAll rights reserved.",
     NSPrincipalClass="NSApplication",
-    ATSApplicationFontsPath="Fonts/",
+    # ATSApplicationFontsPath="Fonts/",
 )
 
 dataFiles = [
+        '../Lib/fontgoggles/mac/libmakePathFromOutline.dylib',
         'Resources/English.lproj',
-        'Resources/Fonts',
+        # 'Resources/Fonts',
 ] + glob.glob("Resources/*.pdf")
 
 appName = "FontGoggles"
