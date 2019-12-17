@@ -40,6 +40,13 @@ class UnicodePicker:
         self.w._window.setBecomesKeyOnlyIfNeeded_(False)
         self.w._window.makeKeyWindow()
 
+    def show(self):
+        if self.w._window is None:
+            # we have been closed, let's reconstruct
+            self.__init__()
+        else:
+            self.w.show()
+
     def searchTextChanged(self, sender):
         results = []
         terms = sender.get().upper().split()

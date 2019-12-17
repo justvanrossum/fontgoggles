@@ -10,6 +10,7 @@ from .document import FGDocument
 class FGAppDelegate(NSObject):
 
     filesToOpen = None
+    unicodePicker = None
 
     def applicationShouldOpenUntitledFile_(self, app):
         return False
@@ -44,3 +45,10 @@ class FGAppDelegate(NSObject):
             for path in filesToOpen:
                 url = NSURL.fileURLWithPath_(path)
                 docController.noteNewRecentDocumentURL_(url)
+
+    def showUnicodePicker_(self, sender):
+        from .unicodePicker import UnicodePicker
+        if self.unicodePicker is not None:
+            self.unicodePicker.show()
+        else:
+            self.unicodePicker = UnicodePicker()
