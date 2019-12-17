@@ -1,8 +1,34 @@
+""" This module exports a function called findPrefix(prefix). It will
+return a sorted list of unicode values (ints) that are associated with
+the supplied prefix. The prefix is matched with the substrings (as split
+by whitespace) of all Unicode names.
+
+To make this run reasonably fast, this is implemented with a binary
+search over a sorted list of substrings. The needed data takes a while
+to be loaded when created from scratch, so this module stores the data
+in pickled form for faster loading.
+"""
+
 import base64
 import bisect
 from collections import defaultdict
 import pickle
 import unicodedata
+
+
+__all__ = ["findPrefix"]
+
+
+def findPrefix(prefix):
+    i = bisect.bisect_left(nameParts, prefix)
+    return sorted(set(iterMatches(prefix, i)))
+
+
+def iterMatches(prefix, i):
+    while i < len(nameParts) and nameParts[i].startswith(prefix):
+        for uni in unicodeRefs[i]:
+            yield uni
+        i += 1
 
 
 def makeUnicodeNameList():
@@ -29,18 +55,6 @@ def makeUnicodeNameList():
     nameParts = [n for n, lst in partsList]
     unicodeRefs = [lst for n, lst in partsList]
     return nameParts, unicodeRefs
-
-
-def iterMatches(prefix, i):
-    while i < len(nameParts) and nameParts[i].startswith(prefix):
-        for uni in unicodeRefs[i]:
-            yield uni
-        i += 1
-
-
-def findPrefix(prefix):
-    i = bisect.bisect_left(nameParts, prefix)
-    return sorted(set(iterMatches(prefix, i)))
 
 
 data = b"""
