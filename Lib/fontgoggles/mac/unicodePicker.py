@@ -71,8 +71,8 @@ class UnicodePicker:
         unicodeItems = [dict(char=chr(uni),
                              unicode=f"U+{uni:04X}",
                              name=unicodedata.name(chr(uni), "")) for uni in results]
-        if len(unicodeItems) > 100:
-            unicodeItems = unicodeItems[:100] + [dict(name="...more...")]
+        if len(unicodeItems) > 500:
+            unicodeItems = unicodeItems[:500] + [dict(name="...more...")]
         self.w.unicodeList.set(unicodeItems)
 
     def listSelectionChanged(self, sender):
