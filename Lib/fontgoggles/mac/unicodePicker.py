@@ -3,6 +3,7 @@ import unicodedata
 import AppKit
 from vanilla import *
 from ..misc.unicodeNameList import findPrefix
+from .misc import makeTextCell
 
 
 _unicodePat = re.compile(r"(([u]\+)|(0x))?([0-9a-f]+)$", re.IGNORECASE)
@@ -23,7 +24,8 @@ class UnicodePicker:
 
         y += 40
         columnDescriptions = [
-            dict(title="unicode", width=80),
+            dict(title="char", width=40, cell=makeTextCell(align="center")),
+            dict(title="unicode", width=60, cell=makeTextCell(align="right")),
             dict(title="name"),
         ]
         self.w.unicodeList = List((0, y, 0, -100), [], columnDescriptions=columnDescriptions,
@@ -64,7 +66,9 @@ class UnicodePicker:
             results += sorted(foundSet)
 
         self.searchResults = results
-        unicodeItems = [dict(unicode=f"U+{uni:04X}", name=unicodedata.name(chr(uni), "")) for uni in results]
+        unicodeItems = [dict(char=chr(uni),
+                             unicode=f"U+{uni:04X}",
+                             name=unicodedata.name(chr(uni), "")) for uni in results]
         if len(unicodeItems) > 100:
             unicodeItems = unicodeItems[:100] + [dict(name="...more...")]
         self.w.unicodeList.set(unicodeItems)
