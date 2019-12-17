@@ -1,4 +1,5 @@
 import os
+import pathlib
 from AppKit import NSDocumentController
 from Foundation import NSObject, NSURL
 from ..font import sniffFontType
@@ -26,7 +27,7 @@ class FGAppDelegate(NSObject):
     @suppressAndLogException
     def openQueuedFiles(self):
         if self.filesToOpen:
-            filesToOpen = [p for p in self.filesToOpen if os.path.isdir(p) or sniffFontType(p)]
+            filesToOpen = [p for p in self.filesToOpen if os.path.isdir(p) or sniffFontType(pathlib.Path(p))]
             self.filesToOpen = None
             if not filesToOpen:
                 return

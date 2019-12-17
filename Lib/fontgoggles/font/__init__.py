@@ -1,5 +1,3 @@
-import functools
-import pathlib
 from os import PathLike
 
 
@@ -10,7 +8,6 @@ def getOpener(fontPath: PathLike):
     return numFontsFunc, openerFunc
 
 
-@functools.singledispatch
 def sniffFontType(fontPath: PathLike):
     if not isinstance(fontPath, PathLike):
         raise TypeError("fontPath must be a Path(-like) object")
@@ -18,11 +15,6 @@ def sniffFontType(fontPath: PathLike):
     if openerKey not in fontOpeners:
         return None
     return openerKey
-
-
-@sniffFontType.register
-def _(fontPath: str):
-    return sniffFontType(pathlib.Path(fontPath))
 
 
 def iterFontPathsAndNumbers(paths: list):
