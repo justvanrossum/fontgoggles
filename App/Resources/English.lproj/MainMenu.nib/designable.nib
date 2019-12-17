@@ -397,8 +397,7 @@
 											<object class="NSMenuItem" id="221049415">
 												<reference key="NSMenu" ref="934363260"/>
 												<string key="NSTitle">Find Next</string>
-												<string key="NSKeyEquiv">g</string>
-												<int key="NSKeyEquivModMask">1048576</int>
+												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="888217921"/>
 												<reference key="NSMixedImage" ref="637174933"/>
@@ -407,8 +406,7 @@
 											<object class="NSMenuItem" id="260847167">
 												<reference key="NSMenu" ref="934363260"/>
 												<string key="NSTitle">Find Previous</string>
-												<string key="NSKeyEquiv">G</string>
-												<int key="NSKeyEquivModMask">1048576</int>
+												<string key="NSKeyEquiv"/>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="888217921"/>
 												<reference key="NSMixedImage" ref="637174933"/>
@@ -551,7 +549,7 @@
 								<object class="NSMenuItem" id="356445786">
 									<reference key="NSMenu" ref="242134042"/>
 									<string key="NSTitle">Show Character list</string>
-									<string key="NSKeyEquiv">C</string>
+									<string key="NSKeyEquiv">U</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="888217921"/>
@@ -569,7 +567,7 @@
 								<object class="NSMenuItem" id="319108824">
 									<reference key="NSMenu" ref="242134042"/>
 									<string key="NSTitle">Show Formatting options</string>
-									<string key="NSKeyEquiv">O</string>
+									<string key="NSKeyEquiv">F</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="888217921"/>

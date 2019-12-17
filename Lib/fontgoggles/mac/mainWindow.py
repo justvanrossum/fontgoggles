@@ -208,18 +208,19 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         sidebarGroup = self.setupSidebarGroup()
 
         paneDescriptors = [
-            dict(view=glyphListGroup, identifier="pane1", canCollapse=True,
+            dict(view=glyphListGroup, identifier="glyphList", canCollapse=True,
                  size=205, resizeFlexibility=False),
-            dict(view=fontListGroup, identifier="pane2", canCollapse=False,
+            dict(view=fontListGroup, identifier="fontList", canCollapse=False,
                  size=200),
         ]
         subSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
+        self.subSplitView = subSplitView
 
         paneDescriptors = [
-            dict(view=unicodeListGroup, identifier="pane1", canCollapse=True,
-                 size=100, resizeFlexibility=False),
-            dict(view=subSplitView, identifier="pane3", canCollapse=False),
-            dict(view=sidebarGroup, identifier="pane4", canCollapse=True,
+            dict(view=unicodeListGroup, identifier="characterList", canCollapse=True,
+                 size=100, minSize=100, resizeFlexibility=False),
+            dict(view=subSplitView, identifier="subSplit", canCollapse=False),
+            dict(view=sidebarGroup, identifier="formattingOptions", canCollapse=True,
                  size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth,
                  resizeFlexibility=False),
         ]
@@ -397,11 +398,39 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             )
         self.unicodeList.set(uniListData)
 
-    def zoomIn_(self, event):
+    def showCharacterList_(self, sender):
+        self.w.mainSplitView.togglePane("characterList")
+
+    def showGlyphList_(self, sender):
+        self.subSplitView.togglePane("glyphList")
+
+    def showFormattingOptions_(self, sender):
+        self.w.mainSplitView.togglePane("formattingOptions")
+
+    @suppressAndLogException
+    def validateMenuItem_(self, sender):
+        action = sender.action()
+        title = sender.title()
+        isVisible = None
+        findReplace = ["Hide", "Show"]
+        if action == "showCharacterList:":
+            isVisible = not self.w.mainSplitView.isPaneVisible("characterList")
+        elif action == "showGlyphList:":
+            isVisible = not self.subSplitView.isPaneVisible("glyphList")
+        elif action == "showFormattingOptions:":
+            isVisible = not self.w.mainSplitView.isPaneVisible("formattingOptions")
+        if isVisible is not None:
+            if isVisible:
+                findReplace.reverse()
+            newTitle = title.replace(findReplace[0], findReplace[1])
+            sender.setTitle_(newTitle)
+        return True
+
+    def zoomIn_(self, sender):
         self.itemHeight = min(1000, round(self.itemHeight * (2 ** (1 / 3))))
         self._fontGroup.resizeFontItems(self.itemHeight)
 
-    def zoomOut_(self, event):
+    def zoomOut_(self, sender):
         self.itemHeight = max(50, round(self.itemHeight / (2 ** (1 / 3))))
         self._fontGroup.resizeFontItems(self.itemHeight)
 
