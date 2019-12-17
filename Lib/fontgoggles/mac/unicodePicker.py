@@ -36,6 +36,7 @@ class UnicodePicker:
         y = -95
         self.w.unicodeText = TextBox((20, y, -10, 55), "")
         self.w.unicodeText._nsObject.cell().setFont_(AppKit.NSFont.systemFontOfSize_(36))
+        self.w.unicodeText._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
         y += 55
         self.w.copyButton = Button((20, y, 120, 25), "Copy", callback=self.copyButtonCallback)
         self.w.copyButton.enable(False)
