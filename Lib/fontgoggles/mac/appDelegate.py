@@ -27,7 +27,8 @@ class FGAppDelegate(NSObject):
     @suppressAndLogException
     def openQueuedFiles(self):
         if self.filesToOpen:
-            filesToOpen = [p for p in self.filesToOpen if os.path.isdir(p) or sniffFontType(pathlib.Path(p))]
+            filesToOpen = [p for p in self.filesToOpen
+                           if os.path.isdir(p) or sniffFontType(pathlib.Path(p))]
             self.filesToOpen = None
             if not filesToOpen:
                 return
