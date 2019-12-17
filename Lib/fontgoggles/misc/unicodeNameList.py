@@ -33156,10 +33156,10 @@ AQBhXXJBtgAATeqiYV1yQrYAAE3somFdckO2AABN66JhXXJEtgAATeeiYV1yRbYAAE3oomFlhnJG
 tgAALg==
 """
 
-nameParts, unicodeRefs = pickle.loads(base64.decodestring(data))
+nameParts, unicodeRefs = pickle.loads(base64.decodebytes(data))
 
 
 if __name__ == "__main__":
     nameParts, unicodeRefs = makeUnicodeNameList()
     p = pickle.dumps((nameParts, unicodeRefs))
-    print(base64.encodestring(p).decode("ascii"))
+    print(base64.encodebytes(p).decode("ascii"))
