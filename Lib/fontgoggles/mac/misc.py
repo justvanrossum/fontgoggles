@@ -19,10 +19,12 @@ _textLineBreakModes = dict(
 )
 
 
-def makeTextCell(align="left", lineBreakMode="wordwrap"):
+def makeTextCell(align="left", lineBreakMode="wordwrap", font=None):
     cell = AppKit.NSTextFieldCell.alloc().init()
     cell.setAlignment_(_textAlignments[align])
     cell.setLineBreakMode_(_textLineBreakModes[lineBreakMode])
+    if font is not None:
+        cell.setFont_(font)
     return cell
 
 
