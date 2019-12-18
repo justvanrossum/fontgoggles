@@ -92,7 +92,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
                     rect.origin.x = 0
                 elif self.hAlign == "right":
                     rect.origin.x = (viewFrame.size.width - rect.size.width)
-            elif self._prevBounds is not None:
+            else:
                 if self.hAlign == "center":
                     rect.origin.x = self._prevBounds.origin.x - dw / 2 + dx
                 elif self.hAlign == "right":
