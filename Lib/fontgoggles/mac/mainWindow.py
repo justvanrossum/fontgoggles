@@ -28,6 +28,8 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._selection = set()
         self.setNeedsDisplay_(True)
+        x, y = endPos
+        return self.offset[0] * 2 + x * self.scaleFactor
 
     @suppressAndLogException
     def mouseDown_(self, event):
@@ -142,6 +144,19 @@ class FontGroup(Group):
             y += itemHeight
         self.setPosSize((0, 0, width, y))
 
+    @property
+    def width(self):
+        return self.getPosSize()[2]
+
+    @width.setter
+    def width(self, newWidth):
+        x, y, w, h = self.getPosSize()
+        self.setPosSize((x, y, newWidth, h))
+
+    @property
+    def height(self):
+        return self.getPosSize()[3]
+
     def iterFontItems(self):
         index = 0
         while True:
@@ -186,7 +201,7 @@ class FontItem(Group):
         self.fileNameLabel._nsObject.setToolTip_(str(fontPath))
 
     def setGlyphs(self, glyphs, endPos, unitsPerEm):
-        self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
+        return self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
@@ -278,7 +293,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         initialText = "ABC abc 0123 :;?"
         self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
-        self._fontGroup = FontGroup(self.fontKeys, 3000, self.itemHeight)
+        self._fontGroup = FontGroup(self.fontKeys, 300, self.itemHeight)
         group.fontList = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True)
         group.textEntry = self._textEntry
         return group
@@ -375,7 +390,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         glyphs, endPos = getGlyphRun(font, txt)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
-        fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
+        minimumWidth = fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
+        if minimumWidth > self._fontGroup.width:
+            # We make it a little wider than needed, so as to minimize the
+            # number of times we need to make it grow, as it requires a full
+            # redraw.
+            self._fontGroup.width = minimumWidth + 200
 
     @asyncTaskAutoCancel
     async def updateGlyphList(self, glyphs, delay=0):
