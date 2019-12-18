@@ -161,6 +161,7 @@ class FontGroup(Group):
 
     def __init__(self, fontKeys, width, itemHeight):
         super().__init__((0, 0, width, 900))
+        self._align = "left"
         y = 0
         for index, fontKey in enumerate(fontKeys):
             fontItemName = fontItemNameTemplate.format(index=index)
@@ -181,6 +182,19 @@ class FontGroup(Group):
     @property
     def height(self):
         return self.getPosSize()[3]
+
+    @property
+    def align(self):
+        return self._align
+
+    @align.setter
+    def align(self, value):
+        assert value in {"left", "center", "right"}
+        if value == self._align:
+            return
+        self._align = align
+        for fontItem in self.iterFontItems():
+            fontItem.align = align
 
     def iterFontItems(self):
         index = 0
@@ -227,6 +241,14 @@ class FontItem(Group):
 
     def setGlyphs(self, glyphs, endPos, unitsPerEm):
         return self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
+
+    @property
+    def align(self):
+        return self.glyphLineView._nsObject.align
+
+    @align.setter
+    def align(self, value):
+        self.glyphLineView._nsObject.align = value
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
