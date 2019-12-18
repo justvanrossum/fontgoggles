@@ -17,19 +17,30 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     _glyphs = None
     _rectTree = None
     _selection = None
+    _align = "left"
+    _endPos = (0, 0)
 
     def isOpaque(self):
         return True
 
     def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
         self._glyphs = glyphs
+        self._endPos = endPos
         self.unitsPerEm = unitsPerEm
         rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._selection = set()
         self.setNeedsDisplay_(True)
-        x, y = endPos
-        return self.origin[0] * 2 + x * self.scaleFactor
+        # Return the minimal width our view must have to fit the glyphs
+        return self.margin * 2 + endPos[0] * self.scaleFactor
+
+    @property
+    def align(self):
+        return self._align
+
+    @align.setter
+    def align(self, value):
+        self._align = value
 
     @property
     def scaleFactor(self):
@@ -37,9 +48,23 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         return 0.7 * height / self.unitsPerEm
 
     @property
-    def origin(self):
+    def margin(self):
         height = self.frame().size.height
-        return 0.1 * height, 0.25 * height
+        return 0.1 * height
+
+    @property
+    def origin(self):
+        endPosX = self._endPos[0] * self.scaleFactor
+        margin = self.margin
+        align = self.align
+        width, height = self.frame().size
+        if align == "right":
+            xPos = width - margin - endPosX
+        elif align == "center":
+            xPos = (width - endPosX) / 2
+        else:  # align == "left"
+            xPos = margin
+        return xPos, 0.25 * height
 
     @suppressAndLogException
     def drawRect_(self, rect):
