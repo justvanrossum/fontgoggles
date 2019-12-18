@@ -41,6 +41,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     @align.setter
     def align(self, value):
         self._align = value
+        self.setNeedsDisplay_(True)
 
     @property
     def scaleFactor(self):
@@ -192,9 +193,9 @@ class FontGroup(Group):
         assert value in {"left", "center", "right"}
         if value == self._align:
             return
-        self._align = align
+        self._align = value
         for fontItem in self.iterFontItems():
-            fontItem.align = align
+            fontItem.align = value
 
     def iterFontItems(self):
         index = 0
@@ -378,6 +379,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.alignmentPopup = LabeledView(
             (10, y, -10, 40), "Visual alignment:",
             PopUpButton, alignmentOptionsHorizontal,
+            callback=self.alignmentChangedCallback,
         )
         y += 50
         group.setPosSize((0, 0, 0, y))
@@ -464,6 +466,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                      unicodeName=unicodedata.name(char, "?"))
             )
         self.unicodeList.set(uniListData)
+
+    @suppressAndLogException
+    def alignmentChangedCallback(self, sender):
+        values = [None, "left", "right", "center"]
+        align = values[sender.get()]
+        if align:
+            self._fontGroup.align = align
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
