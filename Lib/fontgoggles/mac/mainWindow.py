@@ -342,7 +342,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         initialText = "ABC abc 0123 :;?"
         self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
         self._fontGroup = FontGroup(self.fontKeys, 300, self.itemHeight)
-        group.fontList = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True)
+        self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True)
+        group.fontList = self._fontListScrollView
         group.textEntry = self._textEntry
         return group
 
@@ -473,6 +474,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         align = values[sender.get()]
         if align:
             self._fontGroup.align = align
+            self._fontListScrollView.hAlign = align
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
