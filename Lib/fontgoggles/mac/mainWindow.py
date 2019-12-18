@@ -31,6 +31,47 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         x, y = endPos
         return self.origin[0] * 2 + x * self.scaleFactor
 
+    @property
+    def scaleFactor(self):
+        height = self.frame().size.height
+        return 0.7 * height / self.unitsPerEm
+
+    @property
+    def origin(self):
+        height = self.frame().size.height
+        return 0.1 * height, 0.25 * height
+
+    @suppressAndLogException
+    def drawRect_(self, rect):
+        AppKit.NSColor.whiteColor().set()
+        AppKit.NSRectFill(rect)
+
+        if not self._glyphs:
+            return
+
+        dx, dy = self.origin
+
+        invScale = 1 / self.scaleFactor
+        rect = rectFromNSRect(rect)
+        rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
+
+        translate(dx, dy)
+        scale(self.scaleFactor)
+
+        AppKit.NSColor.blackColor().set()
+        lastPosX = lastPosY = 0
+        for index in self._rectTree.iterIntersections(rect):
+            gi = self._glyphs[index]
+            selected = self._selection and index in self._selection
+            if selected:
+                AppKit.NSColor.redColor().set()
+            posX, posY = gi.pos
+            translate(posX - lastPosX, posY - lastPosY)
+            lastPosX, lastPosY = posX, posY
+            gi.path.fill()
+            if selected:
+                AppKit.NSColor.blackColor().set()
+
     @suppressAndLogException
     def mouseDown_(self, event):
         if self._rectTree is None:
@@ -73,47 +114,6 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
                     continue
                 bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
                 self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
-
-    @property
-    def scaleFactor(self):
-        height = self.frame().size.height
-        return 0.7 * height / self.unitsPerEm
-
-    @property
-    def origin(self):
-        height = self.frame().size.height
-        return 0.1 * height, 0.25 * height
-
-    @suppressAndLogException
-    def drawRect_(self, rect):
-        AppKit.NSColor.whiteColor().set()
-        AppKit.NSRectFill(rect)
-
-        if not self._glyphs:
-            return
-
-        dx, dy = self.origin
-
-        invScale = 1 / self.scaleFactor
-        rect = rectFromNSRect(rect)
-        rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
-
-        translate(dx, dy)
-        scale(self.scaleFactor)
-
-        AppKit.NSColor.blackColor().set()
-        lastPosX = lastPosY = 0
-        for index in self._rectTree.iterIntersections(rect):
-            gi = self._glyphs[index]
-            selected = self._selection and index in self._selection
-            if selected:
-                AppKit.NSColor.redColor().set()
-            posX, posY = gi.pos
-            translate(posX - lastPosX, posY - lastPosY)
-            lastPosX, lastPosY = posX, posY
-            gi.path.fill()
-            if selected:
-                AppKit.NSColor.blackColor().set()
 
 
 class FGFontGroupView(AppKit.NSView, metaclass=ClassNameIncrementer):
