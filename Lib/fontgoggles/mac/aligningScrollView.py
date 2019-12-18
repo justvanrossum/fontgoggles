@@ -34,6 +34,22 @@ class AligningScrollView(vanilla.ScrollView):
             scrollView.setAllowsMagnification_(True)
             scrollView.setMinMagnification_(minMagnification)
 
+    @property
+    def hAlign(self):
+        return self._nsObject.contentView().hAlign
+
+    @hAlign.setter
+    def hAlign(self, value):
+        self._nsObject.contentView().hAlign = value
+
+    @property
+    def vAlign(self):
+        return self._nsObject.contentView().vAlign
+
+    @vAlign.setter
+    def vAlign(self, value):
+        self._nsObject.contentView().vAlign = value
+
 
 class _AligningScrollView_ClipView(AppKit.NSClipView):
 
