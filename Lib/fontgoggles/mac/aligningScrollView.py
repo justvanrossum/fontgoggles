@@ -113,6 +113,9 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
                         rect.origin.y = 0
                     elif self.vAlign == "bottom":
                         rect.origin.y = -(viewFrame.size.height - rect.size.height)
+            else:
+                # TODO implement alignment for vertical
+                pass
 
         self._prevBounds = rect
         return rect
