@@ -29,7 +29,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         self._selection = set()
         self.setNeedsDisplay_(True)
         x, y = endPos
-        return self.offset[0] * 2 + x * self.scaleFactor
+        return self.origin[0] * 2 + x * self.scaleFactor
 
     @suppressAndLogException
     def mouseDown_(self, event):
@@ -37,7 +37,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
             return
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
         scaleFactor = self.scaleFactor
-        dx, dy = self.offset
+        dx, dy = self.origin
         x -= dx
         y -= dy
         x /= scaleFactor
@@ -80,9 +80,9 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         return 0.7 * height / self.unitsPerEm
 
     @property
-    def offset(self):
+    def origin(self):
         height = self.frame().size.height
-        return 10, 0.25 * height
+        return 0.1 * height, 0.25 * height
 
     @suppressAndLogException
     def drawRect_(self, rect):
@@ -92,7 +92,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         if not self._glyphs:
             return
 
-        dx, dy = self.offset
+        dx, dy = self.origin
 
         invScale = 1 / self.scaleFactor
         rect = rectFromNSRect(rect)
