@@ -438,7 +438,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 # time to unblock the event loop
                 await asyncio.sleep(0)
                 t = time.time()
-        newWidth = 0
+        newWidth = 300  # some minimum so that our filename label stays large enough
         for fontItem in self.iterFontItems():
             newWidth = max(newWidth, fontItem.minimumWidth)
         if self._fontList.width > newWidth + groupsSizePadding:
