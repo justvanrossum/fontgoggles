@@ -1,21 +1,19 @@
-The fonts that are included in this repository all have permissive licenses.
+The fonts that are included in this repository all have permissive
+licenses. See their individual LICENSE.txt files for details.
+
+Their sources can be found here:
 
 Amiri:
 - https://www.amirifont.org/
-- https://www.amirifont.org/#license
 
 IBM Plex:
 - https://github.com/IBM/plex
-- https://github.com/IBM/plex/blob/master/LICENSE.txt
 
 MutatorSans:
 - https://github.com/LettError/mutatorSans
-- https://github.com/LettError/mutatorSans/blob/master/LICENSE
 
 Noto:
 - https://github.com/googlefonts/noto-fonts
-- https://github.com/googlefonts/noto-fonts/blob/master/LICENSE
 
 QuadTest:
 - Belongs to FontGoggles
-- https://github.com/justvanrossum/fontgoggles/blob/master/LICENSE
