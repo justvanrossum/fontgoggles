@@ -8,7 +8,8 @@ from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
-from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
+from fontgoggles.misc.decorators import (asyncTaskAutoCancel, suppressAndLogException,
+                                         hookedProperty)
 from fontgoggles.misc.rectTree import RectTree
 
 
@@ -17,8 +18,12 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     _glyphs = None
     _rectTree = None
     _selection = None
-    _align = "left"
     _endPos = (0, 0)
+
+    def init(self):
+        self = super().init()
+        self.align = "left"
+        return self
 
     def isOpaque(self):
         return True
@@ -38,13 +43,8 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     def minimumWidth(self):
         return self.margin * 2 + self._endPos[0] * self.scaleFactor
 
-    @property
+    @hookedProperty
     def align(self):
-        return self._align
-
-    @align.setter
-    def align(self, value):
-        self._align = value
         self.setNeedsDisplay_(True)
 
     @property
@@ -166,7 +166,7 @@ class FontList(Group):
 
     def __init__(self, fontKeys, width, itemHeight):
         super().__init__((0, 0, width, 900))
-        self._align = "left"
+        self.align = "left"
         y = 0
         for index, fontKey in enumerate(fontKeys):
             fontItemName = fontItemNameTemplate.format(index=index)
@@ -188,18 +188,10 @@ class FontList(Group):
     def height(self):
         return self.getPosSize()[3]
 
-    @property
+    @hookedProperty
     def align(self):
-        return self._align
-
-    @align.setter
-    def align(self, value):
-        assert value in {"left", "center", "right"}
-        if value == self._align:
-            return
-        self._align = value
         for fontItem in self.iterFontItems():
-            fontItem.align = value
+            fontItem.align = self.align
 
     def iterFontItems(self):
         index = 0
