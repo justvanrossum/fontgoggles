@@ -23,7 +23,7 @@ infoplist = dict(
             LSTypeIsPackage=True,
         ),
         dict(
-            CFBundleTypeExtensions=["ttf", "otf", "woff", "woff2", "otc", "ttc", "dfont"],
+            CFBundleTypeExtensions=["ttf", "otf", "otc", "ttc", "dfont"],  # "woff", "woff2" are disabled, see #16
             CFBundleTypeName="OpenType Font",
             CFBundleTypeRole="Viewer",
         ),
