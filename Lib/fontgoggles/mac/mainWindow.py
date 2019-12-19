@@ -261,7 +261,9 @@ class FontItem(Group):
 
 
 # When the size of the line view needs to grow, overallocate this amount,
-# to avoid having to resize the font line group too often.
+# to avoid having to resize the font line group too often. In other words,
+# this value specifies some wiggle room: the font list can be a little
+# larger than strictly necessary for fitting all glyphs.
 groupsSizePadding = 200
 
 
