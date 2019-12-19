@@ -3,7 +3,7 @@ import AppKit
 
 from ..project import Project
 from .mainWindow import FGMainWindowController
-from ..font import iterFontPathsAndNumbers
+from ..font import sortedFontPathsAndNumbers
 
 
 class FGDocument(AppKit.NSDocument):
@@ -16,7 +16,7 @@ class FGDocument(AppKit.NSDocument):
 
     def addSourceFiles_(self, paths):
         paths = [pathlib.Path(path) for path in paths]
-        for fontPath, fontNumber, getSortInfo in iterFontPathsAndNumbers(paths):
+        for fontPath, fontNumber in sortedFontPathsAndNumbers(paths):
             self.project.addFont(fontPath, fontNumber)
 
     def makeWindowControllers(self):

@@ -1,6 +1,6 @@
 import pathlib
 import pytest
-from fontgoggles.font import getOpener, iterFontPathsAndNumbers, sniffFontType
+from fontgoggles.font import getOpener, sniffFontType, sortedFontPathsAndNumbers
 from testSupport import getFontPath, testDataFolder
 
 
@@ -105,16 +105,16 @@ def test_iterFontPathsAndNumbers():
       testDataFolder / "Noto",
       testDataFolder / "FontGoggles",
     ]
-    for fontPath, fontNumber, getSortInfo in iterFontPathsAndNumbers(paths):
+    for fontPath, fontNumber, in sortedFontPathsAndNumbers(paths, ("suffix", "familyName",)):
         results.append((fontPath.name, fontNumber))
     # TODO: add .ttc test font
     expectedResults = [
-        ('Amiri-Regular.ttf', 0),
         ('IBMPlexSans-Regular.otf', 0),
+        ('Amiri-Regular.ttf', 0),
         ('IBMPlexSans-Regular.ttf', 0),
         ('MutatorSans.ttf', 0),
-        ('MutatorSansBoldWide.ufo', 0),
         ('NotoNastaliqUrdu-Regular.ttf', 0),
         ('QuadTest-Regular.ttf', 0),
+        ('MutatorSansBoldWide.ufo', 0),
     ]
-    assert results == expectedResults
+    assert expectedResults == results

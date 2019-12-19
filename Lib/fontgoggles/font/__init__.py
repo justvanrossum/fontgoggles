@@ -17,6 +17,16 @@ def sniffFontType(fontPath: PathLike):
     return openerKey
 
 
+def sortedFontPathsAndNumbers(paths: list, sortSpec: tuple=()):
+    expandedPaths = list(iterFontPathsAndNumbers(paths))
+    def sorter(item):
+        path, fontNum, getSortInfo = item
+        sortInfo = getSortInfo(path, fontNum)
+        return tuple(sortInfo.get(key, defaultSortInfo[key]) for key in sortSpec)
+    expandedPaths.sort(key=sorter)
+    return [(fontPath, fontNum) for fontPath, fontNum, getSortInfo in expandedPaths]
+
+
 def iterFontPathsAndNumbers(paths: list):
     for path in paths:
         if sniffFontType(path) is None and path.is_dir():
@@ -61,6 +71,9 @@ def numFontsTTC(fontPath: PathLike):
     with open(fontPath, "rb") as f:
         header = readTTCHeader(f)
     return header.numFonts
+
+
+defaultSortInfo = dict(familyName="", styleName="", weight=400, width=5, italicAngle=0, suffix="")
 
 
 def getSortInfoOTF(fontPath: PathLike, fontNum: int):
