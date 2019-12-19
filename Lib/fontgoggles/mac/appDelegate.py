@@ -2,6 +2,7 @@ import os
 import pathlib
 from AppKit import NSDocumentController
 from Foundation import NSObject, NSURL
+from vanilla.dialogs import getFile
 from ..font import sniffFontType
 from ..misc.decorators import suppressAndLogException
 from .document import FGDocument
@@ -11,6 +12,16 @@ class FGAppDelegate(NSObject):
 
     filesToOpen = None
     unicodePicker = None
+
+    def openDocument_(self, sender):
+        result = getFile(allowsMultipleSelection=True,
+                fileTypes=["ttf", "otf", "ufo", "ufoz"])
+                # resultCallback=self.getFileResultCallback_)
+        # NOTE: ideally we would use a result callback, but vanilla's
+        # getFile() only supports result callbacks in the presence of
+        # parent window, which we obviously do not have here.
+        if result:
+            self.application_openFiles_(None, result)
 
     def applicationShouldOpenUntitledFile_(self, app):
         return False
