@@ -146,7 +146,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
                 self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
 
 
-class FGFontGroupView(AppKit.NSView, metaclass=ClassNameIncrementer):
+class FGFontListView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     @suppressAndLogException
     def magnifyWithEvent_(self, event):
@@ -160,9 +160,9 @@ class GlyphLine(Group):
 fontItemNameTemplate = "fontItem_{index}"
 
 
-class FontGroup(Group):
+class FontList(Group):
 
-    nsViewClass = FGFontGroupView
+    nsViewClass = FGFontListView
 
     def __init__(self, fontKeys, width, itemHeight):
         super().__init__((0, 0, width, 900))
@@ -356,8 +356,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         initialText = "ABC abc 0123 :;?"
         self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
-        self._fontGroup = FontGroup(self.fontKeys, 300, self.itemHeight)
-        self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontGroup, drawBackground=True)
+        self._fontList = FontList(self.fontKeys, 300, self.itemHeight)
+        self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True)
         group.fontList = self._fontListScrollView
         group.textEntry = self._textEntry
         return group
@@ -429,7 +429,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.setFontItemText(fontKey, fontItem, txt, isSelectedFont)
 
     def iterFontItems(self):
-        return self._fontGroup.iterFontItems()
+        return self._fontList.iterFontItems()
 
     @asyncTaskAutoCancel
     async def textEntryCallback(self, sender):
@@ -448,9 +448,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         newWidth = 0
         for fontItem in self.iterFontItems():
             newWidth = max(newWidth, fontItem.minimumWidth)
-        if self._fontGroup.width > newWidth + groupsSizePadding:
+        if self._fontList.width > newWidth + groupsSizePadding:
             # Shrink the font list
-            self._fontGroup.width = newWidth
+            self._fontList.width = newWidth
             # TODO: deal with scroll position
 
     @objc.python_method
@@ -464,11 +464,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
         minimumWidth = fontItem.minimumWidth
-        if minimumWidth > self._fontGroup.width:
+        if minimumWidth > self._fontList.width:
             # We make it a little wider than needed, so as to minimize the
             # number of times we need to make it grow, as it requires a full
             # redraw.
-            self._fontGroup.width = minimumWidth + groupsSizePadding
+            self._fontList.width = minimumWidth + groupsSizePadding
             # TODO: deal with scroll position
 
     @asyncTaskAutoCancel
@@ -497,7 +497,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         values = [None, "left", "right", "center"]
         align = values[sender.get()]
         if align:
-            self._fontGroup.align = align
+            self._fontList.align = align
             self._fontListScrollView.hAlign = align
 
     def showCharacterList_(self, sender):
@@ -530,11 +530,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def zoomIn_(self, sender):
         self.itemHeight = min(1000, round(self.itemHeight * (2 ** (1 / 3))))
-        self._fontGroup.resizeFontItems(self.itemHeight)
+        self._fontList.resizeFontItems(self.itemHeight)
 
     def zoomOut_(self, sender):
         self.itemHeight = max(50, round(self.itemHeight / (2 ** (1 / 3))))
-        self._fontGroup.resizeFontItems(self.itemHeight)
+        self._fontList.resizeFontItems(self.itemHeight)
 
 
 class LabeledView(Group):
