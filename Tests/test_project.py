@@ -1,13 +1,7 @@
 import pathlib
 import pytest
 from fontgoggles.project import Project
-
-
-testRoot = pathlib.Path(__file__).resolve().parent
-
-
-def getFontPath(fileName):
-    return testRoot / "data" / fileName
+from testSupport import getFontPath
 
 
 @pytest.mark.asyncio

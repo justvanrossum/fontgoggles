@@ -1,13 +1,7 @@
 import pathlib
 import pytest
 from fontgoggles.font import getOpener, iterFontPathsAndNumbers, sniffFontType
-
-
-testRoot = pathlib.Path(__file__).resolve().parent
-
-
-def getFontPath(fileName):
-    return testRoot / "data" / fileName
+from testSupport import getFontPath, testDataFolder
 
 
 def test_sniffFontType():
@@ -79,7 +73,14 @@ async def test_openFonts(fileName,
 
 def test_iterFontPathsAndNumbers():
     results = []
-    for fontPath, fontNumber in iterFontPathsAndNumbers([testRoot / "data"]):
+    paths = [
+      testDataFolder / "Amiri",
+      testDataFolder / "IBM-Plex",
+      testDataFolder / "MutatorSans",
+      testDataFolder / "Noto",
+      testDataFolder / "FontGoggles",
+    ]
+    for fontPath, fontNumber in iterFontPathsAndNumbers(paths):
         results.append((fontPath.name, fontNumber))
     # TODO: add .ttc test font
     expectedResults = [

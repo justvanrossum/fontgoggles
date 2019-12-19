@@ -2,15 +2,9 @@ import pathlib
 from fontTools.pens.recordingPen import RecordingPen, RecordingPointPen
 from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.ttLib import TTFont
-from fontgoggles.misc.ftFont import FTFont
 import Quartz
-
-
-testRoot = pathlib.Path(__file__).resolve().parent
-
-
-def getFontPath(fileName):
-    return testRoot / "data" / fileName
+from fontgoggles.misc.ftFont import FTFont
+from testSupport import getFontPath
 
 
 def _getFonts(fileName):
