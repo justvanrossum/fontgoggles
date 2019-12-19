@@ -105,7 +105,7 @@ def test_iterFontPathsAndNumbers():
       testDataFolder / "Noto",
       testDataFolder / "FontGoggles",
     ]
-    for fontPath, fontNumber in iterFontPathsAndNumbers(paths):
+    for fontPath, fontNumber, getSortInfo in iterFontPathsAndNumbers(paths):
         results.append((fontPath.name, fontNumber))
     # TODO: add .ttc test font
     expectedResults = [

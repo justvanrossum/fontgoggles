@@ -16,7 +16,7 @@ class FGDocument(AppKit.NSDocument):
 
     def addSourceFiles_(self, paths):
         paths = [pathlib.Path(path) for path in paths]
-        for fontPath, fontNumber in iterFontPathsAndNumbers(paths):
+        for fontPath, fontNumber, getSortInfo in iterFontPathsAndNumbers(paths):
             self.project.addFont(fontPath, fontNumber)
 
     def makeWindowControllers(self):

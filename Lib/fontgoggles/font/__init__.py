@@ -31,7 +31,7 @@ def iterFontNumbers(path):
         return
     numFonts, opener, getSortInfo = getOpener(path)
     for i in range(numFonts(path)):
-        yield path, i
+        yield path, i, getSortInfo
 
 
 async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
