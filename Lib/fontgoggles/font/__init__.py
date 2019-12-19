@@ -88,7 +88,26 @@ def getSortInfoOTF(fontPath: PathLike, fontNum: int):
 
 
 def getSortInfoUFO(fontPath: PathLike, fontNum: int):
-    return {}
+    from fontTools.ufoLib import UFOReader
+    from .ufoFont import UFOInfo
+    assert fontNum == 0
+    suffix = fontPath.suffix.lower().lstrip(".")
+    reader = UFOReader(fontPath, validate=False)
+    info = UFOInfo()
+    reader.readInfo(info)
+    sortInfo = dict(suffix=suffix)
+    ufoAttrs = [
+        ("familyName", "familyName"),
+        ("styleName", "styleName"),
+        ("weight", "openTypeOS2WeightClass"),
+        ("width", "openTypeOS2WidthClass"),
+        ("italicAngle", "italicAngle"),
+    ]
+    for key, attr in ufoAttrs:
+        val = getattr(info, attr, None)
+        if val is not None:
+            sortInfo[key] = val
+    return sortInfo
 
 
 fontOpeners = {
