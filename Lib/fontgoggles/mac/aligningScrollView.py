@@ -57,7 +57,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         return cls.alloc().init()
 
     def __init__(self, hAlign, vAlign):
-        self.hAlign = hAlign
+        self._hAlign = hAlign
         self.vAlign = vAlign
         self._prevBounds = self.bounds()
 
@@ -66,6 +66,14 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         # smaller than the clipview. Make the document view first responder.
         self.window().makeFirstResponder_(self.documentView())
 
+    @property
+    def hAlign(self):
+        return self._hAlign
+
+    @hAlign.setter
+    def hAlign(self, value):
+        self._hAlign = value
+        self.setBounds_(self.constrainBoundsRect_(self.bounds()))
 
     def constrainBoundsRect_(self, proposedClipViewBoundsRect):
         # Partially taken from https://stackoverflow.com/questions/22072105/
