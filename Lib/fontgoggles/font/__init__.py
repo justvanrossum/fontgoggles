@@ -64,11 +64,30 @@ def numFontsTTC(fontPath: PathLike):
 
 
 def getSortInfoOTF(fontPath: PathLike, fontNum: int):
-    ...
+    # TODO: move to baseFont/otfFont
+    from fontTools.ttLib import TTFont
+    ttf = TTFont(fontPath, fontNumber=fontNum, lazy=True)
+    sortInfo = {}
+    name = ttf.get("name")
+    os2 = ttf.get("OS/2")
+    post = ttf.get("post")
+    if name is not None:
+        for key, nameIDs in [("familyName", [16, 1]), ("styleName", [17, 2])]:
+            for nameID in nameIDs:
+                nameRec = name.getName(nameID, 3, 1)
+                if nameRec is not None:
+                    sortInfo[key] = str(nameRec)
+                    break
+    if os2 is not None:
+        sortInfo["weight"] = os2.usWeightClass
+        sortInfo["width"] = os2.usWidthClass
+    if post is not None:
+        sortInfo["italicAngle"] = post.italicAngle
+    return sortInfo
 
 
 def getSortInfoUFO(fontPath: PathLike, fontNum: int):
-    ...
+    return {}
 
 
 fontOpeners = {
