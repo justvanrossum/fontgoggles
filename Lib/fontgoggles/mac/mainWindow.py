@@ -185,7 +185,7 @@ class FontList(Group):
         x, y, w, h = self.getPosSize()
         self.setPosSize((x, y, newWidth, h))
         # Given what we know about our alignment, try to keep the scroll
-        # position "the same". So if we are right aligned, if we grow,
+        # position "the same". So if we are right aligned and we grow,
         # grow to the left. If we are centered, grow left and right.
         ourBounds = self._nsObject.bounds()
         clipView = self._nsObject.enclosingScrollView().contentView()
