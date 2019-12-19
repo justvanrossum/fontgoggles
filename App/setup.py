@@ -11,6 +11,12 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))  # make our parent dir the 
 infoplist = dict(
     CFBundleDocumentTypes = [
         dict(
+            CFBundleTypeExtensions = ["gggls"],
+            CFBundleTypeName = "FontGoggles Project File",
+            CFBundleTypeRole = "Editor",
+            NSDocumentClass = "FGDocument",
+        ),
+        dict(
             CFBundleTypeExtensions=["ufo"],
             CFBundleTypeName="Unified Font Object",
             CFBundleTypeRole="Viewer",
@@ -21,11 +27,6 @@ infoplist = dict(
             CFBundleTypeName="OpenType Font",
             CFBundleTypeRole="Viewer",
         ),
-        # dict(
-        #     CFBundleTypeExtensions=["glyphs"],
-        #     CFBundleTypeName="GlyphsApp Source File",
-        #     CFBundleTypeRole="Viewer",
-        # ),
         dict(
             CFBundleTypeExtensions=["designspace"],
             CFBundleTypeName="Designspace File",
