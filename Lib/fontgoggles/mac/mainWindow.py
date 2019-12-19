@@ -7,7 +7,7 @@ from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
-from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
+from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell, _textAlignments as textAlignments
 from fontgoggles.misc.decorators import (asyncTaskAutoCancel, suppressAndLogException,
                                          hookedProperty)
 from fontgoggles.misc.rectTree import RectTree
@@ -217,7 +217,7 @@ class FontItem(Group):
     def __init__(self, posSize, fontKey):
         super().__init__(posSize)
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
-        self.fileNameLabel = TextBox((10, 0, 300, 17), "", sizeStyle="regular")
+        self.fileNameLabel = TextBox((10, 0, -10, 17), "", sizeStyle="regular")
         self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
@@ -249,6 +249,7 @@ class FontItem(Group):
 
     @align.setter
     def align(self, value):
+        self.fileNameLabel._nsObject.cell().setAlignment_(textAlignments[value])
         self.glyphLineView._nsObject.align = value
 
 
