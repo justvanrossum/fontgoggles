@@ -206,6 +206,28 @@ class FontList(Group):
         # self.align has already been set to the new value
         for fontItem in self.iterFontItems():
             fontItem.align = self.align
+        scrollView = self._nsObject.enclosingScrollView()
+        if scrollView is None:
+            return
+        ourBounds = self._nsObject.bounds()
+        clipView = scrollView.contentView()
+        clipBounds = clipView.bounds()
+        if clipBounds.size.width >= ourBounds.size.width:
+            return
+        sizeDiff = ourBounds.size.width - clipBounds.size.width
+        atLeft = abs(clipBounds.origin.x) < 2
+        atRight = abs(clipBounds.origin.x - sizeDiff) < 2
+        atCenter = abs(clipBounds.origin.x - sizeDiff / 2) < 2
+        if self.align == "left":
+            if atRight or atCenter:
+                clipBounds.origin.x = 0
+        elif self.align == "center":
+            if atLeft or atRight:
+                clipBounds.origin.x = sizeDiff / 2
+        elif self.align == "right":
+            if atLeft or atCenter:
+                clipBounds.origin.x = sizeDiff
+        clipView.setBounds_(clipBounds)
 
     def iterFontItems(self):
         index = 0
