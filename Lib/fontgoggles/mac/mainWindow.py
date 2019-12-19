@@ -260,6 +260,11 @@ class FontItem(Group):
         self.glyphLineView._nsObject.align = value
 
 
+# When the size of the line view needs to grow, overallocate this amount,
+# to avoid having to resize the font line group too often.
+groupsSizePadding = 200
+
+
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
 
     def __new__(cls, project):
@@ -441,8 +446,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         newWidth = 0
         for fontItem in self.iterFontItems():
             newWidth = max(newWidth, fontItem.minimumWidth)
-        self._fontGroup.width = newWidth
-        # TODO: deal with scroll position
+        if self._fontGroup.width > newWidth + groupsSizePadding:
+            # Shrink the font list
+            self._fontGroup.width = newWidth
+            # TODO: deal with scroll position
 
     @objc.python_method
     def setFontItemText(self, fontKey, fontItem, txt, isSelectedFont):
@@ -459,7 +466,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # We make it a little wider than needed, so as to minimize the
             # number of times we need to make it grow, as it requires a full
             # redraw.
-            self._fontGroup.width = minimumWidth + 200
+            self._fontGroup.width = minimumWidth + groupsSizePadding
             # TODO: deal with scroll position
 
     @asyncTaskAutoCancel
