@@ -96,7 +96,7 @@ def getSortInfoOTF(fontPath: PathLike, fontNum: int):
         sortInfo["weight"] = os2.usWeightClass
         sortInfo["width"] = os2.usWidthClass
     if post is not None:
-        sortInfo["italicAngle"] = post.italicAngle
+        sortInfo["italicAngle"] = -post.italicAngle  # negative for intuitive sort order
     return sortInfo
 
 
@@ -119,6 +119,8 @@ def getSortInfoUFO(fontPath: PathLike, fontNum: int):
     for key, attr in ufoAttrs:
         val = getattr(info, attr, None)
         if val is not None:
+            if key == "italicAngle":
+                val = -val  # negative for intuitive sort order
             sortInfo[key] = val
     return sortInfo
 
