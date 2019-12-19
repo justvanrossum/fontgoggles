@@ -4,8 +4,8 @@ from os import PathLike
 def getOpener(fontPath: PathLike):
     openerKey = sniffFontType(fontPath)
     assert openerKey is not None
-    numFontsFunc, openerFunc = fontOpeners[openerKey]
-    return numFontsFunc, openerFunc
+    numFontsFunc, openerFunc, getSortInfo = fontOpeners[openerKey]
+    return numFontsFunc, openerFunc, getSortInfo
 
 
 def sniffFontType(fontPath: PathLike):
@@ -29,7 +29,7 @@ def iterFontPathsAndNumbers(paths: list):
 def iterFontNumbers(path):
     if sniffFontType(path) is None:
         return
-    numFonts, opener = getOpener(path)
+    numFonts, opener, getSortInfo = getOpener(path)
     for i in range(numFonts(path)):
         yield path, i
 
@@ -63,15 +63,23 @@ def numFontsTTC(fontPath: PathLike):
     return header.numFonts
 
 
+def getSortInfoOTF(fontPath: PathLike, fontNum: int):
+    ...
+
+
+def getSortInfoUFO(fontPath: PathLike, fontNum: int):
+    ...
+
+
 fontOpeners = {
-    "ttf": (numFontsOne, openOTF),
-    "otf": (numFontsOne, openOTF),
-    "woff": (numFontsOne, openOTF),
-    "woff2": (numFontsOne, openOTF),
-    "ufo": (numFontsOne, openUFO),
-    "ufos": (numFontsOne, openUFO),
-    "ttc": (numFontsTTC, openOTF),
-    "otc": (numFontsTTC, openOTF),
+    "ttf": (numFontsOne, openOTF, getSortInfoOTF),
+    "otf": (numFontsOne, openOTF, getSortInfoOTF),
+    "woff": (numFontsOne, openOTF, getSortInfoOTF),
+    "woff2": (numFontsOne, openOTF, getSortInfoOTF),
+    "ufo": (numFontsOne, openUFO, getSortInfoUFO),
+    "ufos": (numFontsOne, openUFO, getSortInfoUFO),
+    "ttc": (numFontsTTC, openOTF, getSortInfoOTF),
+    "otc": (numFontsTTC, openOTF, getSortInfoOTF),
 }
 
 fileTypes = sorted(fontOpeners)

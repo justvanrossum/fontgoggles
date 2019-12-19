@@ -60,7 +60,7 @@ async def test_openFonts(fileName,
                          text,
                          glyphNames):
     fontPath = getFontPath(fileName)
-    numFonts, opener = getOpener(fontPath)
+    numFonts, opener, getSortInfo = getOpener(fontPath)
     assert numFonts(fontPath) == 1
     font, fontData = await opener(fontPath, 0)
     assert font.features == features
