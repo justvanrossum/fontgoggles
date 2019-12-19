@@ -20,6 +20,8 @@ class FGAppDelegate(NSObject):
         # NOTE: ideally we would use a result callback, but vanilla's
         # getFile() only supports result callbacks in the presence of
         # parent window, which we obviously do not have here.
+        # Also note: we can't use NSDocumentController's openDocument_
+        # as it assumes one file per document.
         if result:
             self.application_openFiles_(None, result)
 
