@@ -141,3 +141,29 @@ class cachedProperty(readOnlyCachedProperty):
     def __delete__(self, obj):
         if self.name in obj.__dict__:
             del obj.__dict__[self.name]
+
+
+class hookedProperty:
+
+    def __init__(self, hook):
+        self.hook = hook
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, obj, cls=None):
+        try:
+            return obj.__dict__[self.name]
+        except KeyError:
+            raise AttributeError(self.name)
+
+    def __set__(self, obj, value):
+        obj.__dict__[self.name] = value
+        self.hook(obj)
+
+    def __delete__(self, obj):
+        try:
+            del obj.__dict__[self.name]
+        except KeyError:
+            raise AttributeError(self.name)
+        self.hook(obj)

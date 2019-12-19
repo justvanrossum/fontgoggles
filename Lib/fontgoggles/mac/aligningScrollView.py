@@ -1,5 +1,6 @@
 import AppKit
 import vanilla
+from ..misc.decorators import hookedProperty
 
 
 class AligningScrollView(vanilla.ScrollView):
@@ -57,8 +58,8 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         return cls.alloc().init()
 
     def __init__(self, hAlign, vAlign):
-        self._hAlign = hAlign
-        self._vAlign = vAlign
+        self.hAlign = hAlign
+        self.vAlign = vAlign
         self._prevBounds = self.bounds()
 
     def mouseDown_(self, event):
@@ -66,28 +67,20 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         # smaller than the clipview. Make the document view first responder.
         self.window().makeFirstResponder_(self.documentView())
 
-    @property
+    @hookedProperty
     def hAlign(self):
-        return self._hAlign
-
-    @hAlign.setter
-    def hAlign(self, value):
-        self._hAlign = value
         self.setBounds_(self.constrainBoundsRect_(self.bounds()))
 
-    @property
+    @hookedProperty
     def vAlign(self):
-        return self._vAlign
-
-    @vAlign.setter
-    def vAlign(self, value):
-        self._vAlign = value
         self.setBounds_(self.constrainBoundsRect_(self.bounds()))
 
     def constrainBoundsRect_(self, proposedClipViewBoundsRect):
         # Partially taken from https://stackoverflow.com/questions/22072105/
         rect = super().constrainBoundsRect_(proposedClipViewBoundsRect)
         view = self.documentView()
+        if view is None:
+            return rect
         viewFrame = view.bounds()
 
         if self._prevBounds is not None:
