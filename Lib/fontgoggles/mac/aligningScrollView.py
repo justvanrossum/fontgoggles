@@ -58,7 +58,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
 
     def __init__(self, hAlign, vAlign):
         self._hAlign = hAlign
-        self.vAlign = vAlign
+        self._vAlign = vAlign
         self._prevBounds = self.bounds()
 
     def mouseDown_(self, event):
@@ -73,6 +73,15 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
     @hAlign.setter
     def hAlign(self, value):
         self._hAlign = value
+        self.setBounds_(self.constrainBoundsRect_(self.bounds()))
+
+    @property
+    def vAlign(self):
+        return self._vAlign
+
+    @vAlign.setter
+    def vAlign(self, value):
+        self._vAlign = value
         self.setBounds_(self.constrainBoundsRect_(self.bounds()))
 
     def constrainBoundsRect_(self, proposedClipViewBoundsRect):
