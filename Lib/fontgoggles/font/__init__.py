@@ -73,3 +73,5 @@ fontOpeners = {
     "ttc": (numFontsTTC, openOTF),
     "otc": (numFontsTTC, openOTF),
 }
+
+fileTypes = sorted(fontOpeners)
