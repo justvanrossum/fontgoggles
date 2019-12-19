@@ -203,6 +203,7 @@ class FontList(Group):
 
     @hookedProperty
     def align(self):
+        # self.align has already been set to the new value
         for fontItem in self.iterFontItems():
             fontItem.align = self.align
 
