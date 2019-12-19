@@ -66,8 +66,9 @@ def numFontsTTC(fontPath: PathLike):
 def getSortInfoOTF(fontPath: PathLike, fontNum: int):
     # TODO: move to baseFont/otfFont
     from fontTools.ttLib import TTFont
+    suffix = fontPath.suffix.lower().lstrip(".")
     ttf = TTFont(fontPath, fontNumber=fontNum, lazy=True)
-    sortInfo = {}
+    sortInfo = dict(suffix=suffix)
     name = ttf.get("name")
     os2 = ttf.get("OS/2")
     post = ttf.get("post")
