@@ -35,6 +35,10 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         return self.margin * 2 + endPos[0] * self.scaleFactor
 
     @property
+    def minimumWidth(self):
+        return self.margin * 2 + self._endPos[0] * self.scaleFactor
+
+    @property
     def align(self):
         return self._align
 
@@ -241,7 +245,11 @@ class FontItem(Group):
         self.fileNameLabel._nsObject.setToolTip_(str(fontPath))
 
     def setGlyphs(self, glyphs, endPos, unitsPerEm):
-        return self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
+        self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
+
+    @property
+    def minimumWidth(self):
+        return self.glyphLineView._nsObject.minimumWidth
 
     @property
     def align(self):
@@ -430,6 +438,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 # time to unblock the event loop
                 await asyncio.sleep(0)
                 t = time.time()
+        newWidth = 0
+        for fontItem in self.iterFontItems():
+            newWidth = max(newWidth, fontItem.minimumWidth)
+        self._fontGroup.width = newWidth
+        # TODO: deal with scroll position
 
     @objc.python_method
     def setFontItemText(self, fontKey, fontItem, txt, isSelectedFont):
@@ -440,12 +453,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         glyphs, endPos = getGlyphRun(font, txt)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
-        minimumWidth = fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
+        fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
+        minimumWidth = fontItem.minimumWidth
         if minimumWidth > self._fontGroup.width:
             # We make it a little wider than needed, so as to minimize the
             # number of times we need to make it grow, as it requires a full
             # redraw.
             self._fontGroup.width = minimumWidth + 200
+            # TODO: deal with scroll position
 
     @asyncTaskAutoCancel
     async def updateGlyphList(self, glyphs, delay=0):
