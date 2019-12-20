@@ -448,7 +448,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
         self.allFeatureTags.update(font.features)
-        print(self.allFeatureTags)
         txt = self._textEntry.get()
         self.setFontItemText(fontKey, fontItem, txt, isSelectedFont)
 
