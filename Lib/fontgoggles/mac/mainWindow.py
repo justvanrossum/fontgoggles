@@ -485,6 +485,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         if align != self._fontList.align:
             self.alignmentChangedCallback(self.alignmentPopup)
+        self.updateTextEntryAlignment(align)
 
         self.updateUnicodeList(delay=0.05)
         t = time.time()
@@ -557,7 +558,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             align = self.textInfo.suggestedAlignment
         self._fontList.align = align
         self._fontListScrollView.hAlign = align
-        fieldEditor = sender._nsObject.window().fieldEditor_forObject_(True, sender._nsObject)
+        self.updateTextEntryAlignment(align)
+
+    @objc.python_method
+    def updateTextEntryAlignment(self, align):
+        fieldEditor = self.w._window.fieldEditor_forObject_(True, self._textEntry._nsObject)
         if align == "right":
             fieldEditor.setAlignment_(AppKit.NSTextAlignmentRight)
         elif align == "center":
