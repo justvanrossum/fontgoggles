@@ -6,7 +6,7 @@ from ..misc.ftFont import FTFont
 
 
 def _mergeScriptsAndLanguages(d1, d2):
-    return {k: sorted(set(d1.get(k, []) + d2.get(k, []))) for k in sorted(set(d1) | set(d2))}
+    return {k: (d1.get(k, set()) | d2.get(k, set())) for k in sorted(set(d1) | set(d2))}
 
 
 class BaseFont:

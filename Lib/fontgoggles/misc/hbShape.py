@@ -107,7 +107,7 @@ class HBShape:
     def getScriptsAndLanguages(self, otTableTag):
         scriptsAndLanguages = {}
         for scriptIndex, script in enumerate(hb.ot_layout_table_get_script_tags(self.face, otTableTag)):
-            scriptsAndLanguages[script] = hb.ot_layout_script_get_language_tags(self.face, otTableTag, scriptIndex)
+            scriptsAndLanguages[script] = set(hb.ot_layout_script_get_language_tags(self.face, otTableTag, scriptIndex))
         return scriptsAndLanguages
 
     def getGlyphID(self, glyphName, default=0):
