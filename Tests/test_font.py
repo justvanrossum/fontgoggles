@@ -10,6 +10,21 @@ def test_sniffFontType():
 
 
 openFontsTestData = [
+    ("Amiri-Regular.ttf",
+        {'familyName': 'Amiri',
+         'italicAngle': -0.0,
+         'styleName': 'Regular',
+         'suffix': 'ttf',
+         'weight': 400,
+         'width': 5},
+        ['calt', 'ccmp', 'curs', 'dnom', 'fina', 'init',
+         'kern', 'liga', 'mark', 'medi', 'mkmk', 'numr',
+         'pnum', 'rlig', 'rtlm', 'ss01', 'ss02', 'ss03',
+         'ss04', 'ss05', 'ss06', 'ss07', 'ss08'],
+        ['DFLT', 'arab', 'latn'],
+        [],
+        [],
+        "", []),
     ("IBMPlexSans-Regular.ttf",
         {'familyName': 'IBM Plex Sans',
          'italicAngle': 0.0,

@@ -104,8 +104,9 @@ class HBShape:
     def getFeatures(self, tag):
         return hb.ot_layout_language_get_feature_tags(self.face, tag)
 
-    def getLanguages(self, tag):
-        return hb.ot_layout_script_get_language_tags(self.face, tag)
+    def getLanguages(self, tag, script="DFLT"):
+        scriptIndex = self.getScripts(tag).index(script)
+        return hb.ot_layout_script_get_language_tags(self.face, tag, scriptIndex)
 
     def getScripts(self, tag):
         return hb.ot_layout_table_get_script_tags(self.face, tag)
