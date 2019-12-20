@@ -330,7 +330,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.w.open()
         self.w._window.setWindowController_(self)
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
-        self.updateUnicodeList(self._textEntry.get())
+
+        initialText = "ABC abc 0123 :;?"
+        self._textEntry.set(initialText)
+        self.textEntryCallback(self._textEntry)
+
         self.loadFonts()
 
     @objc.python_method
@@ -375,8 +379,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
-        initialText = "ABC abc 0123 :;?"
-        self._textEntry = EditText((10, 8, -10, 25), initialText, callback=self.textEntryCallback)
+        self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryCallback)
         self._fontList = FontList(self.fontKeys, 300, self.itemHeight)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True)
         group.fontList = self._fontListScrollView
