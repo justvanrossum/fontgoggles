@@ -11,6 +11,7 @@ from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell, _textAlignm
 from fontgoggles.misc.decorators import (asyncTaskAutoCancel, suppressAndLogException,
                                          hookedProperty)
 from fontgoggles.misc.rectTree import RectTree
+from fontgoggles.misc.textInfo import TextInfo
 
 
 class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
@@ -351,7 +352,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.unicodeList = List((0, 40, 0, 0), [],
                                 columnDescriptions=columnDescriptions,
                                 allowsSorting=False, drawFocusRing=False, rowHeight=20)
-        group.bidiCheckBox = CheckBox((10, 8, -10, 20), "BiDi")
+        self.unicodeShowBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
+                                                callback=self.unicodeShowBiDiCheckBoxCallback)
+        group.unicodeShowBiDiCheckBox = self.unicodeShowBiDiCheckBox
         group.unicodeList = self.unicodeList
         return group
 
@@ -454,9 +457,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def iterFontItems(self):
         return self._fontList.iterFontItems()
 
+    @objc.python_method
+    def unicodeShowBiDiCheckBoxCallback(self, sender):
+        self.updateUnicodeList()
+
     @asyncTaskAutoCancel
     async def textEntryChangedCallback(self, sender):
         # TODO: set up text info here
+        self.textInfo = TextInfo(sender.get())
+        # self.textInfo.shouldApplyBiDi = ...  # get from popup button
         self.updateUnicodeList(delay=0.05)
         t = time.time()
         firstKey = self.fontKeys[0] if self.fontKeys else None
@@ -482,8 +491,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
-        txt = self._textEntry.get()
-        glyphs, endPos = getGlyphRun(font, txt)
+        if self.textInfo.shouldApplyBiDi:
+            direction = "LTR"
+        else:
+            direction = None
+        glyphs, endPos = getGlyphRun(font, self.textInfo.text, direction=direction)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
@@ -508,7 +520,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
-        txt = self._textEntry.get()
+        if self.unicodeShowBiDiCheckBox.get():
+            txt = self.textInfo.text
+        else:
+            txt = self.textInfo.originalText
         uniListData = []
         for index, char in enumerate(txt):
             uniListData.append(
