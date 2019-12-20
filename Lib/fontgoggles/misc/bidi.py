@@ -10,9 +10,10 @@ def applyBiDi(text):
     string, and char index mappings for to_bidi and from_bidi.
     """
     storage, display = getBiDiInfo(text)
+    base_dir = storage['base_dir']
     from_bidi = [char_info['index'] for char_info in storage['chars']]
     to_bidi = [bidi_index for index, bidi_index in sorted(zip(from_bidi, range(len(text))))]
-    return display, to_bidi, from_bidi
+    return display, base_dir, to_bidi, from_bidi
 
 
 # copied from bidi/algorthm.py and modified to be more useful for us.

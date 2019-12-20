@@ -94,17 +94,18 @@ def test_getBiDiInfo_ltr(testString, expectedString, expectedInfo):
 
 
 testDataApplyBiDi = [
-    ("Abc", "Abc",
+    ("Abc", "Abc", "L",
      [0, 1, 2], [0, 1, 2]),
-    ("\u062D\u062A\u064912", "12\u0649\u062A\u062D",
+    ("\u062D\u062A\u064912", "12\u0649\u062A\u062D", "R",
      [4, 3, 2, 0, 1], [3, 4, 2, 1, 0]),
 ]
 
 
-@pytest.mark.parametrize("testString,expectedString,expectedToBiDi,expectedFromBiDi", testDataApplyBiDi)
-def test_applyBiDi(testString, expectedString, expectedToBiDi, expectedFromBiDi):
-    display, toBiDi, fromBiDi = applyBiDi(testString)
+@pytest.mark.parametrize("testString,expectedString,expectedDir,expectedToBiDi,expectedFromBiDi", testDataApplyBiDi)
+def test_applyBiDi(testString, expectedString, expectedDir, expectedToBiDi, expectedFromBiDi):
+    display, baseDirection, toBiDi, fromBiDi = applyBiDi(testString)
     assert display == expectedString
+    assert baseDirection == expectedDir
     assert toBiDi == expectedToBiDi
     assert fromBiDi == expectedFromBiDi
     assert set(toBiDi) == set(range(len(toBiDi)))
