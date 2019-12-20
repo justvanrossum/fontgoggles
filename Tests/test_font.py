@@ -23,7 +23,7 @@ openFontsTestData = [
          'ss04', 'ss05', 'ss06', 'ss07', 'ss08'],
         {'DFLT': set(), 'arab': {'ARA ', 'KSH ', 'MLY ', 'SND ', 'URD '}, 'latn': {'TRK '}},
         [],
-        "", []),
+        "فعل", ['uni0644.fina', 'uni0639.medi', 'uni0641.init']),
     ("IBMPlexSans-Regular.ttf",
         {'familyName': 'IBM Plex Sans',
          'italicAngle': 0.0,
