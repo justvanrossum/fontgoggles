@@ -427,11 +427,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             "Right",  # Bottom
             "Center",
         ]
-        group.alignmentPopup = LabeledView(
+        self.alignmentPopup = LabeledView(
             (10, y, -10, 40), "Visual alignment:",
             PopUpButton, alignmentOptionsHorizontal,
             callback=self.alignmentChangedCallback,
         )
+        group.alignmentPopup = self.alignmentPopup
         y += 50
         group.setPosSize((0, 0, 0, y))
         return group
@@ -483,9 +484,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             align = self.textInfo.suggestedAlignment
 
         if align != self._fontList.align:
-            self._fontList.align = align
-            self._fontListScrollView.hAlign = align  # TODO Vertical
-
+            self.alignmentChangedCallback(self.alignmentPopup)
 
         self.updateUnicodeList(delay=0.05)
         t = time.time()
@@ -558,6 +557,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             align = self.textInfo.suggestedAlignment
         self._fontList.align = align
         self._fontListScrollView.hAlign = align
+        fieldEditor = sender._nsObject.window().fieldEditor_forObject_(True, sender._nsObject)
+        if align != "right":
+            fieldEditor.setAlignment_(AppKit.NSTextAlignmentLeft)
+        else:
+            fieldEditor.setAlignment_(AppKit.NSTextAlignmentRight)
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
