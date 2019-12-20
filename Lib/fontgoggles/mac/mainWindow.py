@@ -558,10 +558,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._fontList.align = align
         self._fontListScrollView.hAlign = align
         fieldEditor = sender._nsObject.window().fieldEditor_forObject_(True, sender._nsObject)
-        if align != "right":
-            fieldEditor.setAlignment_(AppKit.NSTextAlignmentLeft)
-        else:
+        if align == "right":
             fieldEditor.setAlignment_(AppKit.NSTextAlignmentRight)
+        elif align == "center":
+            fieldEditor.setAlignment_(AppKit.NSTextAlignmentCenter)
+        else:
+            fieldEditor.setAlignment_(AppKit.NSTextAlignmentLeft)
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
