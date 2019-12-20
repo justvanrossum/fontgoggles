@@ -108,8 +108,12 @@ class HBShape:
         return hb.ot_layout_table_get_script_tags(self.face, tag)
 
     def getLanguages(self, tag, script="DFLT"):
-        scriptIndex = self.getScripts(tag).index(script)
-        return hb.ot_layout_script_get_language_tags(self.face, tag, scriptIndex)
+        scripts = self.getScripts(tag)
+        if script in scripts:
+            scriptIndex = scripts.index(script)
+            return hb.ot_layout_script_get_language_tags(self.face, tag, scriptIndex)
+        else:
+            return []
 
     def getGlyphID(self, glyphName, default=0):
         try:
