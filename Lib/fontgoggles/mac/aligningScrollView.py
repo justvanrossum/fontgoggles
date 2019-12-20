@@ -96,6 +96,8 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
             self.setBounds_(clipBounds)
         # else: handled by self.constrainBoundsRect_()
 
+        # TODO: handle vertical alignments
+
         self._prevDocBounds = docBounds
         super().viewFrameChanged_(notification)
 
