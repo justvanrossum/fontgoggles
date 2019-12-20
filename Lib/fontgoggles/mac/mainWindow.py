@@ -562,13 +562,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):
-        fieldEditor = self.w._window.fieldEditor_forObject_(True, self._textEntry._nsObject)
         if align == "right":
-            fieldEditor.setAlignment_(AppKit.NSTextAlignmentRight)
+            nsAlign = AppKit.NSTextAlignmentRight
         elif align == "center":
-            fieldEditor.setAlignment_(AppKit.NSTextAlignmentCenter)
+            nsAlign = AppKit.NSTextAlignmentCenter
         else:
-            fieldEditor.setAlignment_(AppKit.NSTextAlignmentLeft)
+            nsAlign = AppKit.NSTextAlignmentLeft
+        fieldEditor = self.w._window.fieldEditor_forObject_(True, self._textEntry._nsObject)
+        fieldEditor.setAlignment_(nsAlign)
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
