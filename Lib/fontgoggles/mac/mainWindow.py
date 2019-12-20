@@ -449,21 +449,20 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
         self.allFeatureTags.update(font.features)
-        txt = self._textEntry.get()
-        self.setFontItemText(fontKey, fontItem, txt, isSelectedFont)
+        self.setFontItemText(fontKey, fontItem, isSelectedFont)
 
     def iterFontItems(self):
         return self._fontList.iterFontItems()
 
     @asyncTaskAutoCancel
     async def textEntryChangedCallback(self, sender):
-        txt = sender.get()
-        self.updateUnicodeList(txt, delay=0.05)
+        # TODO: set up text info here
+        self.updateUnicodeList(delay=0.05)
         t = time.time()
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
             isSelectedFont = (fontKey == firstKey)
-            self.setFontItemText(fontKey, fontItem, txt, isSelectedFont=isSelectedFont)
+            self.setFontItemText(fontKey, fontItem, isSelectedFont=isSelectedFont)
             elapsed = time.time() - t
             if elapsed > 0.01:
                 # time to unblock the event loop
@@ -478,11 +477,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # TODO: deal with scroll position
 
     @objc.python_method
-    def setFontItemText(self, fontKey, fontItem, txt, isSelectedFont):
+    def setFontItemText(self, fontKey, fontItem, isSelectedFont):
         fontPath, fontNumber = fontKey
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
+        txt = self._textEntry.get()
         glyphs, endPos = getGlyphRun(font, txt)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
@@ -504,10 +504,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.glyphList.set(glyphListData)
 
     @asyncTaskAutoCancel
-    async def updateUnicodeList(self, txt, delay=0):
+    async def updateUnicodeList(self, delay=0):
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
+        txt = self._textEntry.get()
         uniListData = []
         for index, char in enumerate(txt):
             uniListData.append(
