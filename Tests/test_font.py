@@ -21,8 +21,7 @@ openFontsTestData = [
          'kern', 'liga', 'mark', 'medi', 'mkmk', 'numr',
          'pnum', 'rlig', 'rtlm', 'ss01', 'ss02', 'ss03',
          'ss04', 'ss05', 'ss06', 'ss07', 'ss08'],
-        ['DFLT', 'arab', 'latn'],
-        [],
+        {'DFLT': [], 'arab': ['ARA ', 'KSH ', 'MLY ', 'SND ', 'URD '], 'latn': ['TRK ']},
         [],
         "", []),
     ("IBMPlexSans-Regular.ttf",
@@ -37,8 +36,7 @@ openFontsTestData = [
          'ss02', 'ss03', 'ss04', 'ss05', 'subs', 'sups',
          'zero',
          ],
-        ['DFLT', 'cyrl', 'grek', 'latn'],
-        [],
+        {'DFLT': [], 'cyrl': [], 'grek': [], 'latn': []},
         [],
         "Kofi", ["K", "o", "fi"]),
     ("MutatorSans.ttf",
@@ -49,8 +47,7 @@ openFontsTestData = [
          'weight': 400,
          'width': 5},
         ['kern', 'rvrn'],
-        ['DFLT'],
-        [],
+        {'DFLT': []},
         [{'defaultValue': 0.0,
           'maxValue': 1000.0,
           'minValue': 0.0,
@@ -70,8 +67,7 @@ openFontsTestData = [
          'weight': 400,
          'width': 5},
         ['ccmp', 'curs', 'fina', 'init', 'isol', 'mark', 'medi', 'mkmk', 'rlig'],
-        ['DFLT', 'arab', 'latn'],
-        [],
+        {'DFLT': [], 'arab': ['ARA ', 'FAR ', 'KSH ', 'SND ', 'URD '], 'latn': []},
         [],
         "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
     ("MutatorSansBoldWide.ufo",
@@ -80,20 +76,18 @@ openFontsTestData = [
          'styleName': 'BoldWide',
          'suffix': 'ufo'},
         ['calt', 'ss01'],
-        ['DFLT'],
-        [],
+        {'DFLT': []},
         [],
         "HIiIII", ["H", "I", ".notdef", "I", "I.narrow", "I"])
 ]
 
-@pytest.mark.parametrize("fileName,expectedSortInfo,features,scripts,languages,axes,text,glyphNames",
+@pytest.mark.parametrize("fileName,expectedSortInfo,features,scripts,axes,text,glyphNames",
                          openFontsTestData)
 @pytest.mark.asyncio
 async def test_openFonts(fileName,
                          expectedSortInfo,
                          features,
                          scripts,
-                         languages,
                          axes,
                          text,
                          glyphNames):
@@ -105,7 +99,6 @@ async def test_openFonts(fileName,
     assert sortInfo == expectedSortInfo
     assert font.features == features
     assert font.scripts == scripts
-    assert font.languages == languages
     assert font.axes == axes
     run = font.getGlyphRun(text)
     assert [gi.name for gi in run] == glyphNames

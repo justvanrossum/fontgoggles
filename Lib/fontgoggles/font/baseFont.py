@@ -5,6 +5,10 @@ from ..misc.hbShape import HBShape
 from ..misc.ftFont import FTFont
 
 
+def _mergeScriptsAndLanguages(d1, d2):
+    return {k: sorted(set(d1.get(k, []) + d2.get(k, []))) for k in sorted(set(d1) | set(d2))}
+
+
 class BaseFont:
 
     def __init__(self):
@@ -27,12 +31,10 @@ class BaseFont:
         return sorted(set(self.shaper.getFeatures("GSUB") + self.shaper.getFeatures("GPOS")))
 
     @readOnlyCachedProperty
-    def languages(self):
-        return sorted(set(self.shaper.getLanguages("GSUB") + self.shaper.getLanguages("GPOS")))
-
-    @readOnlyCachedProperty
     def scripts(self):
-        return sorted(set(self.shaper.getScripts("GSUB") + self.shaper.getScripts("GPOS")))
+        gsub = self.shaper.getScriptsAndLanguages("GSUB")
+        gpos = self.shaper.getScriptsAndLanguages("GPOS")
+        return _mergeScriptsAndLanguages(gsub, gpos)
 
     @readOnlyCachedProperty
     def axes(self):
