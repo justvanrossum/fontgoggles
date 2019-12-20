@@ -290,6 +290,18 @@ class FontItem(Group):
 groupsSizePadding = 200
 
 
+directionPopUpConfig = [
+    ("Automatic, with BiDi", None),
+    ("Automatic, without BiDi", None),
+    ("Left-to-Right", "LTR"),
+    ("Right-to-Left", "RTL"),
+    ("Top-to-Bottom", "TTB"),
+    ("Bottom-to-Top", "BTT"),
+]
+directionOptions = [label for label, direction in directionPopUpConfig]
+directionSettings = [direction for label, direction in directionPopUpConfig]
+
+
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
 
     def __new__(cls, project):
@@ -401,18 +413,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupGeneralSettingsGroup(self):
         group = Group((0, 0, 0, 0))
         y = 10
-        directionOptions = [
-            "Automatic, with BiDi",
-            "Automatic, without BiDi",
-            "Left-to-Right",
-            "Right-to-Left",
-            "Top-to-Bottom",
-            "Bottom-to-Top",
-        ]
-        group.directionPopUp = LabeledView(
+        self.directionPopUp = LabeledView(
             (10, y, -10, 40), "Direction/orientation:",
             PopUpButton, directionOptions,
+            callback=self.directionPopUpCallback,
         )
+        group.directionPopUp = self.directionPopUp
         y += 50
         alignmentOptionsHorizontal = [
             "Automatic",
@@ -461,11 +467,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def unicodeShowBiDiCheckBoxCallback(self, sender):
         self.updateUnicodeList()
 
+    @objc.python_method
+    def directionPopUpCallback(self, sender):
+        self.textEntryChangedCallback(self._textEntry)
+
     @asyncTaskAutoCancel
     async def textEntryChangedCallback(self, sender):
-        # TODO: set up text info here
         self.textInfo = TextInfo(sender.get())
-        # self.textInfo.shouldApplyBiDi = ...  # get from popup button
+        self.textInfo.shouldApplyBiDi = self.directionPopUp.get() == 0
+
         self.updateUnicodeList(delay=0.05)
         t = time.time()
         firstKey = self.fontKeys[0] if self.fontKeys else None
@@ -494,7 +504,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if self.textInfo.shouldApplyBiDi:
             direction = "LTR"
         else:
-            direction = None
+            direction = directionSettings[self.directionPopUp.get()]
         glyphs, endPos = getGlyphRun(font, self.textInfo.text, direction=direction)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
@@ -585,6 +595,9 @@ class LabeledView(Group):
         assert h > 0
         self.label = TextBox((0, 0, 0, 0), label)
         self.view = viewClass((0, 20, 0, 20), *args, **kwargs)
+
+    def get(self):
+        return self.view.get()
 
 
 def getGlyphRun(font, txt, **kwargs):
