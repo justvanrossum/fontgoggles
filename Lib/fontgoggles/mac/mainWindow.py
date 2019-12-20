@@ -312,6 +312,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.fontKeys = list(self.project.iterFontKeys())
         self.allFeatureTags = set()
         self.itemHeight = 150
+        self.alignmentOverride = None
 
         sidebarWidth = 300
 
@@ -475,8 +476,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     async def textEntryChangedCallback(self, sender):
         self.textInfo = TextInfo(sender.get())
         self.textInfo.shouldApplyBiDi = self.directionPopUp.get() == 0
+        self.textInfo.directionOverride = directionSettings[self.directionPopUp.get()]
+        if self.alignmentOverride is not None:
+            align = self.alignmentOverride
+        else:
+            align = self.textInfo.suggestedAlignment
 
-        align = self.textInfo.suggestedAlignment
+        if align != self._fontList.align:
+            self._fontList.align = align
+            self._fontListScrollView.hAlign = align  # TODO Vertical
+
 
         self.updateUnicodeList(delay=0.05)
         t = time.time()
@@ -544,10 +553,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
         values = [None, "left", "right", "center"]
-        align = values[sender.get()]
-        if align:
-            self._fontList.align = align
-            self._fontListScrollView.hAlign = align
+        align = self.alignmentOverride = values[sender.get()]
+        if align is None:
+            align = self.textInfo.suggestedAlignment
+        self._fontList.align = align
+        self._fontListScrollView.hAlign = align
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
