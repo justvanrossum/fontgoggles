@@ -476,6 +476,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.textInfo = TextInfo(sender.get())
         self.textInfo.shouldApplyBiDi = self.directionPopUp.get() == 0
 
+        align = self.textInfo.suggestedAlignment
+
         self.updateUnicodeList(delay=0.05)
         t = time.time()
         firstKey = self.fontKeys[0] if self.fontKeys else None
@@ -501,11 +503,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
-        if self.textInfo.shouldApplyBiDi:
-            direction = "LTR"
-        else:
-            direction = directionSettings[self.directionPopUp.get()]
-        glyphs, endPos = getGlyphRun(font, self.textInfo.text, direction=direction)
+        glyphs, endPos = getGlyphRun(font, self.textInfo.text,
+                                     direction=self.textInfo.directionForShaper)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
