@@ -23,6 +23,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
     def init(self):
         self = super().init()
         self.align = "left"
+        self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
         return self
 
     def isOpaque(self):
@@ -333,7 +334,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         initialText = "ABC abc 0123 :;?"
         self._textEntry.set(initialText)
-        self.textEntryCallback(self._textEntry)
+        self.textEntryChangedCallback(self._textEntry)
 
         self.loadFonts()
 
@@ -379,7 +380,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
-        self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryCallback)
+        self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
         self._fontList = FontList(self.fontKeys, 300, self.itemHeight)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True)
         group.fontList = self._fontListScrollView
@@ -455,7 +456,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return self._fontList.iterFontItems()
 
     @asyncTaskAutoCancel
-    async def textEntryCallback(self, sender):
+    async def textEntryChangedCallback(self, sender):
         txt = sender.get()
         self.updateUnicodeList(txt, delay=0.05)
         t = time.time()
