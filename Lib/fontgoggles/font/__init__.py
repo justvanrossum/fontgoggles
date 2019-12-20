@@ -137,3 +137,13 @@ fontOpeners = {
 }
 
 fileTypes = sorted(fontOpeners)
+
+
+def mergeScriptsAndLanguages(d1, d2):
+    d = dict(d1)
+    for k, v in d2.items():
+        if k in d:
+            d[k] = d[k] | v
+        else:
+            d[k] = v
+    return d

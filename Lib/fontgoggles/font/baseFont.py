@@ -3,10 +3,7 @@ from fontTools.ttLib import TTFont
 from ..misc.decorators import readOnlyCachedProperty
 from ..misc.hbShape import HBShape
 from ..misc.ftFont import FTFont
-
-
-def _mergeScriptsAndLanguages(d1, d2):
-    return {k: (d1.get(k, set()) | d2.get(k, set())) for k in sorted(set(d1) | set(d2))}
+from . import mergeScriptsAndLanguages
 
 
 class BaseFont:
@@ -34,7 +31,7 @@ class BaseFont:
     def scripts(self):
         gsub = self.shaper.getScriptsAndLanguages("GSUB")
         gpos = self.shaper.getScriptsAndLanguages("GPOS")
-        return _mergeScriptsAndLanguages(gsub, gpos)
+        return mergeScriptsAndLanguages(gsub, gpos)
 
     @readOnlyCachedProperty
     def axes(self):
