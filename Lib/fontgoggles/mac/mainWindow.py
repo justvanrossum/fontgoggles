@@ -152,7 +152,23 @@ class FGFontListView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     @suppressAndLogException
     def magnifyWithEvent_(self, event):
-        print(self, self.vanillaWrapper(), event)
+        scrollView = self.enclosingScrollView()
+        # clipView = scrollView.contentView()
+        # if event.phase() == AppKit.NSEventPhaseBegan:
+        #     self._savedClipBounds = clipView.bounds()
+        # if event.phase() == AppKit.NSEventPhaseEnded:
+        #     origin = clipView.bounds().origin
+        #     fontList = self.vanillaWrapper()
+        #     fontList.resizeFontItems(fontList.itemHeight * scrollView.magnification())
+
+        #     scrollView.setMagnification_(1.0)  #centeredAtPoint_
+        #     # self._savedClipBounds.origin = clipView.bounds().origin
+        #     bounds = clipView.bounds()
+        #     bounds.origin = origin
+        #     # clipView.setBounds_(bounds)
+        #     del self._savedClipBounds
+        # else:
+        #     super().magnifyWithEvent_(event)
 
 
 class GlyphLine(Group):
@@ -168,6 +184,7 @@ class FontList(Group):
 
     def __init__(self, fontKeys, width, itemHeight):
         super().__init__((0, 0, width, 900))
+        self.itemHeight = itemHeight
         self.align = "left"
         y = 0
         for index, fontKey in enumerate(fontKeys):
@@ -233,6 +250,7 @@ class FontList(Group):
             index += 1
 
     def resizeFontItems(self, itemHeight):
+        self.itemHeight = itemHeight
         posY = 0
         for fontItem in self.iterFontItems():
             x, y, w, h = fontItem.getPosSize()
@@ -400,7 +418,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
         self._fontList = FontList(self.fontKeys, 300, self.itemHeight)
-        self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True)
+        self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True,
+                                                      minMagnification=0.2)
         group.fontList = self._fontListScrollView
         group.textEntry = self._textEntry
         return group
