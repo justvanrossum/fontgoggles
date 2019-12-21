@@ -332,7 +332,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.project = project
         self.fontKeys = list(self.project.iterFontKeys())
         self.allFeatureTags = set()
-        self.itemHeight = 150
+        self.defaultItemHeight = 150
         self.alignmentOverride = None
 
         sidebarWidth = 300
@@ -418,7 +418,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
-        self._fontList = FontList(self.fontKeys, 300, self.itemHeight)
+        self._fontList = FontList(self.fontKeys, 300, self.defaultItemHeight)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True,
                                                       minMagnification=0.2)
         group.fontList = self._fontListScrollView
@@ -639,12 +639,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return True
 
     def zoomIn_(self, sender):
-        self.itemHeight = min(1000, round(self.itemHeight * (2 ** (1 / 3))))
-        self._fontList.resizeFontItems(self.itemHeight)
+        itemHeight = min(1000, round(self._fontList.itemHeight * (2 ** (1 / 3))))
+        self._fontList.resizeFontItems(itemHeight)
 
     def zoomOut_(self, sender):
-        self.itemHeight = max(50, round(self.itemHeight / (2 ** (1 / 3))))
-        self._fontList.resizeFontItems(self.itemHeight)
+        itemHeight = max(50, round(self._fontList.itemHeight / (2 ** (1 / 3))))
+        self._fontList.resizeFontItems(itemHeight)
 
 
 class LabeledView(Group):
