@@ -250,6 +250,7 @@ class FontList(Group):
             index += 1
 
     def resizeFontItems(self, itemHeight):
+        scaleFactor = itemHeight / self.itemHeight
         self.itemHeight = itemHeight
         posY = 0
         for fontItem in self.iterFontItems():
@@ -257,7 +258,7 @@ class FontList(Group):
             fontItem.setPosSize((x, posY, w, itemHeight))
             posY += itemHeight
         x, y, w, h = self.getPosSize()
-        self.setPosSize((x, y, w, posY))
+        self.setPosSize((x, y, w * scaleFactor, posY))
 
 
 class FontItem(Group):
