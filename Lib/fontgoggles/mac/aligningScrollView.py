@@ -137,6 +137,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
 
         if proposedClipBounds.size.height > docBounds.size.height:
             if docView.isFlipped():
+                # TODO: needs fixing for magnification
                 if self.vAlign == "center":
                     proposedClipBounds.origin.y = (docBounds.size.height - proposedClipBounds.size.height) / 2.0
                 elif self.vAlign == "top":
@@ -144,7 +145,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
                 elif self.vAlign == "bottom":
                     proposedClipBounds.origin.y = 0
             else:
-                magBias =  (magnification - 1) * proposedClipBounds.size.height
+                magBias = (magnification - 1) * proposedClipBounds.size.height
                 if self.vAlign == "center":
                     proposedClipBounds.origin.y = -(docBounds.size.height - proposedClipBounds.size.height) / 2.0 + magBias
                 elif self.vAlign == "top":
