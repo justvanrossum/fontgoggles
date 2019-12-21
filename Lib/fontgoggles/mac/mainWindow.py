@@ -366,11 +366,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.w.open()
         self.w._window.setWindowController_(self)
         self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
+        self.setWindow_(self.w._window)
 
         initialText = "ABC abc 0123 :;?"
         self._textEntry.set(initialText)
         self.textEntryChangedCallback(self._textEntry)
-
         self.loadFonts()
 
     @objc.python_method
