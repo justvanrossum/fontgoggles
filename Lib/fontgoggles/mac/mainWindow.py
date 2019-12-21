@@ -469,6 +469,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             "Center",
         ]
 
+        self.alignmentPopup = LabeledView(
+            (10, y, -10, 40), "Visual alignment:",
+            PopUpButton, alignmentOptionsHorizontal,
+            callback=self.alignmentChangedCallback,
+        )
+        group.alignmentPopup = self.alignmentPopup
+        y += 50
+
         self.scriptsPopup = LabeledView(
             (10, y, -10, 40), "Script:",
             PopUpButton, ['DFLT'],
@@ -485,13 +493,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.languagesPopup = self.languagesPopup
         y += 50
 
-        self.alignmentPopup = LabeledView(
-            (10, y, -10, 40), "Visual alignment:",
-            PopUpButton, alignmentOptionsHorizontal,
-            callback=self.alignmentChangedCallback,
-        )
-        group.alignmentPopup = self.alignmentPopup
-        y += 50
         group.setPosSize((0, 0, 0, y))
         return group
 
