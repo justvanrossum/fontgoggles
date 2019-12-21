@@ -2,14 +2,14 @@ import AppKit
 import objc
 
 
-_textAlignments = dict(
+textAlignments = dict(
     left=AppKit.NSTextAlignmentLeft,
     center=AppKit.NSTextAlignmentCenter,
     right=AppKit.NSTextAlignmentRight,
 )
 
 
-_textLineBreakModes = dict(
+textLineBreakModes = dict(
     wordwrap=AppKit.NSLineBreakByWordWrapping,
     charwrap=AppKit.NSLineBreakByCharWrapping,
     clipping=AppKit.NSLineBreakByClipping,
@@ -21,8 +21,8 @@ _textLineBreakModes = dict(
 
 def makeTextCell(align="left", lineBreakMode="wordwrap", font=None):
     cell = AppKit.NSTextFieldCell.alloc().init()
-    cell.setAlignment_(_textAlignments[align])
-    cell.setLineBreakMode_(_textLineBreakModes[lineBreakMode])
+    cell.setAlignment_(textAlignments[align])
+    cell.setLineBreakMode_(textLineBreakModes[lineBreakMode])
     if font is not None:
         cell.setFont_(font)
     return cell

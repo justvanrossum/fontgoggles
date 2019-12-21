@@ -7,7 +7,7 @@ from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
-from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell, _textAlignments as textAlignments
+from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell, textAlignments
 from fontgoggles.misc.decorators import (asyncTaskAutoCancel, suppressAndLogException,
                                          hookedProperty)
 from fontgoggles.misc.rectTree import RectTree
