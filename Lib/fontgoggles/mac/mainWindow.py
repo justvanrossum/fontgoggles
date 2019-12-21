@@ -246,6 +246,8 @@ class FontItem(Group):
 
     def __init__(self, posSize, fontKey):
         super().__init__(posSize)
+        # self._nsObject.setWantsLayer_(True)
+        # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.fileNameLabel = TextBox((10, 0, -10, 17), "", sizeStyle="regular")
         self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
