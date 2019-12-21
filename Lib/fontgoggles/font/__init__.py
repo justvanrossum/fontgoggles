@@ -77,7 +77,6 @@ defaultSortInfo = dict(familyName="", styleName="", weight=400, width=5, italicA
 
 
 def getSortInfoOTF(fontPath: PathLike, fontNum: int):
-    # TODO: move to baseFont/otfFont
     from fontTools.ttLib import TTFont
     suffix = fontPath.suffix.lower().lstrip(".")
     ttf = TTFont(fontPath, fontNumber=fontNum, lazy=True)
