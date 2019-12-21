@@ -532,6 +532,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def directionPopUpCallback(self, sender):
+        self.unicodeShowBiDiCheckBox.enable(sender.get() == 0)
         self.textEntryChangedCallback(self._textEntry)
 
     @asyncTaskAutoCancel
