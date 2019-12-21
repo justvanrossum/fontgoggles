@@ -249,6 +249,7 @@ class FontList(Group):
             yield item
             index += 1
 
+    @suppressAndLogException
     def resizeFontItems(self, itemHeight):
         scaleFactor = itemHeight / self.itemHeight
         self.itemHeight = itemHeight
@@ -257,8 +258,26 @@ class FontList(Group):
             x, y, w, h = fontItem.getPosSize()
             fontItem.setPosSize((x, posY, w, itemHeight))
             posY += itemHeight
+
+        # calculate the center of our clip view in relative doc coords
+        # so we can set the scroll position and zoom in/out "from the middle"
         x, y, w, h = self.getPosSize()
+        clipView = self._nsObject.superview()
+        (cx, cy), (cw, ch) = clipView.bounds()
+        cx += cw / 2
+        cy -= ch / 2
+        cx /= w
+        cy /= h
+
         self.setPosSize((x, y, w * scaleFactor, posY))
+
+        cx *= w * scaleFactor
+        cy *= posY
+        cx -= cw / 2
+        cy += ch / 2
+        clipBounds = clipView.bounds()
+        clipBounds.origin = (cx, cy)
+        clipView.setBounds_(clipBounds)
 
 
 class FontItem(Group):
