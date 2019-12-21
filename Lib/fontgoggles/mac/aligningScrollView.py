@@ -101,13 +101,15 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         self._prevDocBounds = docBounds
         super().viewFrameChanged_(notification)
 
-    def constrainBoundsRect_(self, proposedClipViewBoundsRect):
+    def constrainBoundsRect_(self, proposedClipBounds):
         # Partially taken from https://stackoverflow.com/questions/22072105/
-        rect = super().constrainBoundsRect_(proposedClipViewBoundsRect)
+        proposedClipBounds = super().constrainBoundsRect_(proposedClipBounds)
         docView = self.documentView()
         if docView is None:
-            return rect
+            return proposedClipBounds
         docBounds = docView.bounds()
+        scrollView = self.superview()
+        magnification = scrollView.magnification()
 
         if self._prevClipBounds is not None:
             clipBounds = self.bounds()
@@ -118,37 +120,40 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         else:
             dx = dy = dw = dh = 0
 
-        if rect.size.width > docBounds.size.width:
+        if proposedClipBounds.size.width > docBounds.size.width:
             if self.hAlign == "center":
-                rect.origin.x = (docBounds.size.width - rect.size.width) / 2.0
+                proposedClipBounds.origin.x = (docBounds.size.width - proposedClipBounds.size.width) / 2.0
             elif self.hAlign == "left":
-                rect.origin.x = 0
+                proposedClipBounds.origin.x = 0
             elif self.hAlign == "right":
-                rect.origin.x = (docBounds.size.width - rect.size.width)
+                proposedClipBounds.origin.x = (docBounds.size.width - proposedClipBounds.size.width)
         else:
             if self.hAlign == "center":
-                rect.origin.x = self._prevClipBounds.origin.x - dw / 2 + dx
+                proposedClipBounds.origin.x = self._prevClipBounds.origin.x - dw / 2 + dx
             elif self.hAlign == "right":
-                rect.origin.x = self._prevClipBounds.origin.x - dw + dx
+                minX = docBounds.size.width - clipBounds.size.width
+                newX = self._prevClipBounds.origin.x - dw + dx
+                proposedClipBounds.origin.x = min(newX, minX)
 
-        if rect.size.height > docBounds.size.height:
+        if proposedClipBounds.size.height > docBounds.size.height:
             if docView.isFlipped():
                 if self.vAlign == "center":
-                    rect.origin.y = (docBounds.size.height - rect.size.height) / 2.0
+                    proposedClipBounds.origin.y = (docBounds.size.height - proposedClipBounds.size.height) / 2.0
                 elif self.vAlign == "top":
-                    rect.origin.y = (docBounds.size.height - rect.size.height)
+                    proposedClipBounds.origin.y = (docBounds.size.height - proposedClipBounds.size.height)
                 elif self.vAlign == "bottom":
-                    rect.origin.y = 0
+                    proposedClipBounds.origin.y = 0
             else:
+                magBias =  (magnification - 1) * proposedClipBounds.size.height
                 if self.vAlign == "center":
-                    rect.origin.y = -(docBounds.size.height - rect.size.height) / 2.0
+                    proposedClipBounds.origin.y = -(docBounds.size.height - proposedClipBounds.size.height) / 2.0 + magBias
                 elif self.vAlign == "top":
-                    rect.origin.y = 0
+                    proposedClipBounds.origin.y = magBias
                 elif self.vAlign == "bottom":
-                    rect.origin.y = -(docBounds.size.height - rect.size.height)
+                    proposedClipBounds.origin.y = -(docBounds.size.height - proposedClipBounds.size.height) + magBias
         else:
             # TODO implement alignment for vertical
             pass
 
-        self._prevClipBounds = rect
-        return rect
+        self._prevClipBounds = proposedClipBounds
+        return proposedClipBounds
