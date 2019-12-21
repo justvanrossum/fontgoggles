@@ -104,11 +104,3 @@ class OTFFont(BaseFont):
             return [(outline, 0)]
         else:
             return outline
-
-
-class UFOFont(BaseFont):
-    ...
-
-
-class DesignSpaceFont(BaseFont):
-    ...
