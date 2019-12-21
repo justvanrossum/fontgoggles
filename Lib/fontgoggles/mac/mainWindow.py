@@ -276,7 +276,6 @@ class FontList(Group):
         cx -= cw / 2
         cy += ch / 2
         clipBounds = clipView.bounds()
-        cx = min(cx, w * scaleFactor - clipBounds.size.width)  # TODO: check with magnification
         clipBounds.origin = (cx, cy)
         clipView.setBounds_(clipBounds)
 
