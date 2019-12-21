@@ -455,6 +455,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupGeneralSettingsGroup(self):
         group = Group((0, 0, 0, 0))
         y = 10
+
         self.directionPopUp = LabeledView(
             (10, y, -10, 40), "Direction/orientation:",
             PopUpButton, directionOptions,
@@ -462,6 +463,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         )
         group.directionPopUp = self.directionPopUp
         y += 50
+
         alignmentOptionsHorizontal = [
             "Automatic",
             "Left",   # Top
