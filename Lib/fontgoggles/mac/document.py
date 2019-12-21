@@ -8,11 +8,13 @@ from ..font import sortedFontPathsAndNumbers
 
 class FGDocument(AppKit.NSDocument):
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls):
         return cls.alloc().init()
 
-    def __init__(self):
+    def init(self):
+        self = super().init()
         self.project = Project()
+        return self
 
     def addSourceFiles_(self, paths):
         paths = [pathlib.Path(path) for path in paths]
