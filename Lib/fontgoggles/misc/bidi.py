@@ -1,3 +1,4 @@
+import itertools
 from bidi.algorithm import (get_empty_storage, get_base_level, get_embedding_levels,
                             explicit_embed_and_overrides, resolve_weak_types,
                             resolve_neutral_types, resolve_implicit_levels,
@@ -10,10 +11,14 @@ def applyBiDi(text):
     string, and char index mappings for to_bidi and from_bidi.
     """
     storage, display = getBiDiInfo(text)
+    run_lenghts = []
+    for value, sub in itertools.groupby(storage['chars'], key=lambda ch: ch['level']):
+        run_lenghts.append(len(list(sub)))
+    assert sum(run_lenghts) == len(display)
     base_dir = storage['base_dir']
     from_bidi = [char_info['index'] for char_info in storage['chars']]
     to_bidi = [bidi_index for index, bidi_index in sorted(zip(from_bidi, range(len(text))))]
-    return display, base_dir, to_bidi, from_bidi
+    return display, run_lenghts, base_dir, to_bidi, from_bidi
 
 
 # copied from bidi/algorthm.py and modified to be more useful for us.

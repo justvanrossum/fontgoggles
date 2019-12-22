@@ -8,7 +8,7 @@ class TextInfo:
 
     def __init__(self, text):
         self.originalText = text
-        self.biDiText, self.baseDirection, self.toBiDi, self.fromBiDi = applyBiDi(self.originalText)
+        self.biDiText, self.runLenghts, self.baseDirection, self.toBiDi, self.fromBiDi = applyBiDi(self.originalText)
         self.shouldApplyBiDi = True
         self.directionOverride = None
         self.scriptOverride = None
