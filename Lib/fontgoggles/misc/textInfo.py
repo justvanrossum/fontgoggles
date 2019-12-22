@@ -11,6 +11,8 @@ class TextInfo:
         self.biDiText, self.baseDirection, self.toBiDi, self.fromBiDi = applyBiDi(self.originalText)
         self.shouldApplyBiDi = True
         self.directionOverride = None
+        self.scriptOverride = None
+        self.languageOverride = None
 
     @property
     def text(self):

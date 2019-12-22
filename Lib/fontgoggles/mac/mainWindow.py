@@ -494,7 +494,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.languagesPopup = LabeledView(
             (10, y, -10, 40), "Language:",
             PopUpButton, [],
-            # callback=self.languagesPopupCallback,
+            callback=self.languagesPopupCallback,
         )
         group.languagesPopup = self.languagesPopup
         y += 50
@@ -550,6 +550,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.textInfo = TextInfo(sender.get())
         self.textInfo.shouldApplyBiDi = self.directionPopUp.get() == 0
         self.textInfo.directionOverride = directionSettings[self.directionPopUp.get()]
+        self.textInfo.scriptOverride = self.scriptOverride
+        self.textInfo.languageOverride = self.languageOverride
         if self.alignmentOverride is not None:
             align = self.alignmentOverride
         else:
@@ -585,7 +587,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if font is None:
             return
         glyphs, endPos = getGlyphRun(font, self.textInfo.text,
-                                     direction=self.textInfo.directionForShaper)
+                                     direction=self.textInfo.directionForShaper,
+                                     script=self.textInfo.scriptOverride,
+                                     language=self.textInfo.languageOverride)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
@@ -632,15 +636,29 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._fontListScrollView.hAlign = align
         self.updateTextEntryAlignment(align)
 
+
+    @property
+    def scriptOverride(self):
+        tag = _tagFromMenuItem(self.scriptsPopup.getItem())
+        return None if tag == "DFLT" else tag
+
+    @property
+    def languageOverride(self):
+        tag = _tagFromMenuItem(self.languagesPopup.getItem())
+        return None if tag == "dflt" else tag
+
     @objc.python_method
     def scriptsPopupCallback(self, sender):
-        tag = sender.getItem().split()[0]
-        if len(tag) < 4:
-            tag += " " * (4 - len(tag))
+        tag = _tagFromMenuItem(sender.getItem())
         languages = [f"{tag} – {opentypeTags.languages.get(tag, ['?'])[0]}"
                      for tag in sorted(self.allScriptsAndLanguages[tag])]
         self.languagesPopup.setItems(['dflt – Default'] + languages)
         self.languagesPopup.set(0)
+        self.textEntryChangedCallback(self._textEntry)
+
+    @objc.python_method
+    def languagesPopupCallback(self, sender):
+        self.textEntryChangedCallback(self._textEntry)
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):
@@ -705,6 +723,9 @@ class LabeledView(Group):
     def set(self, value):
         self.view.set(value)
 
+    def getItem(self):
+        return self.view.getItem()
+
     def getItems(self):
         return self.view.getItems()
 
@@ -724,3 +745,12 @@ def getGlyphRun(font, txt, **kwargs):
         x += gi.ax
         y += gi.ay
     return glyphs, (x, y)
+
+
+def _tagFromMenuItem(title):
+    if not title:
+        return None
+    tag = title.split()[0]
+    if len(tag) < 4:
+        tag += " " * (4 - len(tag))
+    return tag
