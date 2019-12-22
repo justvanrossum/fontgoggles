@@ -523,6 +523,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # print(f"loaded {self._loadCounter} fonts in {time.time() - self._startLoading:.4f} seconds")
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
+        # TODO: Perhaps we need some callback after all fonts are loaded to avoid setting
+        # things like features and scripts for every single font we load.
         self.allFeatureTags.update(font.features)
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
         self.scriptsPopup.setItems(sorted(self.allScriptsAndLanguages))
