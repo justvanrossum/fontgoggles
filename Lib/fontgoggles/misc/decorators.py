@@ -145,8 +145,9 @@ class cachedProperty(readOnlyCachedProperty):
 
 class hookedProperty:
 
-    def __init__(self, hook):
+    def __init__(self, hook, default=_NotFoundToken):
         self.hook = hook
+        self.default = default
 
     def __set_name__(self, owner, name):
         self.name = name
@@ -155,7 +156,10 @@ class hookedProperty:
         try:
             return obj.__dict__[self.name]
         except KeyError:
-            raise AttributeError(self.name)
+            if self.default is _NotFoundToken:
+                raise AttributeError(self.name)
+            else:
+                return self.default
 
     def __set__(self, obj, value):
         obj.__dict__[self.name] = value
@@ -167,3 +171,27 @@ class hookedProperty:
         except KeyError:
             raise AttributeError(self.name)
         self.hook(obj)
+
+
+class delegateProperty:
+
+    def __init__(self, delegateAttributeName):
+        self.delegateAttributeName = delegateAttributeName
+
+    def __set_name__(self, owner, name):
+        # This is Python >= 3.6
+        self.propertyName = name
+
+    def __get__(self, obj, cls=None):
+        if obj is None:
+            return self
+        delegate = getattr(obj, self.delegateAttributeName)
+        return getattr(delegate, self.propertyName)
+
+    def __set__(self, obj, value):
+        delegate = getattr(obj, self.delegateAttributeName)
+        setattr(delegate, self.propertyName, value)
+
+    def __delete__(self, obj):
+        delegate = getattr(obj, self.delegateAttributeName)
+        delattr(delegate, self.propertyName)
