@@ -731,6 +731,8 @@ class LabeledView(Group):
 
 
 def getGlyphRun(font, textInfo, **kwargs):
+    # TODO: move this someplace UI-neutral
+    # TODO: write tests
     text = textInfo.text
     runLengths = textInfo.runLengths
     direction = textInfo.directionForShaper
