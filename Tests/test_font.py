@@ -1,6 +1,7 @@
 import pathlib
 import pytest
 from fontgoggles.font import getOpener, sniffFontType, sortedFontPathsAndNumbers
+from fontgoggles.misc.textInfo import TextInfo
 from testSupport import getFontPath, testDataFolder
 
 
@@ -126,3 +127,13 @@ def test_iterFontPathsAndNumbers():
         ('MutatorSansBoldWide.ufo', 0),
     ]
     assert expectedResults == results
+
+
+@pytest.mark.asyncio
+async def test_getGlyphRunFromTextInfo():
+    fontPath = getFontPath('NotoNastaliqUrdu-Regular.ttf')
+    numFonts, opener, getSortInfo = getOpener(fontPath)
+    font, fontData = await opener(fontPath, 0)
+    textInfo = TextInfo("abc")
+    glyphs, endPos = font.getGlyphRunFromTextInfo(textInfo)
+    assert [g.pos for g in glyphs] == [(0, 0), (900, 0), (1800, 0)]
