@@ -13,6 +13,7 @@ from fontgoggles.misc.decorators import (asyncTaskAutoCancel, suppressAndLogExce
                                          hookedProperty)
 from fontgoggles.misc.rectTree import RectTree
 from fontgoggles.misc.textInfo import TextInfo
+from fontgoggles.misc import opentypeTags
 
 
 class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
@@ -527,7 +528,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # things like features and scripts for every single font we load.
         self.allFeatureTags.update(font.features)
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
-        self.scriptsPopup.setItems(sorted(self.allScriptsAndLanguages))
+        scriptTags = sorted(self.allScriptsAndLanguages)
+        scriptMenuTitles = [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
+        self.scriptsPopup.setItems(scriptMenuTitles)
         self.setFontItemText(fontKey, fontItem, isSelectedFont)
 
     def iterFontItems(self):
