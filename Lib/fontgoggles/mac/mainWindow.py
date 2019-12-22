@@ -329,7 +329,7 @@ class FontItem(Group):
 # to avoid having to resize the font line group too often. In other words,
 # this value specifies some wiggle room: the font list can be a little
 # larger than strictly necessary for fitting all glyphs.
-groupsSizePadding = 200
+fontListSizePadding = 200
 
 
 directionPopUpConfig = [
@@ -575,7 +575,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         newWidth = 300  # some minimum so that our filename label stays large enough
         for fontItem in self.iterFontItems():
             newWidth = max(newWidth, fontItem.minimumWidth)
-        if self._fontList.width > newWidth + groupsSizePadding:
+        if self._fontList.width > newWidth + fontListSizePadding:
             # Shrink the font list
             self._fontList.width = newWidth
             # TODO: deal with scroll position
@@ -595,7 +595,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # We make it a little wider than needed, so as to minimize the
             # number of times we need to make it grow, as it requires a full
             # redraw.
-            self._fontList.width = minimumWidth + groupsSizePadding
+            self._fontList.width = minimumWidth + fontListSizePadding
             # TODO: deal with scroll position
 
     @asyncTaskAutoCancel
