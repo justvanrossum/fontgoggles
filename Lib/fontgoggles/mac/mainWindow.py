@@ -750,6 +750,7 @@ def getGlyphRun(font, textInfo, **kwargs):
             gi.cluster += index
         glyphs.extend(run)
         index += rl
+    assert index == len(text)
     x = y = 0
     for gi in glyphs:
         gi.pos = posX, posY = x + gi.dx, y + gi.dy
