@@ -486,7 +486,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.scriptsPopup = LabeledView(
             (10, y, -10, 40), "Script:",
             PopUpButton, ['DFLT'],
-            # callback=self.scriptsPopupCallback,
+            callback=self.scriptsPopupCallback,
         )
         group.scriptsPopup = self.scriptsPopup
         y += 50
@@ -631,6 +631,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._fontList.align = align
         self._fontListScrollView.hAlign = align
         self.updateTextEntryAlignment(align)
+
+    @objc.python_method
+    def scriptsPopupCallback(self, sender):
+        tag = sender.getItem().split()[0]
+        if len(tag) < 4:
+            tag += " " * (4 - len(tag))
+        languages = [f"{tag} – {opentypeTags.languages.get(tag, ['?'])[0]}"
+                     for tag in sorted(self.allScriptsAndLanguages[tag])]
+        self.languagesPopup.setItems(['dflt – Default'] + languages)
+        self.languagesPopup.set(0)
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):
