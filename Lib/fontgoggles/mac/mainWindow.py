@@ -5,6 +5,7 @@ import AppKit
 import objc
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
+from fontgoggles.font import mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell, textAlignments
@@ -351,6 +352,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.project = project
         self.fontKeys = list(self.project.iterFontKeys())
         self.allFeatureTags = set()
+        self.allScriptsAndLanguages = {}
         self.defaultItemHeight = 150
         self.alignmentOverride = None
 
@@ -490,7 +492,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.languagesPopup = LabeledView(
             (10, y, -10, 40), "Language:",
-            PopUpButton, ['dflt'],
+            PopUpButton, [],
             # callback=self.languagesPopupCallback,
         )
         group.languagesPopup = self.languagesPopup
@@ -522,6 +524,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
         self.allFeatureTags.update(font.features)
+        self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
+        self.scriptsPopup.setItems(sorted(self.allScriptsAndLanguages))
         self.setFontItemText(fontKey, fontItem, isSelectedFont)
 
     def iterFontItems(self):
@@ -682,6 +686,15 @@ class LabeledView(Group):
 
     def get(self):
         return self.view.get()
+
+    def set(self, value):
+        self.view.set(value)
+
+    def getItems(self):
+        return self.view.getItems()
+
+    def setItems(self, items):
+        self.view.setItems(items)
 
 
 def getGlyphRun(font, txt, **kwargs):
