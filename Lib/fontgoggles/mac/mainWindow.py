@@ -586,7 +586,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
-        glyphs, endPos = getGlyphRun(font, self.textInfo)
+        glyphs, endPos = font.getGlyphRunFromTextInfo(self.textInfo)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
@@ -728,41 +728,6 @@ class LabeledView(Group):
 
     def setItems(self, items):
         self.view.setItems(items)
-
-
-def getGlyphRun(font, textInfo, **kwargs):
-    # TODO: move this someplace UI-neutral
-    # TODO: write tests
-    text = textInfo.text
-    runLengths = textInfo.runLengths
-    direction = textInfo.directionForShaper
-    script = textInfo.scriptOverride
-    language = textInfo.languageOverride
-
-    glyphs = []
-    index = 0
-    for rl in runLengths:
-        seg = text[index:index+rl]
-        run = font.getGlyphRun(seg,
-                               direction=direction,
-                               script=script,
-                               language=language,
-                               **kwargs)
-        for gi in run:
-            gi.cluster += index
-        glyphs.extend(run)
-        index += rl
-    assert index == len(text)
-    x = y = 0
-    for gi in glyphs:
-        gi.pos = posX, posY = x + gi.dx, y + gi.dy
-        if gi.path.elementCount():
-            gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), posX, posY)
-        else:
-            gi.bounds = None
-        x += gi.ax
-        y += gi.ay
-    return glyphs, (x, y)
 
 
 def _tagFromMenuItem(title):

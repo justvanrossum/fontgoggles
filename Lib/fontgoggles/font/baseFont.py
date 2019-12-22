@@ -1,4 +1,5 @@
 import io
+from fontTools.misc.arrayTools import offsetRect
 from fontTools.ttLib import TTFont
 from ..misc.decorators import readOnlyCachedProperty
 from ..misc.hbShape import HBShape
@@ -48,6 +49,42 @@ class BaseFont:
                             maxValue=axis.maxValue)
             axes.append(axisDict)
         return axes
+
+    def getGlyphRunFromTextInfo(self, textInfo, **kwargs):
+        # TODO: move out mac-specific bounds code
+        # TODO: write tests
+        from ..mac.drawing import rectFromNSRect
+        text = textInfo.text
+        runLengths = textInfo.runLengths
+        direction = textInfo.directionForShaper
+        script = textInfo.scriptOverride
+        language = textInfo.languageOverride
+
+        glyphs = []
+        index = 0
+        for rl in runLengths:
+            seg = text[index:index+rl]
+            run = self.getGlyphRun(seg,
+                                   direction=direction,
+                                   script=script,
+                                   language=language,
+                                   **kwargs)
+            for gi in run:
+                gi.cluster += index
+            glyphs.extend(run)
+            index += rl
+        assert index == len(text)
+        x = y = 0
+        for gi in glyphs:
+            gi.pos = posX, posY = x + gi.dx, y + gi.dy
+            if gi.path.elementCount():
+                gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), posX, posY)
+            else:
+                gi.bounds = None
+            x += gi.ax
+            y += gi.ay
+        return glyphs, (x, y)
+
 
     def getGlyphRun(self, txt, *, features=None, variations=None,
                     direction=None, language=None, script=None,
