@@ -587,6 +587,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if font is None:
             return
         glyphs, endPos = font.getGlyphRunFromTextInfo(self.textInfo)
+        addBoundingBoxes(glyphs)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
@@ -728,6 +729,14 @@ class LabeledView(Group):
 
     def setItems(self, items):
         self.view.setItems(items)
+
+
+def addBoundingBoxes(glyphs):
+    for gi in glyphs:
+        if gi.path.elementCount():
+            gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), *gi.pos)
+        else:
+            gi.bounds = None
 
 
 def _tagFromMenuItem(title):

@@ -1,5 +1,4 @@
 import io
-from fontTools.misc.arrayTools import offsetRect
 from fontTools.ttLib import TTFont
 from ..misc.decorators import readOnlyCachedProperty
 from ..misc.hbShape import HBShape
@@ -53,7 +52,6 @@ class BaseFont:
     def getGlyphRunFromTextInfo(self, textInfo, **kwargs):
         # TODO: move out mac-specific bounds code
         # TODO: write tests
-        from ..mac.drawing import rectFromNSRect
         text = textInfo.text
         runLengths = textInfo.runLengths
         direction = textInfo.directionForShaper
@@ -76,11 +74,7 @@ class BaseFont:
         assert index == len(text)
         x = y = 0
         for gi in glyphs:
-            gi.pos = posX, posY = x + gi.dx, y + gi.dy
-            if gi.path.elementCount():
-                gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), posX, posY)
-            else:
-                gi.bounds = None
+            gi.pos = x + gi.dx, y + gi.dy
             x += gi.ax
             y += gi.ay
         return glyphs, (x, y)
