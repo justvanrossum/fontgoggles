@@ -587,6 +587,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if font is None:
             return
         glyphs, endPos = getGlyphRun(font, self.textInfo.text,
+                                     runLengths=self.textInfo.runLengths,
                                      direction=self.textInfo.directionForShaper,
                                      script=self.textInfo.scriptOverride,
                                      language=self.textInfo.languageOverride)
@@ -733,8 +734,16 @@ class LabeledView(Group):
         self.view.setItems(items)
 
 
-def getGlyphRun(font, txt, **kwargs):
-    glyphs = font.getGlyphRun(txt, **kwargs)
+def getGlyphRun(font, txt, runLengths, **kwargs):
+    glyphs = []
+    index = 0
+    for rl in runLengths:
+        seg = txt[index:index+rl]
+        run = font.getGlyphRun(seg, **kwargs)
+        for gi in run:
+            gi.cluster += index
+        glyphs.extend(run)
+        index += rl
     x = y = 0
     for gi in glyphs:
         gi.pos = posX, posY = x + gi.dx, y + gi.dy
