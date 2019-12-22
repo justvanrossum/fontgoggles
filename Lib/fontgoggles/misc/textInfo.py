@@ -15,7 +15,7 @@ class TextInfo:
         self.languageOverride = None
 
     @property
-    def runLengths(self)
+    def runLengths(self):
         if self.shouldApplyBiDi:
             return self._runLengths
         else:
