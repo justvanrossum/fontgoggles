@@ -133,7 +133,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
             elif self.hAlign == "right":
                 minX = docBounds.size.width - clipBounds.size.width
                 newX = self._prevClipBounds.origin.x - dw + dx
-                proposedClipBounds.origin.x = min(newX, minX)
+                proposedClipBounds.origin.x = max(min(newX, minX), -1)
 
         if proposedClipBounds.size.height > docBounds.size.height:
             if docView.isFlipped():
