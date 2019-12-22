@@ -586,11 +586,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
-        glyphs, endPos = getGlyphRun(font, self.textInfo.text,
-                                     runLengths=self.textInfo.runLengths,
-                                     direction=self.textInfo.directionForShaper,
-                                     script=self.textInfo.scriptOverride,
-                                     language=self.textInfo.languageOverride)
+        glyphs, endPos = getGlyphRun(font, self.textInfo)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
@@ -734,12 +730,22 @@ class LabeledView(Group):
         self.view.setItems(items)
 
 
-def getGlyphRun(font, txt, runLengths, **kwargs):
+def getGlyphRun(font, textInfo, **kwargs):
+    text = textInfo.text
+    runLengths = textInfo.runLengths
+    direction = textInfo.directionForShaper
+    script = textInfo.scriptOverride
+    language = textInfo.languageOverride
+
     glyphs = []
     index = 0
     for rl in runLengths:
-        seg = txt[index:index+rl]
-        run = font.getGlyphRun(seg, **kwargs)
+        seg = text[index:index+rl]
+        run = font.getGlyphRun(seg,
+                               direction=direction,
+                               script=script,
+                               language=language,
+                               **kwargs)
         for gi in run:
             gi.cluster += index
         glyphs.extend(run)
