@@ -130,11 +130,22 @@ def test_iterFontPathsAndNumbers():
     assert expectedResults == results
 
 
+testDataGetGlyphRun = [
+    ("fit", ["fi", "t"],
+     [(0, 0), (567, 0)]),
+    ("\u062D\u062A\u0649 fit", ['fi', 't', 'space', 'uniFC74', 'uniFEA3'],
+     [(0, 0), (567, 0), (918, 0), (1154, 0), (2044, 0)]),
+]
+
+@pytest.mark.parametrize("text,expectedGlyphNames,expectedPositions", testDataGetGlyphRun)
 @pytest.mark.asyncio
-async def test_getGlyphRunFromTextInfo():
+async def test_getGlyphRunFromTextInfo(text, expectedGlyphNames, expectedPositions):
     fontPath = getFontPath('IBMPlexSansArabic-Regular.ttf')
     numFonts, opener, getSortInfo = getOpener(fontPath)
     font, fontData = await opener(fontPath, 0)
-    textInfo = TextInfo("abc")
+    textInfo = TextInfo(text)
     glyphs, endPos = font.getGlyphRunFromTextInfo(textInfo)
-    assert [g.pos for g in glyphs] == [(0, 0), (534, 0), (1114, 0)]
+    glyphNames = [g.name for g in glyphs]
+    positions = [g.pos for g in glyphs]
+    assert expectedGlyphNames == glyphNames
+    assert expectedPositions == positions
