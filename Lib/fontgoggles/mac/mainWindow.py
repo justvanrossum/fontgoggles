@@ -321,7 +321,8 @@ class FontItem(Group):
 
     @align.setter
     def align(self, value):
-        self.fileNameLabel._nsObject.cell().setAlignment_(textAlignments[value])
+        nsAlignment = textAlignments.get(value, textAlignments["left"])
+        self.fileNameLabel._nsObject.cell().setAlignment_(nsAlignment)
         self.glyphLineView._nsObject.align = value
 
 
