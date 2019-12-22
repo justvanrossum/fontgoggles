@@ -121,6 +121,7 @@ def test_iterFontPathsAndNumbers():
         ('IBMPlexSans-Regular.otf', 0),
         ('Amiri-Regular.ttf', 0),
         ('IBMPlexSans-Regular.ttf', 0),
+        ('IBMPlexSansArabic-Regular.ttf', 0),
         ('MutatorSans.ttf', 0),
         ('NotoNastaliqUrdu-Regular.ttf', 0),
         ('QuadTest-Regular.ttf', 0),
@@ -131,9 +132,9 @@ def test_iterFontPathsAndNumbers():
 
 @pytest.mark.asyncio
 async def test_getGlyphRunFromTextInfo():
-    fontPath = getFontPath('NotoNastaliqUrdu-Regular.ttf')
+    fontPath = getFontPath('IBMPlexSansArabic-Regular.ttf')
     numFonts, opener, getSortInfo = getOpener(fontPath)
     font, fontData = await opener(fontPath, 0)
     textInfo = TextInfo("abc")
     glyphs, endPos = font.getGlyphRunFromTextInfo(textInfo)
-    assert [g.pos for g in glyphs] == [(0, 0), (900, 0), (1800, 0)]
+    assert [g.pos for g in glyphs] == [(0, 0), (534, 0), (1114, 0)]
