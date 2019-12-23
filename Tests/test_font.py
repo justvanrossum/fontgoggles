@@ -138,8 +138,8 @@ def test_iterFontPathsAndNumbers():
 testDataGetGlyphRun = [
     ("fit", ["fi", "t"],
      [(0, 0), (567, 0)]),
-    ("\u062D\u062A\u0649 fit", ['fi', 't', 'space', 'uniFC74', 'uniFEA3'],
-     [(0, 0), (567, 0), (918, 0), (1154, 0), (2044, 0)]),
+    ("\u062D\u062A\u0649", ['uniFC74', 'uniFEA3'],
+     [(0, 0), (890, 0)]),
 ]
 
 @pytest.mark.parametrize("text,expectedGlyphNames,expectedPositions", testDataGetGlyphRun)
