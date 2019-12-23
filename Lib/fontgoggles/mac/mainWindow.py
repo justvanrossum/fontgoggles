@@ -647,7 +647,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._fontListScrollView.hAlign = align
         self.updateTextEntryAlignment(align)
 
-
     @property
     def scriptOverride(self):
         tag = _tagFromMenuItem(self.scriptsPopup.getItem())
