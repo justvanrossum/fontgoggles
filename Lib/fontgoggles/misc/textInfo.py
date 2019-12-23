@@ -1,7 +1,7 @@
 from .bidi import applyBiDi
 
 
-alignments = dict(LTR="left", RTL="right", TTB="top", BBT="bottom")
+alignments = dict(LTR="left", RTL="right", TTB="top", BTT="bottom")
 
 
 class TextInfo:
@@ -45,7 +45,7 @@ class TextInfo:
     @property
     def suggestedAlignment(self):
         if self.directionOverride is not None:
-            alignments = dict(LTR="left", RTL="right", TTB="top", BBT="bottom")
+            alignments = dict(LTR="left", RTL="right", TTB="top", BTT="bottom")
             return alignments[self.directionOverride]
         else:
             alignments = dict(L="left", R="right")
