@@ -1,8 +1,7 @@
 import functools
-import weakref
 import AppKit
 from vanilla import Group
-from fontgoggles.misc.decorators import delegateProperty, hookedProperty
+from fontgoggles.misc.decorators import delegateProperty, hookedProperty, weakrefCallbackProperty
 from fontgoggles.mac.drawing import rgbColor, grayColor, drawText
 
 
@@ -72,18 +71,16 @@ class TagView(Group):
     nsViewClass = FGTagView
     tag = delegateProperty("_nsObject")
     state = delegateProperty("_nsObject")
+    _callback = weakrefCallbackProperty()
 
     def __init__(self, posSize, tag, state, callback=None):
         super().__init__(posSize)
         self.tag = tag
         self.state = state
-        if callback is not None:
-            self._callbackRef = weakref.WeakMethod(callback)
-        else:
-            self._callbackRef = lambda: None
+        self._callback = callback
 
     def _callCallback(self):
-        callback = self._callbackRef()
+        callback = self._callback
         if callback is not None:
             callback(self)
 

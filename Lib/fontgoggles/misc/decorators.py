@@ -1,6 +1,7 @@
 import asyncio
 import functools
 import logging
+import weakref
 
 
 def asyncTask(func):
@@ -195,3 +196,32 @@ class delegateProperty:
     def __delete__(self, obj):
         delegate = getattr(obj, self.delegateAttributeName)
         delattr(delegate, self.propertyName)
+
+
+class weakrefCallbackProperty:
+
+    def __init__(self, doc=None):
+        self.__doc__ = doc
+
+    def __set_name__(self, owner, name):
+        self.weakrefCallbackName = "_weakrefCallback_" + name
+
+    def __get__(self, obj, cls=None):
+        if obj is None:
+            return self
+        weakrefCallback = getattr(obj, self.weakrefCallbackName, None)
+        if weakrefCallback is None:
+            return None
+        return weakrefCallback()
+
+    def __set__(self, obj, value):
+        if value is None:
+            self.__delete__(obj)
+        else:
+            setattr(obj, self.weakrefCallbackName, weakref.WeakMethod(value))
+
+    def __delete__(self, obj):
+        try:
+            delattr(obj, self.weakrefCallbackName)
+        except AttributeError:
+            pass
