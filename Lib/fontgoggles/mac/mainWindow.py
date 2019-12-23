@@ -246,7 +246,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def directionPopUpCallback(self, sender):
-        self.unicodeShowBiDiCheckBox.enable(sender.get() == 0)
+        popupValue = sender.get()
+        self.unicodeShowBiDiCheckBox.enable(popupValue == 0)
+        isVertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
+        self._fontList.setVertical(isVertical)
         self.textEntryChangedCallback(self._textEntry)
 
     @asyncTaskAutoCancel
@@ -276,13 +279,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 # time to unblock the event loop
                 await asyncio.sleep(0)
                 t = time.time()
-        newWidth = 300  # some minimum so that our filename label stays large enough
+        newExtent = 300  # some minimum so that our filename label stays large enough
         for fontItem in self.iterFontItems():
-            newWidth = max(newWidth, fontItem.minimumWidth)
-        if self._fontList.width > newWidth + fontListSizePadding:
-            # Shrink the font list
-            self._fontList.width = newWidth
-            # TODO: deal with scroll position
+            newExtent = max(newExtent, fontItem.minimumExtent)
+        if not self._fontList.isVertical:
+            if self._fontList.width > newExtent + fontListSizePadding:
+                # Shrink the font list
+                self._fontList.width = newExtent
+        else:
+            if self._fontList.height > newExtent + fontListSizePadding:
+                # Shrink the font list
+                self._fontList.height = newExtent
 
     @objc.python_method
     def setFontItemText(self, fontKey, fontItem, isSelectedFont):
@@ -295,13 +302,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
-        minimumWidth = fontItem.minimumWidth
-        if minimumWidth > self._fontList.width:
-            # We make it a little wider than needed, so as to minimize the
-            # number of times we need to make it grow, as it requires a full
-            # redraw.
-            self._fontList.width = minimumWidth + fontListSizePadding
-            # TODO: deal with scroll position
+        minimumExtent = fontItem.minimumExtent
+        if not self._fontList.isVertical:
+            if minimumExtent > self._fontList.width:
+                # We make it a little wider than needed, so as to minimize the
+                # number of times we need to make it grow, as it requires a full
+                # redraw.
+                self._fontList.width = minimumExtent + fontListSizePadding
+        else:
+            if minimumExtent > self._fontList.height:
+                # We see above
+                self._fontList.height = minimumExtent + fontListSizePadding
 
     @asyncTaskAutoCancel
     async def updateGlyphList(self, glyphs, delay=0):

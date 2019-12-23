@@ -31,12 +31,10 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._selection = set()
         self.setNeedsDisplay_(True)
-        # Return the minimal width our view must have to fit the glyphs
-        return self.margin * 2 + endPos[0] * self.scaleFactor
 
     @property
-    def minimumWidth(self):
-        return self.margin * 2 + self._endPos[0] * self.scaleFactor
+    def minimumExtent(self):
+        return self.margin * 2 + abs(self._endPos[self.isVertical]) * self.scaleFactor
 
     @hookedProperty
     def align(self):
@@ -54,7 +52,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     @property
     def origin(self):
-        endPos = self._endPos[self.isVertical] * self.scaleFactor
+        endPos = abs(self._endPos[self.isVertical]) * self.scaleFactor
         margin = self.margin
         align = self.align
         itemExtent = self.frame().size[self.isVertical]
@@ -68,7 +66,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         if not self.isVertical:
             return pos, 0.25 * itemSize  # TODO: something with hhea/OS/2 ascender/descender
         else:
-            return 0.5 * itemSize, pos  # TODO: something with vhea ascender/descender
+            return 0.5 * itemSize, itemExtent - pos  # TODO: something with vhea ascender/descender
 
     @suppressAndLogException
     def drawRect_(self, rect):
@@ -172,6 +170,14 @@ class FGFontListView(AppKit.NSView, metaclass=ClassNameIncrementer):
 class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
 
+    @property
+    def isVertical(self):
+        return self._nsObject.isVertical
+
+    @isVertical.setter
+    def isVertical(self, isVertical):
+        self._nsObject.isVertical = isVertical
+
 
 fontItemNameTemplate = "fontItem_{index}"
 
@@ -252,6 +258,22 @@ class FontList(Group):
             yield item
             index += 1
 
+    def setVertical(self, isVertical):
+        if self.isVertical == isVertical:
+            return
+        self.isVertical = isVertical
+        pos = [0, 0]
+        for fontItem in self.iterFontItems():
+            fontItem.isVertical = isVertical
+            x, y, w, h = fontItem.getPosSize()
+            w, h = h, w
+            fontItem.setPosSize((*pos, w, h))
+            pos[1 - isVertical] += self.itemSize
+        x, y, w, h = self.getPosSize()
+        w, h = h, w
+        self.setPosSize((x, y, w, h))
+        self._nsObject.setNeedsDisplay_(True)
+
     @suppressAndLogException
     def resizeFontItems(self, itemSize):
         scaleFactor = itemSize / self.itemSize
@@ -273,12 +295,12 @@ class FontList(Group):
         cx /= w
         cy /= h
 
-        self.setPosSize((x, y, w * scaleFactor, posY))
-
         if not self.isVertical:
+            self.setPosSize((x, y, w * scaleFactor, pos[1]))
             cx *= w * scaleFactor
             cy *= pos[1]
         else:
+            self.setPosSize((x, y, pos[0], h * scaleFactor))
             cx *= pos[0]
             cy *= h * scaleFactor
         cx -= cw / 2
@@ -318,8 +340,8 @@ class FontItem(Group):
         self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
 
     @property
-    def minimumWidth(self):
-        return self.glyphLineView._nsObject.minimumWidth
+    def minimumExtent(self):
+        return self.glyphLineView._nsObject.minimumExtent
 
     @property
     def align(self):
@@ -330,3 +352,11 @@ class FontItem(Group):
         nsAlignment = textAlignments.get(value, textAlignments["left"])
         self.fileNameLabel._nsObject.cell().setAlignment_(nsAlignment)
         self.glyphLineView._nsObject.align = value
+
+    @property
+    def isVertical(self):
+        return self.glyphLineView.isVertical
+
+    @isVertical.setter
+    def isVertical(self, isVertical):
+        self.glyphLineView.isVertical = isVertical
