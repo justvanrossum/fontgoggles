@@ -9,15 +9,15 @@ from fontgoggles.misc.rectTree import RectTree
 
 class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
-    _glyphs = None
-    _rectTree = None
-    _selection = None
-    _endPos = (0, 0)
-
     def init(self):
         self = super().init()
+        self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
         self.align = "left"
         self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
+        self._glyphs = None
+        self._rectTree = None
+        self._selection = None
+        self._endPos = (0, 0)
         return self
 
     def isOpaque(self):
@@ -178,6 +178,7 @@ class FontList(Group):
 
     def __init__(self, fontKeys, width, itemHeight):
         super().__init__((0, 0, width, 900))
+        self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
         self.itemHeight = itemHeight
         self.align = "left"
         y = 0
