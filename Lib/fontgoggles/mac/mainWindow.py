@@ -356,6 +356,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def __init__(self, project):
         self.project = project
         self.fontKeys = list(self.project.iterFontKeys())
+        self.loadingFonts = set()
         self.allFeatureTagsGSUB = set()
         self.allFeatureTagsGPOS = set()
         self.allScriptsAndLanguages = {}
@@ -517,6 +518,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         sharableFontData = {}
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
+            self.loadingFonts.add(fontKey)
             isSelectedFont = (fontKey == firstKey)
             coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData,
                                   isSelectedFont=isSelectedFont)
@@ -530,13 +532,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber)
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
-        # TODO: Perhaps we need some callback after all fonts are loaded to avoid setting
-        # things like features and scripts for every single font we load.
         self.allFeatureTagsGSUB.update(font.featuresGSUB)
         self.allFeatureTagsGPOS.update(font.featuresGPOS)
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
         self.setFontItemText(fontKey, fontItem, isSelectedFont)
-        self.updateSidebarItems()
+        self.loadingFonts.remove(fontKey)
+        if not self.loadingFonts:
+            # All fonts have been loaded
+            self.updateSidebarItems()
 
     def updateSidebarItems(self):
         self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
