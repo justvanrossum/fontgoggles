@@ -514,8 +514,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return group
 
     def loadFonts(self):
-        self._startLoading = time.time()
-        self._loadCounter = 0
         sharableFontData = {}
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
@@ -526,13 +524,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     async def _loadFont(self, fontKey, fontItem, sharableFontData, isSelectedFont):
-        # print(f"start loading at {time.time() - self._startLoading:.4f} seconds")
         fontItem.setIsLoading(True)
         fontPath, fontNumber = fontKey
         await self.project.loadFont(fontPath, fontNumber, sharableFontData=sharableFontData)
         font = self.project.getFont(fontPath, fontNumber)
-        self._loadCounter += 1
-        # print(f"loaded {self._loadCounter} fonts in {time.time() - self._startLoading:.4f} seconds")
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
         # TODO: Perhaps we need some callback after all fonts are loaded to avoid setting
