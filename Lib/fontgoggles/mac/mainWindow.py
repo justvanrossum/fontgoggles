@@ -496,7 +496,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.scriptsPopup = LabeledView(
             (10, y, -10, 40), "Script:",
-            PopUpButton, ['DFLT'],
+            PopUpButton, ['DFLT – Default'],
             callback=self.scriptsPopupCallback,
         )
         group.scriptsPopup = self.scriptsPopup
@@ -539,12 +539,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # things like features and scripts for every single font we load.
         self.allFeatureTagsGSUB.update(font.featuresGSUB)
         self.allFeatureTagsGPOS.update(font.featuresGPOS)
-        self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
+        self.setFontItemText(fontKey, fontItem, isSelectedFont)
+        self.updateSidebarItems()
+
+    def updateSidebarItems(self):
+        self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
         scriptTags = sorted(self.allScriptsAndLanguages)
         scriptMenuTitles = [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
         self.scriptsPopup.setItems(scriptMenuTitles)
-        self.setFontItemText(fontKey, fontItem, isSelectedFont)
 
     def iterFontItems(self):
         return self._fontList.iterFontItems()
