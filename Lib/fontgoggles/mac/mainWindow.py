@@ -61,7 +61,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="glyphList", canCollapse=True,
-                 size=205, resizeFlexibility=False),
+                 size=220, resizeFlexibility=False),
             dict(view=fontListGroup, identifier="fontList", canCollapse=False,
                  size=200),
         ]
@@ -117,9 +117,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # dict(title="index", width=34, cell=makeTextCell("right")),
             dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200,
                  typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
-            dict(title="adv", key="ax", width=40, cell=makeTextCell("right")),  # XXX
-            dict(title="∆X", key="dx", width=40, cell=makeTextCell("right")),
-            dict(title="∆Y", key="dy", width=40, cell=makeTextCell("right")),
+            # "adv" is "ax" or "ay", depending on isVertical:
+            dict(title="adv", key="adv", width=45, cell=makeTextCell("right")),
+            dict(title="∆X", key="dx", width=45, cell=makeTextCell("right")),
+            dict(title="∆Y", key="dy", width=45, cell=makeTextCell("right")),
             dict(title="cluster", width=40, cell=makeTextCell("right")),
             dict(title="gid", width=40, cell=makeTextCell("right")),
             # dummy filler column so "glyph" doesn't get to wide:
@@ -319,7 +320,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
-        glyphListData = [g.__dict__ for g in glyphs]
+        if not self._fontList.isVertical:
+            keyMap = {"ax": "adv"}
+        else:
+            keyMap = {"ay": "adv"}
+        glyphListData = [{keyMap.get(k, k): v for k, v in g.__dict__.items()} for g in glyphs]
         self.glyphList.set(glyphListData)
 
     @asyncTaskAutoCancel
