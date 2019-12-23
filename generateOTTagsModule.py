@@ -38,7 +38,17 @@ def formatFeatures(data, baseURL):
 def formatScripts(data):
     print("scripts = {")
     print("    # tag, friendly name")
-    for friendlyName, tag in data:
+    duplicates = {}
+    for i, (friendlyName, tag) in enumerate(data):
+        if tag in duplicates:
+            duplicates[tag] = duplicates[tag] + ", " + friendlyName
+            data[i] = (None, None)  # skip
+        else:
+            duplicates[tag] = friendlyName
+    for _, tag in data:
+        if tag is None:
+            continue
+        friendlyName = duplicates[tag]
         print(f"    {tag!r}: {friendlyName!r},")
     print("}")
 
