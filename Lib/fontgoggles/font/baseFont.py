@@ -65,7 +65,7 @@ class BaseFont:
         glyphs = []
         index = 0
         for rl in runLengths:
-            seg = text[index:index+rl]
+            seg = text[index:index + rl]
             run = self.getGlyphRun(seg,
                                    direction=direction,
                                    script=script,
@@ -82,7 +82,6 @@ class BaseFont:
             x += gi.ax
             y += gi.ay
         return glyphs, (x, y)
-
 
     def getGlyphRun(self, txt, *, features=None, variations=None,
                     direction=None, language=None, script=None,

@@ -19,10 +19,12 @@ def sniffFontType(fontPath: PathLike):
 
 def sortedFontPathsAndNumbers(paths: list, sortSpec: tuple=()):
     expandedPaths = list(iterFontPathsAndNumbers(paths))
+
     def sorter(item):
         path, fontNum, getSortInfo = item
         sortInfo = getSortInfo(path, fontNum)
         return tuple(sortInfo.get(key, defaultSortInfo[key]) for key in sortSpec)
+
     expandedPaths.sort(key=sorter)
     return [(fontPath, fontNum) for fontPath, fontNum, getSortInfo in expandedPaths]
 
