@@ -365,6 +365,6 @@ class FontItem(Group):
 
     def getFileNameLabelPosSize(self):
         if self.isVertical:
-            return (0, 10, 17, -10)
+            return (2, 10, 17, -10)
         else:
             return (10, 0, -10, 17)
