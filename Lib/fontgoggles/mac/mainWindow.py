@@ -37,6 +37,20 @@ directionPopUpConfig = [
 directionOptions = [label for label, direction in directionPopUpConfig]
 directionSettings = [direction for label, direction in directionPopUpConfig]
 
+alignmentOptionsHorizontal = [
+    "Automatic",
+    "Left",
+    "Right",
+    "Center",
+]
+
+alignmentOptionsVertical = [
+    "Automatic",
+    "Top",
+    "Bottom",
+    "Center",
+]
+
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
 
@@ -171,13 +185,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.directionPopUp = self.directionPopUp
         y += 50
 
-        alignmentOptionsHorizontal = [
-            "Automatic",
-            "Left",   # Top
-            "Right",  # Bottom
-            "Center",
-        ]
-
         self.alignmentPopup = LabeledView(
             (10, y, -10, 40), "Visual alignment:",
             PopUpButton, alignmentOptionsHorizontal,
@@ -250,6 +257,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         popupValue = sender.get()
         self.unicodeShowBiDiCheckBox.enable(popupValue == 0)
         isVertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
+        self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][isVertical])
         self._fontList.setVertical(isVertical)
         self.textEntryChangedCallback(self._textEntry)
 
@@ -346,12 +354,20 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
-        values = [None, "left", "right", "center"]
-        align = self.alignmentOverride = values[sender.get()]
+        values = [[None, "left", "right", "center"],
+                  [None, "top", "bottom", "center"]][self._fontList.isVertical]
+        align = values[sender.get()]
         if align is None:
             align = self.textInfo.suggestedAlignment
         self._fontList.align = align
-        self._fontListScrollView.hAlign = align
+        if not self._fontList.isVertical:
+            self._fontListScrollView.hAlign = align
+            self._fontListScrollView.vAlign = "top"
+            self.alignmentOverride = align
+        else:
+            self._fontListScrollView.hAlign = "left"
+            self._fontListScrollView.vAlign = align
+            self.alignmentOverride = None  # XXX
         self.updateTextEntryAlignment(align)
 
     @property
