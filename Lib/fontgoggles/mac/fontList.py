@@ -44,27 +44,31 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     @property
     def scaleFactor(self):
-        height = self.frame().size.height
-        return 0.7 * height / self.unitsPerEm
+        itemSize = self.frame().size[1 - self.isVertical]
+        return 0.7 * itemSize / self.unitsPerEm
 
     @property
     def margin(self):
-        height = self.frame().size.height
-        return 0.1 * height
+        itemSize = self.frame().size[1 - self.isVertical]
+        return 0.1 * itemSize
 
     @property
     def origin(self):
-        endPosX = self._endPos[0] * self.scaleFactor
+        endPos = self._endPos[self.isVertical] * self.scaleFactor
         margin = self.margin
         align = self.align
-        width, height = self.frame().size
-        if align == "right":
-            xPos = width - margin - endPosX
+        itemExtent = self.frame().size[self.isVertical]
+        itemSize = self.frame().size[1 - self.isVertical]
+        if align == "right" or align == "bottom":
+            pos = itemExtent - margin - endPos
         elif align == "center":
-            xPos = (width - endPosX) / 2
+            pos = (itemExtent - endPosX) / 2
         else:  # align == "left"
-            xPos = margin
-        return xPos, 0.25 * height
+            pos = margin
+        if not self.isVertical:
+            return pos, 0.25 * itemSize  # TODO: something with hhea/OS/2 ascender/descender
+        else:
+            return 0.5 * itemSize, pos  # TODO: something with vhea ascender/descender
 
     @suppressAndLogException
     def drawRect_(self, rect):
@@ -201,6 +205,11 @@ class FontList(Group):
     @property
     def height(self):
         return self.getPosSize()[3]
+
+    @height.setter
+    def height(self, newHeight):
+        x, y, w, h = self.getPosSize()
+        self.setPosSize((x, y, w, newHeight))
 
     @hookedProperty
     def align(self):
