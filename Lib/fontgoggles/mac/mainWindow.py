@@ -331,7 +331,10 @@ class FontItem(Group):
 # to avoid having to resize the font line group too often. In other words,
 # this value specifies some wiggle room: the font list can be a little
 # larger than strictly necessary for fitting all glyphs.
-fontListSizePadding = 200
+fontListSizePadding = 120
+
+# Width of the sidebar with direction/alignment/script/language/features controls etc.
+sidebarWidth = 300
 
 
 directionPopUpConfig = [
@@ -345,7 +348,6 @@ directionPopUpConfig = [
 directionOptions = [label for label, direction in directionPopUpConfig]
 directionSettings = [direction for label, direction in directionPopUpConfig]
 
-sidebarWidth = 300
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
