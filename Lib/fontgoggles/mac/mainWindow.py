@@ -8,6 +8,7 @@ from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.font import mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
+from fontgoggles.mac.featureTagGroup import FeatureTagGroup
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell, textAlignments
 from fontgoggles.misc.decorators import (asyncTaskAutoCancel, suppressAndLogException,
                                          hookedProperty)
@@ -344,6 +345,8 @@ directionPopUpConfig = [
 directionOptions = [label for label, direction in directionPopUpConfig]
 directionSettings = [direction for label, direction in directionPopUpConfig]
 
+sidebarWidth = 300
+
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
 
@@ -358,8 +361,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allScriptsAndLanguages = {}
         self.defaultItemHeight = 150
         self.alignmentOverride = None
-
-        sidebarWidth = 300
+        self.featureState = {}
 
         unicodeListGroup = self.setupUnicodeListGroup()
         glyphListGroup = self.setupGlyphListGroup()
@@ -456,6 +458,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.generalSettings = self.setupGeneralSettingsGroup()
         x, y, w, h = group.generalSettings.getPosSize()
         group.feaVarTabs = Tabs((0, h + 6, 0, 0), ["Features", "Variations", "Options"])
+
+        featuresTab = group.feaVarTabs[0]
+        self.featuresGroup = FeatureTagGroup(sidebarWidth, {}, callback=self.featuresChanged)
+        featuresTab.main = AligningScrollView((0, 0, 0, 0), self.featuresGroup, drawBackground=False,
+                                              borderType=AppKit.NSNoBorder)
+
         return group
 
     def setupGeneralSettingsGroup(self):
@@ -530,6 +538,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # things like features and scripts for every single font we load.
         self.allFeatureTagsGSUB.update(font.featuresGSUB)
         self.allFeatureTagsGPOS.update(font.featuresGPOS)
+        self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
         scriptTags = sorted(self.allScriptsAndLanguages)
         scriptMenuTitles = [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
@@ -589,7 +598,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
-        glyphs, endPos = font.getGlyphRunFromTextInfo(self.textInfo)
+        glyphs, endPos = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState)
         addBoundingBoxes(glyphs)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
@@ -659,6 +668,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def languagesPopupCallback(self, sender):
+        self.textEntryChangedCallback(self._textEntry)
+
+    @objc.python_method
+    def featuresChanged(self, sender):
+        featureState = self.featuresGroup.get()
+        featureState = {k: v for k, v in featureState.items() if v is not None}
+        self.featureState = featureState
         self.textEntryChangedCallback(self._textEntry)
 
     @objc.python_method
