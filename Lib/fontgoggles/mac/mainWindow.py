@@ -50,7 +50,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allFeatureTagsGSUB = set()
         self.allFeatureTagsGPOS = set()
         self.allScriptsAndLanguages = {}
-        self.defaultItemHeight = 150
+        self.defaultFontItemSize = 150
         self.alignmentOverride = None
         self.featureState = {}
 
@@ -136,7 +136,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
-        self._fontList = FontList(self.fontKeys, 300, self.defaultItemHeight)
+        self._fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True,
                                                       minMagnification=0.2)
         group.fontList = self._fontListScrollView
