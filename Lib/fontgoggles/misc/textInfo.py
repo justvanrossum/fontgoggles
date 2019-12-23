@@ -16,7 +16,12 @@ class TextInfo:
 
     @property
     def runLengths(self):
-        if self.shouldApplyBiDi:
+        # TODO XXX: for now, disable segmenting, because I don't really know what I'm doing.
+        # Segmenting (as I implemented it) pro: Latin embedded in Arabic shows latin features.
+        # Segmenting con: numbers embedded in Arabic do _not_ get localized number variants.
+        # I may be doing segmenting wrong, but right now it's better to not do any segmenting
+        # at all than to possibly do it embarrasingly wrong.
+        if self.shouldApplyBiDi and False:
             return self._runLengths
         else:
             return [len(self.originalText)]
