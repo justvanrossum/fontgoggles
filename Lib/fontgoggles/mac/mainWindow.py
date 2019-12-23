@@ -460,8 +460,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.feaVarTabs = Tabs((0, h + 6, 0, 0), ["Features", "Variations", "Options"])
 
         featuresTab = group.feaVarTabs[0]
-        self.featuresGroup = FeatureTagGroup(sidebarWidth, {}, callback=self.featuresChanged)
+        self.featuresGroup = FeatureTagGroup(sidebarWidth - 6, {}, callback=self.featuresChanged)
         featuresTab.main = AligningScrollView((0, 0, 0, 0), self.featuresGroup, drawBackground=False,
+                                              hasHorizontalScroller=False,
                                               borderType=AppKit.NSNoBorder)
 
         return group

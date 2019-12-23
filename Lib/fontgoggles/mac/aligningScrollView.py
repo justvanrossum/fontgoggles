@@ -14,7 +14,7 @@ class AligningScrollView(vanilla.ScrollView):
 
     def __init__(self, posSize, documentView, hAlign="left", vAlign="top",
                  drawBackground=True, minMagnification=None, maxMagnification=None,
-                 borderType=AppKit.NSBezelBorder, clipview=None):
+                 borderType=AppKit.NSBezelBorder, clipview=None, **kwargs):
         self._docRef = [documentView]
         if hasattr(documentView, "_nsObject"):
             x, y, w, h = documentView._posSize
@@ -24,7 +24,7 @@ class AligningScrollView(vanilla.ScrollView):
             documentView.setFrame_(((0, 0), (w, h)))
         if clipview is None:
             clipView = _AligningScrollView_ClipView(hAlign, vAlign)
-        super().__init__(posSize, documentView, clipView=clipView)
+        super().__init__(posSize, documentView, clipView=clipView, **kwargs)
         clipView.setDrawsBackground_(drawBackground)  # Must be called _after_ super()
         scrollView = self._nsObject
         scrollView.setBorderType_(borderType)
