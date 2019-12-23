@@ -218,7 +218,12 @@ class weakrefCallbackProperty:
         if value is None:
             self.__delete__(obj)
         else:
-            setattr(obj, self.weakrefCallbackName, weakref.WeakMethod(value))
+            try:
+                weakMethod = weakref.WeakMethod(value)
+            except TypeError:
+                setattr(obj, self.weakrefCallbackName, lambda: value)
+            else:
+                setattr(obj, self.weakrefCallbackName, weakMethod)
 
     def __delete__(self, obj):
         try:
