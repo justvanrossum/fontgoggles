@@ -18,10 +18,11 @@ openFontsTestData = [
          'suffix': 'ttf',
          'weight': 400,
          'width': 5},
-        ['calt', 'ccmp', 'curs', 'dnom', 'fina', 'init',
-         'kern', 'liga', 'mark', 'medi', 'mkmk', 'numr',
+        {'calt', 'ccmp', 'dnom', 'fina', 'init',
+         'liga', 'medi', 'numr',
          'pnum', 'rlig', 'rtlm', 'ss01', 'ss02', 'ss03',
-         'ss04', 'ss05', 'ss06', 'ss07', 'ss08'],
+         'ss04', 'ss05', 'ss06', 'ss07', 'ss08'},
+        {'curs', 'kern','mark', 'mkmk', 'ss05'},
         {'DFLT': set(), 'arab': {'ARA ', 'KSH ', 'MLY ', 'SND ', 'URD '}, 'latn': {'TRK '}},
         [],
         "فعل", ['uni0644.fina', 'uni0639.medi', 'uni0641.init']),
@@ -32,11 +33,10 @@ openFontsTestData = [
          'suffix': 'ttf',
          'weight': 400,
          'width': 5},
-        ['aalt', 'ccmp', 'dnom', 'frac', 'kern', 'liga',
-         'mark', 'numr', 'ordn', 'salt', 'sinf', 'ss01',
-         'ss02', 'ss03', 'ss04', 'ss05', 'subs', 'sups',
-         'zero',
-         ],
+        {'aalt', 'ccmp', 'dnom', 'frac', 'liga', 'numr', 'ordn',
+         'salt', 'sinf', 'ss01', 'ss02', 'ss03', 'ss04', 'ss05',
+         'subs', 'sups', 'zero'},
+        {'kern', 'mark'},
         {'DFLT': set(), 'cyrl': set(), 'grek': set(), 'latn': set()},
         [],
         "Kofi", ["K", "o", "fi"]),
@@ -47,7 +47,8 @@ openFontsTestData = [
          'suffix': 'ttf',
          'weight': 400,
          'width': 5},
-        ['kern', 'rvrn'],
+        {'rvrn'},
+        {'kern'},
         {'DFLT': set()},
         [{'defaultValue': 0.0,
           'maxValue': 1000.0,
@@ -67,7 +68,8 @@ openFontsTestData = [
          'suffix': 'ttf',
          'weight': 400,
          'width': 5},
-        ['ccmp', 'curs', 'fina', 'init', 'isol', 'mark', 'medi', 'mkmk', 'rlig'],
+        {'init', 'rlig', 'fina', 'isol', 'ccmp', 'medi'},
+        {'curs', 'mkmk', 'mark'},
         {'DFLT': set(), 'arab': {'ARA ', 'FAR ', 'KSH ', 'SND ', 'URD '}, 'latn': set()},
         [],
         "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
@@ -76,18 +78,20 @@ openFontsTestData = [
          'italicAngle': 0,
          'styleName': 'BoldWide',
          'suffix': 'ufo'},
-        ['calt', 'ss01'],
+        {'calt', 'ss01'},
+        set(),
         {'DFLT': set()},
         [],
         "HIiIII", ["H", "I", ".notdef", "I", "I.narrow", "I"])
 ]
 
-@pytest.mark.parametrize("fileName,expectedSortInfo,features,scripts,axes,text,glyphNames",
+@pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,text,glyphNames",
                          openFontsTestData)
 @pytest.mark.asyncio
 async def test_openFonts(fileName,
                          expectedSortInfo,
-                         features,
+                         featuresGSUB,
+                         featuresGPOS,
                          scripts,
                          axes,
                          text,
@@ -98,7 +102,8 @@ async def test_openFonts(fileName,
     font, fontData = await opener(fontPath, 0)
     sortInfo = getSortInfo(fontPath, 0)
     assert sortInfo == expectedSortInfo
-    assert font.features == features
+    assert font.featuresGSUB == featuresGSUB
+    assert font.featuresGPOS == featuresGPOS
     assert font.scripts == scripts
     assert font.axes == axes
     run = font.getGlyphRun(text)

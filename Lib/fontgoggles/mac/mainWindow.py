@@ -353,7 +353,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def __init__(self, project):
         self.project = project
         self.fontKeys = list(self.project.iterFontKeys())
-        self.allFeatureTags = set()
+        self.allFeatureTagsGSUB = set()
+        self.allFeatureTagsGPOS = set()
         self.allScriptsAndLanguages = {}
         self.defaultItemHeight = 150
         self.alignmentOverride = None
@@ -527,7 +528,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontItem.setIsLoading(False)
         # TODO: Perhaps we need some callback after all fonts are loaded to avoid setting
         # things like features and scripts for every single font we load.
-        self.allFeatureTags.update(font.features)
+        self.allFeatureTagsGSUB.update(font.featuresGSUB)
+        self.allFeatureTagsGPOS.update(font.featuresGPOS)
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
         scriptTags = sorted(self.allScriptsAndLanguages)
         scriptMenuTitles = [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]

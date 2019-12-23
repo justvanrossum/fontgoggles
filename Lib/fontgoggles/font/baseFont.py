@@ -24,8 +24,12 @@ class BaseFont:
         return [[(0, 0, 0, 1)]]  # default palette [[(r, g, b, a)]]
 
     @readOnlyCachedProperty
-    def features(self):
-        return sorted(set(self.shaper.getFeatures("GSUB") + self.shaper.getFeatures("GPOS")))
+    def featuresGSUB(self):
+        return set(self.shaper.getFeatures("GSUB"))
+
+    @readOnlyCachedProperty
+    def featuresGPOS(self):
+        return set(self.shaper.getFeatures("GPOS"))
 
     @readOnlyCachedProperty
     def scripts(self):
