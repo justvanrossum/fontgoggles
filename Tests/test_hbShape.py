@@ -1,4 +1,3 @@
-import pathlib
 import pytest
 from fontgoggles.misc.hbShape import HBShape
 from testSupport import getFontPath

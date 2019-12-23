@@ -11,6 +11,7 @@ testData = [
     ("", 131259),
 ]
 
+
 @pytest.mark.parametrize("prefix,expectedChars", testData)
 def test_findPrefix(prefix, expectedChars):
     chars = findPrefix(prefix)

@@ -1,4 +1,3 @@
-import pathlib
 import pytest
 from fontgoggles.project import Project
 from testSupport import getFontPath

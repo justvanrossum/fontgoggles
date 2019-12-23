@@ -9,6 +9,7 @@ testData = [
     ("abc", True, "RTL", "abc", [3], "RTL", "right"),
 ]
 
+
 @pytest.mark.parametrize("org,bidi,dirOverride,result,runLengths,dir,align", testData)
 def test_textInfo(org, bidi, dirOverride, result, runLengths, dir, align):
     ti = TextInfo(org)

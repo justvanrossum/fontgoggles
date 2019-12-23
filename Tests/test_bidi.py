@@ -101,7 +101,8 @@ testDataApplyBiDi = [
 ]
 
 
-@pytest.mark.parametrize("testString,expectedString,expectedRunLengths,expectedDir,expectedToBiDi,expectedFromBiDi", testDataApplyBiDi)
+@pytest.mark.parametrize("testString,expectedString,expectedRunLengths,expectedDir,expectedToBiDi,expectedFromBiDi",
+                         testDataApplyBiDi)
 def test_applyBiDi(testString, expectedString, expectedRunLengths, expectedDir, expectedToBiDi, expectedFromBiDi):
     display, runLenghts, baseDirection, toBiDi, fromBiDi = applyBiDi(testString)
     assert display == expectedString

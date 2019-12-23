@@ -1,4 +1,3 @@
-import pathlib
 from fontTools.pens.recordingPen import RecordingPen, RecordingPointPen
 from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.ttLib import TTFont

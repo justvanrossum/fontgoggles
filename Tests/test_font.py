@@ -1,4 +1,3 @@
-import pathlib
 import pytest
 from fontgoggles.font import getOpener, sniffFontType, sortedFontPathsAndNumbers
 from fontgoggles.misc.textInfo import TextInfo
@@ -141,6 +140,7 @@ testDataGetGlyphRun = [
     ("\u062D\u062A\u0649", ['uniFC74', 'uniFEA3'],
      [(0, 0), (890, 0)]),
 ]
+
 
 @pytest.mark.parametrize("text,expectedGlyphNames,expectedPositions", testDataGetGlyphRun)
 @pytest.mark.asyncio
