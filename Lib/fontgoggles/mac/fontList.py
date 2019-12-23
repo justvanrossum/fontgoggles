@@ -265,6 +265,8 @@ class FontList(Group):
         pos = [0, 0]
         for fontItem in self.iterFontItems():
             fontItem.isVertical = isVertical
+            fontItem.fileNameLabel.setPosSize(fontItem.getFileNameLabelPosSize())
+            fontItem.fileNameLabel._nsObject.rotateByAngle_([-90, 90][isVertical])
             x, y, w, h = fontItem.getPosSize()
             w, h = h, w
             fontItem.setPosSize((*pos, w, h))
@@ -317,7 +319,7 @@ class FontItem(Group):
         # self._nsObject.setWantsLayer_(True)
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
-        self.fileNameLabel = TextBox((10, 0, -10, 17), "", sizeStyle="regular")
+        self.fileNameLabel = TextBox(self.getFileNameLabelPosSize(), "", sizeStyle="regular")
         self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
@@ -360,3 +362,9 @@ class FontItem(Group):
     @isVertical.setter
     def isVertical(self, isVertical):
         self.glyphLineView.isVertical = isVertical
+
+    def getFileNameLabelPosSize(self):
+        if self.isVertical:
+            return (0, 10, 17, -10)
+        else:
+            return (10, 0, -10, 17)
