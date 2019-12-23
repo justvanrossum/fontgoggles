@@ -408,12 +408,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return True
 
     def zoomIn_(self, sender):
-        itemHeight = min(1000, round(self._fontList.itemHeight * (2 ** (1 / 3))))
-        self._fontList.resizeFontItems(itemHeight)
+        itemSize = min(1000, round(self._fontList.itemSize * (2 ** (1 / 3))))
+        self._fontList.resizeFontItems(itemSize)
 
     def zoomOut_(self, sender):
-        itemHeight = max(50, round(self._fontList.itemHeight / (2 ** (1 / 3))))
-        self._fontList.resizeFontItems(itemHeight)
+        itemSize = max(50, round(self._fontList.itemSize / (2 ** (1 / 3))))
+        self._fontList.resizeFontItems(itemSize)
 
 
 class LabeledView(Group):

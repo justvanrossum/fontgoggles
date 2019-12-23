@@ -157,7 +157,7 @@ class FGFontListView(AppKit.NSView, metaclass=ClassNameIncrementer):
         # if event.phase() == AppKit.NSEventPhaseEnded:
         #     origin = clipView.bounds().origin
         #     fontList = self.vanillaWrapper()
-        #     fontList.resizeFontItems(fontList.itemHeight * scrollView.magnification())
+        #     fontList.resizeFontItems(fontList.itemSize * scrollView.magnification())
 
         #     scrollView.setMagnification_(1.0)  #centeredAtPoint_
         #     # self._savedClipBounds.origin = clipView.bounds().origin
@@ -180,17 +180,17 @@ class FontList(Group):
 
     nsViewClass = FGFontListView
 
-    def __init__(self, fontKeys, width, itemHeight):
+    def __init__(self, fontKeys, width, itemSize):
         super().__init__((0, 0, width, 900))
         self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
-        self.itemHeight = itemHeight
+        self.itemSize = itemSize
         self.align = "left"
         y = 0
         for index, fontKey in enumerate(fontKeys):
             fontItemName = fontItemNameTemplate.format(index=index)
-            fontItem = FontItem((0, y, 0, itemHeight), fontKey)
+            fontItem = FontItem((0, y, 0, itemSize), fontKey)
             setattr(self, fontItemName, fontItem)
-            y += itemHeight
+            y += itemSize
         self.setPosSize((0, 0, width, y))
 
     @property
@@ -253,14 +253,14 @@ class FontList(Group):
             index += 1
 
     @suppressAndLogException
-    def resizeFontItems(self, itemHeight):
-        scaleFactor = itemHeight / self.itemHeight
-        self.itemHeight = itemHeight
+    def resizeFontItems(self, itemSize):
+        scaleFactor = itemSize / self.itemSize
+        self.itemSize = itemSize
         posY = 0
         for fontItem in self.iterFontItems():
             x, y, w, h = fontItem.getPosSize()
-            fontItem.setPosSize((x, posY, w, itemHeight))
-            posY += itemHeight
+            fontItem.setPosSize((x, posY, w, itemSize))
+            posY += itemSize
 
         # calculate the center of our clip view in relative doc coords
         # so we can set the scroll position and zoom in/out "from the middle"
