@@ -62,7 +62,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
         if align == "right" or align == "bottom":
             pos = itemExtent - margin - endPos
         elif align == "center":
-            pos = (itemExtent - endPosX) / 2
+            pos = (itemExtent - endPos) / 2
         else:  # align == "left"
             pos = margin
         if not self.isVertical:
@@ -256,11 +256,12 @@ class FontList(Group):
     def resizeFontItems(self, itemSize):
         scaleFactor = itemSize / self.itemSize
         self.itemSize = itemSize
-        posY = 0
+        pos = [0, 0]
         for fontItem in self.iterFontItems():
-            x, y, w, h = fontItem.getPosSize()
-            fontItem.setPosSize((x, posY, w, itemSize))
-            posY += itemSize
+            x, y, *wh = fontItem.getPosSize()
+            wh[1 - self.isVertical] = itemSize
+            fontItem.setPosSize((*pos, *wh))
+            pos[1 - self.isVertical] += itemSize
 
         # calculate the center of our clip view in relative doc coords
         # so we can set the scroll position and zoom in/out "from the middle"
@@ -274,8 +275,12 @@ class FontList(Group):
 
         self.setPosSize((x, y, w * scaleFactor, posY))
 
-        cx *= w * scaleFactor
-        cy *= posY
+        if not self.isVertical:
+            cx *= w * scaleFactor
+            cy *= pos[1]
+        else:
+            cx *= pos[0]
+            cy *= h * scaleFactor
         cx -= cw / 2
         cy += ch / 2
         clipBounds = clipView.bounds()
