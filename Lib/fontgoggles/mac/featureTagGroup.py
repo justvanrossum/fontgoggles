@@ -79,7 +79,8 @@ if __name__ == "__main__":
             self.w = Window((300, 500), "TagTest", minSize=(200, 200), autosaveName="TempTagTesttt")
             self.tags = FeatureTagGroup(300, tagGroups, callback=self.tagsChanged)
 
-            self.w.tagsScrollView = AligningScrollView((0, 0, 0, -50), self.tags, drawBackground=False, borderType=AppKit.NSNoBorder)
+            self.w.tagsScrollView = AligningScrollView((0, 0, 0, -50), self.tags, drawBackground=False,
+                                                       borderType=AppKit.NSNoBorder)
             self.w.mutateButton = Button((10, -30, 100, 20), "Mutate", callback=self.mutate)
             self.w.repopulateButton = Button((120, -30, 100, 20), "Repopulate", callback=self.repopulate)
             self.w.open()

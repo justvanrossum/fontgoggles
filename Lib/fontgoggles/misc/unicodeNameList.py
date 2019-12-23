@@ -50,7 +50,6 @@ def makeUnicodeNameList():
                         continue
             partsList[part].append(i)
 
-
     partsList = sorted(partsList.items())
     nameParts = [n for n, lst in partsList]
     unicodeRefs = [lst for n, lst in partsList]

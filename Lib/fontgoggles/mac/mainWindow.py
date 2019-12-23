@@ -155,7 +155,8 @@ class FGFontListView(AppKit.NSView, metaclass=ClassNameIncrementer):
 
     @suppressAndLogException
     def magnifyWithEvent_(self, event):
-        scrollView = self.enclosingScrollView()
+        pass
+        # scrollView = self.enclosingScrollView()
         # clipView = scrollView.contentView()
         # if event.phase() == AppKit.NSEventPhaseBegan:
         #     self._savedClipBounds = clipView.bounds()
@@ -203,7 +204,6 @@ class FontList(Group):
 
     @width.setter
     def width(self, newWidth):
-        oldWidth = self._nsObject.bounds().size.width
         x, y, w, h = self.getPosSize()
         self.setPosSize((x, y, newWidth, h))
 
@@ -347,7 +347,6 @@ directionPopUpConfig = [
 ]
 directionOptions = [label for label, direction in directionPopUpConfig]
 directionSettings = [direction for label, direction in directionPopUpConfig]
-
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):

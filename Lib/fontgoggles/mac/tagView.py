@@ -15,7 +15,6 @@ class FGTagView(AppKit.NSView):
     tracked = updatingProperty(default=False)
 
     def mouseDown_(self, event):
-        point = self.convertPoint_fromView_(event.locationInWindow(), None)
         self.tracked = True
 
     def mouseDragged_(self, event):
@@ -51,14 +50,12 @@ class FGTagView(AppKit.NSView):
         else:
             mainRGB = (0.9, 0.2, 0.4)
 
-        newState = self.state
         if self.tracked:
             mainRGB = tuple(0.6 * ch for ch in mainRGB)
-            newState = self.toggledState()
 
         mainColor = rgbColor(*mainRGB)
         mainColor.set()
-        radius = min(h/2.75, 10)
+        radius = min(h / 2.75, 10)
         path = AppKit.NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(self.bounds(), radius, radius)
         path.fill()
 

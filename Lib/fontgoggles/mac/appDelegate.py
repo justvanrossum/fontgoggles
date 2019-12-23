@@ -15,8 +15,7 @@ class FGAppDelegate(NSObject):
 
     def openDocument_(self, sender):
         result = getFile(allowsMultipleSelection=True,
-                fileTypes=fileTypes)
-                # resultCallback=self.getFileResultCallback_)
+                         fileTypes=fileTypes)  # resultCallback=self.getFileResultCallback_)
         # NOTE: ideally we would use a result callback, but vanilla's
         # getFile() only supports result callbacks in the presence of
         # parent window, which we obviously do not have here.
