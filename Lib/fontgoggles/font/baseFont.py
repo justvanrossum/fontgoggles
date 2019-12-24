@@ -54,8 +54,6 @@ class BaseFont:
         return axes
 
     def getGlyphRunFromTextInfo(self, textInfo, **kwargs):
-        # TODO: move out mac-specific bounds code
-        # TODO: write tests
         text = textInfo.text
         runLengths = textInfo.runLengths
         direction = textInfo.directionForShaper
