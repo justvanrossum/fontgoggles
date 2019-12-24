@@ -1,5 +1,8 @@
 # fontgoggles
+
 FontGoggles: Visual OTL Preview and QA
+
+![FontGoggles Icon](icon.png)
 
 ## Build instructions
 
