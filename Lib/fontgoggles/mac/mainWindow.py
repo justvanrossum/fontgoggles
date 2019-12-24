@@ -105,6 +105,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.textEntryChangedCallback(self._textEntry)
         self.loadFonts()
 
+    def windowTitleForDocumentDisplayName_(self, displayName):
+        return f"FontGoggles — {displayName}"
+
     @objc.python_method
     def setupUnicodeListGroup(self):
         group = Group((0, 0, 0, 0))
