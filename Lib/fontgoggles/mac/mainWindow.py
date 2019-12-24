@@ -195,7 +195,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.scriptsPopup = LabeledView(
             (10, y, -10, 40), "Script:",
-            PopUpButton, ['DFLT – Default'],
+            PopUpButton, ['Automatic'],
             callback=self.scriptsPopupCallback,
         )
         group.scriptsPopup = self.scriptsPopup
@@ -242,7 +242,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def updateSidebarItems(self):
         self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
         scriptTags = sorted(self.allScriptsAndLanguages)
-        scriptMenuTitles = [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
+        scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
         self.scriptsPopup.setItems(scriptMenuTitles)
 
     def iterFontItems(self):
@@ -373,7 +373,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @property
     def scriptOverride(self):
         tag = _tagFromMenuItem(self.scriptsPopup.getItem())
-        return None if tag == "DFLT" else tag
+        return None if tag == "Automatic" else tag
 
     @property
     def languageOverride(self):
@@ -383,8 +383,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def scriptsPopupCallback(self, sender):
         tag = _tagFromMenuItem(sender.getItem())
-        languages = [f"{tag} – {opentypeTags.languages.get(tag, ['?'])[0]}"
-                     for tag in sorted(self.allScriptsAndLanguages[tag])]
+        if tag == "Automatic":
+            languages = []
+        else:
+            languages = [f"{tag} – {opentypeTags.languages.get(tag, ['?'])[0]}"
+                         for tag in sorted(self.allScriptsAndLanguages[tag])]
         self.languagesPopup.setItems(['dflt – Default'] + languages)
         self.languagesPopup.set(0)
         self.textEntryChangedCallback(self._textEntry)
