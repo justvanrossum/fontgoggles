@@ -57,10 +57,11 @@ class SliderPlus(Group):
         super().__init__(posSize)
         self._callback = callback
         self.label = TextBox((0, 0, 0, 20), label)
-        self.slider = Slider((0, 18, -60, 20), value=value, minValue=minValue, maxValue=maxValue,
+        self.slider = Slider((0, 18, -60, 20), value=minValue, minValue=minValue, maxValue=maxValue,
                              continuous=continuous, callback=self._sliderCallback)
         self.editField = EditText((-50, 16, 0, 24), "", continuous=False, callback=self._editFieldCallback)
         self.editField._nsObject.setAlignment_(AppKit.NSRightTextAlignment)
+        self._setSliderFromValue(value)
         self._setEditFieldFromValue(value)
 
     def _sliderCallback(self, sender):
@@ -70,6 +71,10 @@ class SliderPlus(Group):
 
     def _editFieldCallback(self, sender):
         value = sender.get()
+        if not value:
+            self._setSliderFromValue(None)
+            callCallback(self._callback, self)
+            return
         value = value.replace(",", ".")
         try:
             f = float(value)
@@ -84,8 +89,17 @@ class SliderPlus(Group):
             callCallback(self._callback, self)
         sender._nsObject.setTextColor_(color)
 
+    def _setSliderFromValue(self, value):
+        if value is None:
+            minValue = self.slider._nsObject.minValue()
+            maxValue = self.slider._nsObject.maxValue()
+            value = (minValue + maxValue) / 2
+        self.slider.set(value)
+
     def _setEditFieldFromValue(self, value):
-        if int(value) == value:
+        if value is None:
+            s = ""
+        elif int(value) == value:
             s = str(int(value))
         else:
             s = f"{value:.1f}"
@@ -93,10 +107,13 @@ class SliderPlus(Group):
         self.editField._nsObject.setTextColor_(AppKit.NSColor.blackColor())
 
     def get(self):
-        return self.slider.get()
+        if not self.editField.get():
+            return None
+        else:
+            return self.slider.get()
 
     def set(self, value):
-        self.slider.set(value)
+        self._setSliderFromValue(value)
         self._setEditFieldFromValue(value)
 
 
