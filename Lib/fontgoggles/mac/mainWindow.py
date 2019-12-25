@@ -178,7 +178,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                               borderType=AppKit.NSNoBorder)
 
         variationsTab = group.feaVarTabs[1]
-        self.variationsGroup = SliderGroup(sidebarWidth - 6, {}, callback=self.variationsChanged)
+        self.variationsGroup = SliderGroup(sidebarWidth - 6, {}, callback=self.varLocationChanged)
         variationsTab.main = AligningScrollView((0, 0, 0, 0), self.variationsGroup, drawBackground=False,
                                               hasHorizontalScroller=False,
                                               borderType=AppKit.NSNoBorder)
@@ -427,7 +427,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.textEntryChangedCallback(self._textEntry)
 
     @objc.python_method
-    def variationsChanged(self, sender):
+    def varLocationChanged(self, sender):
         self.varLocation = {k: v for k, v in sender.get().items() if v is not None}
         self.textEntryChangedCallback(self._textEntry)
 
