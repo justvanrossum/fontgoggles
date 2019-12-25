@@ -297,7 +297,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         if align != self._fontList.align:
             self.alignmentChangedCallback(self.alignmentPopup)
-        self.updateTextEntryAlignment(align)
+        else:
+            self.updateTextEntryAlignment(align)
 
         self.updateUnicodeList(delay=0.05)
         t = time.time()
@@ -380,17 +381,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         values = [[None, "left", "right", "center"],
                   [None, "top", "bottom", "center"]][self._fontList.isVertical]
         align = values[sender.get()]
+        self.alignmentOverride = align
         if align is None:
             align = self.textInfo.suggestedAlignment
         self._fontList.align = align
         if not self._fontList.isVertical:
             self._fontListScrollView.hAlign = align
             self._fontListScrollView.vAlign = "top"
-            self.alignmentOverride = align
         else:
             self._fontListScrollView.hAlign = "left"
             self._fontListScrollView.vAlign = align
-            self.alignmentOverride = None  # XXX
         self.updateTextEntryAlignment(align)
 
     @property
@@ -439,26 +439,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             nsAlign = AppKit.NSTextAlignmentCenter
         else:
             nsAlign = AppKit.NSTextAlignmentLeft
-        # I must be doing something stupid. The next many lines of code are to ensure the
-        # alignment of our text field is changed, both while having focus, as while not
-        # having focus.
+
         fieldEditor = self.w._window.fieldEditor_forObject_(False, self._textEntry._nsObject)
         hasFocus = fieldEditor.delegate() is self._textEntry._nsObject
         if hasFocus:
             fieldEditor.setAlignment_(nsAlign)
-            # stor = fieldEditor.textStorage()
-            # parStyle, effectiveRange = stor.attribute_atIndex_effectiveRange_("NSParagraphStyle", 0, None)
-            # parStyle.setAlignment_(nsAlign)
-            # stor.addAttribute_value_range_("NSParagraphStyle", parStyle, (0, stor.length()))
-            # self._textEntry._nsObject.setAlignment_(nsAlign)
-            # self.w._window.makeFirstResponder_(self._textEntry._nsObject)
         else:
-            attrString = self._textEntry._nsObject.attributedStringValue()
-            parStyle, effectiveRange = attrString.attribute_atIndex_effectiveRange_("NSParagraphStyle", 0, None)
-            parStyle.setAlignment_(nsAlign)
-            newAttrString = AppKit.NSMutableAttributedString.alloc().initWithAttributedString_(attrString)
-            newAttrString.addAttribute_value_range_("NSParagraphStyle", parStyle, (0, newAttrString.length()))
-            self._textEntry._nsObject.setAttributedStringValue_(newAttrString)
+            self._textEntry._nsObject.setAlignment_(nsAlign)
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
