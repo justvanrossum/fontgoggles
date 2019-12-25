@@ -2,12 +2,12 @@ import AppKit
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.mac.drawing import *
-from fontgoggles.mac.misc import ClassNameIncrementer, textAlignments
+from fontgoggles.mac.misc import textAlignments
 from fontgoggles.misc.decorators import suppressAndLogException, hookedProperty
 from fontgoggles.misc.rectTree import RectTree
 
 
-class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
+class FGGlyphLineView(AppKit.NSView):
 
     def init(self):
         self = super().init()
@@ -143,7 +143,7 @@ class FGGlyphLineView(AppKit.NSView, metaclass=ClassNameIncrementer):
                 self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
 
 
-class FGFontListView(AppKit.NSView, metaclass=ClassNameIncrementer):
+class FGFontListView(AppKit.NSView):
 
     @suppressAndLogException
     def magnifyWithEvent_(self, event):
