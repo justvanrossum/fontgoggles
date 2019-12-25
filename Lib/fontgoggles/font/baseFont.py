@@ -100,6 +100,7 @@ class BaseFont:
             # purge outline cache
             self._outlinePaths = [{}, {}]
             self._currentVarLocation = variations
+            self._setVarLocation(variations)
         for glyphName in glyphNames:
             outline = self._outlinePaths[colorLayers].get(glyphName)
             if outline is None:
@@ -109,6 +110,9 @@ class BaseFont:
 
     def _getOutlinePath(self, glyphName, colorLayers):
         raise NotImplementedError()
+
+    def _setVarLocation(self, location):
+        pass  # optional override
 
 
 class OTFFont(BaseFont):
@@ -135,3 +139,6 @@ class OTFFont(BaseFont):
             return [(outline, 0)]
         else:
             return outline
+
+    def _setVarLocation(self, location):
+        self.ftFont.setVariableFontLocation(self._currentVarLocation if self._currentVarLocation else {})
