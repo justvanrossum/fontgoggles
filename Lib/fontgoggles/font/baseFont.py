@@ -41,16 +41,15 @@ class BaseFont:
     def axes(self):
         fvar = self.ttFont.get("fvar")
         if fvar is None:
-            return []
+            return {}
         name = self.ttFont["name"]
-        axes = []
+        axes = {}
         for axis in fvar.axes:
-            axisDict = dict(tag=axis.axisTag,
-                            name=str(name.getName(axis.axisNameID, 3, 1)),
+            axisDict = dict(name=str(name.getName(axis.axisNameID, 3, 1)),
                             minValue=axis.minValue,
                             defaultValue=axis.defaultValue,
                             maxValue=axis.maxValue)
-            axes.append(axisDict)
+            axes[axis.axisTag] = axisDict
         return axes
 
     def getGlyphRunFromTextInfo(self, textInfo, **kwargs):

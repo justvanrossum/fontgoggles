@@ -15,7 +15,7 @@ async def test_project_loadFonts():
     assert font is notLoadedMarker
     await pr.loadFonts()
     font = pr.getFont(fontPath, 0)
-    assert font.axes == []  # simple check to see if we have a font at all
+    assert font.axes == {}  # simple check to see if we have a font at all
     with pytest.raises(KeyError):
         await pr.loadFont(fontPath, 1)
 
@@ -29,4 +29,4 @@ async def test_project_loadFont():
     with pytest.raises(TypeError):
         pr.addFont("a string", 0)
     font = pr.getFont(fontPath, 0)
-    assert font.axes == []  # simple check to see if we have a font at all
+    assert font.axes == {}  # simple check to see if we have a font at all
