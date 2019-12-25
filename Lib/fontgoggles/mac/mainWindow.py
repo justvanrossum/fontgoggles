@@ -261,7 +261,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 defaultValue = next(iter(defaultValue))
             else:
                 defaultValue = None  # mixed default values
-            sliderInfo[tag] = (axis["name"], axis["minValue"], defaultValue, axis["maxValue"])
+            sliderInfo[tag] = (f"{axis['name']} ({tag})", axis["minValue"], defaultValue, axis["maxValue"])
         self.variationsGroup.setSliderInfo(sliderInfo)
         scriptTags = sorted(self.allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
