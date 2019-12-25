@@ -69,7 +69,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.defaultFontItemSize = 150
         self.alignmentOverride = None
         self.featureState = {}
-        self.variationLocation = {}
+        self.varLocation = {}
 
         unicodeListGroup = self.setupUnicodeListGroup()
         glyphListGroup = self.setupGlyphListGroup()
@@ -329,7 +329,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if font is None:
             return
         glyphs, endPos = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
-                                                      variations=self.variationLocation)
+                                                      variations=self.varLocation)
         addBoundingBoxes(glyphs)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
@@ -428,7 +428,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def variationsChanged(self, sender):
-        self.variationLocation = {k: v for k, v in sender.get().items() if v is not None}
+        self.varLocation = {k: v for k, v in sender.get().items() if v is not None}
         self.textEntryChangedCallback(self._textEntry)
 
     @objc.python_method
