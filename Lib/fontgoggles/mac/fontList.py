@@ -71,19 +71,12 @@ class FGGlyphLineView(AppKit.NSView):
 
     @suppressAndLogException
     def drawRect_(self, rect):
-        AppKit.NSColor.whiteColor().set()
+        AppKit.NSColor.textBackgroundColor().set()
         AppKit.NSRectFill(rect)
-        # if self.isSelected:
-        #     extent = abs(self._endPos[self.isVertical]) * self.scaleFactor
-        #     bounds = self.bounds()
-        #     bounds.origin[self.isVertical] += self.margin
-        #     bounds.origin[1 - self.isVertical] += 2
-        #     bounds.size[self.isVertical] = extent
-        #     bounds.size[1 - self.isVertical] -= 4
-        #     path = AppKit.NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(bounds, 5, 5)
-        #     AppKit.NSColor.lightGrayColor().set()
-        #     path.fill()
-
+        if self.isSelected:
+            bounds = self.bounds()
+            AppKit.NSColor.lightGrayColor().set()
+            AppKit.NSRectFill(bounds)
 
         if not self._glyphs:
             return
@@ -97,7 +90,7 @@ class FGGlyphLineView(AppKit.NSView):
         translate(dx, dy)
         scale(self.scaleFactor)
 
-        AppKit.NSColor.blackColor().set()
+        AppKit.NSColor.textColor().set()
         lastPosX = lastPosY = 0
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
