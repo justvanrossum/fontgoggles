@@ -7,8 +7,8 @@ class SliderGroup(Group):
 
     _callback = weakrefCallbackProperty()
 
-    def __init__(self, sliderInfo, continuous=True, callback=None):
-        super().__init__((0, 0, 0, 0))
+    def __init__(self, width, sliderInfo, continuous=True, callback=None):
+        super().__init__((0, 0, width, 0))
         self._callback = callback
         self._continuous = continuous
         self.setSliderInfo(sliderInfo)
@@ -90,6 +90,7 @@ class SliderPlus(Group):
         else:
             s = f"{value:.1f}"
         self.editField.set(s)
+        self.editField._nsObject.setTextColor_(AppKit.NSColor.blackColor())
 
     def get(self):
         return self.slider.get()
@@ -119,7 +120,7 @@ if __name__ == "__main__":
             self.sliderInfo = {}
             for tag, label in info:
                 self.sliderInfo[tag] = (label, 0, 50, 100)
-            self.w.sliderGroup = SliderGroup(self.sliderInfo, continuous=True, callback=self.sliderGroupCallback)
+            self.w.sliderGroup = SliderGroup(300, self.sliderInfo, continuous=True, callback=self.sliderGroupCallback)
             self.w.mutateButton = Button((10, -40, 80, 20), "Mutate", callback=self.mutateCallback)
             self.w.open()
 
