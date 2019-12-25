@@ -11,6 +11,7 @@ from fontgoggles.mac.drawing import *
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
 from fontgoggles.mac.fontList import FontList
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
+from fontgoggles.mac.sliderGroup import SliderGroup
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.textInfo import TextInfo
 from fontgoggles.misc import opentypeTags
@@ -174,6 +175,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                               hasHorizontalScroller=False,
                                               borderType=AppKit.NSNoBorder)
 
+        variationsTab = group.feaVarTabs[1]
+        self.variationsGroup = SliderGroup(sidebarWidth - 6, {}, callback=self.variationsChanged)
+        variationsTab.main = AligningScrollView((0, 0, 0, 0), self.variationsGroup, drawBackground=False,
+                                              hasHorizontalScroller=False,
+                                              borderType=AppKit.NSNoBorder)
+
         return group
 
     def setupGeneralSettingsGroup(self):
@@ -244,6 +251,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def updateSidebarItems(self):
         self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
+        self.variationsGroup.setSliderInfo({"abcs": ("Hello", 0, 50, 100)})
         scriptTags = sorted(self.allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
         self.scriptsPopup.setItems(scriptMenuTitles)
@@ -405,6 +413,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         featureState = {k: v for k, v in featureState.items() if v is not None}
         self.featureState = featureState
         self.textEntryChangedCallback(self._textEntry)
+
+    @objc.python_method
+    def variationsChanged(self, sender):
+        print(sender.get())
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):
