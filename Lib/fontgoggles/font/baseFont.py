@@ -115,7 +115,7 @@ class BaseFont:
     def _getOutlinePath(self, glyphName, colorLayers):
         raise NotImplementedError()
 
-    def _setVarLocation(self, location):
+    def _setVarLocation(self, varLocation):
         pass  # optional override
 
 
@@ -144,5 +144,5 @@ class OTFFont(BaseFont):
         else:
             return outline
 
-    def _setVarLocation(self, location):
-        self.ftFont.setVariableFontLocation(self._currentVarLocation if self._currentVarLocation else {})
+    def _setVarLocation(self, varLocation):
+        self.ftFont.setVariableFontLocation(varLocation if varLocation else {})
