@@ -96,6 +96,8 @@ class BaseFont:
                                  direction=direction, language=language, script=script)
 
     def getOutlinePaths(self, glyphNames, variations, colorLayers=False):
+        axes = self.axes
+        variations = {k: v for k, v in variations.items() if k in axes}  # subset to our own axes
         if self._currentVarLocation != variations:
             # purge outline cache
             self._outlinePaths = [{}, {}]
