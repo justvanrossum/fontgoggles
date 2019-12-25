@@ -439,8 +439,26 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             nsAlign = AppKit.NSTextAlignmentCenter
         else:
             nsAlign = AppKit.NSTextAlignmentLeft
-        fieldEditor = self.w._window.fieldEditor_forObject_(True, self._textEntry._nsObject)
-        fieldEditor.setAlignment_(nsAlign)
+        # I must be doing something stupid. The next many lines of code are to ensure the
+        # alignment of our text field is changed, both while having focus, as while not
+        # having focus.
+        fieldEditor = self.w._window.fieldEditor_forObject_(False, self._textEntry._nsObject)
+        hasFocus = fieldEditor.delegate() is self._textEntry._nsObject
+        if hasFocus:
+            stor = fieldEditor.textStorage()
+            parStyle, effectiveRange = stor.attribute_atIndex_effectiveRange_("NSParagraphStyle", 0, None)
+            parStyle.setAlignment_(nsAlign)
+            stor.addAttribute_value_range_("NSParagraphStyle", parStyle, (0, stor.length()))
+            fieldEditor.setAlignment_(nsAlign)
+            self._textEntry._nsObject.setAlignment_(nsAlign)
+            self.w._window.makeFirstResponder_(self._textEntry._nsObject)
+        else:
+            attrString = self._textEntry._nsObject.attributedStringValue()
+            parStyle, effectiveRange = attrString.attribute_atIndex_effectiveRange_("NSParagraphStyle", 0, None)
+            parStyle.setAlignment_(nsAlign)
+            newAttrString = AppKit.NSMutableAttributedString.alloc().initWithAttributedString_(attrString)
+            newAttrString.addAttribute_value_range_("NSParagraphStyle", parStyle, (0, newAttrString.length()))
+            self._textEntry._nsObject.setAttributedStringValue_(newAttrString)
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
