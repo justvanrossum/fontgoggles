@@ -12,7 +12,7 @@ class FGGlyphLineView(AppKit.NSView):
     def init(self):
         self = super().init()
         self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
-        self.isSelected = False
+        self.isSelected = True
         self.align = "left"
         self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
         self._glyphs = None
@@ -102,7 +102,7 @@ class FGGlyphLineView(AppKit.NSView):
             lastPosX, lastPosY = posX, posY
             gi.path.fill()
             if selected:
-                AppKit.NSColor.blackColor().set()
+                AppKit.NSColor.textColor().set()
 
     @suppressAndLogException
     def mouseDown_(self, event):
