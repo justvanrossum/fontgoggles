@@ -79,15 +79,13 @@ class SliderPlus(Group):
         try:
             f = float(value)
         except ValueError:
-            color = AppKit.NSColor.redColor()
+            pass
         else:
-            color = AppKit.NSColor.textColor()
             self.slider.set(f)
             sliderValue = self.slider.get()
             if sliderValue != f:
                 self._setEditFieldFromValue(sliderValue)
             callCallback(self._callback, self)
-        sender._nsObject.setTextColor_(color)
 
     def _setSliderFromValue(self, value):
         if value is None:
@@ -104,7 +102,6 @@ class SliderPlus(Group):
         else:
             s = f"{value:.1f}"
         self.editField.set(s)
-        self.editField._nsObject.setTextColor_(AppKit.NSColor.textColor())
 
     def get(self):
         if not self.editField.get():
