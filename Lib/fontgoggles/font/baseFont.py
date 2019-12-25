@@ -80,31 +80,31 @@ class BaseFont:
             y += gi.ay
         return glyphs, (x, y)
 
-    def getGlyphRun(self, txt, *, features=None, variations=None,
+    def getGlyphRun(self, txt, *, features=None, varLocation=None,
                     direction=None, language=None, script=None,
                     colorLayers=False):
-        glyphInfo = self.shape(txt, features=features, variations=variations,
+        glyphInfo = self.shape(txt, features=features, varLocation=varLocation,
                                direction=direction, language=language,
                                script=script)
         glyphNames = (gi.name for gi in glyphInfo)
-        for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, variations, colorLayers)):
+        for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, varLocation, colorLayers)):
             glyph.path = path
         return glyphInfo
 
-    def shape(self, text, *, features, variations, direction, language, script):
-        return self.shaper.shape(text, features=features, variations=variations,
+    def shape(self, text, *, features, varLocation, direction, language, script):
+        return self.shaper.shape(text, features=features, varLocation=varLocation,
                                  direction=direction, language=language, script=script)
 
-    def getOutlinePaths(self, glyphNames, variations, colorLayers=False):
+    def getOutlinePaths(self, glyphNames, varLocation, colorLayers=False):
         axes = self.axes
-        if variations:
+        if varLocation:
             # subset to our own axes
-            variations = {k: v for k, v in variations.items() if k in axes}
-        if self._currentVarLocation != variations:
+            varLocation = {k: v for k, v in varLocation.items() if k in axes}
+        if self._currentVarLocation != varLocation:
             # purge outline cache
             self._outlinePaths = [{}, {}]
-            self._currentVarLocation = variations
-            self._setVarLocation(variations)
+            self._currentVarLocation = varLocation
+            self._setVarLocation(varLocation)
         for glyphName in glyphNames:
             outline = self._outlinePaths[colorLayers].get(glyphName)
             if outline is None:
@@ -145,4 +145,4 @@ class OTFFont(BaseFont):
             return outline
 
     def _setVarLocation(self, varLocation):
-        self.ftFont.setVariableFontLocation(varLocation if varLocation else {})
+        self.ftFont.setVarLocation(varLocation if varLocation else {})

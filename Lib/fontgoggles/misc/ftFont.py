@@ -22,12 +22,12 @@ class FTFont:
         self._ftFace = freetype.Face(stream, index=fontNumber)
         self._ftFace.set_char_size(self._ftFace.units_per_EM)
 
-    def setVariableFontLocation(self, location):
+    def setVarLocation(self, varLocation):
         if "fvar" not in self._ttFont:
             return
         coordinates = []
         for axis in self._ttFont["fvar"].axes:
-            coordinates.append(location.get(axis.axisTag, axis.defaultValue))
+            coordinates.append(varLocation.get(axis.axisTag, axis.defaultValue))
         coordinates = [round(v * 0x10000) for v in coordinates]
         c_coordinates = (freetype.FT_Fixed * len(coordinates))(*coordinates)
         freetype.FT_Set_Var_Design_Coordinates(self._ftFace._FT_Face, len(coordinates), c_coordinates)

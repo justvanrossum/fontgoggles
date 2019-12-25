@@ -116,15 +116,15 @@ class HBShape:
         except KeyError:
             return default
 
-    def shape(self, text, *, features=None, variations=None,
+    def shape(self, text, *, features=None, varLocation=None,
               direction=None, language=None, script=None):
         if features is None:
             features = {}
-        if variations is None:
-            variations = {}
+        if varLocation is None:
+            varLocation = {}
 
         self.font.scale = (self.face.upem, self.face.upem)
-        self.font.set_variations(variations)
+        self.font.set_variations(varLocation)
 
         hb.ot_font_set_funcs(self.font)
 

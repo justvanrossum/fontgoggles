@@ -329,7 +329,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if font is None:
             return
         glyphs, endPos = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
-                                                      variations=self.varLocation)
+                                                      varLocation=self.varLocation)
         addBoundingBoxes(glyphs)
         if isSelectedFont:
             self.updateGlyphList(glyphs, delay=0.05)
