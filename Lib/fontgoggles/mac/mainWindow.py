@@ -5,7 +5,7 @@ import AppKit
 import objc
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect
-from fontgoggles.font import mergeScriptsAndLanguages
+from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
@@ -65,6 +65,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allFeatureTagsGSUB = set()
         self.allFeatureTagsGPOS = set()
         self.allScriptsAndLanguages = {}
+        self.allAxes = {}
         self.defaultFontItemSize = 150
         self.alignmentOverride = None
         self.featureState = {}
@@ -243,6 +244,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allFeatureTagsGSUB.update(font.featuresGSUB)
         self.allFeatureTagsGPOS.update(font.featuresGPOS)
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
+        self.allAxes = mergeAxes(self.allAxes, font.axes)
         self.setFontItemText(fontKey, fontItem, isSelectedFont)
         self.loadingFonts.remove(fontKey)
         if not self.loadingFonts:
@@ -251,7 +253,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def updateSidebarItems(self):
         self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
-        self.variationsGroup.setSliderInfo({"abcs": ("Hello", 0, 50, 100)})
+        sliderInfo = {}
+        for tag, axis in self.allAxes.items():
+            defaultValue = axis["defaultValue"]
+            if len(defaultValue) == 1:
+                defaultValue = next(iter(defaultValue))
+            else:
+                defaultValue = None  # mixed default values
+            sliderInfo[tag] = (axis["name"], axis["minValue"], defaultValue, axis["maxValue"])
+        self.variationsGroup.setSliderInfo(sliderInfo)
         scriptTags = sorted(self.allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
         self.scriptsPopup.setItems(scriptMenuTitles)
