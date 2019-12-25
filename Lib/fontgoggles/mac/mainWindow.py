@@ -440,10 +440,19 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             nsAlign = AppKit.NSTextAlignmentLeft
 
+        if self._textEntry._nsObject.alignment() == nsAlign:
+            return
+
         fieldEditor = self.w._window.fieldEditor_forObject_(False, self._textEntry._nsObject)
         hasFocus = fieldEditor.delegate() is self._textEntry._nsObject
         if hasFocus:
+            sel = fieldEditor.selectedRange()
             fieldEditor.setAlignment_(nsAlign)
+            self._textEntry._nsObject.setAlignment_(nsAlign)
+            # Now we've lost focus, let's get it again
+            self.w._window.makeFirstResponder_(self._textEntry._nsObject)
+            # Now we've lost the selection, let's restore it
+            fieldEditor.setSelectedRange_(sel)
         else:
             self._textEntry._nsObject.setAlignment_(nsAlign)
 
