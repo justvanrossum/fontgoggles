@@ -12,6 +12,7 @@ class FGGlyphLineView(AppKit.NSView):
     def init(self):
         self = super().init()
         self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
+        self.isSelected = False
         self.align = "left"
         self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
         self._glyphs = None
@@ -72,6 +73,17 @@ class FGGlyphLineView(AppKit.NSView):
     def drawRect_(self, rect):
         AppKit.NSColor.whiteColor().set()
         AppKit.NSRectFill(rect)
+        # if self.isSelected:
+        #     extent = abs(self._endPos[self.isVertical]) * self.scaleFactor
+        #     bounds = self.bounds()
+        #     bounds.origin[self.isVertical] += self.margin
+        #     bounds.origin[1 - self.isVertical] += 2
+        #     bounds.size[self.isVertical] = extent
+        #     bounds.size[1 - self.isVertical] -= 4
+        #     path = AppKit.NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(bounds, 5, 5)
+        #     AppKit.NSColor.lightGrayColor().set()
+        #     path.fill()
+
 
         if not self._glyphs:
             return
