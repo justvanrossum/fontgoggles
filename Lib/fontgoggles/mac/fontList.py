@@ -207,7 +207,7 @@ class FontList(Group):
             if selRect is None:
                 selRect = fontItem._nsObject.frame()
             else:
-                selRect = AppKit.NSUnionRect(selRect, fontItem.frame())
+                selRect = AppKit.NSUnionRect(selRect, fontItem._nsObject.frame())
         return selRect
 
     def scrollSelectionToVisible(self):
@@ -222,6 +222,7 @@ class FontList(Group):
             newSelection = {fontItemIdentifier}
         self.selection = newSelection
 
+    @suppressAndLogException
     def keyDown(self, event):
         chars = event.characters()
         if chars in arrowKeyDefs:
@@ -237,7 +238,10 @@ class FontList(Group):
                     index = min(len(self._fontItemIdentifiers) - 1, indices[-1] + 1)
                 else:
                     index = max(0, indices[0] - 1)
-                self.selection = {self._fontItemIdentifiers[index]}
+                if event.modifierFlags() & AppKit.NSShiftKeyMask:
+                    self.selection = self.selection | {self._fontItemIdentifiers[index]}
+                else:
+                    self.selection = {self._fontItemIdentifiers[index]}
                 self.scrollSelectionToVisible()
 
 
