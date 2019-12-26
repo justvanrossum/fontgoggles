@@ -174,6 +174,8 @@ class FontList(Group):
 
     def listItemMouseDown(self, event, fontListIdentifier):
         print("...", fontListIdentifier)
+        fontItem = getattr(self, fontListIdentifier)
+        fontItem.selected = not fontItem.selected
 
 
 class FontItem(Group):
@@ -345,7 +347,6 @@ class FGGlyphLineView(AppKit.NSView):
 
         indices = list(self._rectTree.iterIntersections((x, y, x, y)))
         if not indices:
-            self.selected = not self.selected
             index = None
         elif len(indices) == 1:
             index = indices[0]
