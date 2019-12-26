@@ -42,7 +42,7 @@ class FontList(Group):
         super().__init__((0, 0, width, 900))
         self._fontItemAttrNames = []
         self.selection = set()
-        self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
+        self.vertical = 0  # 0, 1: it is also an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"
         self.setupFontItems(fontKeys)
@@ -295,7 +295,7 @@ class FGGlyphLineView(AppKit.NSView):
 
         if self.selected:
             # Blend color could be a pref from the systemXxxxColor colors
-            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.3, AppKit.NSColor.systemOrangeColor())
+            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.5, AppKit.NSColor.selectedTextBackgroundColor())
 
         backgroundColor.set()
         AppKit.NSRectFill(rect)
