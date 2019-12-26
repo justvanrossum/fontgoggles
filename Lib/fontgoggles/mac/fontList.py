@@ -156,14 +156,7 @@ class FGGlyphLineView(AppKit.NSView):
 
 class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
-
-    @property
-    def vertical(self):
-        return self._nsObject.vertical
-
-    @vertical.setter
-    def vertical(self, vertical):
-        self._nsObject.vertical = vertical
+    vertical = delegateProperty("_nsObject")
 
 
 class FGFontListView(AppKit.NSView):
