@@ -40,6 +40,7 @@ class FontList(Group):
 
     def __init__(self, fontKeys, width, itemSize):
         super().__init__((0, 0, width, 900))
+        self._fontItemAttrNames = []
         self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"
@@ -112,13 +113,8 @@ class FontList(Group):
         clipView.setBounds_(clipBounds)
 
     def iterFontItems(self):
-        index = 0
-        while True:
-            item = getattr(self, fontItemAttrNameTemplate.format(index=index), None)
-            if item is None:
-                break
-            yield item
-            index += 1
+        for fontItemAttrName in self._fontItemAttrNames:
+            yield getattr(self, fontItemAttrName)
 
     def setVertical(self, vertical):
         if self.vertical == vertical:
