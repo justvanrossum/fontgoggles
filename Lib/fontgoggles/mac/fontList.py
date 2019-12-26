@@ -7,158 +7,6 @@ from fontgoggles.misc.decorators import delegateProperty, hookedProperty, suppre
 from fontgoggles.misc.rectTree import RectTree
 
 
-class FGGlyphLineView(AppKit.NSView):
-
-    def _scheduleRedraw(self):
-        self.setNeedsDisplay_(True)
-
-    selected = hookedProperty(_scheduleRedraw)
-    align = hookedProperty(_scheduleRedraw)
-
-    def init(self):
-        self = super().init()
-        self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
-        self.selected = False
-        self.align = "left"
-        self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
-        self._glyphs = None
-        self._rectTree = None
-        self._selection = None
-        self._endPos = (0, 0)
-        return self
-
-    def isOpaque(self):
-        return True
-
-    def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
-        self._glyphs = glyphs
-        self._endPos = endPos
-        self.unitsPerEm = unitsPerEm
-        rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
-        self._rectTree = RectTree.fromSeq(rectIndexList)
-        self._selection = set()
-        self.setNeedsDisplay_(True)
-
-    @property
-    def minimumExtent(self):
-        return self.margin * 2 + abs(self._endPos[self.vertical]) * self.scaleFactor
-
-    @property
-    def scaleFactor(self):
-        itemSize = self.frame().size[1 - self.vertical]
-        return 0.7 * itemSize / self.unitsPerEm
-
-    @property
-    def margin(self):
-        itemSize = self.frame().size[1 - self.vertical]
-        return 0.1 * itemSize
-
-    @property
-    def origin(self):
-        endPos = abs(self._endPos[self.vertical]) * self.scaleFactor
-        margin = self.margin
-        align = self.align
-        itemExtent = self.frame().size[self.vertical]
-        itemSize = self.frame().size[1 - self.vertical]
-        if align == "right" or align == "bottom":
-            pos = itemExtent - margin - endPos
-        elif align == "center":
-            pos = (itemExtent - endPos) / 2
-        else:  # align == "left"
-            pos = margin
-        if not self.vertical:
-            return pos, 0.25 * itemSize  # TODO: something with hhea/OS/2 ascender/descender
-        else:
-            return 0.5 * itemSize, itemExtent - pos  # TODO: something with vhea ascender/descender
-
-    @suppressAndLogException
-    def drawRect_(self, rect):
-        backgroundColor = AppKit.NSColor.textBackgroundColor()
-        foregroundColor = AppKit.NSColor.textColor()
-
-        if self.selected:
-            # Blend color could be a pref from the systemXxxxColor colors
-            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.3, AppKit.NSColor.systemOrangeColor())
-
-        backgroundColor.set()
-        AppKit.NSRectFill(rect)
-
-        if not self._glyphs:
-            return
-
-        dx, dy = self.origin
-
-        invScale = 1 / self.scaleFactor
-        rect = rectFromNSRect(rect)
-        rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
-
-        translate(dx, dy)
-        scale(self.scaleFactor)
-
-        foregroundColor.set()
-        lastPosX = lastPosY = 0
-        for index in self._rectTree.iterIntersections(rect):
-            gi = self._glyphs[index]
-            selected = self._selection and index in self._selection
-            if selected:
-                AppKit.NSColor.redColor().set()
-            posX, posY = gi.pos
-            translate(posX - lastPosX, posY - lastPosY)
-            lastPosX, lastPosY = posX, posY
-            gi.path.fill()
-            if selected:
-                AppKit.NSColor.textColor().set()
-
-    @suppressAndLogException
-    def mouseDown_(self, event):
-        if self._rectTree is None:
-            return
-        x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
-        scaleFactor = self.scaleFactor
-        dx, dy = self.origin
-        x -= dx
-        y -= dy
-        x /= scaleFactor
-        y /= scaleFactor
-
-        indices = list(self._rectTree.iterIntersections((x, y, x, y)))
-        if not indices:
-            self.selected = not self.selected
-            return
-        if len(indices) == 1:
-            index = indices[0]
-        else:
-            # There are multiple candidates. Let's do point-inside testing,
-            # and take the last hit, if any. Fall back to the last.
-            for index in reversed(indices):
-                gi = self._glyphs[index]
-                posX, posY = gi.pos
-                if gi.path.containsPoint_((x - posX, y - posY)):
-                    break
-            else:
-                index = indices[-1]
-
-        if index is not None:
-            if self._selection is None:
-                self._selection = set()
-            newSelection = {index}
-            if newSelection == self._selection:
-                newSelection = set()  # deselect
-            diffSelection = self._selection ^ newSelection
-            self._selection = newSelection
-            for index in diffSelection:
-                bounds = self._glyphs[index].bounds
-                if bounds is None:
-                    continue
-                bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
-                self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
-
-
-class GlyphLine(Group):
-    nsViewClass = FGGlyphLineView
-    vertical = delegateProperty("_nsObject")
-
-
 class FGFontListView(AppKit.NSView):
 
     @suppressAndLogException
@@ -366,6 +214,158 @@ class FontItem(Group):
             return (2, 10, 17, -10)
         else:
             return (10, 0, -10, 17)
+
+
+class FGGlyphLineView(AppKit.NSView):
+
+    def _scheduleRedraw(self):
+        self.setNeedsDisplay_(True)
+
+    selected = hookedProperty(_scheduleRedraw)
+    align = hookedProperty(_scheduleRedraw)
+
+    def init(self):
+        self = super().init()
+        self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
+        self.selected = False
+        self.align = "left"
+        self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
+        self._glyphs = None
+        self._rectTree = None
+        self._selection = None
+        self._endPos = (0, 0)
+        return self
+
+    def isOpaque(self):
+        return True
+
+    def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
+        self._glyphs = glyphs
+        self._endPos = endPos
+        self.unitsPerEm = unitsPerEm
+        rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
+        self._rectTree = RectTree.fromSeq(rectIndexList)
+        self._selection = set()
+        self.setNeedsDisplay_(True)
+
+    @property
+    def minimumExtent(self):
+        return self.margin * 2 + abs(self._endPos[self.vertical]) * self.scaleFactor
+
+    @property
+    def scaleFactor(self):
+        itemSize = self.frame().size[1 - self.vertical]
+        return 0.7 * itemSize / self.unitsPerEm
+
+    @property
+    def margin(self):
+        itemSize = self.frame().size[1 - self.vertical]
+        return 0.1 * itemSize
+
+    @property
+    def origin(self):
+        endPos = abs(self._endPos[self.vertical]) * self.scaleFactor
+        margin = self.margin
+        align = self.align
+        itemExtent = self.frame().size[self.vertical]
+        itemSize = self.frame().size[1 - self.vertical]
+        if align == "right" or align == "bottom":
+            pos = itemExtent - margin - endPos
+        elif align == "center":
+            pos = (itemExtent - endPos) / 2
+        else:  # align == "left"
+            pos = margin
+        if not self.vertical:
+            return pos, 0.25 * itemSize  # TODO: something with hhea/OS/2 ascender/descender
+        else:
+            return 0.5 * itemSize, itemExtent - pos  # TODO: something with vhea ascender/descender
+
+    @suppressAndLogException
+    def drawRect_(self, rect):
+        backgroundColor = AppKit.NSColor.textBackgroundColor()
+        foregroundColor = AppKit.NSColor.textColor()
+
+        if self.selected:
+            # Blend color could be a pref from the systemXxxxColor colors
+            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.3, AppKit.NSColor.systemOrangeColor())
+
+        backgroundColor.set()
+        AppKit.NSRectFill(rect)
+
+        if not self._glyphs:
+            return
+
+        dx, dy = self.origin
+
+        invScale = 1 / self.scaleFactor
+        rect = rectFromNSRect(rect)
+        rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
+
+        translate(dx, dy)
+        scale(self.scaleFactor)
+
+        foregroundColor.set()
+        lastPosX = lastPosY = 0
+        for index in self._rectTree.iterIntersections(rect):
+            gi = self._glyphs[index]
+            selected = self._selection and index in self._selection
+            if selected:
+                AppKit.NSColor.redColor().set()
+            posX, posY = gi.pos
+            translate(posX - lastPosX, posY - lastPosY)
+            lastPosX, lastPosY = posX, posY
+            gi.path.fill()
+            if selected:
+                AppKit.NSColor.textColor().set()
+
+    @suppressAndLogException
+    def mouseDown_(self, event):
+        if self._rectTree is None:
+            return
+        x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
+        scaleFactor = self.scaleFactor
+        dx, dy = self.origin
+        x -= dx
+        y -= dy
+        x /= scaleFactor
+        y /= scaleFactor
+
+        indices = list(self._rectTree.iterIntersections((x, y, x, y)))
+        if not indices:
+            self.selected = not self.selected
+            return
+        if len(indices) == 1:
+            index = indices[0]
+        else:
+            # There are multiple candidates. Let's do point-inside testing,
+            # and take the last hit, if any. Fall back to the last.
+            for index in reversed(indices):
+                gi = self._glyphs[index]
+                posX, posY = gi.pos
+                if gi.path.containsPoint_((x - posX, y - posY)):
+                    break
+            else:
+                index = indices[-1]
+
+        if index is not None:
+            if self._selection is None:
+                self._selection = set()
+            newSelection = {index}
+            if newSelection == self._selection:
+                newSelection = set()  # deselect
+            diffSelection = self._selection ^ newSelection
+            self._selection = newSelection
+            for index in diffSelection:
+                bounds = self._glyphs[index].bounds
+                if bounds is None:
+                    continue
+                bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
+                self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
+
+
+class GlyphLine(Group):
+    nsViewClass = FGGlyphLineView
+    vertical = delegateProperty("_nsObject")
 
 
 class FGUnclickableTextField(AppKit.NSTextField):
