@@ -181,6 +181,7 @@ class FontList(Group):
 class FontItem(Group):
 
     vertical = delegateProperty("glyphLineView")
+    selected = delegateProperty("glyphLineView")
 
     def __init__(self, posSize, fontKey, fontListIdentifier):
         super().__init__(posSize)
@@ -384,6 +385,7 @@ class FGGlyphLineView(AppKit.NSView):
 class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
     vertical = delegateProperty("_nsObject")
+    selected = delegateProperty("_nsObject")
 
 
 class FGUnclickableTextField(AppKit.NSTextField):
