@@ -17,7 +17,7 @@ class FGGlyphLineView(AppKit.NSView):
 
     def init(self):
         self = super().init()
-        self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
+        self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
         self.isSelected = False
         self.align = "left"
         self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
@@ -41,32 +41,32 @@ class FGGlyphLineView(AppKit.NSView):
 
     @property
     def minimumExtent(self):
-        return self.margin * 2 + abs(self._endPos[self.isVertical]) * self.scaleFactor
+        return self.margin * 2 + abs(self._endPos[self.vertical]) * self.scaleFactor
 
     @property
     def scaleFactor(self):
-        itemSize = self.frame().size[1 - self.isVertical]
+        itemSize = self.frame().size[1 - self.vertical]
         return 0.7 * itemSize / self.unitsPerEm
 
     @property
     def margin(self):
-        itemSize = self.frame().size[1 - self.isVertical]
+        itemSize = self.frame().size[1 - self.vertical]
         return 0.1 * itemSize
 
     @property
     def origin(self):
-        endPos = abs(self._endPos[self.isVertical]) * self.scaleFactor
+        endPos = abs(self._endPos[self.vertical]) * self.scaleFactor
         margin = self.margin
         align = self.align
-        itemExtent = self.frame().size[self.isVertical]
-        itemSize = self.frame().size[1 - self.isVertical]
+        itemExtent = self.frame().size[self.vertical]
+        itemSize = self.frame().size[1 - self.vertical]
         if align == "right" or align == "bottom":
             pos = itemExtent - margin - endPos
         elif align == "center":
             pos = (itemExtent - endPos) / 2
         else:  # align == "left"
             pos = margin
-        if not self.isVertical:
+        if not self.vertical:
             return pos, 0.25 * itemSize  # TODO: something with hhea/OS/2 ascender/descender
         else:
             return 0.5 * itemSize, itemExtent - pos  # TODO: something with vhea ascender/descender
@@ -182,12 +182,12 @@ class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
 
     @property
-    def isVertical(self):
-        return self._nsObject.isVertical
+    def vertical(self):
+        return self._nsObject.vertical
 
-    @isVertical.setter
-    def isVertical(self, isVertical):
-        self._nsObject.isVertical = isVertical
+    @vertical.setter
+    def vertical(self, vertical):
+        self._nsObject.vertical = vertical
 
 
 fontItemNameTemplate = "fontItem_{index}"
@@ -199,7 +199,7 @@ class FontList(Group):
 
     def __init__(self, fontKeys, width, itemSize):
         super().__init__((0, 0, width, 900))
-        self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
+        self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"
         y = 0
@@ -269,19 +269,19 @@ class FontList(Group):
             yield item
             index += 1
 
-    def setVertical(self, isVertical):
-        if self.isVertical == isVertical:
+    def setVertical(self, vertical):
+        if self.vertical == vertical:
             return
-        self.isVertical = isVertical
+        self.vertical = vertical
         pos = [0, 0]
         for fontItem in self.iterFontItems():
-            fontItem.isVertical = isVertical
+            fontItem.vertical = vertical
             fontItem.fileNameLabel.setPosSize(fontItem.getFileNameLabelPosSize())
-            fontItem.fileNameLabel._nsObject.rotateByAngle_([-90, 90][isVertical])
+            fontItem.fileNameLabel._nsObject.rotateByAngle_([-90, 90][vertical])
             x, y, w, h = fontItem.getPosSize()
             w, h = h, w
             fontItem.setPosSize((*pos, w, h))
-            pos[1 - isVertical] += self.itemSize
+            pos[1 - vertical] += self.itemSize
         x, y, w, h = self.getPosSize()
         w, h = h, w
         self.setPosSize((x, y, w, h))
@@ -294,9 +294,9 @@ class FontList(Group):
         pos = [0, 0]
         for fontItem in self.iterFontItems():
             x, y, *wh = fontItem.getPosSize()
-            wh[1 - self.isVertical] = itemSize
+            wh[1 - self.vertical] = itemSize
             fontItem.setPosSize((*pos, *wh))
-            pos[1 - self.isVertical] += itemSize
+            pos[1 - self.vertical] += itemSize
 
         # calculate the center of our clip view in relative doc coords
         # so we can set the scroll position and zoom in/out "from the middle"
@@ -308,7 +308,7 @@ class FontList(Group):
         cx /= w
         cy /= h
 
-        if not self.isVertical:
+        if not self.vertical:
             self.setPosSize((x, y, w * scaleFactor, pos[1]))
             cx *= w * scaleFactor
             cy *= pos[1]
@@ -325,7 +325,7 @@ class FontList(Group):
 
 class FontItem(Group):
 
-    isVertical = delegateProperty("glyphLineView")
+    vertical = delegateProperty("glyphLineView")
 
     def __init__(self, posSize, fontKey):
         super().__init__(posSize)
@@ -369,7 +369,7 @@ class FontItem(Group):
         self.glyphLineView._nsObject.align = value
 
     def getFileNameLabelPosSize(self):
-        if self.isVertical:
+        if self.vertical:
             return (2, 10, 17, -10)
         else:
             return (10, 0, -10, 17)

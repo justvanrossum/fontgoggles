@@ -137,7 +137,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # dict(title="index", width=34, cell=makeTextCell("right")),
             dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200,
                  typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
-            # "adv" is "ax" or "ay", depending on isVertical:
+            # "adv" is "ax" or "ay", depending on vertical:
             dict(title="adv", key="adv", width=45, cell=makeTextCell("right")),
             dict(title="∆X", key="dx", width=45, cell=makeTextCell("right")),
             dict(title="∆Y", key="dy", width=45, cell=makeTextCell("right")),
@@ -278,9 +278,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def directionPopUpCallback(self, sender):
         popupValue = sender.get()
         self.unicodeShowBiDiCheckBox.enable(popupValue == 0)
-        isVertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
-        self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][isVertical])
-        self._fontList.setVertical(isVertical)
+        vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
+        self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
+        self._fontList.setVertical(vertical)
         self.textEntryChangedCallback(self._textEntry)
 
     @asyncTaskAutoCancel
@@ -314,7 +314,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         newExtent = 300  # some minimum so that our filename label stays large enough
         for fontItem in self.iterFontItems():
             newExtent = max(newExtent, fontItem.minimumExtent)
-        if not self._fontList.isVertical:
+        if not self._fontList.vertical:
             if self._fontList.width > newExtent + fontListSizePadding:
                 # Shrink the font list
                 self._fontList.width = newExtent
@@ -336,7 +336,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
         minimumExtent = fontItem.minimumExtent
-        if not self._fontList.isVertical:
+        if not self._fontList.vertical:
             if minimumExtent > self._fontList.width:
                 # We make it a little wider than needed, so as to minimize the
                 # number of times we need to make it grow, as it requires a full
@@ -352,7 +352,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
-        if not self._fontList.isVertical:
+        if not self._fontList.vertical:
             keyMap = {"ax": "adv"}
         else:
             keyMap = {"ay": "adv"}
@@ -379,13 +379,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
         values = [[None, "left", "right", "center"],
-                  [None, "top", "bottom", "center"]][self._fontList.isVertical]
+                  [None, "top", "bottom", "center"]][self._fontList.vertical]
         align = values[sender.get()]
         self.alignmentOverride = align
         if align is None:
             align = self.textInfo.suggestedAlignment
         self._fontList.align = align
-        if not self._fontList.isVertical:
+        if not self._fontList.vertical:
             self._fontListScrollView.hAlign = align
             self._fontListScrollView.vAlign = "top"
         else:
