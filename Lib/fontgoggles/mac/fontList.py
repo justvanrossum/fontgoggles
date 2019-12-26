@@ -58,7 +58,7 @@ class FontList(Group):
         y = 0
         for index, fontKey in enumerate(fontKeys):
             fontItemAttrName = fontItemAttrNameTemplate.format(index=index)
-            fontItem = FontItem((0, y, 0, itemSize), fontKey)
+            fontItem = FontItem((0, y, 0, itemSize), fontKey, fontItemAttrName)
             setattr(self, fontItemAttrName, fontItem)
             self._fontItemAttrNames.append(fontItemAttrName)
             y += itemSize
@@ -172,15 +172,19 @@ class FontList(Group):
         clipBounds.origin = (cx, cy)
         clipView.setBounds_(clipBounds)
 
+    def listItemMouseDown(self, event, fontListIdentifier):
+        print("...", fontListIdentifier)
+
 
 class FontItem(Group):
 
     vertical = delegateProperty("glyphLineView")
 
-    def __init__(self, posSize, fontKey):
+    def __init__(self, posSize, fontKey, fontListIdentifier):
         super().__init__(posSize)
         # self._nsObject.setWantsLayer_(True)
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
+        self.fontListIdentifier = fontListIdentifier
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
         self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
@@ -342,8 +346,8 @@ class FGGlyphLineView(AppKit.NSView):
         indices = list(self._rectTree.iterIntersections((x, y, x, y)))
         if not indices:
             self.selected = not self.selected
-            return
-        if len(indices) == 1:
+            index = None
+        elif len(indices) == 1:
             index = indices[0]
         else:
             # There are multiple candidates. Let's do point-inside testing,
@@ -370,6 +374,10 @@ class FGGlyphLineView(AppKit.NSView):
                     continue
                 bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
                 self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
+
+        fontListIdentifier = self.superview().vanillaWrapper().fontListIdentifier
+        fontList = self.superview().superview().vanillaWrapper()
+        fontList.listItemMouseDown(event, fontListIdentifier)
 
 
 class GlyphLine(Group):
