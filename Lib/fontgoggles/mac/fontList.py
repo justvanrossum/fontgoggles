@@ -9,6 +9,12 @@ from fontgoggles.misc.rectTree import RectTree
 
 class FGGlyphLineView(AppKit.NSView):
 
+    def _scheduleRedraw(self):
+        self.setNeedsDisplay_(True)
+
+    isSelected = hookedProperty(_scheduleRedraw)
+    align = hookedProperty(_scheduleRedraw)
+
     def init(self):
         self = super().init()
         self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
@@ -36,10 +42,6 @@ class FGGlyphLineView(AppKit.NSView):
     @property
     def minimumExtent(self):
         return self.margin * 2 + abs(self._endPos[self.isVertical]) * self.scaleFactor
-
-    @hookedProperty
-    def align(self):
-        self.setNeedsDisplay_(True)
 
     @property
     def scaleFactor(self):
