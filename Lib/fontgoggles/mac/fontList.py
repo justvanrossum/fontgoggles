@@ -227,6 +227,12 @@ class FontList(Group):
         chars = event.characters()
         if chars in arrowKeyDefs:
             direction, vertical = arrowKeyDefs[chars]
+            if vertical == self.vertical:
+                for ffi in self.selection:
+                    fontItem = getattr(self, ffi)
+                    fontItem.glyphLineView._nsObject.shiftSelectedGlyph_(direction)
+                return
+
             if not self._selection:
                 if direction == 1:
                     self.selection = {self._fontItemIdentifiers[0]}
@@ -329,12 +335,6 @@ class FGGlyphLineView(AppKit.NSView):
         return True
 
     def keyDown_(self, event):
-        chars = event.characters()
-        if chars in arrowKeyDefs:
-            direction, vertical = arrowKeyDefs[chars]
-            if vertical == self.vertical:
-                self.shiftSelectedGlyph_(direction)
-                return
         super().keyDown_(event)
 
     def shiftSelectedGlyph_(self, direction):
