@@ -41,6 +41,7 @@ class FontList(Group):
     def __init__(self, fontKeys, width, itemSize):
         super().__init__((0, 0, width, 900))
         self._fontItemAttrNames = []
+        self.selection = set()
         self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"

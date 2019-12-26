@@ -163,8 +163,9 @@ class hookedProperty:
                 return self.default
 
     def __set__(self, obj, value):
-        obj.__dict__[self.name] = value
-        self.hook(obj)
+        if self.name not in obj.__dict__ or obj.__dict__[self.name] != value:
+            obj.__dict__[self.name] = value
+            self.hook(obj)
 
     def __delete__(self, obj):
         try:
