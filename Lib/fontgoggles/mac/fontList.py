@@ -123,6 +123,7 @@ class FGGlyphLineView(AppKit.NSView):
 
         indices = list(self._rectTree.iterIntersections((x, y, x, y)))
         if not indices:
+            self.isSelected = not self.isSelected
             return
         if len(indices) == 1:
             index = indices[0]
