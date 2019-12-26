@@ -43,13 +43,17 @@ class FontList(Group):
         self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"
+        self.setupFontItems(fontKeys)
+
+    def setupFontItems(self, fontKeys):
+        itemSize = self.itemSize
         y = 0
         for index, fontKey in enumerate(fontKeys):
             fontItemName = fontItemNameTemplate.format(index=index)
             fontItem = FontItem((0, y, 0, itemSize), fontKey)
             setattr(self, fontItemName, fontItem)
             y += itemSize
-        self.setPosSize((0, 0, width, y))
+        self.setPosSize((0, 0, self.getPosSize()[2], y))
 
     @property
     def width(self):
