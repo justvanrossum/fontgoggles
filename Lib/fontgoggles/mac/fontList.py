@@ -12,7 +12,7 @@ class FGGlyphLineView(AppKit.NSView):
     def init(self):
         self = super().init()
         self.isVertical = 0  # 0, 1: it will also be an index into (x, y) tuples
-        self.isSelected = True
+        self.isSelected = False
         self.align = "left"
         self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
         self._glyphs = None
@@ -71,12 +71,15 @@ class FGGlyphLineView(AppKit.NSView):
 
     @suppressAndLogException
     def drawRect_(self, rect):
-        AppKit.NSColor.textBackgroundColor().set()
-        AppKit.NSRectFill(rect)
+        backgroundColor = AppKit.NSColor.textBackgroundColor()
+        foregroundColor = AppKit.NSColor.textColor()
+
         if self.isSelected:
-            bounds = self.bounds()
-            AppKit.NSColor.lightGrayColor().set()
-            AppKit.NSRectFill(bounds)
+            # Blend color could be a pref from the systemXxxxColor colors
+            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.3, AppKit.NSColor.systemOrangeColor())
+
+        backgroundColor.set()
+        AppKit.NSRectFill(rect)
 
         if not self._glyphs:
             return
@@ -90,7 +93,7 @@ class FGGlyphLineView(AppKit.NSView):
         translate(dx, dy)
         scale(self.scaleFactor)
 
-        AppKit.NSColor.textColor().set()
+        foregroundColor.set()
         lastPosX = lastPosY = 0
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
