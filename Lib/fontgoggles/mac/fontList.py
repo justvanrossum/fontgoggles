@@ -332,7 +332,7 @@ class FGGlyphLineView(AppKit.NSView):
         return True
 
     def becomeFirstResponder(self):
-        return True
+        return self.superview().superview().becomeFirstResponder()
 
     def keyDown_(self, event):
         super().keyDown_(event)
