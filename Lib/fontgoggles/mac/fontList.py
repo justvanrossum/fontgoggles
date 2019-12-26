@@ -7,19 +7,6 @@ from fontgoggles.misc.decorators import delegateProperty, hookedProperty, suppre
 from fontgoggles.misc.rectTree import RectTree
 
 
-class FGUnclickableTextField(AppKit.NSTextField):
-
-    def hitTest_(self, point):
-        return None
-
-
-class UnclickableTextBox(TextBox):
-
-    """This TextBox sublass is transparent for clicks."""
-
-    nsTextFieldClass = FGUnclickableTextField
-
-
 class FGGlyphLineView(AppKit.NSView):
 
     def _scheduleRedraw(self):
@@ -386,3 +373,16 @@ class FontItem(Group):
             return (2, 10, 17, -10)
         else:
             return (10, 0, -10, 17)
+
+
+class FGUnclickableTextField(AppKit.NSTextField):
+
+    def hitTest_(self, point):
+        return None
+
+
+class UnclickableTextBox(TextBox):
+
+    """This TextBox sublass is transparent for clicks."""
+
+    nsTextFieldClass = FGUnclickableTextField
