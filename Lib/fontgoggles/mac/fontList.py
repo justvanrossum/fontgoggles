@@ -42,10 +42,10 @@ class FGFontListView(AppKit.NSView):
 
 
 arrowKeyDefs = {
-    AppKit.NSUpArrowFunctionKey: ("<", 1),
-    AppKit.NSDownArrowFunctionKey: (">", 1),
-    AppKit.NSLeftArrowFunctionKey: ("<", 0),
-    AppKit.NSRightArrowFunctionKey: (">", 0),
+    AppKit.NSUpArrowFunctionKey: (-1, 1),
+    AppKit.NSDownArrowFunctionKey: (1, 1),
+    AppKit.NSLeftArrowFunctionKey: (-1, 0),
+    AppKit.NSRightArrowFunctionKey: (1, 0),
 }
 
 fontItemIdentifierTemplate = "fontItem_{index}"
@@ -228,13 +228,13 @@ class FontList(Group):
         if chars in arrowKeyDefs:
             direction, vertical = arrowKeyDefs[chars]
             if not self._selection:
-                if direction == ">":
+                if direction == 1:
                     self.selection = {self._fontItemIdentifiers[0]}
                 else:
                     self.selection = {self._fontItemIdentifiers[-1]}
             else:
                 indices = [i for i, fii in enumerate(self._fontItemIdentifiers) if fii in self._selection]
-                if direction == ">":
+                if direction == 1:
                     index = min(len(self._fontItemIdentifiers) - 1, indices[-1] + 1)
                 else:
                     index = max(0, indices[0] - 1)
