@@ -46,6 +46,10 @@ class FontList(Group):
         self.setupFontItems(fontKeys)
 
     def setupFontItems(self, fontKeys):
+        # clear all subviews
+        for attr, value in list(self.__dict__.items()):
+            if isinstance(value, VanillaBaseObject):
+                delattr(self, attr)
         itemSize = self.itemSize
         y = 0
         for index, fontKey in enumerate(fontKeys):
@@ -53,7 +57,7 @@ class FontList(Group):
             fontItem = FontItem((0, y, 0, itemSize), fontKey)
             setattr(self, fontItemName, fontItem)
             y += itemSize
-        self.setPosSize((0, 0, self.getPosSize()[2], y))
+        self.setPosSize((0, 0, self.width, y))
 
     @property
     def width(self):
