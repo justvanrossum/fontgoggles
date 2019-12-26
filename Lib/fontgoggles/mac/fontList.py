@@ -12,13 +12,13 @@ class FGGlyphLineView(AppKit.NSView):
     def _scheduleRedraw(self):
         self.setNeedsDisplay_(True)
 
-    isSelected = hookedProperty(_scheduleRedraw)
+    selected = hookedProperty(_scheduleRedraw)
     align = hookedProperty(_scheduleRedraw)
 
     def init(self):
         self = super().init()
         self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
-        self.isSelected = False
+        self.selected = False
         self.align = "left"
         self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
         self._glyphs = None
@@ -76,7 +76,7 @@ class FGGlyphLineView(AppKit.NSView):
         backgroundColor = AppKit.NSColor.textBackgroundColor()
         foregroundColor = AppKit.NSColor.textColor()
 
-        if self.isSelected:
+        if self.selected:
             # Blend color could be a pref from the systemXxxxColor colors
             backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.3, AppKit.NSColor.systemOrangeColor())
 
@@ -123,7 +123,7 @@ class FGGlyphLineView(AppKit.NSView):
 
         indices = list(self._rectTree.iterIntersections((x, y, x, y)))
         if not indices:
-            self.isSelected = not self.isSelected
+            self.selected = not self.selected
             return
         if len(indices) == 1:
             index = indices[0]
