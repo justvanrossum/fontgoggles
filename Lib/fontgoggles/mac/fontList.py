@@ -117,10 +117,11 @@ class FontList(Group):
         for fontItemAttrName in self._fontItemAttrNames:
             yield getattr(self, fontItemAttrName)
 
-    def setVertical(self, vertical):
-        if self.vertical == vertical:
-            return
-        self.vertical = vertical
+    @hookedProperty
+    def vertical(self):
+        # Note that we heavily depend on hookedProperty's property that
+        # the hook is only called when the value is different than before.
+        vertical = self.vertical
         pos = [0, 0]
         for fontItem in self.iterFontItems():
             fontItem.vertical = vertical

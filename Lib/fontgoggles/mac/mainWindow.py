@@ -280,7 +280,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.unicodeShowBiDiCheckBox.enable(popupValue == 0)
         vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
         self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
-        self._fontList.setVertical(vertical)
+        self._fontList.vertical = vertical
         self.textEntryChangedCallback(self._textEntry)
 
     @asyncTaskAutoCancel
