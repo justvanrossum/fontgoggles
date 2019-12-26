@@ -137,7 +137,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # dict(title="index", width=34, cell=makeTextCell("right")),
             dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200,
                  typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
-            # "adv" is "ax" or "ay", depending on vertical:
+            # "adv" is "ax" or "ay", depending on whether we are in vertical layout mode or not:
             dict(title="adv", key="adv", width=45, cell=makeTextCell("right")),
             dict(title="∆X", key="dx", width=45, cell=makeTextCell("right")),
             dict(title="∆Y", key="dy", width=45, cell=makeTextCell("right")),
