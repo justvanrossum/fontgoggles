@@ -10,6 +10,15 @@ from fontgoggles.misc.rectTree import RectTree
 
 class FGFontListView(AppKit.NSView):
 
+    def acceptsFirstResponder(self):
+        return True
+
+    def becomeFirstResponder(self):
+        return True
+
+    def keyDown_(self, event):
+        self.vanillaWrapper().keyDown(event)
+
     @suppressAndLogException
     def magnifyWithEvent_(self, event):
         pass
@@ -31,6 +40,13 @@ class FGFontListView(AppKit.NSView):
         # else:
         #     super().magnifyWithEvent_(event)
 
+
+arrowKeyDefs = {
+    AppKit.NSUpArrowFunctionKey: ("<", 1),
+    AppKit.NSDownArrowFunctionKey: (">", 1),
+    AppKit.NSLeftArrowFunctionKey: ("<", 0),
+    AppKit.NSRightArrowFunctionKey: (">", 0),
+}
 
 fontItemIdentifierTemplate = "fontItem_{index}"
 
@@ -172,6 +188,18 @@ class FontList(Group):
         clipBounds.origin = (cx, cy)
         clipView.setBounds_(clipBounds)
 
+    @property
+    def selection(self):
+        return self._selection
+
+    @selection.setter
+    def selection(self, newSelection):
+        diffSelection = self._selection ^ newSelection
+        self._selection = newSelection
+        for fontItemIdentifier in diffSelection:
+            fontItem = getattr(self, fontItemIdentifier)
+            fontItem.selected = not fontItem.selected
+
     def listItemMouseDown(self, event, fontItemIdentifier):
         if event.modifierFlags() & AppKit.NSCommandKeyMask:
             newSelection = self._selection ^ {fontItemIdentifier}
@@ -179,14 +207,24 @@ class FontList(Group):
             newSelection = self._selection  # no change
         else:
             newSelection = {fontItemIdentifier}
-        selDiff = self._selection ^ newSelection
-        self._selection = newSelection
-        for fontItemIdentifier in selDiff:
-            fontItem = getattr(self, fontItemIdentifier)
-            fontItem.selected = not fontItem.selected
+        self.selection = newSelection
 
-    def keyDown_(self, event):
-        print("---------", event)
+    def keyDown(self, event):
+        chars = event.characters()
+        if chars in arrowKeyDefs:
+            direction, vertical = arrowKeyDefs[chars]
+            if not self._selection:
+                if direction == ">":
+                    self.selection = {self._fontItemIdentifiers[0]}
+                else:
+                    self.selection = {self._fontItemIdentifiers[-1]}
+            else:
+                indices = [i for i, fii in enumerate(self._fontItemIdentifiers) if fii in self._selection]
+                if direction == ">":
+                    index = min(len(self._fontItemIdentifiers) - 1, indices[-1] + 1)
+                else:
+                    index = max(0, indices[0] - 1)
+                self.selection = {self._fontItemIdentifiers[index]}
 
 
 class FontItem(Group):
@@ -265,6 +303,24 @@ class FGGlyphLineView(AppKit.NSView):
 
     def isOpaque(self):
         return True
+
+    def acceptsFirstResponder(self):
+        return True
+
+    def becomeFirstResponder(self):
+        return True
+
+    def keyDown_(self, event):
+        chars = event.characters()
+        if chars in arrowKeyDefs:
+            direction, vertical = arrowKeyDefs[chars]
+            if vertical == self.vertical:
+                self.shiftSelectedGlyph_(direction)
+                return
+        super().keyDown_(event)
+
+    def shiftSelectedGlyph_(self, direction):
+        pass
 
     def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
         self._glyphs = glyphs
