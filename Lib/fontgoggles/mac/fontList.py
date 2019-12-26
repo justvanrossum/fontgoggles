@@ -327,7 +327,7 @@ class FontItem(Group):
         # self._nsObject.setWantsLayer_(True)
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
-        self.fileNameLabel = TextBox(self.getFileNameLabelPosSize(), "", sizeStyle="regular")
+        self.fileNameLabel = TextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
         self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
