@@ -42,7 +42,7 @@ class FontList(Group):
     def __init__(self, fontKeys, width, itemSize):
         super().__init__((0, 0, width, 900))
         self._fontItemIdentifiers = []
-        self.selection = set()
+        self._selection = set()  # a set of fontItemIdentifiers
         self.vertical = 0  # 0, 1: it is also an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"
@@ -173,9 +173,17 @@ class FontList(Group):
         clipView.setBounds_(clipBounds)
 
     def listItemMouseDown(self, event, fontItemIdentifier):
-        print("...", fontItemIdentifier)
-        fontItem = getattr(self, fontItemIdentifier)
-        fontItem.selected = not fontItem.selected
+        if event.modifierFlags() & AppKit.NSCommandKeyMask:
+            newSelection = self._selection ^ {fontItemIdentifier}
+        elif fontItemIdentifier in self._selection:
+            newSelection = self._selection  # no change
+        else:
+            newSelection = {fontItemIdentifier}
+        selDiff = self._selection ^ newSelection
+        self._selection = newSelection
+        for fontItemIdentifier in selDiff:
+            fontItem = getattr(self, fontItemIdentifier)
+            fontItem.selected = not fontItem.selected
 
 
 class FontItem(Group):
