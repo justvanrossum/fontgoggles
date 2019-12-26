@@ -282,7 +282,7 @@ class FGGlyphLineView(AppKit.NSView):
             pos = itemExtent - margin - endPos
         elif align == "center":
             pos = (itemExtent - endPos) / 2
-        else:  # align == "left"
+        else:  # align == "left" or align == "top"
             pos = margin
         if not self.vertical:
             return pos, 0.25 * itemSize  # TODO: something with hhea/OS/2 ascender/descender
