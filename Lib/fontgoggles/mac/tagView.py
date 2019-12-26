@@ -43,17 +43,16 @@ class FGTagView(AppKit.NSView):
     def drawRect_(self, rect):
         (x, y), (w, h) = self.bounds()
         if self.state is None:
-            g = 0.6
-            mainRGB = (g, g, g)
+            mainColor = AppKit.NSColor.systemGrayColor()
         elif self.state:
-            mainRGB = (0, 0.7, 0.2)
+            mainColor = AppKit.NSColor.systemGreenColor()
+            mainColor = mainColor.blendedColorWithFraction_ofColor_(0.25, AppKit.NSColor.systemGrayColor())
         else:
-            mainRGB = (0.9, 0.2, 0.4)
+            mainColor = AppKit.NSColor.systemRedColor()
 
         if self.tracked:
-            mainRGB = tuple(0.6 * ch for ch in mainRGB)
+            mainColor = mainColor.blendedColorWithFraction_ofColor_(0.5, AppKit.NSColor.textColor())
 
-        mainColor = rgbColor(*mainRGB)
         mainColor.set()
         radius = min(h / 2.75, 10)
         path = AppKit.NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(self.bounds(), radius, radius)
