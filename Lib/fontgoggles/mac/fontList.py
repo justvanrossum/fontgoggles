@@ -7,6 +7,19 @@ from fontgoggles.misc.decorators import delegateProperty, hookedProperty, suppre
 from fontgoggles.misc.rectTree import RectTree
 
 
+class FGUnclickableTextField(AppKit.NSTextField):
+
+    def hitTest_(self, point):
+        return None
+
+
+class UnclickableTextBox(TextBox):
+
+    """This TextBox sublass is transparent for clicks."""
+
+    nsTextFieldClass = FGUnclickableTextField
+
+
 class FGGlyphLineView(AppKit.NSView):
 
     def _scheduleRedraw(self):
@@ -332,7 +345,7 @@ class FontItem(Group):
         # self._nsObject.setWantsLayer_(True)
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
-        self.fileNameLabel = TextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
+        self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
         self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
