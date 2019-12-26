@@ -338,7 +338,31 @@ class FGGlyphLineView(AppKit.NSView):
         super().keyDown_(event)
 
     def shiftSelectedGlyph_(self, direction):
-        pass
+        if direction == 1:
+            if self._selection:
+                index = min(len(self._glyphs) - 1, max(self._selection) + 1)
+                self.selection = {index}
+        else:
+            if self._selection:
+                index = max(0, min(self._selection) - 1)
+                self.selection = {index}
+
+    @property
+    def selection(self):
+        return self._selection
+
+    @selection.setter
+    def selection(self, newSelection):
+        diffSelection = self._selection ^ newSelection
+        self._selection = newSelection
+        dx, dy = self.origin
+        scaleFactor = self.scaleFactor
+        for index in diffSelection:
+            bounds = self._glyphs[index].bounds
+            if bounds is None:
+                continue
+            bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
+            self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
 
     def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
         self._glyphs = glyphs
@@ -453,14 +477,7 @@ class FGGlyphLineView(AppKit.NSView):
             newSelection = {index}
             if newSelection == self._selection:
                 newSelection = set()  # deselect
-            diffSelection = self._selection ^ newSelection
-            self._selection = newSelection
-            for index in diffSelection:
-                bounds = self._glyphs[index].bounds
-                if bounds is None:
-                    continue
-                bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
-                self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
+            self.selection = newSelection
 
         fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
         fontList = self.superview().superview().vanillaWrapper()
