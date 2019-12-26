@@ -154,6 +154,18 @@ class FGGlyphLineView(AppKit.NSView):
                 self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
 
 
+class GlyphLine(Group):
+    nsViewClass = FGGlyphLineView
+
+    @property
+    def vertical(self):
+        return self._nsObject.vertical
+
+    @vertical.setter
+    def vertical(self, vertical):
+        self._nsObject.vertical = vertical
+
+
 class FGFontListView(AppKit.NSView):
 
     @suppressAndLogException
@@ -176,18 +188,6 @@ class FGFontListView(AppKit.NSView):
         #     del self._savedClipBounds
         # else:
         #     super().magnifyWithEvent_(event)
-
-
-class GlyphLine(Group):
-    nsViewClass = FGGlyphLineView
-
-    @property
-    def vertical(self):
-        return self._nsObject.vertical
-
-    @vertical.setter
-    def vertical(self, vertical):
-        self._nsObject.vertical = vertical
 
 
 fontItemNameTemplate = "fontItem_{index}"
