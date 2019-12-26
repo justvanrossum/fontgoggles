@@ -31,7 +31,7 @@ class FGFontListView(AppKit.NSView):
         #     super().magnifyWithEvent_(event)
 
 
-fontItemNameTemplate = "fontItem_{index}"
+fontItemAttrNameTemplate = "fontItem_{index}"
 
 
 class FontList(Group):
@@ -50,12 +50,14 @@ class FontList(Group):
         for attr, value in list(self.__dict__.items()):
             if isinstance(value, VanillaBaseObject):
                 delattr(self, attr)
+        self._fontItemAttrNames = []
         itemSize = self.itemSize
         y = 0
         for index, fontKey in enumerate(fontKeys):
-            fontItemName = fontItemNameTemplate.format(index=index)
+            fontItemAttrName = fontItemAttrNameTemplate.format(index=index)
             fontItem = FontItem((0, y, 0, itemSize), fontKey)
-            setattr(self, fontItemName, fontItem)
+            setattr(self, fontItemAttrName, fontItem)
+            self._fontItemAttrNames.append(fontItemAttrName)
             y += itemSize
         self.setPosSize((0, 0, self.width, y))
 
@@ -112,7 +114,7 @@ class FontList(Group):
     def iterFontItems(self):
         index = 0
         while True:
-            item = getattr(self, fontItemNameTemplate.format(index=index), None)
+            item = getattr(self, fontItemAttrNameTemplate.format(index=index), None)
             if item is None:
                 break
             yield item
