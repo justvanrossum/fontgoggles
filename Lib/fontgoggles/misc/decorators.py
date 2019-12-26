@@ -146,6 +146,21 @@ class cachedProperty(readOnlyCachedProperty):
 
 class hookedProperty:
 
+    """Property that calls a hook whenever its value changed, or
+    when it got deleted.
+
+    The `hook` should be a callable, that will be called with the
+    owner of property as the first argument, and is therefore
+    effectively a method of the owner.
+
+    The hook will only be called when the value is actually
+    different, so when clients set it to the same value several
+    times in a row, the hook is only called once.
+
+    Likewise, the hook itself can rely on the fact that the value
+    has actually changed when it is called.
+    """
+
     def __init__(self, hook, default=_NotFoundToken):
         self.hook = hook
         self.default = default
