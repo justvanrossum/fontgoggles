@@ -3,7 +3,7 @@ from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import textAlignments
-from fontgoggles.misc.decorators import suppressAndLogException, hookedProperty
+from fontgoggles.misc.decorators import delegateProperty, hookedProperty, suppressAndLogException
 from fontgoggles.misc.rectTree import RectTree
 
 
@@ -325,6 +325,8 @@ class FontList(Group):
 
 class FontItem(Group):
 
+    isVertical = delegateProperty("glyphLineView")
+
     def __init__(self, posSize, fontKey):
         super().__init__(posSize)
         # self._nsObject.setWantsLayer_(True)
@@ -365,14 +367,6 @@ class FontItem(Group):
         nsAlignment = textAlignments.get(value, textAlignments["left"])
         self.fileNameLabel._nsObject.cell().setAlignment_(nsAlignment)
         self.glyphLineView._nsObject.align = value
-
-    @property
-    def isVertical(self):
-        return self.glyphLineView.isVertical
-
-    @isVertical.setter
-    def isVertical(self, isVertical):
-        self.glyphLineView.isVertical = isVertical
 
     def getFileNameLabelPosSize(self):
         if self.isVertical:
