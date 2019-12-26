@@ -185,6 +185,9 @@ class FontList(Group):
             fontItem = getattr(self, fontItemIdentifier)
             fontItem.selected = not fontItem.selected
 
+    def keyDown_(self, event):
+        print("---------", event)
+
 
 class FontItem(Group):
 
