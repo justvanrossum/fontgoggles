@@ -1,6 +1,6 @@
 import AppKit
 import vanilla
-from ..misc.decorators import hookedProperty
+from ..misc.properties import hookedProperty
 
 
 class AligningScrollView(vanilla.ScrollView):

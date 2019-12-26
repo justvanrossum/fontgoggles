@@ -3,7 +3,8 @@ from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import textAlignments
-from fontgoggles.misc.decorators import delegateProperty, hookedProperty, suppressAndLogException
+from fontgoggles.misc.decorators import suppressAndLogException
+from fontgoggles.misc.properties import delegateProperty, hookedProperty
 from fontgoggles.misc.rectTree import RectTree
 
 

@@ -1,6 +1,6 @@
 import io
 from fontTools.ttLib import TTFont
-from ..misc.decorators import readOnlyCachedProperty
+from ..misc.properties import readOnlyCachedProperty
 from ..misc.hbShape import HBShape
 from ..misc.ftFont import FTFont
 from . import mergeScriptsAndLanguages

@@ -1,7 +1,7 @@
 import functools
 import AppKit
 from vanilla import Group
-from fontgoggles.misc.decorators import delegateProperty, hookedProperty, weakrefCallbackProperty
+from fontgoggles.misc.properties import delegateProperty, hookedProperty, weakrefCallbackProperty
 from fontgoggles.mac.drawing import rgbColor, grayColor, drawText
 
 

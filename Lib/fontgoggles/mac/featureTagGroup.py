@@ -2,7 +2,7 @@ import AppKit
 from vanilla import *
 from fontgoggles.mac.tagView import TagView
 from fontgoggles.misc.opentypeTags import features
-from fontgoggles.misc.decorators import weakrefCallbackProperty
+from fontgoggles.misc.properties import weakrefCallbackProperty
 
 
 class FeatureTagGroup(Group):

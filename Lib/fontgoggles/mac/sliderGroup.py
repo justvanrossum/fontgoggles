@@ -1,6 +1,6 @@
 import AppKit
 from vanilla import *
-from fontgoggles.misc.decorators import weakrefCallbackProperty
+from fontgoggles.misc.properties import weakrefCallbackProperty
 
 
 class SliderGroup(Group):
