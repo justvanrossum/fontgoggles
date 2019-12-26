@@ -1,18 +1,17 @@
-import functools
 import AppKit
 from vanilla import Group
 from fontgoggles.misc.properties import delegateProperty, hookedProperty, weakrefCallbackProperty
 from fontgoggles.mac.drawing import rgbColor, grayColor, drawText
 
 
-updatingProperty = functools.partial(hookedProperty, lambda obj: obj.setNeedsDisplay_(True))
-
-
 class FGTagView(AppKit.NSView):
 
-    tag = updatingProperty()
-    state = updatingProperty()
-    tracked = updatingProperty(default=False)
+    def _scheduleRedraw(self):
+        self.setNeedsDisplay_(True)
+
+    tag = hookedProperty(_scheduleRedraw)
+    state = hookedProperty(_scheduleRedraw)
+    tracked = hookedProperty(_scheduleRedraw, default=False)
 
     def mouseDown_(self, event):
         self.tracked = True
