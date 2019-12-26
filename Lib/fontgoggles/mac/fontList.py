@@ -32,7 +32,7 @@ class FGFontListView(AppKit.NSView):
         #     super().magnifyWithEvent_(event)
 
 
-fontItemAttrNameTemplate = "fontItem_{index}"
+fontItemIdentifierTemplate = "fontItem_{index}"
 
 
 class FontList(Group):
@@ -41,7 +41,7 @@ class FontList(Group):
 
     def __init__(self, fontKeys, width, itemSize):
         super().__init__((0, 0, width, 900))
-        self._fontItemAttrNames = []
+        self._fontItemIdentifiers = []
         self.selection = set()
         self.vertical = 0  # 0, 1: it is also an index into (x, y) tuples
         self.itemSize = itemSize
@@ -53,14 +53,14 @@ class FontList(Group):
         for attr, value in list(self.__dict__.items()):
             if isinstance(value, VanillaBaseObject):
                 delattr(self, attr)
-        self._fontItemAttrNames = []
+        self._fontItemIdentifiers = []
         itemSize = self.itemSize
         y = 0
         for index, fontKey in enumerate(fontKeys):
-            fontItemAttrName = fontItemAttrNameTemplate.format(index=index)
-            fontItem = FontItem((0, y, 0, itemSize), fontKey, fontItemAttrName)
-            setattr(self, fontItemAttrName, fontItem)
-            self._fontItemAttrNames.append(fontItemAttrName)
+            fontItemIdentifier = fontItemIdentifierTemplate.format(index=index)
+            fontItem = FontItem((0, y, 0, itemSize), fontKey, fontItemIdentifier)
+            setattr(self, fontItemIdentifier, fontItem)
+            self._fontItemIdentifiers.append(fontItemIdentifier)
             y += itemSize
         self.setPosSize((0, 0, self.width, y))
 
@@ -115,8 +115,8 @@ class FontList(Group):
         clipView.setBounds_(clipBounds)
 
     def iterFontItems(self):
-        for fontItemAttrName in self._fontItemAttrNames:
-            yield getattr(self, fontItemAttrName)
+        for fontItemIdentifier in self._fontItemIdentifiers:
+            yield getattr(self, fontItemIdentifier)
 
     @hookedProperty
     def vertical(self):
@@ -172,9 +172,9 @@ class FontList(Group):
         clipBounds.origin = (cx, cy)
         clipView.setBounds_(clipBounds)
 
-    def listItemMouseDown(self, event, fontListIdentifier):
-        print("...", fontListIdentifier)
-        fontItem = getattr(self, fontListIdentifier)
+    def listItemMouseDown(self, event, fontItemIdentifier):
+        print("...", fontItemIdentifier)
+        fontItem = getattr(self, fontItemIdentifier)
         fontItem.selected = not fontItem.selected
 
 
@@ -183,11 +183,11 @@ class FontItem(Group):
     vertical = delegateProperty("glyphLineView")
     selected = delegateProperty("glyphLineView")
 
-    def __init__(self, posSize, fontKey, fontListIdentifier):
+    def __init__(self, posSize, fontKey, fontItemIdentifier):
         super().__init__(posSize)
         # self._nsObject.setWantsLayer_(True)
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
-        self.fontListIdentifier = fontListIdentifier
+        self.fontItemIdentifier = fontItemIdentifier
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
         self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
@@ -377,9 +377,9 @@ class FGGlyphLineView(AppKit.NSView):
                 bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
                 self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
 
-        fontListIdentifier = self.superview().vanillaWrapper().fontListIdentifier
+        fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
         fontList = self.superview().superview().vanillaWrapper()
-        fontList.listItemMouseDown(event, fontListIdentifier)
+        fontList.listItemMouseDown(event, fontItemIdentifier)
 
 
 class GlyphLine(Group):
