@@ -289,7 +289,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.textEntryChangedCallback(self._textEntry)
 
     @asyncTaskAutoCancel
-    async def textEntryChangedCallback(self, sender):
+    async def textEntryChangedCallback(self, sender, updateUnicodeList=True):
         self.textInfo = TextInfo(sender.get())
         self.textInfo.shouldApplyBiDi = self.directionPopUp.get() == 0
         self.textInfo.directionOverride = directionSettings[self.directionPopUp.get()]
@@ -305,7 +305,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             self.updateTextEntryAlignment(align)
 
-        self.updateUnicodeList(delay=0.05)
+        if updateUnicodeList:
+            self.updateUnicodeList(delay=0.05)
         t = time.time()
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
@@ -365,7 +366,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.glyphList.setSelection(selection)
 
     @asyncTaskAutoCancel
-    async def updateUnicodeList(self, delay=0):
+    async def updateUnicodeList(self, selection=None, delay=0):
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
@@ -380,6 +381,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                      unicodeName=unicodedata.name(char, "?"))
             )
         self.unicodeList.set(uniListData)
+        if selection is not None:
+            self.unicodeList.setSelection(selection)
 
     @objc.python_method
     def fontListSelectionChangedCallback(self, sender):
@@ -462,23 +465,23 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                          for tag in sorted(self.allScriptsAndLanguages[tag])]
         self.languagesPopup.setItems(['dflt – Default'] + languages)
         self.languagesPopup.set(0)
-        self.textEntryChangedCallback(self._textEntry)
+        self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
 
     @objc.python_method
     def languagesPopupCallback(self, sender):
-        self.textEntryChangedCallback(self._textEntry)
+        self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
 
     @objc.python_method
     def featuresChanged(self, sender):
         featureState = self.featuresGroup.get()
         featureState = {k: v for k, v in featureState.items() if v is not None}
         self.featureState = featureState
-        self.textEntryChangedCallback(self._textEntry)
+        self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
 
     @objc.python_method
     def varLocationChanged(self, sender):
         self.varLocation = {k: v for k, v in sender.get().items() if v is not None}
-        self.textEntryChangedCallback(self._textEntry)
+        self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):
