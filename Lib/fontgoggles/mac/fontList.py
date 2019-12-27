@@ -439,6 +439,9 @@ class FGGlyphLineView(AppKit.NSView):
             # Blend color could be a pref from the systemXxxxColor colors
             backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.5, AppKit.NSColor.selectedTextBackgroundColor())
 
+        if self._selection:
+            selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(0.9, AppKit.NSColor.systemRedColor())
+
         backgroundColor.set()
         AppKit.NSRectFill(rect)
 
@@ -460,7 +463,7 @@ class FGGlyphLineView(AppKit.NSView):
             gi = self._glyphs[index]
             selected = index in self._selection
             if selected:
-                AppKit.NSColor.redColor().set()
+                selectedColor.set()
             posX, posY = gi.pos
             translate(posX - lastPosX, posY - lastPosY)
             lastPosX, lastPosY = posX, posY
