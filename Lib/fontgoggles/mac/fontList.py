@@ -278,8 +278,7 @@ class FontItem(Group):
         fileNameLabel = f"{fontPath.name}"
         if fontNumber or fontPath.suffix.lower() in {".ttc", ".otc"}:
             fileNameLabel += f"#{fontNumber}"
-        self.fileNameLabel.set(fileNameLabel)
-        self.fileNameLabel._nsObject.setToolTip_(str(fontPath))
+        self.fileNameLabel.set(fileNameLabel, tooltip=str(fontPath))
 
     def setGlyphs(self, glyphs, endPos, unitsPerEm):
         self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
@@ -504,3 +503,8 @@ class UnclickableTextBox(TextBox):
     """This TextBox sublass is transparent for clicks."""
 
     nsTextFieldClass = FGUnclickableTextField
+
+    def set(self, value, tooltip=None):
+        super().set(value)
+        if tooltip is not None:
+            self._nsObject.setToolTip_(tooltip)
