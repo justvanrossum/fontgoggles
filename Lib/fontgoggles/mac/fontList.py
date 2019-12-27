@@ -200,9 +200,9 @@ class FontList(Group):
             fontItem = getattr(self, fontItemIdentifier)
             fontItem.selected = not fontItem.selected
 
-    def _getSelectionRect(self):
+    def _getSelectionRect(self, selection):
         selRect = None
-        for fontItemIdentifier in self._selection:
+        for fontItemIdentifier in selection:
             fontItem = getattr(self, fontItemIdentifier)
             if selRect is None:
                 selRect = fontItem._nsObject.frame()
@@ -210,17 +210,21 @@ class FontList(Group):
                 selRect = AppKit.NSUnionRect(selRect, fontItem._nsObject.frame())
         return selRect
 
-    def scrollSelectionToVisible(self):
-        self._nsObject.scrollRectToVisible_(self._getSelectionRect())
+    def scrollSelectionToVisible(self, selection=None):
+        if selection is None:
+            selection = self._selection
+        self._nsObject.scrollRectToVisible_(self._getSelectionRect(selection))
 
     def listItemMouseDown(self, event, fontItemIdentifier):
         if event.modifierFlags() & AppKit.NSCommandKeyMask:
             newSelection = self._selection ^ {fontItemIdentifier}
         elif fontItemIdentifier in self._selection:
-            newSelection = self._selection  # no change
+            newSelection = None
         else:
             newSelection = {fontItemIdentifier}
-        self.selection = newSelection
+        if newSelection is not None:
+            self.selection = newSelection
+            self.scrollSelectionToVisible({fontItemIdentifier})
 
     @suppressAndLogException
     def keyDown(self, event):
