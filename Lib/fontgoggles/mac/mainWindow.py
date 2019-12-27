@@ -157,7 +157,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
-        self._fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize)
+        self._fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize,
+                                  selectionChangedCallback=self.fontListSelectionChangedCallback)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True,
                                                       minMagnification=0.2)
         group.fontList = self._fontListScrollView
@@ -375,6 +376,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                      unicodeName=unicodedata.name(char, "?"))
             )
         self.unicodeList.set(uniListData)
+
+    @objc.python_method
+    def fontListSelectionChangedCallback(self, sender):
+        if len(sender.selection) == 1:
+            fontItem = sender.getFontItem(list(sender.selection)[0])
+            glyphs = fontItem.glyphs
+        else:
+            glyphs = []
+        self.updateGlyphList(glyphs, 0.05)
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):

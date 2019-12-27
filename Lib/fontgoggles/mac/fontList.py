@@ -55,13 +55,14 @@ class FontList(Group):
 
     nsViewClass = FGFontListView
 
-    def __init__(self, fontKeys, width, itemSize):
+    def __init__(self, fontKeys, width, itemSize, selectionChangedCallback=None):
         super().__init__((0, 0, width, 900))
         self._fontItemIdentifiers = []
         self._selection = set()  # a set of fontItemIdentifiers
         self.vertical = 0  # 0, 1: it is also an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"
+        self._selectionChangedCallback = selectionChangedCallback
         self.setupFontItems(fontKeys)
 
     def setupFontItems(self, fontKeys):
@@ -132,7 +133,7 @@ class FontList(Group):
 
     def iterFontItems(self):
         for fontItemIdentifier in self._fontItemIdentifiers:
-            yield getattr(self, fontItemIdentifier)
+            yield self.getFontItem(fontItemIdentifier)
 
     @hookedProperty
     def vertical(self):
@@ -197,13 +198,18 @@ class FontList(Group):
         diffSelection = self._selection ^ newSelection
         self._selection = newSelection
         for fontItemIdentifier in diffSelection:
-            fontItem = getattr(self, fontItemIdentifier)
+            fontItem = self.getFontItem(fontItemIdentifier)
             fontItem.selected = not fontItem.selected
+        if self._selectionChangedCallback is not None:
+            self._selectionChangedCallback(self)
+
+    def getFontItem(self, fontItemIdentifier):
+        return getattr(self, fontItemIdentifier)
 
     def _getSelectionRect(self, selection):
         selRect = None
         for fontItemIdentifier in selection:
-            fontItem = getattr(self, fontItemIdentifier)
+            fontItem = self.getFontItem(fontItemIdentifier)
             if selRect is None:
                 selRect = fontItem._nsObject.frame()
             else:
@@ -285,6 +291,10 @@ class FontItem(Group):
 
     def setGlyphs(self, glyphs, endPos, unitsPerEm):
         self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
+
+    @property
+    def glyphs(self):
+        return self.glyphLineView._nsObject._glyphs
 
     @property
     def minimumExtent(self):
