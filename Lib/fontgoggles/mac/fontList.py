@@ -230,7 +230,7 @@ class FontList(Group):
             if vertical == self.vertical:
                 for ffi in self.selection:
                     fontItem = getattr(self, ffi)
-                    fontItem.glyphLineView._nsObject.shiftSelectedGlyph_(direction)
+                    fontItem.shiftSelectedGlyphs(direction)
                 return
 
             if not self._selection:
@@ -301,6 +301,9 @@ class FontItem(Group):
         else:
             return (10, 0, -10, 17)
 
+    def shiftSelectedGlyphs(self, direction):
+        self.glyphLineView._nsObject.shiftSelectedGlyphs_(direction)
+
 
 class FGGlyphLineView(AppKit.NSView):
 
@@ -337,7 +340,7 @@ class FGGlyphLineView(AppKit.NSView):
     def keyDown_(self, event):
         super().keyDown_(event)
 
-    def shiftSelectedGlyph_(self, direction):
+    def shiftSelectedGlyphs_(self, direction):
         if direction == 1:
             if self._selection:
                 index = min(len(self._glyphs) - 1, max(self._selection) + 1)
