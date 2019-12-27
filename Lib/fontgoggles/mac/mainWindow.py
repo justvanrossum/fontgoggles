@@ -230,13 +230,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
             self.loadingFonts.add(fontKey)
-            isSelectedFont = (fontKey == firstKey)
-            coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData,
-                                  isSelectedFont=isSelectedFont)
+            coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData)
             asyncio.create_task(coro)
 
     @objc.python_method
-    async def _loadFont(self, fontKey, fontItem, sharableFontData, isSelectedFont):
+    async def _loadFont(self, fontKey, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
         fontPath, fontNumber = fontKey
         await self.project.loadFont(fontPath, fontNumber, sharableFontData=sharableFontData)
@@ -247,11 +245,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allFeatureTagsGPOS.update(font.featuresGPOS)
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
         self.allAxes = mergeAxes(self.allAxes, font.axes)
-        self.setFontItemText(fontKey, fontItem, isSelectedFont)
+        self.setFontItemText(fontKey, fontItem)
         self.loadingFonts.remove(fontKey)
         if not self.loadingFonts:
             # All fonts have been loaded
             self.updateSidebarItems()
+            self.fontListSelectionChangedCallback(self._fontList)
 
     def updateSidebarItems(self):
         self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
@@ -305,8 +304,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         t = time.time()
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
-            isSelectedFont = (fontKey == firstKey)
-            self.setFontItemText(fontKey, fontItem, isSelectedFont=isSelectedFont)
+            self.setFontItemText(fontKey, fontItem)
             elapsed = time.time() - t
             if elapsed > 0.01:
                 # time to unblock the event loop
@@ -323,9 +321,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             if self._fontList.height > newExtent + fontListSizePadding:
                 # Shrink the font list
                 self._fontList.height = newExtent
+        self.fontListSelectionChangedCallback(self._fontList)
 
     @objc.python_method
-    def setFontItemText(self, fontKey, fontItem, isSelectedFont):
+    def setFontItemText(self, fontKey, fontItem):
         fontPath, fontNumber = fontKey
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
@@ -333,8 +332,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         glyphs, endPos = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
                                                       varLocation=self.varLocation)
         addBoundingBoxes(glyphs)
-        if isSelectedFont:
-            self.updateGlyphList(glyphs, delay=0.05)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
         minimumExtent = fontItem.minimumExtent
         if not self._fontList.vertical:
