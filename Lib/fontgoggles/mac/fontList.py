@@ -215,6 +215,14 @@ class FontList(Group):
     def getNumFontItems(self):
         return len(self._fontItemIdentifiers)
 
+    def getSingleSelectedItem(self):
+        if len(self._fontItemIdentifiers) == 1:
+            return self.getFontItem(self._fontItemIdentifiers[0])
+        elif len(self.selection) == 1:
+            return self.getFontItem(list(self.selection)[0])
+        else:
+            return None
+
     def _getSelectionRect(self, selection):
         selRect = None
         for fontItemIdentifier in selection:
@@ -308,6 +316,10 @@ class FontItem(Group):
     @property
     def selection(self):
         return self.glyphLineView._nsObject.selection
+
+    @selection.setter
+    def selection(self, newSelection):
+        self.glyphLineView._nsObject.selection = newSelection
 
     @property
     def minimumExtent(self):

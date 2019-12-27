@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import unicodedata
 import time
 import AppKit
@@ -70,6 +71,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.alignmentOverride = None
         self.featureState = {}
         self.varLocation = {}
+        self._settingGlyphListPogrammatically = False
 
         unicodeListGroup = self.setupUnicodeListGroup()
         glyphListGroup = self.setupGlyphListGroup()
@@ -149,7 +151,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.glyphList = List((0, 40, 0, 0), [],
                               columnDescriptions=columnDescriptions,
                               allowsSorting=False, drawFocusRing=False,
-                              rowHeight=20)
+                              rowHeight=20,
+                              selectionCallback=self.glyphListSelectionChangedCallback)
         group.glyphList = self.glyphList
         return group
 
@@ -356,8 +359,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             keyMap = {"ay": "adv"}
         glyphListData = [{keyMap.get(k, k): v for k, v in g.__dict__.items()} for g in glyphs]
-        self.glyphList.set(glyphListData)
-        self.glyphList.setSelection(selection)
+        with self._changingGlyphList():
+            self.glyphList.set(glyphListData)
+            self.glyphList.setSelection(selection)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, delay=0):
@@ -378,12 +382,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def fontListSelectionChangedCallback(self, sender):
-        if len(sender.selection) == 1:
-            fontItem = sender.getFontItem(list(sender.selection)[0])
-            glyphs = fontItem.glyphs
-            selection = fontItem.selection
-        elif len(sender.selection) == 0 and sender.getNumFontItems() == 1:
-            fontItem = list(sender.iterFontItems())[0]
+        fontItem = sender.getSingleSelectedItem()
+        if fontItem is not None:
             glyphs = fontItem.glyphs
             selection = fontItem.selection
         else:
@@ -393,9 +393,24 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def fontListGlyphSelectionChangedCallback(self, sender):
-        if len(sender.selection) == 1:
-            fontItem = sender.getFontItem(list(sender.selection)[0])
-            self.glyphList.setSelection(fontItem.selection)
+        fontItem = sender.getSingleSelectedItem()
+        if fontItem is not None:
+            with self._changingGlyphList():
+                self.glyphList.setSelection(fontItem.selection)
+
+    @contextlib.contextmanager
+    def _changingGlyphList(self):
+        self._settingGlyphListPogrammatically = True
+        yield
+        self._settingGlyphListPogrammatically = False
+
+    @objc.python_method
+    def glyphListSelectionChangedCallback(self, sender):
+        if self._settingGlyphListPogrammatically:
+            return
+        fontItem = self._fontList.getSingleSelectedItem()
+        if fontItem is not None:
+            fontItem.selection = set(self.glyphList.getSelection())
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
