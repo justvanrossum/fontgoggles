@@ -276,7 +276,7 @@ class FontItem(Group):
     def setFontKey(self, fontKey):
         fontPath, fontNumber = fontKey
         fileNameLabel = f"{fontPath.name}"
-        if fontNumber:
+        if fontNumber or fontPath.suffix.lower() in {".ttc", ".otc"}:
             fileNameLabel += f"#{fontNumber}"
         self.fileNameLabel.set(fileNameLabel)
         self.fileNameLabel._nsObject.setToolTip_(str(fontPath))
@@ -332,7 +332,10 @@ class FGGlyphLineView(AppKit.NSView):
         return True
 
     def becomeFirstResponder(self):
-        return self.superview().superview().becomeFirstResponder()
+        # Defer to our FGFontListView
+        fontListView = self.superview().superview()
+        assert isinstance(fontListView, FGFontListView)
+        return fontListView.becomeFirstResponder()
 
     def keyDown_(self, event):
         super().keyDown_(event)
