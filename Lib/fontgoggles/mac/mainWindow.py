@@ -158,7 +158,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
         self._fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize,
-                                  selectionChangedCallback=self.fontListSelectionChangedCallback)
+                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
+                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True,
                                                       minMagnification=0.2)
         group.fontList = self._fontListScrollView
@@ -346,7 +347,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 self._fontList.height = minimumExtent + fontListSizePadding
 
     @asyncTaskAutoCancel
-    async def updateGlyphList(self, glyphs, delay=0):
+    async def updateGlyphList(self, glyphs, selection=(), delay=0):
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
@@ -356,6 +357,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             keyMap = {"ay": "adv"}
         glyphListData = [{keyMap.get(k, k): v for k, v in g.__dict__.items()} for g in glyphs]
         self.glyphList.set(glyphListData)
+        self.glyphList.setSelection(selection)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, delay=0):
@@ -379,12 +381,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if len(sender.selection) == 1:
             fontItem = sender.getFontItem(list(sender.selection)[0])
             glyphs = fontItem.glyphs
+            selection = fontItem.selection
         elif len(sender.selection) == 0 and sender.getNumFontItems() == 1:
             fontItem = list(sender.iterFontItems())[0]
             glyphs = fontItem.glyphs
+            selection = fontItem.selection
         else:
             glyphs = []
-        self.updateGlyphList(glyphs, 0.05)
+            selection = []
+        self.updateGlyphList(glyphs, selection, delay=0.05)
+
+    @objc.python_method
+    def fontListGlyphSelectionChangedCallback(self, sender):
+        if len(sender.selection) == 1:
+            fontItem = sender.getFontItem(list(sender.selection)[0])
+            self.glyphList.setSelection(fontItem.selection)
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):

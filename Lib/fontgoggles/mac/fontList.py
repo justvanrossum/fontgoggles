@@ -55,7 +55,8 @@ class FontList(Group):
 
     nsViewClass = FGFontListView
 
-    def __init__(self, fontKeys, width, itemSize, selectionChangedCallback=None):
+    def __init__(self, fontKeys, width, itemSize, selectionChangedCallback=None,
+                 glyphSelectionChangedCallback=None):
         super().__init__((0, 0, width, 900))
         self._fontItemIdentifiers = []
         self._selection = set()  # a set of fontItemIdentifiers
@@ -63,7 +64,12 @@ class FontList(Group):
         self.itemSize = itemSize
         self.align = "left"
         self._selectionChangedCallback = selectionChangedCallback
+        self._glyphSelectionChangedCallback = glyphSelectionChangedCallback
         self.setupFontItems(fontKeys)
+
+    def _glyphSelectionChanged(self):
+        if self._glyphSelectionChangedCallback is not None:
+            self._glyphSelectionChangedCallback(self)
 
     def setupFontItems(self, fontKeys):
         # clear all subviews
@@ -300,6 +306,10 @@ class FontItem(Group):
         return self.glyphLineView._nsObject._glyphs
 
     @property
+    def selection(self):
+        return self.glyphLineView._nsObject.selection
+
+    @property
     def minimumExtent(self):
         return self.glyphLineView._nsObject.minimumExtent
 
@@ -388,6 +398,9 @@ class FGGlyphLineView(AppKit.NSView):
                 continue
             bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
             self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
+        if diffSelection:
+            fontList = self.superview().superview().vanillaWrapper()
+            fontList._glyphSelectionChanged()
 
     def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
         self._glyphs = glyphs
