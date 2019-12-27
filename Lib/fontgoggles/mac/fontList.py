@@ -355,14 +355,19 @@ class FGGlyphLineView(AppKit.NSView):
         super().keyDown_(event)
 
     def shiftSelectedGlyph_(self, direction):
+        index = None
         if direction == 1:
             if self._selection:
                 index = min(len(self._glyphs) - 1, max(self._selection) + 1)
-                self.selection = {index}
+            elif self._glyphs:
+                index = 0
         else:
             if self._selection:
                 index = max(0, min(self._selection) - 1)
-                self.selection = {index}
+            elif self._glyphs:
+                index = len(self._glyphs) - 1
+        if index is not None:
+            self.selection = {index}
 
     @property
     def selection(self):
