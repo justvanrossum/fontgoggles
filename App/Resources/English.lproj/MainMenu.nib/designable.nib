@@ -549,7 +549,7 @@
 								<object class="NSMenuItem" id="356445786">
 									<reference key="NSMenu" ref="242134042"/>
 									<string key="NSTitle">Show Character list</string>
-									<string key="NSKeyEquiv">U</string>
+									<string key="NSKeyEquiv">1</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="888217921"/>
@@ -558,7 +558,7 @@
 								<object class="NSMenuItem" id="750927309">
 									<reference key="NSMenu" ref="242134042"/>
 									<string key="NSTitle">Show Glyph list</string>
-									<string key="NSKeyEquiv">G</string>
+									<string key="NSKeyEquiv">2</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="888217921"/>
@@ -567,7 +567,7 @@
 								<object class="NSMenuItem" id="319108824">
 									<reference key="NSMenu" ref="242134042"/>
 									<string key="NSTitle">Show Formatting options</string>
-									<string key="NSKeyEquiv">F</string>
+									<string key="NSKeyEquiv">3</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="888217921"/>
