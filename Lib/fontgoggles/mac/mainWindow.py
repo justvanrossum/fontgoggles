@@ -419,6 +419,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if fontItem is None:
             return
         charIndices = set(sender.getSelection())
+        if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
+            toBiDi = self.textInfo.toBiDi
+            charIndices = [toBiDi[charIndex] for charIndex in charIndices]
         selectedGlyphs = {i for i, g in enumerate(fontItem.glyphs) if g.cluster in charIndices}
         self.glyphList.setSelection(selectedGlyphs)
 
