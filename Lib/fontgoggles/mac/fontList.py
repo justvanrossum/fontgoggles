@@ -263,7 +263,6 @@ class FontItem(Group):
         self.fontItemIdentifier = fontItemIdentifier
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
-        self.fileNameLabel._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
 
@@ -293,8 +292,7 @@ class FontItem(Group):
 
     @align.setter
     def align(self, value):
-        nsAlignment = textAlignments.get(value, textAlignments["left"])
-        self.fileNameLabel._nsObject.cell().setAlignment_(nsAlignment)
+        self.fileNameLabel.align = value
         self.glyphLineView._nsObject.align = value
 
     def getFileNameLabelPosSize(self):
@@ -504,6 +502,10 @@ class UnclickableTextBox(TextBox):
 
     nsTextFieldClass = FGUnclickableTextField
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
+
     def set(self, value, tooltip=None):
         super().set(value)
         if tooltip is not None:
@@ -511,3 +513,12 @@ class UnclickableTextBox(TextBox):
 
     def rotate(self, angle):
         self._nsObject.rotateByAngle_(angle)
+
+    @property
+    def align(self):
+        return self._nsObject.alignment()
+
+    @align.setter
+    def align(self, value):
+        nsAlignment = textAlignments.get(value, textAlignments["left"])
+        self._nsObject.cell().setAlignment_(nsAlignment)
