@@ -206,6 +206,9 @@ class FontList(Group):
     def getFontItem(self, fontItemIdentifier):
         return getattr(self, fontItemIdentifier)
 
+    def getNumFontItems(self):
+        return len(self._fontItemIdentifiers)
+
     def _getSelectionRect(self, selection):
         selRect = None
         for fontItemIdentifier in selection:

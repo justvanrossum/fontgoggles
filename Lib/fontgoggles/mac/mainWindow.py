@@ -379,6 +379,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if len(sender.selection) == 1:
             fontItem = sender.getFontItem(list(sender.selection)[0])
             glyphs = fontItem.glyphs
+        elif len(sender.selection) == 0 and sender.getNumFontItems() == 1:
+            fontItem = list(sender.iterFontItems())[0]
+            glyphs = fontItem.glyphs
         else:
             glyphs = []
         self.updateGlyphList(glyphs, 0.05)
