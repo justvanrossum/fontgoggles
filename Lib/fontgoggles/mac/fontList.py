@@ -143,7 +143,7 @@ class FontList(Group):
         for fontItem in self.iterFontItems():
             fontItem.vertical = vertical
             fontItem.fileNameLabel.setPosSize(fontItem.getFileNameLabelPosSize())
-            fontItem.fileNameLabel._nsObject.rotateByAngle_([-90, 90][vertical])
+            fontItem.fileNameLabel.rotate([-90, 90][vertical])
             x, y, w, h = fontItem.getPosSize()
             w, h = h, w
             fontItem.setPosSize((*pos, w, h))
@@ -508,3 +508,6 @@ class UnclickableTextBox(TextBox):
         super().set(value)
         if tooltip is not None:
             self._nsObject.setToolTip_(tooltip)
+
+    def rotate(self, angle):
+        self._nsObject.rotateByAngle_(angle)
