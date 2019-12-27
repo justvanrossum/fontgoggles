@@ -125,7 +125,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         ]
         self.unicodeList = List((0, 40, 0, 0), [],
                                 columnDescriptions=columnDescriptions,
-                                allowsSorting=False, drawFocusRing=False, rowHeight=20)
+                                allowsSorting=False, drawFocusRing=False, rowHeight=20,
+                                selectionCallback=self.unicodeListSelectionChangedCallback)
         self.unicodeShowBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
                                                 callback=self.unicodeShowBiDiCheckBoxCallback)
         group.unicodeShowBiDiCheckBox = self.unicodeShowBiDiCheckBox
@@ -411,6 +412,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontItem = self._fontList.getSingleSelectedItem()
         if fontItem is not None:
             fontItem.selection = set(self.glyphList.getSelection())
+
+    @objc.python_method
+    def unicodeListSelectionChangedCallback(self, sender):
+        fontItem = self._fontList.getSingleSelectedItem()
+        if fontItem is None:
+            return
+        charIndices = set(sender.getSelection())
+        selectedGlyphs = {i for i, g in enumerate(fontItem.glyphs) if g.cluster in charIndices}
+        self.glyphList.setSelection(selectedGlyphs)
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
