@@ -161,10 +161,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
-        self._fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize,
+        self.fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize,
                                   selectionChangedCallback=self.fontListSelectionChangedCallback,
                                   glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback)
-        self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self._fontList, drawBackground=True,
+        self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self.fontList, drawBackground=True,
                                                       minMagnification=0.2)
         group.fontList = self._fontListScrollView
         group.textEntry = self._textEntry
@@ -255,7 +255,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if not self.loadingFonts:
             # All fonts have been loaded
             self.updateSidebarItems()
-            self.fontListSelectionChangedCallback(self._fontList)
+            self.fontListSelectionChangedCallback(self.fontList)
 
     def updateSidebarItems(self):
         self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
@@ -273,7 +273,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.scriptsPopup.setItems(scriptMenuTitles)
 
     def iterFontItems(self):
-        return self._fontList.iterFontItems()
+        return self.fontList.iterFontItems()
 
     @objc.python_method
     def unicodeShowBiDiCheckBoxCallback(self, sender):
@@ -285,7 +285,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.unicodeShowBiDiCheckBox.enable(popupValue == 0)
         vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
         self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
-        self._fontList.vertical = vertical
+        self.fontList.vertical = vertical
         self.textEntryChangedCallback(self._textEntry)
 
     @asyncTaskAutoCancel
@@ -300,7 +300,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             align = self.textInfo.suggestedAlignment
 
-        if align != self._fontList.align:
+        if align != self.fontList.align:
             self.alignmentChangedCallback(self.alignmentPopup)
         else:
             self.updateTextEntryAlignment(align)
@@ -318,15 +318,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         newExtent = 300  # some minimum so that our filename label stays large enough
         for fontItem in self.iterFontItems():
             newExtent = max(newExtent, fontItem.minimumExtent)
-        if not self._fontList.vertical:
-            if self._fontList.width > newExtent + fontListSizePadding:
+        if not self.fontList.vertical:
+            if self.fontList.width > newExtent + fontListSizePadding:
                 # Shrink the font list
-                self._fontList.width = newExtent
+                self.fontList.width = newExtent
         else:
-            if self._fontList.height > newExtent + fontListSizePadding:
+            if self.fontList.height > newExtent + fontListSizePadding:
                 # Shrink the font list
-                self._fontList.height = newExtent
-        self.fontListSelectionChangedCallback(self._fontList)
+                self.fontList.height = newExtent
+        self.fontListSelectionChangedCallback(self.fontList)
 
     @objc.python_method
     def setFontItemText(self, fontKey, fontItem):
@@ -339,23 +339,23 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         addBoundingBoxes(glyphs)
         fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
         minimumExtent = fontItem.minimumExtent
-        if not self._fontList.vertical:
-            if minimumExtent > self._fontList.width:
+        if not self.fontList.vertical:
+            if minimumExtent > self.fontList.width:
                 # We make it a little wider than needed, so as to minimize the
                 # number of times we need to make it grow, as it requires a full
                 # redraw.
-                self._fontList.width = minimumExtent + fontListSizePadding
+                self.fontList.width = minimumExtent + fontListSizePadding
         else:
-            if minimumExtent > self._fontList.height:
+            if minimumExtent > self.fontList.height:
                 # We see above
-                self._fontList.height = minimumExtent + fontListSizePadding
+                self.fontList.height = minimumExtent + fontListSizePadding
 
     @asyncTaskAutoCancel
     async def updateGlyphList(self, glyphs, selection=(), delay=0):
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
-        if not self._fontList.vertical:
+        if not self.fontList.vertical:
             keyMap = {"ax": "adv"}
         else:
             keyMap = {"ay": "adv"}
@@ -409,13 +409,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def glyphListSelectionChangedCallback(self, sender):
         if self._settingGlyphListPogrammatically:
             return
-        fontItem = self._fontList.getSingleSelectedItem()
+        fontItem = self.fontList.getSingleSelectedItem()
         if fontItem is not None:
             fontItem.selection = set(self.glyphList.getSelection())
 
     @objc.python_method
     def unicodeListSelectionChangedCallback(self, sender):
-        fontItem = self._fontList.getSingleSelectedItem()
+        fontItem = self.fontList.getSingleSelectedItem()
         if fontItem is None:
             return
         charIndices = set(sender.getSelection())
@@ -425,13 +425,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
         values = [[None, "left", "right", "center"],
-                  [None, "top", "bottom", "center"]][self._fontList.vertical]
+                  [None, "top", "bottom", "center"]][self.fontList.vertical]
         align = values[sender.get()]
         self.alignmentOverride = align
         if align is None:
             align = self.textInfo.suggestedAlignment
-        self._fontList.align = align
-        if not self._fontList.vertical:
+        self.fontList.align = align
+        if not self.fontList.vertical:
             self._fontListScrollView.hAlign = align
             self._fontListScrollView.vAlign = "top"
         else:
@@ -531,12 +531,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return True
 
     def zoomIn_(self, sender):
-        itemSize = min(1000, round(self._fontList.itemSize * (2 ** (1 / 3))))
-        self._fontList.resizeFontItems(itemSize)
+        itemSize = min(1000, round(self.fontList.itemSize * (2 ** (1 / 3))))
+        self.fontList.resizeFontItems(itemSize)
 
     def zoomOut_(self, sender):
-        itemSize = max(50, round(self._fontList.itemSize / (2 ** (1 / 3))))
-        self._fontList.resizeFontItems(itemSize)
+        itemSize = max(50, round(self.fontList.itemSize / (2 ** (1 / 3))))
+        self.fontList.resizeFontItems(itemSize)
 
 
 class LabeledView(Group):
