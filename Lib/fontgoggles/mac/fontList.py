@@ -338,7 +338,7 @@ class FGGlyphLineView(AppKit.NSView):
         self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
         self._glyphs = None
         self._rectTree = None
-        self._selection = None
+        self._selection = set()
         self._endPos = (0, 0)
         return self
 
@@ -458,7 +458,7 @@ class FGGlyphLineView(AppKit.NSView):
         lastPosX = lastPosY = 0
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
-            selected = self._selection and index in self._selection
+            selected = index in self._selection
             if selected:
                 AppKit.NSColor.redColor().set()
             posX, posY = gi.pos
