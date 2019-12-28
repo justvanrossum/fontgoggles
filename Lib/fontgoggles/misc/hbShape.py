@@ -195,8 +195,7 @@ def characterGlyphMapping(clusters, numChars):
             charToGlyphs[ci].append(glyphIndex)
 
     # assert list(charToGlyphs) == list(range(numChars))
-
-    charToGlyphs = [glyphIndices for ci, glyphIndices in sorted(charToGlyphs.items())]
+    charToGlyphs = [charToGlyphs[ci] for ci in charToGlyphs]
 
     return glyphToChars, charToGlyphs
 
