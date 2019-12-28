@@ -424,7 +424,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def updateUnicodeListSelection(self, fontItem):
         glyphClusters = [g.cluster for g in fontItem.glyphs]
-        numChars = len(self.unicodeList)
+        numChars = len(self.textInfo.text)
         clusterToCharIndex, charIndexToCluster = clusterMapping(glyphClusters, numChars)
         charIndices = {ci for glyphIndex in fontItem.selection for ci in clusterToCharIndex[glyphClusters[glyphIndex]]}
 
@@ -449,7 +449,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             charIndices = {toBiDi[charIndex] for charIndex in charIndices}
 
         glyphClusters = [g.cluster for g in fontItem.glyphs]
-        numChars = len(sender)
+        numChars = len(self.textInfo.text)
         clusterToCharIndex, charIndexToCluster = clusterMapping(glyphClusters, numChars)
         selectedClusters = {charIndexToCluster[charIndex] for charIndex in charIndices}
         selectedGlyphs = {i for i, cluster in enumerate(glyphClusters) if cluster in selectedClusters}
