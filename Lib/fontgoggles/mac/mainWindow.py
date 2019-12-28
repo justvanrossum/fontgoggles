@@ -422,8 +422,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def updateUnicodeListSelection(self, fontItem):
-        charIndices = {ci for glyphIndex in fontItem.selection
-            for ci in fontItem.glyphs.glyphToChars[glyphIndex]}
+        charIndices = fontItem.glyphs.mapGlyphsToChars(fontItem.selection)
 
         if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
             fromBiDi = self.textInfo.fromBiDi
@@ -445,7 +444,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             toBiDi = self.textInfo.toBiDi
             charIndices = {toBiDi[charIndex] for charIndex in charIndices}
 
-        selectedGlyphs = {gi for ci in charIndices for gi in fontItem.glyphs.charToGlyphs[ci]}
+        selectedGlyphs = fontItem.glyphs.mapCharsToGlyphs(charIndices)
         with self.blockCallbackRecursion():
             self.glyphList.setSelection(selectedGlyphs)
             fontItem.selection = selectedGlyphs

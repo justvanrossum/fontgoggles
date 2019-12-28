@@ -158,8 +158,16 @@ class GlyphsRun(list):
         self._glyphToChars = None
         self._charToGlyphs = None
 
+    def mapGlyphsToChars(self, glyphIndices):
+        glyphToChars = self.glyphToChars
+        return {ci for gi in glyphIndices for ci in glyphToChars[gi]}
+
+    def mapCharsToGlyphs(self, charIndices):
+        charToGlyphs = self.charToGlyphs
+        return {gi for ci in charIndices for gi in charToGlyphs[ci]}
+
     def _calcMappings(self):
-        clusters = [gi.cluster for gi in self]
+        clusters = [glyphInfo.cluster for glyphInfo in self]
         self._glyphToChars, self._charToGlyphs = characterGlyphMapping(clusters, self.numChars)
 
     @property
