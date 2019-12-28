@@ -14,6 +14,7 @@ from fontgoggles.mac.fontList import FontList
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
+from fontgoggles.misc.hbShape import clusterMapping
 from fontgoggles.misc.textInfo import TextInfo
 from fontgoggles.misc import opentypeTags
 
@@ -424,8 +425,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         charIndices = set(sender.getSelection())
         if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
             toBiDi = self.textInfo.toBiDi
-            charIndices = [toBiDi[charIndex] for charIndex in charIndices]
-        selectedGlyphs = {i for i, g in enumerate(fontItem.glyphs) if g.cluster in charIndices}
+            charIndices = {toBiDi[charIndex] for charIndex in charIndices}
+
+        clusters = [g.cluster for g in fontItem.glyphs]
+        numChars = len(sender)
+        clusterToCharIndex, charIndexToCluster = clusterMapping(clusters, numChars)
+        selectedClusters = {charIndexToCluster[charIndex] for charIndex in charIndices}
+        selectedGlyphs = {i for i, g in enumerate(fontItem.glyphs) if g.cluster in selectedClusters}
         self.glyphList.setSelection(selectedGlyphs)
 
     @suppressAndLogException
