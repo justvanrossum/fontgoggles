@@ -425,8 +425,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         charIndices = fontItem.glyphs.mapGlyphsToChars(fontItem.selection)
 
         if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
-            fromBiDi = self.textInfo.fromBiDi
-            charIndices = {fromBiDi[charIndex] for charIndex in charIndices}
+            charIndices = self.textInfo.mapSelectionFromBiDi(charIndices)
 
         with self.blockCallbackRecursion():
             self.unicodeList.setSelection(charIndices)
@@ -441,8 +440,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         charIndices = set(sender.getSelection())
         if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
-            toBiDi = self.textInfo.toBiDi
-            charIndices = {toBiDi[charIndex] for charIndex in charIndices}
+            charIndices = self.textInfo.mapSelectionToBiDi(charIndices)
 
         selectedGlyphs = fontItem.glyphs.mapCharsToGlyphs(charIndices)
         with self.blockCallbackRecursion():

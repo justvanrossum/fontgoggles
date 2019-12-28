@@ -14,6 +14,14 @@ class TextInfo:
         self.scriptOverride = None
         self.languageOverride = None
 
+    def mapSelectionToBiDi(self, charIndices):
+        toBiDi = self.toBiDi
+        return {toBiDi[charIndex] for charIndex in charIndices}
+
+    def mapSelectionFromBiDi(self, charIndices):
+        fromBiDi = self.fromBiDi
+        return {fromBiDi[charIndex] for charIndex in charIndices}
+
     @property
     def runLengths(self):
         # TODO XXX: for now, disable segmenting, because I don't really know what I'm doing.
