@@ -336,10 +336,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = self.project.getFont(fontPath, fontNumber, None)
         if font is None:
             return
-        glyphs, endPos = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
+        glyphs = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
                                                       varLocation=self.varLocation)
         addBoundingBoxes(glyphs)
-        fontItem.setGlyphs(glyphs, endPos, font.unitsPerEm)
+        fontItem.setGlyphs(glyphs)
         minimumExtent = fontItem.minimumExtent
         if not self.fontList.vertical:
             if minimumExtent > self.fontList.width:

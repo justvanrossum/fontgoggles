@@ -306,8 +306,8 @@ class FontItem(Group):
             fileNameLabel += f"#{fontNumber}"
         self.fileNameLabel.set(fileNameLabel, tooltip=str(fontPath))
 
-    def setGlyphs(self, glyphs, endPos, unitsPerEm):
-        self.glyphLineView._nsObject.setGlyphs_endPos_upm_(glyphs, endPos, unitsPerEm)
+    def setGlyphs(self, glyphs):
+        self.glyphLineView._nsObject.setGlyphs_(glyphs)
 
     @property
     def glyphs(self):
@@ -414,10 +414,10 @@ class FGGlyphLineView(AppKit.NSView):
             fontList = self.superview().superview().vanillaWrapper()
             fontList._glyphSelectionChanged()
 
-    def setGlyphs_endPos_upm_(self, glyphs, endPos, unitsPerEm):
+    def setGlyphs_(self, glyphs):
         self._glyphs = glyphs
-        self._endPos = endPos
-        self.unitsPerEm = unitsPerEm
+        self._endPos = glyphs.endPos
+        self.unitsPerEm = glyphs.unitsPerEm
         rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._selection = set()

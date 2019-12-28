@@ -147,7 +147,7 @@ async def test_getGlyphRunFromTextInfo(text, expectedGlyphNames, expectedPositio
     numFonts, opener, getSortInfo = getOpener(fontPath)
     font, fontData = await opener(fontPath, 0)
     textInfo = TextInfo(text)
-    glyphs, endPos = font.getGlyphRunFromTextInfo(textInfo)
+    glyphs = font.getGlyphRunFromTextInfo(textInfo)
     glyphNames = [g.name for g in glyphs]
     positions = [g.pos for g in glyphs]
     assert expectedGlyphNames == glyphNames

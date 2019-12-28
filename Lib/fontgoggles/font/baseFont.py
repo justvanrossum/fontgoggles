@@ -1,4 +1,5 @@
 import io
+from typing import Tuple
 from fontTools.ttLib import TTFont
 from ..misc.properties import readOnlyCachedProperty
 from ..misc.hbShape import HBShape
@@ -59,7 +60,8 @@ class BaseFont:
         script = textInfo.scriptOverride
         language = textInfo.languageOverride
 
-        glyphs = []
+        glyphs = GlyphsRun()
+        glyphs.unitsPerEm = self.unitsPerEm
         index = 0
         for rl in runLengths:
             seg = text[index:index + rl]
@@ -78,7 +80,8 @@ class BaseFont:
             gi.pos = x + gi.dx, y + gi.dy
             x += gi.ax
             y += gi.ay
-        return glyphs, (x, y)
+        glyphs.endPos = (x, y)
+        return glyphs
 
     def getGlyphRun(self, txt, *, features=None, varLocation=None,
                     direction=None, language=None, script=None,
@@ -146,3 +149,8 @@ class OTFFont(BaseFont):
 
     def _setVarLocation(self, varLocation):
         self.ftFont.setVarLocation(varLocation if varLocation else {})
+
+
+class GlyphsRun(list):
+    unitsPerEm: int
+    endPos: Tuple[int, int]
