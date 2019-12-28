@@ -430,11 +430,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             toBiDi = self.textInfo.toBiDi
             charIndices = {toBiDi[charIndex] for charIndex in charIndices}
 
-        clusters = [g.cluster for g in fontItem.glyphs]
+        glyphClusters = [g.cluster for g in fontItem.glyphs]
         numChars = len(sender)
-        clusterToCharIndex, charIndexToCluster = clusterMapping(clusters, numChars)
+        clusterToCharIndex, charIndexToCluster = clusterMapping(glyphClusters, numChars)
         selectedClusters = {charIndexToCluster[charIndex] for charIndex in charIndices}
-        selectedGlyphs = {i for i, cluster in enumerate(clusters) if cluster in selectedClusters}
+        selectedGlyphs = {i for i, cluster in enumerate(glyphClusters) if cluster in selectedClusters}
         with self.blockCallbackRecursion():
             self.glyphList.setSelection(selectedGlyphs)
             fontItem.selection = selectedGlyphs
