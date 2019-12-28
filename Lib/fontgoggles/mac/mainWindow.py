@@ -352,6 +352,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 # We see above
                 self.fontList.height = minimumExtent + fontListSizePadding
 
+    @contextlib.contextmanager
+    def blockCallbackRecursion(self):
+        self._callbackRecursionLock = True
+        yield
+        self._callbackRecursionLock = False
+
     @asyncTaskAutoCancel
     async def updateGlyphList(self, glyphs, selection=(), delay=0):
         if delay:
@@ -402,12 +408,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if fontItem is not None:
             with self.blockCallbackRecursion():
                 self.glyphList.setSelection(fontItem.selection)
-
-    @contextlib.contextmanager
-    def blockCallbackRecursion(self):
-        self._callbackRecursionLock = True
-        yield
-        self._callbackRecursionLock = False
 
     @objc.python_method
     def glyphListSelectionChangedCallback(self, sender):
