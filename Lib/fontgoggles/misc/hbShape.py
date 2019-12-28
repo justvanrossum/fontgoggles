@@ -1,6 +1,7 @@
 from collections import defaultdict
-import io
 import functools
+import io
+import itertools
 from fontTools.ttLib import TTFont
 import uharfbuzz as hb
 
@@ -164,45 +165,45 @@ class HBShape:
         return infos
 
 
-def clusterMapping(clusters, numChars):
-    """This implements cluster to char index mapping and vice versa, and
-    should be correct for HB clustering support levels 0 and 1, see:
+def characterGlyphMapping(clusters, numChars):
+    """This implements character to glyph mapping and vice versa, using
+    cluster information from HarfBuzz. It should be correct for HB
+    clustering support levels 0 and 1, see:
 
         https://harfbuzz.github.io/working-with-harfbuzz-clusters.html
 
     "Each character belongs to the cluster that has the highest cluster
     value not larger than its initial cluster value.""
     """
-    clusterToCharIndex = {}
 
-    for c in clusters:
-        clusterToCharIndex[c] = [c]
+    if clusters:
+        assert clusters[0] == 0
 
-    charIndexToCluster = []
-    for index in range(numChars):
-        if index not in clusterToCharIndex:
-            assert index > 0, "cluster list must contain cluster 0"
-            clusterSet = clusterToCharIndex[index - 1]
-            clusterSet.append(index)
-            clusterToCharIndex[index] = clusterSet
-            charIndexToCluster.append(min(clusterSet))
-        else:
-            charIndexToCluster.append(index)
-    clusterToCharIndex = [clusterToCharIndex[cluster] for cluster in sorted(clusterToCharIndex)]
-    return clusterToCharIndex, charIndexToCluster
+    clusterToChars = {}
+    charToCluster = {}
+    for cl, clNext in _pairs(sorted(set(clusters)), numChars):
+        chars = list(range(cl, clNext))
+        clusterToChars[cl] = chars
+        for char in chars:
+            charToCluster[char] = cl
 
+    glyphToChars = [clusterToChars[cl] for cl in clusters]
 
-def characterGlyphMapping(clusters, numChars):
-    clusterToCharIndex, charIndexToCluster = clusterMapping(clusters, numChars)
+    charToGlyphs = defaultdict(list)
+    for glyphIndex, charIndices in enumerate(glyphToChars):
+        for ci in charIndices:
+            charToGlyphs[ci].append(glyphIndex)
 
-    glyphToChars = []
-    clusterToGlyphIndices = defaultdict(list)
-    for glyphIndex, cluster in enumerate(clusters):
-        glyphToChars.append(clusterToCharIndex[cluster])
-        clusterToGlyphIndices[cluster].append(glyphIndex)
+    assert list(charToGlyphs) == list(range(numChars))
 
-    charToGlyphs = []
-    for charIndex in range(numChars):
-        charToGlyphs.append(clusterToGlyphIndices[charIndexToCluster[charIndex]])
+    charToGlyphs = [glyphIndices for ci, glyphIndices in sorted(charToGlyphs.items())]
 
     return glyphToChars, charToGlyphs
+
+
+def _pairs(seq, sentinel):
+    it = itertools.chain(seq, (sentinel,))
+    prev = next(it)
+    for i in it:
+        yield prev, i
+        prev = i
