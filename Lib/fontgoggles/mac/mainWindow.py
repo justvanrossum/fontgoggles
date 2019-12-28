@@ -72,7 +72,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.alignmentOverride = None
         self.featureState = {}
         self.varLocation = {}
-        self._callbackRecursionLock = False
+        self._callbackRecursionLock = 0
 
         unicodeListGroup = self.setupUnicodeListGroup()
         glyphListGroup = self.setupGlyphListGroup()
@@ -354,9 +354,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @contextlib.contextmanager
     def blockCallbackRecursion(self):
-        self._callbackRecursionLock = True
+        self._callbackRecursionLock += 1
         yield
-        self._callbackRecursionLock = False
+        self._callbackRecursionLock -= 1
 
     @asyncTaskAutoCancel
     async def updateGlyphList(self, glyphs, selection=(), delay=0):
@@ -397,6 +397,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if fontItem is not None:
             glyphs = fontItem.glyphs
             selection = fontItem.selection
+            self.updateUnicodeListSelection(fontItem)
         else:
             glyphs = []
             selection = []
@@ -404,10 +405,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def fontListGlyphSelectionChangedCallback(self, sender):
+        if self._callbackRecursionLock:
+            return
         fontItem = sender.getSingleSelectedItem()
         if fontItem is not None:
             with self.blockCallbackRecursion():
                 self.glyphList.setSelection(fontItem.selection)
+                self.updateUnicodeListSelection(fontItem)
 
     @objc.python_method
     def glyphListSelectionChangedCallback(self, sender):
@@ -416,6 +420,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontItem = self.fontList.getSingleSelectedItem()
         if fontItem is not None:
             fontItem.selection = set(self.glyphList.getSelection())
+
+    @objc.python_method
+    def updateUnicodeListSelection(self, fontItem):
+        glyphClusters = [g.cluster for g in fontItem.glyphs]
+        numChars = len(self.unicodeList)
+        clusterToCharIndex, charIndexToCluster = clusterMapping(glyphClusters, numChars)
+        charSelection = {ci for glyphIndex in fontItem.selection for ci in clusterToCharIndex[glyphClusters[glyphIndex]]}
+        with self.blockCallbackRecursion():
+            self.unicodeList.setSelection(charSelection)
 
     @objc.python_method
     def unicodeListSelectionChangedCallback(self, sender):
