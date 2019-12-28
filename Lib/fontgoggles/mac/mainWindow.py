@@ -14,7 +14,6 @@ from fontgoggles.mac.fontList import FontList
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
-from fontgoggles.misc.hbShape import clusterMapping
 from fontgoggles.misc.textInfo import TextInfo
 from fontgoggles.misc import opentypeTags
 
@@ -423,9 +422,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def updateUnicodeListSelection(self, fontItem):
-        clusterToCharIndex = fontItem.glyphs.clusterToCharIndex
         charIndices = {ci for glyphIndex in fontItem.selection
-            for ci in clusterToCharIndex[fontItem.glyphs[glyphIndex].cluster]}
+            for ci in fontItem.glyphs.glyphToChars[glyphIndex]}
 
         if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
             fromBiDi = self.textInfo.fromBiDi
@@ -447,11 +445,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             toBiDi = self.textInfo.toBiDi
             charIndices = {toBiDi[charIndex] for charIndex in charIndices}
 
-        glyphClusters = [g.cluster for g in fontItem.glyphs]
-        numChars = len(self.textInfo.text)
-        clusterToCharIndex, charIndexToCluster = clusterMapping(glyphClusters, numChars)
-        selectedClusters = {charIndexToCluster[charIndex] for charIndex in charIndices}
-        selectedGlyphs = {i for i, cluster in enumerate(glyphClusters) if cluster in selectedClusters}
+        selectedGlyphs = {gi for ci in charIndices for gi in fontItem.glyphs.charToGlyphs[ci]}
         with self.blockCallbackRecursion():
             self.glyphList.setSelection(selectedGlyphs)
             fontItem.selection = selectedGlyphs

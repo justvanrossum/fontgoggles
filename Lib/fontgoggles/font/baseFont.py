@@ -3,7 +3,7 @@ from fontTools.ttLib import TTFont
 from ..misc.properties import readOnlyCachedProperty
 from ..misc.hbShape import HBShape
 from ..misc.ftFont import FTFont
-from ..misc.hbShape import clusterMapping
+from ..misc.hbShape import characterGlyphMapping
 from . import mergeScriptsAndLanguages
 
 
@@ -155,21 +155,21 @@ class GlyphsRun(list):
     def __init__(self, numChars, unitsPerEm):
         self.numChars = numChars
         self.unitsPerEm = unitsPerEm
-        self._clusterToCharIndex = None
-        self._charIndexToCluster = None
+        self._glyphToChars = None
+        self._charToGlyphs = None
 
-    def _calcClusterInfo(self):
+    def _calcMappings(self):
         clusters = [gi.cluster for gi in self]
-        self._clusterToCharIndex, self._charIndexToCluster = clusterMapping(clusters, self.numChars)
+        self._glyphToChars, self._charToGlyphs = characterGlyphMapping(clusters, self.numChars)
 
     @property
-    def clusterToCharIndex(self):
-        if self._clusterToCharIndex is None:
-            self._calcClusterInfo()
-        return self._clusterToCharIndex
+    def glyphToChars(self):
+        if self._glyphToChars is None:
+            self._calcMappings()
+        return self._glyphToChars
 
     @property
-    def charIndexToCluster(self):
-        if self._charIndexToCluster is None:
-            self._calcClusterInfo()
-        return self._charIndexToCluster
+    def charToGlyphs(self):
+        if self._charToGlyphs is None:
+            self._calcMappings()
+        return self._charToGlyphs
