@@ -1,5 +1,4 @@
 import io
-from typing import Tuple
 from fontTools.ttLib import TTFont
 from ..misc.properties import readOnlyCachedProperty
 from ..misc.hbShape import HBShape
@@ -60,8 +59,7 @@ class BaseFont:
         script = textInfo.scriptOverride
         language = textInfo.languageOverride
 
-        glyphs = GlyphsRun()
-        glyphs.unitsPerEm = self.unitsPerEm
+        glyphs = GlyphsRun(len(text), self.unitsPerEm)
         index = 0
         for rl in runLengths:
             seg = text[index:index + rl]
@@ -152,5 +150,25 @@ class OTFFont(BaseFont):
 
 
 class GlyphsRun(list):
-    unitsPerEm: int
-    endPos: Tuple[int, int]
+
+    def __init__(self, numChars, unitsPerEm):
+        self.numChars = numChars
+        self.unitsPerEm = unitsPerEm
+        self._clusterToCharIndex = None
+        self._charIndexToCluster = None
+
+    def _calcClusterInfo(self):
+        clusters = [gi.cluster for gi in self]
+        self._clusterToCharIndex, self._charIndexToCluster = clusterMapping(clusters, self.numChars)
+
+    @property
+    def clusterToCharIndex(self):
+        if self._clusterToCharIndex is None:
+            self._calcClusterInfo()
+        return self._clusterToCharIndex
+
+    @property
+    def charIndexToCluster(self):
+        if self._charIndexToCluster is None:
+            self._calcClusterInfo()
+        return self._charIndexToCluster
