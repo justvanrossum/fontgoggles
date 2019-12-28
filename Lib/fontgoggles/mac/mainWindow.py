@@ -433,7 +433,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         numChars = len(sender)
         clusterToCharIndex, charIndexToCluster = clusterMapping(clusters, numChars)
         selectedClusters = {charIndexToCluster[charIndex] for charIndex in charIndices}
-        selectedGlyphs = {i for i, g in enumerate(fontItem.glyphs) if g.cluster in selectedClusters}
+        selectedGlyphs = {i for i, cluster in enumerate(clusters) if cluster in selectedClusters}
         with self.blockCallbackRecursion():
             self.glyphList.setSelection(selectedGlyphs)
             fontItem.selection = selectedGlyphs
