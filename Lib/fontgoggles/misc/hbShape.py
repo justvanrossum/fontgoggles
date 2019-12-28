@@ -1,3 +1,4 @@
+from collections import defaultdict
 import io
 import functools
 from fontTools.ttLib import TTFont
@@ -175,16 +176,33 @@ def clusterMapping(clusters, numChars):
     clusterToCharIndex = {}
 
     for c in clusters:
-        clusterToCharIndex[c] = {c}
+        clusterToCharIndex[c] = [c]
 
     charIndexToCluster = []
     for index in range(numChars):
         if index not in clusterToCharIndex:
             assert index > 0, "cluster list must contain cluster 0"
             clusterSet = clusterToCharIndex[index - 1]
-            clusterSet.add(index)
+            clusterSet.append(index)
             clusterToCharIndex[index] = clusterSet
             charIndexToCluster.append(min(clusterSet))
         else:
             charIndexToCluster.append(index)
+    clusterToCharIndex = [clusterToCharIndex[cluster] for cluster in sorted(clusterToCharIndex)]
     return clusterToCharIndex, charIndexToCluster
+
+
+def characterGlyphMapping(clusters, numChars):
+    clusterToCharIndex, charIndexToCluster = clusterMapping(clusters, numChars)
+
+    glyphToChars = []
+    clusterToGlyphIndices = defaultdict(list)
+    for glyphIndex, cluster in enumerate(clusters):
+        glyphToChars.append(clusterToCharIndex[cluster])
+        clusterToGlyphIndices[cluster].append(glyphIndex)
+
+    charToGlyphs = []
+    for charIndex in range(numChars):
+        charToGlyphs.append(clusterToGlyphIndices[charIndexToCluster[charIndex]])
+
+    return glyphToChars, charToGlyphs

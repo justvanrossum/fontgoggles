@@ -1,5 +1,5 @@
 import pytest
-from fontgoggles.misc.hbShape import HBShape, clusterMapping
+from fontgoggles.misc.hbShape import HBShape, characterGlyphMapping, clusterMapping
 from testSupport import getFontPath
 
 
@@ -30,13 +30,13 @@ def test_shape_GlyphInfo_repr():
 
 clusterTestData = [
     ([0, 1, 2, 5, 6, 8], 10,
-     {0: {0}, 1: {1}, 2: {2, 3, 4}, 5: {5}, 6: {6, 7}, 8: {8, 9}, 3: {2, 3, 4}, 4: {2, 3, 4}, 7: {6, 7}, 9: {8, 9}},
+     [[0], [1], [2, 3, 4], [2, 3, 4], [2, 3, 4], [5], [6, 7], [6, 7], [8, 9], [8, 9]],
      [0, 1, 2, 2, 2, 5, 6, 6, 8, 8]),
     ([0, 1], 3,
-     {0: {0}, 1: {1, 2}, 2: {1, 2}},
+     [[0], [1, 2], [1, 2]],
      [0, 1, 1]),
     ([], 0,
-     {},
+     [],
      []),
 ]
 
@@ -46,3 +46,31 @@ def test_clusterMapping(clusters, numChars, expectedClusterToCharIndex, expected
     clusterToCharIndex, charIndexToCluster = clusterMapping(clusters, numChars)
     assert clusterToCharIndex == expectedClusterToCharIndex
     assert charIndexToCluster == expectedCharIndexToCluster
+
+
+clusterTestData2 = [
+    ([0, 1, 2, 5, 6, 8], 10,
+     [[0], [1], [2, 3, 4], [5], [6, 7], [8, 9]],
+     [[0], [1], [2], [2], [2], [3], [4], [4], [5], [5]]),
+    ([0, 1], 3,
+     [[0], [1, 2]],
+     [[0], [1], [1]]),
+    ([0, 0, 1], 2,
+     [[0], [0], [1]],
+     [[0, 1], [2]]),
+    ([0, 0, 1, 1], 2,
+     [[0], [0], [1], [1]],
+     [[0, 1], [2, 3]]),
+    ([0, 0, 2, 2], 3,
+     [[0, 1], [0, 1], [2], [2]],
+     [[0, 1], [0, 1], [2, 3]]),
+    ([], 0,
+     [],
+     []),
+]
+
+@pytest.mark.parametrize("clusters,numChars,expectedGlyphToChars,expectedCharToGlyphs", clusterTestData2)
+def test_characterGlyphMapping(clusters, numChars, expectedGlyphToChars, expectedCharToGlyphs):
+    glyphToChars, charToGlyphs = characterGlyphMapping(clusters, numChars)
+    assert glyphToChars == expectedGlyphToChars
+    assert charToGlyphs == expectedCharToGlyphs
