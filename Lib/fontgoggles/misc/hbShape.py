@@ -164,6 +164,14 @@ class HBShape:
 
 
 def clusterMapping(clusters, numChars):
+    """This implements cluster to char index mapping and vice versa, and
+    should be correct for HB clustering support levels 0 and 1, see:
+
+        https://harfbuzz.github.io/working-with-harfbuzz-clusters.html
+
+    "Each character belongs to the cluster that has the highest cluster
+    value not larger than its initial cluster value.""
+    """
     clusterToCharIndex = {}
 
     for c in clusters:
