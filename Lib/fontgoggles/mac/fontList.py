@@ -357,11 +357,9 @@ class FGGlyphLineView(AppKit.NSView):
         self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
         self.selected = False
         self.align = "left"
-        self.unitsPerEm = 1000  # We need a non-zero default, proper value will be set later
         self._glyphs = None
         self._rectTree = None
         self._selection = set()
-        self._endPos = (0, 0)
         return self
 
     def isOpaque(self):
@@ -416,8 +414,6 @@ class FGGlyphLineView(AppKit.NSView):
 
     def setGlyphs_(self, glyphs):
         self._glyphs = glyphs
-        self._endPos = glyphs.endPos
-        self.unitsPerEm = glyphs.unitsPerEm
         rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._selection = set()
@@ -425,12 +421,15 @@ class FGGlyphLineView(AppKit.NSView):
 
     @property
     def minimumExtent(self):
-        return self.margin * 2 + abs(self._endPos[self.vertical]) * self.scaleFactor
+        if self._glyphs is None:
+            return self.margin * 2
+        else:
+            return self.margin * 2 + abs(self._glyphs.endPos[self.vertical]) * self.scaleFactor
 
     @property
     def scaleFactor(self):
         itemSize = self.frame().size[1 - self.vertical]
-        return 0.7 * itemSize / self.unitsPerEm
+        return 0.7 * itemSize / self._glyphs.unitsPerEm
 
     @property
     def margin(self):
@@ -439,7 +438,7 @@ class FGGlyphLineView(AppKit.NSView):
 
     @property
     def origin(self):
-        endPos = abs(self._endPos[self.vertical]) * self.scaleFactor
+        endPos = abs(self._glyphs.endPos[self.vertical]) * self.scaleFactor
         margin = self.margin
         align = self.align
         itemExtent = self.frame().size[self.vertical]
