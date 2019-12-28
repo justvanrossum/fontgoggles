@@ -1,5 +1,5 @@
 import pytest
-from fontgoggles.misc.hbShape import HBShape
+from fontgoggles.misc.hbShape import HBShape, clusterMapping
 from testSupport import getFontPath
 
 
@@ -26,3 +26,20 @@ def test_shape_GlyphInfo_repr():
     s = HBShape.fromPath(getFontPath("IBMPlexSans-Regular.ttf"))
     glyphs = s.shape("a")
     assert repr(glyphs[0]) == "GlyphInfo(gid=4, name='a', cluster=0, dx=0, dy=0, ax=534, ay=0)"
+
+
+clusterTestData = [
+    ([0, 1, 2, 5, 6, 8], 10,
+     {0: {0}, 1: {1}, 2: {2, 3, 4}, 5: {5}, 6: {6, 7}, 8: {8, 9}, 3: {2, 3, 4}, 4: {2, 3, 4}, 7: {6, 7}, 9: {8, 9}},
+     [0, 1, 2, 2, 2, 5, 6, 6, 8, 8]),
+    ([0, 1], 3,
+     {0: {0}, 1: {1, 2}, 2: {1, 2}},
+     [0, 1, 1]),
+]
+
+
+@pytest.mark.parametrize("clusters,numChars,expectedClusterToCharIndex,expectedCharIndexToCluster", clusterTestData)
+def test_clusterMapping(clusters, numChars, expectedClusterToCharIndex, expectedCharIndexToCluster):
+    clusterToCharIndex, charIndexToCluster = clusterMapping(clusters, numChars)
+    assert clusterToCharIndex == expectedClusterToCharIndex
+    assert charIndexToCluster == expectedCharIndexToCluster

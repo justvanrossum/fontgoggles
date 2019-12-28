@@ -161,3 +161,22 @@ class HBShape:
             infos.append(GlyphInfo(info.codepoint, glyphOrder[info.codepoint], info.cluster, *pos.position))
 
         return infos
+
+
+def clusterMapping(clusters, numChars):
+    clusterToCharIndex = {}
+
+    for c in clusters:
+        clusterToCharIndex[c] = {c}
+
+    charIndexToCluster = []
+    for index in range(numChars):
+        if index not in clusterToCharIndex:
+            assert index > 0, "cluster list must contain cluster 0"
+            clusterSet = clusterToCharIndex[index - 1]
+            clusterSet.add(index)
+            clusterToCharIndex[index] = clusterSet
+            charIndexToCluster.append(min(clusterSet))
+        else:
+            charIndexToCluster.append(index)
+    return clusterToCharIndex, charIndexToCluster
