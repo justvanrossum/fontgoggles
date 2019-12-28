@@ -424,6 +424,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontItem = self.fontList.getSingleSelectedItem()
         if fontItem is None:
             return
+
         charIndices = set(sender.getSelection())
         if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
             toBiDi = self.textInfo.toBiDi
