@@ -426,9 +426,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         glyphClusters = [g.cluster for g in fontItem.glyphs]
         numChars = len(self.unicodeList)
         clusterToCharIndex, charIndexToCluster = clusterMapping(glyphClusters, numChars)
-        charSelection = {ci for glyphIndex in fontItem.selection for ci in clusterToCharIndex[glyphClusters[glyphIndex]]}
+        charIndices = {ci for glyphIndex in fontItem.selection for ci in clusterToCharIndex[glyphClusters[glyphIndex]]}
+
+        if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
+            fromBiDi = self.textInfo.fromBiDi
+            charIndices = {fromBiDi[charIndex] for charIndex in charIndices}
+
         with self.blockCallbackRecursion():
-            self.unicodeList.setSelection(charSelection)
+            self.unicodeList.setSelection(charIndices)
 
     @objc.python_method
     def unicodeListSelectionChangedCallback(self, sender):
