@@ -419,6 +419,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def unicodeListSelectionChangedCallback(self, sender):
+        if self._settingGlyphListPogrammatically:
+            return
         fontItem = self.fontList.getSingleSelectedItem()
         if fontItem is None:
             return
@@ -432,7 +434,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         clusterToCharIndex, charIndexToCluster = clusterMapping(clusters, numChars)
         selectedClusters = {charIndexToCluster[charIndex] for charIndex in charIndices}
         selectedGlyphs = {i for i, g in enumerate(fontItem.glyphs) if g.cluster in selectedClusters}
-        self.glyphList.setSelection(selectedGlyphs)
+        with self._changingGlyphList():
+            self.glyphList.setSelection(selectedGlyphs)
+            fontItem.selection = selectedGlyphs
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
