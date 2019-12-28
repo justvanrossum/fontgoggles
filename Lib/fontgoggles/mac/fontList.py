@@ -350,14 +350,12 @@ class FGGlyphLineView(AppKit.NSView):
     def _scheduleRedraw(self):
         self.setNeedsDisplay_(True)
 
-    selected = hookedProperty(_scheduleRedraw)
-    align = hookedProperty(_scheduleRedraw)
+    selected = hookedProperty(_scheduleRedraw, default=False)
+    align = hookedProperty(_scheduleRedraw, default="left")
 
     def init(self):
         self = super().init()
         self.vertical = 0  # 0, 1: it will also be an index into (x, y) tuples
-        self.selected = False
-        self.align = "left"
         self._glyphs = None
         self._rectTree = None
         self._selection = set()
