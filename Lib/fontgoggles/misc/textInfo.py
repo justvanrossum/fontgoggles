@@ -14,13 +14,13 @@ class TextInfo:
         self.scriptOverride = None
         self.languageOverride = None
 
-    def mapSelectionToBiDi(self, charIndices):
+    def mapToBiDi(self, charIndices):
         toBiDi = self.toBiDi
-        return {toBiDi[charIndex] for charIndex in charIndices}
+        return [toBiDi[charIndex] for charIndex in charIndices]
 
-    def mapSelectionFromBiDi(self, charIndices):
+    def mapFromBiDi(self, charIndices):
         fromBiDi = self.fromBiDi
-        return {fromBiDi[charIndex] for charIndex in charIndices}
+        return [fromBiDi[charIndex] for charIndex in charIndices]
 
     @property
     def runLengths(self):
