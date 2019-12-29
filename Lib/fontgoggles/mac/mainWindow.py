@@ -363,7 +363,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._callbackRecursionLock -= 1
 
     @asyncTaskAutoCancel
-    async def updateGlyphList(self, glyphs, selection=(), delay=0):
+    async def updateGlyphList(self, glyphs, delay=0):
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
@@ -374,7 +374,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         glyphListData = [{keyMap.get(k, k): v for k, v in g.__dict__.items()} for g in glyphs]
         with self.blockCallbackRecursion():
             self.glyphList.set(glyphListData)
-            self.glyphList.setSelection(selection)
+            fontItem = self.fontList.getSingleSelectedItem()
+            if fontItem is not None:
+                self.glyphList.setSelection(fontItem.selection)
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, selection=None, delay=0):
@@ -400,12 +402,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontItem = sender.getSingleSelectedItem()
         if fontItem is not None:
             glyphs = fontItem.glyphs
-            selection = fontItem.selection
             self.updateUnicodeListSelection(fontItem)
         else:
             glyphs = []
-            selection = []
-        self.updateGlyphList(glyphs, selection, delay=0.05)
+        self.updateGlyphList(glyphs, delay=0.05)
 
     @objc.python_method
     def fontListGlyphSelectionChangedCallback(self, sender):
