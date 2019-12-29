@@ -422,6 +422,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def updateUnicodeListSelection(self, fontItem):
+        if fontItem.glyphs is None:
+            return
         charIndices = fontItem.glyphs.mapGlyphsToChars(fontItem.selection)
 
         if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
@@ -434,18 +436,20 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def unicodeListSelectionChangedCallback(self, sender):
         if self._callbackRecursionLock:
             return
-        fontItem = self.fontList.getSingleSelectedItem()
-        if fontItem is None:
-            return
+        selectedFontItem = self.fontList.getSingleSelectedItem()
 
         charIndices = set(sender.getSelection())
         if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
             charIndices = self.textInfo.mapToBiDi(charIndices)
 
-        selectedGlyphs = fontItem.glyphs.mapCharsToGlyphs(charIndices)
         with self.blockCallbackRecursion():
-            self.glyphList.setSelection(selectedGlyphs)
-            fontItem.selection = selectedGlyphs
+            for fontItem in self.iterFontItems():
+                if fontItem.glyphs is None:
+                    continue
+                selectedGlyphs = fontItem.glyphs.mapCharsToGlyphs(charIndices)
+                if fontItem is selectedFontItem:
+                    self.glyphList.setSelection(selectedGlyphs)
+                fontItem.selection = selectedGlyphs
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
