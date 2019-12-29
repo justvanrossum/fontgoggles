@@ -33,10 +33,12 @@ directionPopUpConfig = [
     ("Automatic, without BiDi", None),
     ("Left-to-Right", "LTR"),
     ("Right-to-Left", "RTL"),
+    (None, None),  # separator
     ("Top-to-Bottom", "TTB"),
     ("Bottom-to-Top", "BTT"),
 ]
-directionOptions = [label for label, direction in directionPopUpConfig]
+directionOptions = [label if label is not None else AppKit.NSMenuItem.separatorItem()
+                    for label, direction in directionPopUpConfig]
 directionSettings = [direction for label, direction in directionPopUpConfig]
 
 alignmentOptionsHorizontal = [
