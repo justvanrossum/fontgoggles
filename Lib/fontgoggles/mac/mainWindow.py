@@ -525,9 +525,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def featuresChanged(self, sender):
-        featureState = self.featuresGroup.get()
-        featureState = {k: v for k, v in featureState.items() if v is not None}
-        self.featureState = featureState
+        self.featureState = self.featuresGroup.get()
         self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
 
     @objc.python_method

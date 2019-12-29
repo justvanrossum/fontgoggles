@@ -1,3 +1,4 @@
+from collections import defaultdict
 import AppKit
 from vanilla import *
 from fontgoggles.mac.tagView import TagView
@@ -13,7 +14,6 @@ class FeatureTagGroup(Group):
         posSize = (0, 0, width, 50)  # dummy height
         super().__init__(posSize)
         self._callback = callback
-        self._titles = []
         self.setTags(tagGroups)
 
     def setTags(self, tagGroups):
@@ -21,11 +21,13 @@ class FeatureTagGroup(Group):
         for attr, value in list(self.__dict__.items()):
             if isinstance(value, VanillaBaseObject):
                 delattr(self, attr)
+        self._titles = list(tagGroups)
+        self._tagIdentifiers = defaultdict(list)
+        self._state = {}
         margin = 10
         tagWidth = 60
         y = margin
         tagCounter = 0
-        self._titles = list(tagGroups)
         for title, tags in tagGroups.items():
             titleLabel = TextBox((margin, y, -margin, 20), title)
             setattr(self, f"label_{title}", titleLabel)
@@ -34,7 +36,9 @@ class FeatureTagGroup(Group):
                 tagView = TagView((margin, y, tagWidth, 20), tag, None, callback=self._tagStateChanged)
                 friendlyName = TextBox((margin + tagWidth + 6, y + 1, -margin, 20), features.get(tag, ["<unknown>"])[0])
                 friendlyName._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingTail)
-                setattr(self, f"tag_{title}_{tag}", tagView)
+                tagIdentifier = f"tag_{title}_{tag}"
+                self._tagIdentifiers[tag].append(tagIdentifier)
+                setattr(self, tagIdentifier, tagView)
                 setattr(self, f"friendlyName_{title}_{tag}", friendlyName)
                 tagCounter += 1
                 y += 26
@@ -46,26 +50,28 @@ class FeatureTagGroup(Group):
         tag = tagView.tag
         state = tagView.state
         # if a tag occurs in more than one group, reflect the new state
-        for title in self._titles:
-            otherTagView = getattr(self, f"tag_{title}_{tag}", None)
-            if otherTagView is not None and otherTagView is not tagView:
+        for tagIdentifier in self._tagIdentifiers[tag]:
+            otherTagView = getattr(self, tagIdentifier)
+            if otherTagView is not tagView:
                 otherTagView.state = state
+        if state is None:
+            if tag in self._state:
+                del self._state[tag]
+        else:
+            self._state[tag] = state
         callback = self._callback
         if callback is not None:
             callback(self)
 
     def get(self):
-        state = {}
-        for subview in self._nsObject.subviews():
-            if hasattr(subview, "state"):
-                state[subview.tag] = subview.state
-        return state
+        return dict(self._state)
 
     def set(self, state):
-        for subview in self._nsObject.subviews():
-            if hasattr(subview, "state") and subview.tag in state:
-                subview.state = state[subview.tag]
-        return state
+        for tag, tagIdentifiers in self._tagIdentifiers.items():
+            for tagIdentifier in tagIdentifiers:
+                tagView = getattr(self, tagIdentifier)
+                tagView.state = state.get(tag)
+        self._state = dict(state)
 
 
 if __name__ == "__main__":
