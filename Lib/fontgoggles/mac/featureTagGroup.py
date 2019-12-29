@@ -55,8 +55,7 @@ class FeatureTagGroup(Group):
             if otherTagView is not tagView:
                 otherTagView.state = state
         if state is None:
-            if tag in self._state:
-                del self._state[tag]
+            self._state.pop(tag, None)
         else:
             self._state[tag] = state
         callback = self._callback
