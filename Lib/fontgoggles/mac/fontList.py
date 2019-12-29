@@ -472,8 +472,9 @@ class FGGlyphLineView(AppKit.NSView):
         selection = self._selection
         if selection:
             selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(0.9, AppKit.NSColor.systemRedColor())
+            selectedSpaceColor = selectedColor.colorWithAlphaComponent_(0.2)
         else:
-            selectedColor = None
+            selectedColor = selectedSpaceColor = None
 
         backgroundColor.set()
         AppKit.NSRectFill(rect)
@@ -495,11 +496,16 @@ class FGGlyphLineView(AppKit.NSView):
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
             selected = index in selection
-            if selected:
-                selectedColor.set()
             posX, posY = gi.pos
             translate(posX - lastPosX, posY - lastPosY)
             lastPosX, lastPosY = posX, posY
+            if selected:
+                if gi.path.elementCount():
+                    selectedColor.set()
+                else:
+                    selectedSpaceColor.set()
+                    AppKit.NSRectFillUsingOperation(nsRectFromRect(offsetRect(gi.bounds, -posX, -posY)),
+                                                    AppKit.NSCompositeSourceOver)
             gi.path.fill()
             if selected:
                 AppKit.NSColor.textColor().set()

@@ -626,7 +626,27 @@ def addBoundingBoxes(glyphs):
         if gi.path.elementCount():
             gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), *gi.pos)
         else:
-            gi.bounds = None
+            # Empty shape, let's make a bounding box so we can visualize it anyway
+            x, y = gi.pos
+            if glyphs.vertical:
+                xMin = x - glyphs.unitsPerEm
+                xMax = x + glyphs.unitsPerEm
+                if gi.ay:
+                    yMin = y + gi.ay
+                    yMax = y
+                else:
+                    yMin = y - 3
+                    yMax = y + 3
+            else:
+                if gi.ax:
+                    xMin = x
+                    xMax = x + gi.ax
+                else:
+                    xMin = x - 3
+                    xMax = x + 3
+                yMin = y - glyphs.unitsPerEm
+                yMax = y + glyphs.unitsPerEm * 1.5
+            gi.bounds = (xMin, yMin, xMax, yMax)
 
 
 def _tagFromMenuItem(title):
