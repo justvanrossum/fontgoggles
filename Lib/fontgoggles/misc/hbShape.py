@@ -177,7 +177,8 @@ def characterGlyphMapping(clusters, numChars):
     """
 
     if clusters:
-        assert clusters[0] == 0
+        if clusters[-1] != 0:
+            assert clusters[0] == 0
 
     clusterToChars = {}
     charToCluster = {}
@@ -194,8 +195,8 @@ def characterGlyphMapping(clusters, numChars):
         for ci in charIndices:
             charToGlyphs[ci].append(glyphIndex)
 
-    # assert list(charToGlyphs) == list(range(numChars))
-    charToGlyphs = [charToGlyphs[ci] for ci in charToGlyphs]
+    # assert sorted(charToGlyphs) == list(range(numChars)), charToGlyphs
+    charToGlyphs = [charToGlyphs[ci] for ci in sorted(charToGlyphs)]
 
     return glyphToChars, charToGlyphs
 
