@@ -37,8 +37,7 @@ directionPopUpConfig = [
     ("Top-to-Bottom", "TTB"),
     ("Bottom-to-Top", "BTT"),
 ]
-directionOptions = [label if label is not None else AppKit.NSMenuItem.separatorItem()
-                    for label, direction in directionPopUpConfig]
+directionOptions = [label for label, direction in directionPopUpConfig]
 directionSettings = [direction for label, direction in directionPopUpConfig]
 
 alignmentOptionsHorizontal = [
@@ -201,9 +200,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         y = 10
 
+        directions = [label if label is not None else AppKit.NSMenuItem.separatorItem() for label in directionOptions]
+
         self.directionPopUp = LabeledView(
             (10, y, -10, 40), "Direction/orientation:",
-            PopUpButton, directionOptions,
+            PopUpButton, directions,
             callback=self.directionPopUpCallback,
         )
         group.directionPopUp = self.directionPopUp
