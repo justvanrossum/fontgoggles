@@ -238,7 +238,7 @@ class FontList(Group):
             selection = self._selection
         self._nsObject.scrollRectToVisible_(self._getSelectionRect(selection))
 
-    def listItemMouseDown(self, event, fontItemIdentifier):
+    def listItemMouseDown(self, event, fontItemIdentifier, glyphSelectionChanged):
         if event.modifierFlags() & AppKit.NSCommandKeyMask:
             newSelection = self._selection ^ {fontItemIdentifier}
         elif fontItemIdentifier in self._selection:
@@ -248,6 +248,8 @@ class FontList(Group):
         if newSelection is not None:
             self.selection = newSelection
             self.scrollSelectionToVisible({fontItemIdentifier})
+        if glyphSelectionChanged:
+            self._glyphSelectionChanged()
 
     @suppressAndLogException
     def keyDown(self, event):
@@ -390,6 +392,9 @@ class FGGlyphLineView(AppKit.NSView):
                 index = len(self._glyphs) - 1
         if index is not None:
             self.selection = {index}
+            # if diffSelection:
+            fontList = self.superview().superview().vanillaWrapper()
+            fontList._glyphSelectionChanged()
 
     @property
     def selection(self):
@@ -407,9 +412,6 @@ class FGGlyphLineView(AppKit.NSView):
                 continue
             bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
             self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
-        if diffSelection:
-            fontList = self.superview().superview().vanillaWrapper()
-            fontList._glyphSelectionChanged()
 
     @property
     def glyphs(self):
@@ -530,17 +532,20 @@ class FGGlyphLineView(AppKit.NSView):
             else:
                 index = indices[-1]
 
+        selectionChanged = False
         if index is not None:
             if self._selection is None:
                 self._selection = set()
             newSelection = {index}
             if newSelection == self._selection:
                 newSelection = set()  # deselect
-            self.selection = newSelection
+            selectionChanged = self.selection != newSelection
+            if selectionChanged:
+                self.selection = newSelection
 
         fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
         fontList = self.superview().superview().vanillaWrapper()
-        fontList.listItemMouseDown(event, fontItemIdentifier)
+        fontList.listItemMouseDown(event, fontItemIdentifier, selectionChanged)
 
 
 class GlyphLine(Group):
