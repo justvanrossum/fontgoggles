@@ -406,11 +406,18 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def fontListGlyphSelectionChangedCallback(self, sender):
         if self._callbackRecursionLock:
             return
-        fontItem = sender.getSingleSelectedItem()
-        if fontItem is not None:
-            with self.blockCallbackRecursion():
-                self.glyphList.setSelection(fontItem.selection)
-                self.updateUnicodeListSelection(fontItem)
+        selectedFontItem = sender.getSingleSelectedItem()
+        if selectedFontItem is None:
+            return
+        charIndices = selectedFontItem.glyphs.mapGlyphsToChars(selectedFontItem.selection)
+
+        with self.blockCallbackRecursion():
+            for fontItem in self.iterFontItems():
+                if fontItem is selectedFontItem:
+                    self.glyphList.setSelection(fontItem.selection)
+                    self.updateUnicodeListSelection(fontItem)
+                else:
+                    fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
 
     @objc.python_method
     def glyphListSelectionChangedCallback(self, sender):
