@@ -307,6 +307,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         if updateUnicodeList:
             self.updateUnicodeList(delay=0.05)
+        else:
+            charSelection = self.unicodeList.getSelection()
         t = time.time()
         firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
@@ -328,6 +330,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 # Shrink the font list
                 self.fontList.height = newExtent
         self.fontListSelectionChangedCallback(self.fontList)
+        if not updateUnicodeList:
+            self.unicodeList.setSelection(charSelection)
+            self.unicodeListSelectionChangedCallback(self.unicodeList)
 
     @objc.python_method
     def setFontItemText(self, fontKey, fontItem):
