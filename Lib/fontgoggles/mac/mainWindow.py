@@ -121,7 +121,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # dict(title="index", width=34, cell=makeTextCell("right")),
             dict(title="char", width=30, typingSensitive=True, cell=makeTextCell("center")),
             dict(title="unicode", width=60, cell=makeTextCell("right")),
-            dict(title="unicode name", width=200, minWidth=200, key="unicodeName",
+            dict(title="unicode name", width=200, minWidth=200, maxWidth=400, key="unicodeName",
                  cell=makeTextCell("left", "truncmiddle")),
         ]
         self.unicodeList = List((0, 40, 0, 0), [],
