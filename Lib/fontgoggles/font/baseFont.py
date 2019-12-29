@@ -60,7 +60,7 @@ class BaseFont:
         script = textInfo.scriptOverride
         language = textInfo.languageOverride
 
-        glyphs = GlyphsRun(len(text), self.unitsPerEm)
+        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"))
         index = 0
         for rl in runLengths:
             seg = text[index:index + rl]
@@ -152,9 +152,10 @@ class OTFFont(BaseFont):
 
 class GlyphsRun(list):
 
-    def __init__(self, numChars, unitsPerEm):
+    def __init__(self, numChars, unitsPerEm, vertical):
         self.numChars = numChars
         self.unitsPerEm = unitsPerEm
+        self.vertical = vertical
         self._glyphToChars = None
         self._charToGlyphs = None
 
