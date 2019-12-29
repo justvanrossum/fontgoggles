@@ -129,6 +129,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                 selectionCallback=self.unicodeListSelectionChangedCallback)
         self.unicodeShowBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
                                                 callback=self.unicodeShowBiDiCheckBoxCallback)
+        self.unicodeShowBiDiCheckBox._nsObject.setToolTip_(
+            "If this option is on, you see the result of Bi-Directional processing "
+            "in the list below, instead of the original text. It does not affect "
+            "the rendered text.")
         group.unicodeShowBiDiCheckBox = self.unicodeShowBiDiCheckBox
         group.unicodeList = self.unicodeList
         return group
