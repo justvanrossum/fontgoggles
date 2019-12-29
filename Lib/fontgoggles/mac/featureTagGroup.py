@@ -45,7 +45,7 @@ class FeatureTagGroup(Group):
     def _tagStateChanged(self, tagView):
         tag = tagView.tag
         state = tagView.state
-        # if a tag occurs in more than one group, refelct the new state
+        # if a tag occurs in more than one group, reflect the new state
         for title in self._titles:
             otherTagView = getattr(self, f"tag_{title}_{tag}", None)
             if otherTagView is not None and otherTagView is not tagView:
