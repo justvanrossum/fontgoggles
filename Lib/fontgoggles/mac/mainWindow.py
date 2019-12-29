@@ -622,7 +622,7 @@ class LabeledView(Group):
         self.view.setItems(items)
 
 
-_minimimSpaceBox = 12
+_minimalSpaceBox = 12
 
 
 def addBoundingBoxes(glyphs):
@@ -635,19 +635,19 @@ def addBoundingBoxes(glyphs):
             if glyphs.vertical:
                 xMin = x - glyphs.unitsPerEm
                 xMax = x + glyphs.unitsPerEm
-                if abs(gi.ay) >= _minimimSpaceBox:
+                if abs(gi.ay) >= _minimalSpaceBox:
                     yMin = y + gi.ay
                     yMax = y
                 else:
-                    yMin = y - _minimimSpaceBox / 2
-                    yMax = y + _minimimSpaceBox / 2
+                    yMin = y - _minimalSpaceBox / 2
+                    yMax = y + _minimalSpaceBox / 2
             else:
-                if abs(gi.ax) >= _minimimSpaceBox:
+                if abs(gi.ax) >= _minimalSpaceBox:
                     xMin = x
                     xMax = x + gi.ax
                 else:
-                    xMin = x - _minimimSpaceBox / 2
-                    xMax = x + _minimimSpaceBox / 2
+                    xMin = x - _minimalSpaceBox / 2
+                    xMax = x + _minimalSpaceBox / 2
                 yMin = y - glyphs.unitsPerEm
                 yMax = y + glyphs.unitsPerEm * 1.5
             gi.bounds = (xMin, yMin, xMax, yMax)
