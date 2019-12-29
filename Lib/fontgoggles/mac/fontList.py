@@ -467,9 +467,11 @@ class FGGlyphLineView(AppKit.NSView):
             # Blend color could be a pref from the systemXxxxColor colors
             backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.5, AppKit.NSColor.selectedTextBackgroundColor())
 
-        selection = self._selection if self.selected else ()
+        selection = self._selection
         if selection:
             selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(0.9, AppKit.NSColor.systemRedColor())
+        else:
+            selectedColor = None
 
         backgroundColor.set()
         AppKit.NSRectFill(rect)
