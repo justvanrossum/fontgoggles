@@ -255,7 +255,7 @@ class FontList(Group):
         else:
             clickedSelection = set()
 
-        if event.modifierFlags() & AppKit.NSCommandKeyMask:
+        if clickedSelection and event.modifierFlags() & AppKit.NSCommandKeyMask:
             newSelection = self._selection ^ clickedSelection
         elif fontItemIdentifier in self._selection:
             newSelection = None
