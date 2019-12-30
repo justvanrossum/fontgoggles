@@ -287,15 +287,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def unicodeShowBiDiCheckBoxCallback(self, sender):
         self.updateUnicodeList()
 
-    @objc.python_method
-    def directionPopUpCallback(self, sender):
-        popupValue = sender.get()
-        self.unicodeShowBiDiCheckBox.enable(popupValue == 0)
-        vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
-        self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
-        self.fontList.vertical = vertical
-        self.textEntryChangedCallback(self._textEntry)
-
     @asyncTaskAutoCancel
     async def textEntryChangedCallback(self, sender, updateUnicodeList=True):
         self.textInfo = TextInfo(sender.get())
@@ -526,6 +517,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 if fontItem is selectedFontItem:
                     self.glyphList.setSelection(selectedGlyphs)
                 fontItem.selection = selectedGlyphs
+
+    @objc.python_method
+    def directionPopUpCallback(self, sender):
+        popupValue = sender.get()
+        self.unicodeShowBiDiCheckBox.enable(popupValue == 0)
+        vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
+        self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
+        self.fontList.vertical = vertical
+        self.textEntryChangedCallback(self._textEntry)
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
