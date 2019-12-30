@@ -435,21 +435,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def fontListArrowKeyCallback(self, sender, event):
         if not self.fontList.vertical:
-            # flip arrowkeys
-            arrowKeyMap = {
-                AppKit.NSUpArrowFunctionKey: AppKit.NSLeftArrowFunctionKey,
-                AppKit.NSDownArrowFunctionKey: AppKit.NSRightArrowFunctionKey,
-                AppKit.NSLeftArrowFunctionKey: AppKit.NSUpArrowFunctionKey,
-                AppKit.NSRightArrowFunctionKey: AppKit.NSDownArrowFunctionKey,
-            }
-            chars = arrowKeyMap[event.characters()]
-            event = AppKit.NSEvent.keyEventWithType_location_modifierFlags_timestamp_windowNumber_context_characters_charactersIgnoringModifiers_isARepeat_keyCode_(
-                event.type(), event.locationInWindow(), event.modifierFlags(), event.timestamp(),
-                event.windowNumber(), event.context(), chars, chars, event.isARepeat(), event.keyCode())
+            event = transposeArrowKeyEvent(event)
         if len(self.glyphList) > 0:
             self.glyphList._nsObject.documentView().keyDown_(event)
         elif len(self.unicodeList) > 0:
-            self.unicodeList._nsObject.documentView().keyDown_(event)
+            if self.textInfo.text == self.textInfo.originalText:
+                event = flipArrowKeyEvent(event)
+                self.unicodeList._nsObject.documentView().keyDown_(event)
+            else:
+                pass  # TODO: needs work
 
     @objc.python_method
     def glyphListSelectionChangedCallback(self, sender):
@@ -678,3 +672,31 @@ def _tagFromMenuItem(title):
     if len(tag) < 4:
         tag += " " * (4 - len(tag))
     return tag
+
+
+def _remapArrowKeys(event, mapping):
+    chars = mapping.get(event.characters(), event.characters())
+    event = AppKit.NSEvent.keyEventWithType_location_modifierFlags_timestamp_windowNumber_context_characters_charactersIgnoringModifiers_isARepeat_keyCode_(
+        event.type(), event.locationInWindow(), event.modifierFlags(), event.timestamp(),
+        event.windowNumber(), event.context(), chars, chars, event.isARepeat(), event.keyCode())
+    return event
+
+
+def transposeArrowKeyEvent(event):
+    transposeMap = {
+        AppKit.NSUpArrowFunctionKey: AppKit.NSLeftArrowFunctionKey,
+        AppKit.NSDownArrowFunctionKey: AppKit.NSRightArrowFunctionKey,
+        AppKit.NSLeftArrowFunctionKey: AppKit.NSUpArrowFunctionKey,
+        AppKit.NSRightArrowFunctionKey: AppKit.NSDownArrowFunctionKey,
+    }
+    return _remapArrowKeys(event, transposeMap)
+
+
+def flipArrowKeyEvent(event):
+    flipMap = {
+        AppKit.NSUpArrowFunctionKey: AppKit.NSDownArrowFunctionKey,
+        AppKit.NSDownArrowFunctionKey: AppKit.NSUpArrowFunctionKey,
+        AppKit.NSLeftArrowFunctionKey: AppKit.NSRightArrowFunctionKey,
+        AppKit.NSRightArrowFunctionKey: AppKit.NSLeftArrowFunctionKey,
+    }
+    return _remapArrowKeys(event, flipMap)
