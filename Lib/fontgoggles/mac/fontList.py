@@ -414,9 +414,9 @@ class FGGlyphLineView(AppKit.NSView):
                 index = len(self._glyphs) - 1
         if index is not None:
             self.selection = {index}
-            # if diffSelection:
-            fontList = self.superview().superview().vanillaWrapper()
-            fontList._glyphSelectionChanged()
+            if self._lastDiffSelection:
+                fontList = self.superview().superview().vanillaWrapper()
+                fontList._glyphSelectionChanged()
 
     @property
     def selection(self):
