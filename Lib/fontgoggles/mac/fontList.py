@@ -397,9 +397,6 @@ class FGGlyphLineView(AppKit.NSView):
         assert isinstance(fontListView, FGFontListView)
         return fontListView.becomeFirstResponder()
 
-    def keyDown_(self, event):
-        super().keyDown_(event)
-
     def shiftSelectedGlyph_(self, direction):
         index = None
         if direction == 1:
