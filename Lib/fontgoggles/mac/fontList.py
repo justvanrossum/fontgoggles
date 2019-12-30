@@ -270,6 +270,9 @@ class FontList(Group):
             glyphSelectionChanged = bool(fontItem.popDiffSelection())
             clickedSelection = {fontItemIdentifier}
         else:
+            for fontItem in self.iterFontItems():
+                fontItem.selection = set()
+            glyphSelectionChanged = True
             clickedSelection = set()
 
         if clickedSelection and event.modifierFlags() & AppKit.NSCommandKeyMask:

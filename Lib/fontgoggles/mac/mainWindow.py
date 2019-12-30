@@ -412,6 +412,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         selectedFontItem = sender.getSingleSelectedItem()
         if selectedFontItem is None:
+            self.unicodeList.setSelection([])
             return
         charIndices = selectedFontItem.glyphs.mapGlyphsToChars(selectedFontItem.selection)
 
