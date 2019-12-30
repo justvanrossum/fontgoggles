@@ -650,10 +650,10 @@ def addBoundingBoxes(glyphs):
             x, y = gi.pos
             if glyphs.vertical:
                 xMin = x - glyphs.unitsPerEm
-                xMax = x + glyphs.unitsPerEm
+                xMax = x + glyphs.unitsPerEm * 1.5
                 if abs(gi.ay) >= _minimalSpaceBox:
-                    yMin = y + gi.ay
-                    yMax = y
+                    yMax = y - gi.dy
+                    yMin = yMax + gi.ay
                 else:
                     yMin = y - _minimalSpaceBox / 2
                     yMax = y + _minimalSpaceBox / 2
