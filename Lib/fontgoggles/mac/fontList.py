@@ -59,7 +59,7 @@ class FontList(Group):
     nsViewClass = FGFontListView
 
     def __init__(self, fontKeys, width, itemSize, selectionChangedCallback=None,
-                 glyphSelectionChangedCallback=None):
+                 glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
         self._fontItemIdentifiers = []
         self._selection = set()  # a set of fontItemIdentifiers
@@ -68,6 +68,7 @@ class FontList(Group):
         self.align = "left"
         self._selectionChangedCallback = selectionChangedCallback
         self._glyphSelectionChangedCallback = glyphSelectionChangedCallback
+        self._arrowKeyCallback = arrowKeyCallback
         self._lastItemClicked = None
         self.setupFontItems(fontKeys)
 
@@ -270,9 +271,8 @@ class FontList(Group):
         if chars in arrowKeyDefs:
             direction, vertical = arrowKeyDefs[chars]
             if vertical == self.vertical:
-                fontItem = self.getSingleSelectedItem()
-                if fontItem is not None:
-                    fontItem.shiftSelectedGlyph(direction)
+                if self._arrowKeyCallback is not None:
+                    self._arrowKeyCallback(self, event)
                 return
 
             if not self._selection:
@@ -359,9 +359,6 @@ class FontItem(Group):
         else:
             return (10, 0, -10, 17)
 
-    def shiftSelectedGlyph(self, direction):
-        self.glyphLineView._nsObject.shiftSelectedGlyph_(direction)
-
 
 class FGGlyphLineView(AppKit.NSView):
 
@@ -396,24 +393,6 @@ class FGGlyphLineView(AppKit.NSView):
         fontListView = self.superview().superview()
         assert isinstance(fontListView, FGFontListView)
         return fontListView.becomeFirstResponder()
-
-    def shiftSelectedGlyph_(self, direction):
-        index = None
-        if direction == 1:
-            if self._selection:
-                index = min(len(self._glyphs) - 1, max(self._selection) + 1)
-            elif self._glyphs:
-                index = 0
-        else:
-            if self._selection:
-                index = max(0, min(self._selection) - 1)
-            elif self._glyphs:
-                index = len(self._glyphs) - 1
-        if index is not None:
-            self.selection = {index}
-            if self._lastDiffSelection:
-                fontList = self.superview().superview().vanillaWrapper()
-                fontList._glyphSelectionChanged()
 
     @property
     def selection(self):

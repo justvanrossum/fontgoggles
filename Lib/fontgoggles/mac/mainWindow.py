@@ -168,7 +168,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
         self.fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize,
                                   selectionChangedCallback=self.fontListSelectionChangedCallback,
-                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback)
+                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
+                                  arrowKeyCallback=self.fontListArrowKeyCallback)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self.fontList, drawBackground=True,
                                                       minMagnification=0.2)
         group.fontList = self._fontListScrollView
@@ -430,6 +431,25 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     self.updateUnicodeListSelection(fontItem)
                 else:
                     fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
+
+    @objc.python_method
+    def fontListArrowKeyCallback(self, sender, event):
+        if not self.fontList.vertical:
+            # flip arrowkeys
+            arrowKeyMap = {
+                AppKit.NSUpArrowFunctionKey: AppKit.NSLeftArrowFunctionKey,
+                AppKit.NSDownArrowFunctionKey: AppKit.NSRightArrowFunctionKey,
+                AppKit.NSLeftArrowFunctionKey: AppKit.NSUpArrowFunctionKey,
+                AppKit.NSRightArrowFunctionKey: AppKit.NSDownArrowFunctionKey,
+            }
+            chars = arrowKeyMap[event.characters()]
+            event = AppKit.NSEvent.keyEventWithType_location_modifierFlags_timestamp_windowNumber_context_characters_charactersIgnoringModifiers_isARepeat_keyCode_(
+                event.type(), event.locationInWindow(), event.modifierFlags(), event.timestamp(),
+                event.windowNumber(), event.context(), chars, chars, event.isARepeat(), event.keyCode())
+        if len(self.glyphList) > 0:
+            self.glyphList._nsObject.documentView().keyDown_(event)
+        elif len(self.unicodeList) > 0:
+            self.unicodeList._nsObject.documentView().keyDown_(event)
 
     @objc.python_method
     def glyphListSelectionChangedCallback(self, sender):
