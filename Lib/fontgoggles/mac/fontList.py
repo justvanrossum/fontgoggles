@@ -8,6 +8,10 @@ from fontgoggles.misc.properties import delegateProperty, hookedProperty
 from fontgoggles.misc.rectTree import RectTree
 
 
+fontItemMinimumSize = 60
+fontItemMaximumSize = 3000
+
+
 class FGFontListView(AppKit.NSView):
 
     def acceptsFirstResponder(self):
@@ -29,6 +33,11 @@ class FGFontListView(AppKit.NSView):
         scrollView = self.enclosingScrollView()
         clipView = scrollView.contentView()
         if event.phase() == AppKit.NSEventPhaseBegan:
+            fontList = self.vanillaWrapper()
+            minMag = (fontItemMinimumSize / fontList.itemSize)
+            maxMag = (fontItemMaximumSize / fontList.itemSize)
+            scrollView.setMinMagnification_(minMag)
+            scrollView.setMaxMagnification_(maxMag)
             if self._savedBounds is None:
                 self._savedBounds = clipView.bounds()
             # else:
@@ -41,8 +50,11 @@ class FGFontListView(AppKit.NSView):
             magnification = scrollView.magnification()
             scrollView.setMagnification_(1.0)
             fontList = self.vanillaWrapper()
-            fontList.resizeFontItems(round(fontList.itemSize * magnification))
-            clipView.setBounds_(((magnification * scrollX, magnification * scrollY), self._savedBounds.size))
+            newItemSize = round(max(fontItemMinimumSize,
+                                    min(fontItemMaximumSize, fontList.itemSize * magnification)))
+            actualMag = newItemSize / fontList.itemSize
+            fontList.resizeFontItems(newItemSize)
+            clipView.setBounds_(((round(actualMag * scrollX), round(actualMag * scrollY)), self._savedBounds.size))
             scrollView.setMagnification_(1.0)
             self._savedBounds = None
         else:
