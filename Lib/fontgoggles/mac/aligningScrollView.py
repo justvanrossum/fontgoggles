@@ -86,6 +86,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
             return
 
         widthDiff = docBounds.size.width - self._prevDocBounds.size.width
+        heightDiff = docBounds.size.height - self._prevDocBounds.size.height
 
         # Given what we know about our alignment, try to keep the scroll
         # position "the same". So if we are right aligned and we grow,
@@ -99,7 +100,13 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
             self.setBounds_(clipBounds)
         # else: handled by self.constrainBoundsRect_()
 
-        # TODO: handle vertical alignments
+        # Vertical
+        if clipBounds.size.height < docBounds.size.height:
+            if self.vAlign == "bottom":
+                clipBounds.origin.y -= heightDiff
+            elif self.vAlign == "center":
+                clipBounds.origin.y -= heightDiff / 2
+            self.setBounds_(clipBounds)
 
         self._prevDocBounds = docBounds
         super().viewFrameChanged_(notification)
