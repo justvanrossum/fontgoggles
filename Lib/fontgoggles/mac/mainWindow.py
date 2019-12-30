@@ -444,11 +444,29 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                         or self.textInfo.directionForShaper in ("RTL", "BTT"):
                     event = flipArrowKeyEvent(event)
                 self.unicodeList._nsObject.documentView().keyDown_(event)
-            elif self.textInfo.shouldApplyBiDi and self.unicodeShowBiDiCheckBox.get():
+            elif self.unicodeShowBiDiCheckBox.get():
                 self.unicodeList._nsObject.documentView().keyDown_(event)
             else:
+                if event.characters() == AppKit.NSUpArrowFunctionKey:
+                    direction = -1
+                else:
+                    direction = 1
                 charSelection = self.unicodeList.getSelection()
-                # TODO ...
+                if not charSelection:
+                    if direction == -1:
+                        newCharselection = [len(self.unicodeList) - 1]
+                    else:
+                        newCharselection = [0]
+                else:
+                    charSelection = self.textInfo.mapToBiDi(charSelection)
+                    if direction == -1:
+                        newCharselection = [max(0, min(charSelection) - 1)]
+                    else:
+                        newCharselection = [min(len(self.unicodeList) - 1, max(charSelection) + 1)]
+                newCharselection = self.textInfo.mapFromBiDi(newCharselection)
+                if event.modifierFlags() & AppKit.NSShiftKeyMask:
+                    newCharselection = set(newCharselection + self.unicodeList.getSelection())
+                self.unicodeList.setSelection(newCharselection)
 
     @objc.python_method
     def glyphListSelectionChangedCallback(self, sender):
