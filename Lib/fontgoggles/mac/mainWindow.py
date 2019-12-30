@@ -10,7 +10,7 @@ from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
-from fontgoggles.mac.fontList import FontList
+from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
@@ -634,11 +634,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return True
 
     def zoomIn_(self, sender):
-        itemSize = min(1000, round(self.fontList.itemSize * (2 ** (1 / 3))))
+        itemSize = min(fontItemMaximumSize, round(self.fontList.itemSize * (2 ** (1 / 3))))
         self.fontList.resizeFontItems(itemSize)
 
     def zoomOut_(self, sender):
-        itemSize = max(50, round(self.fontList.itemSize / (2 ** (1 / 3))))
+        itemSize = max(fontItemMinimumSize, round(self.fontList.itemSize / (2 ** (1 / 3))))
         self.fontList.resizeFontItems(itemSize)
 
 
