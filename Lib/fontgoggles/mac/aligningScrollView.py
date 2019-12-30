@@ -69,6 +69,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         docView = self.documentView()
         if docView.acceptsFirstResponder():
             self.window().makeFirstResponder_(docView)
+            docView.mouseDown_(event)
 
     @hookedProperty
     def hAlign(self):

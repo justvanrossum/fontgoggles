@@ -247,21 +247,24 @@ class FontList(Group):
     def mouseDown(self, event):
         glyphSelectionChanged = False
         fontItemIdentifier = self._lastItemClicked
-        if fontItemIdentifier is None:
-            # Shouldn't happen -- either way, nothing to do here.
-            return
-        fontItem = self.getFontItem(fontItemIdentifier)
-        glyphSelectionChanged = bool(fontItem.popDiffSelection())
+        self._lastItemClicked = None
+        if fontItemIdentifier is not None:
+            fontItem = self.getFontItem(fontItemIdentifier)
+            glyphSelectionChanged = bool(fontItem.popDiffSelection())
+            clickedSelection = {fontItemIdentifier}
+        else:
+            clickedSelection = set()
 
         if event.modifierFlags() & AppKit.NSCommandKeyMask:
-            newSelection = self._selection ^ {fontItemIdentifier}
+            newSelection = self._selection ^ clickedSelection
         elif fontItemIdentifier in self._selection:
             newSelection = None
         else:
-            newSelection = {fontItemIdentifier}
+            newSelection = clickedSelection
         if newSelection is not None:
             self.selection = newSelection
-            self.scrollSelectionToVisible({fontItemIdentifier})
+            if clickedSelection:
+                self.scrollSelectionToVisible(clickedSelection)
         if glyphSelectionChanged:
             self._glyphSelectionChanged()
 
