@@ -568,8 +568,6 @@ class FGGlyphLineView(AppKit.NSView):
                 index = indices[-1]
 
         if index is not None:
-            if self._selection is None:
-                self._selection = set()
             newSelection = {index}
             if newSelection == self._selection:
                 newSelection = set()  # deselect
