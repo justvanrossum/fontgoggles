@@ -22,26 +22,31 @@ class FGFontListView(AppKit.NSView):
     def keyDown_(self, event):
         self.vanillaWrapper().keyDown(event)
 
+    _savedBounds = None
+
     @suppressAndLogException
     def magnifyWithEvent_(self, event):
-        pass
-        # scrollView = self.enclosingScrollView()
-        # clipView = scrollView.contentView()
-        # if event.phase() == AppKit.NSEventPhaseBegan:
-        #     self._savedClipBounds = clipView.bounds()
-        # if event.phase() == AppKit.NSEventPhaseEnded:
-        #     origin = clipView.bounds().origin
-        #     fontList = self.vanillaWrapper()
-        #     fontList.resizeFontItems(fontList.itemSize * scrollView.magnification())
-
-        #     scrollView.setMagnification_(1.0)  #centeredAtPoint_
-        #     # self._savedClipBounds.origin = clipView.bounds().origin
-        #     bounds = clipView.bounds()
-        #     bounds.origin = origin
-        #     # clipView.setBounds_(bounds)
-        #     del self._savedClipBounds
-        # else:
-        #     super().magnifyWithEvent_(event)
+        scrollView = self.enclosingScrollView()
+        clipView = scrollView.contentView()
+        if event.phase() == AppKit.NSEventPhaseBegan:
+            if self._savedBounds is None:
+                self._savedBounds = clipView.bounds()
+            # else:
+            #     print("hmhmhm", scrollView.magnification())
+        if event.phase() == AppKit.NSEventPhaseEnded:
+            finalBounds = clipView.bounds()
+            x, y = finalBounds.origin
+            dy = clipView.frame().size.height - clipView.bounds().size.height
+            scrollX, scrollY = x, y - dy
+            magnification = scrollView.magnification()
+            scrollView.setMagnification_(1.0)
+            fontList = self.vanillaWrapper()
+            fontList.resizeFontItems(round(fontList.itemSize * magnification))
+            clipView.setBounds_(((magnification * scrollX, magnification * scrollY), self._savedBounds.size))
+            scrollView.setMagnification_(1.0)
+            self._savedBounds = None
+        else:
+            super().magnifyWithEvent_(event)
 
 
 arrowKeyDefs = {

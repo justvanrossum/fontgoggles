@@ -71,9 +71,6 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
             self.window().makeFirstResponder_(docView)
             docView.mouseDown_(event)
 
-    def magnifyWithEvent_(self, event):
-        pass
-
     @hookedProperty
     def hAlign(self):
         self.setBounds_(self.constrainBoundsRect_(self.bounds()))
