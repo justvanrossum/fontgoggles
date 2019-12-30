@@ -440,7 +440,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.glyphList._nsObject.documentView().keyDown_(event)
         elif len(self.unicodeList) > 0:
             if self.textInfo.text == self.textInfo.originalText:
-                if self.textInfo.directionForShaper in ("RTL", "BTT"):
+                if (self.textInfo.directionForShaper is None and self.textInfo.baseDirection == "R") \
+                        or self.textInfo.directionForShaper in ("RTL", "BTT"):
                     event = flipArrowKeyEvent(event)
                 self.unicodeList._nsObject.documentView().keyDown_(event)
             elif self.textInfo.shouldApplyBiDi and self.unicodeShowBiDiCheckBox.get():
