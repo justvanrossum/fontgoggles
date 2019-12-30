@@ -685,6 +685,7 @@ def addBoundingBoxes(glyphs):
                 xMin = x - glyphs.unitsPerEm
                 xMax = x + glyphs.unitsPerEm * 1.5
                 if abs(gi.ay) >= _minimalSpaceBox:
+                    # gi.dy and gi.ay are negative
                     yMax = y - gi.dy
                     yMin = yMax + gi.ay
                 else:
