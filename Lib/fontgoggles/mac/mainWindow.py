@@ -583,6 +583,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):
+        if self.fontList.vertical:
+            align = "left"
         if align == "right":
             nsAlign = AppKit.NSTextAlignmentRight
         elif align == "center":

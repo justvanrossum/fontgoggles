@@ -370,6 +370,9 @@ class FontItem(Group):
 
     @align.setter
     def align(self, value):
+        if self.vertical:
+            mapping = dict(top="left", center="center", bottom="right")
+            value = mapping[value]
         self.fileNameLabel.align = value
         self.glyphLineView._nsObject.align = value
 
