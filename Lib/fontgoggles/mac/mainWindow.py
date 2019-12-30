@@ -440,13 +440,23 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.glyphList._nsObject.documentView().keyDown_(event)
         elif len(self.unicodeList) > 0:
             if self.textInfo.text == self.textInfo.originalText:
+                # Either automatic direction (by bidi algo + HB) or explicit
+                # reversal of direction
                 if (self.textInfo.directionForShaper is None and self.textInfo.baseDirection == "R") \
                         or self.textInfo.directionForShaper in ("RTL", "BTT"):
                     event = flipArrowKeyEvent(event)
                 self.unicodeList._nsObject.documentView().keyDown_(event)
             elif self.unicodeShowBiDiCheckBox.get():
+                # We're showing post-BiDi characters, which should lign up
+                # with our glyphs
                 self.unicodeList._nsObject.documentView().keyDown_(event)
             else:
+                # BiDi processing is on, and we're looking at the original
+                # text sequence (before BiDi processing). We convert our
+                # selection to post-BiDi, base the new selection on that,
+                # then convert back to pre-BiDi. This way we should key
+                # through the glyphs by character, but in the order of the
+                # glyphs.
                 if event.characters() == AppKit.NSUpArrowFunctionKey:
                     direction = -1
                 else:
