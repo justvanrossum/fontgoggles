@@ -568,7 +568,6 @@ class FGGlyphLineView(AppKit.NSView):
                 index = indices[-1]
 
         if index is not None:
-            newSelection = 
             if event.modifierFlags() & AppKit.NSCommandKeyMask:
                 newSelection = self.selection ^ {index}
             elif index in self.selection:
