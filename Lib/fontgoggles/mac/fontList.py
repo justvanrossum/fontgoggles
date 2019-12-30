@@ -16,6 +16,9 @@ class FGFontListView(AppKit.NSView):
     def becomeFirstResponder(self):
         return True
 
+    def mouseDown_(self, event):
+        self.vanillaWrapper().mouseDown(event)
+
     def keyDown_(self, event):
         self.vanillaWrapper().keyDown(event)
 
@@ -250,6 +253,10 @@ class FontList(Group):
             self.scrollSelectionToVisible({fontItemIdentifier})
         if glyphSelectionChanged:
             self._glyphSelectionChanged()
+
+    @suppressAndLogException
+    def mouseDown(self, event):
+        ...
 
     @suppressAndLogException
     def keyDown(self, event):
@@ -552,6 +559,7 @@ class FGGlyphLineView(AppKit.NSView):
         fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
         fontList = self.superview().superview().vanillaWrapper()
         fontList.listItemMouseDown(event, fontItemIdentifier, selectionChanged)
+        super().mouseDown_(event)
 
 
 class GlyphLine(Group):
