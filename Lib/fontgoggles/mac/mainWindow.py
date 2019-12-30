@@ -525,6 +525,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
         self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
         self.fontList.vertical = vertical
+        self.alignmentChangedCallback(self.alignmentPopup)
         self.textEntryChangedCallback(self._textEntry)
 
     @suppressAndLogException
