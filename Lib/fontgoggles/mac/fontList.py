@@ -568,9 +568,13 @@ class FGGlyphLineView(AppKit.NSView):
                 index = indices[-1]
 
         if index is not None:
-            newSelection = {index}
-            if newSelection == self._selection:
-                newSelection = set()  # deselect
+            newSelection = 
+            if event.modifierFlags() & AppKit.NSCommandKeyMask:
+                newSelection = self.selection ^ {index}
+            elif index in self.selection:
+                newSelection = self.selection
+            else:
+                newSelection = {index}
             self.selection = newSelection
 
         # tell our parent we've been clicked on
