@@ -441,6 +441,7 @@ class FGGlyphLineView(AppKit.NSView):
         diffSelection = self._lastDiffSelection
         self._lastDiffSelection = None
         return diffSelection
+
     @property
     def glyphs(self):
         return self._glyphs
