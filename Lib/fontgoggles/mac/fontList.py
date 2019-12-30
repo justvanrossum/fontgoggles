@@ -566,16 +566,13 @@ class FGGlyphLineView(AppKit.NSView):
             else:
                 index = indices[-1]
 
-        selectionChanged = False
         if index is not None:
             if self._selection is None:
                 self._selection = set()
             newSelection = {index}
             if newSelection == self._selection:
                 newSelection = set()  # deselect
-            selectionChanged = self.selection != newSelection
-            if selectionChanged:
-                self.selection = newSelection
+            self.selection = newSelection
 
         # tell our parent we've been clicked on
         fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
