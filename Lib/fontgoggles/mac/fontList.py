@@ -270,8 +270,8 @@ class FontList(Group):
         if chars in arrowKeyDefs:
             direction, vertical = arrowKeyDefs[chars]
             if vertical == self.vertical:
-                for ffi in self.selection:
-                    fontItem = getattr(self, ffi)
+                fontItem = self.getSingleSelectedItem()
+                if fontItem is not None:
                     fontItem.shiftSelectedGlyph(direction)
                 return
 
