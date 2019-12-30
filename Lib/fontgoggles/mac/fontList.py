@@ -68,6 +68,7 @@ class FontList(Group):
         self.align = "left"
         self._selectionChangedCallback = selectionChangedCallback
         self._glyphSelectionChangedCallback = glyphSelectionChangedCallback
+        self._lastItemClicked = None
         self.setupFontItems(fontKeys)
 
     def _glyphSelectionChanged(self):
@@ -241,7 +242,16 @@ class FontList(Group):
             selection = self._selection
         self._nsObject.scrollRectToVisible_(self._getSelectionRect(selection))
 
-    def listItemMouseDown(self, event, fontItemIdentifier, glyphSelectionChanged):
+    @suppressAndLogException
+    def mouseDown(self, event):
+        glyphSelectionChanged = False
+        fontItemIdentifier = self._lastItemClicked
+        if fontItemIdentifier is None:
+            # Shouldn't happen -- either way, nothing to do here.
+            return
+        fontItem = self.getFontItem(fontItemIdentifier)
+        glyphSelectionChanged = bool(fontItem.popDiffSelection())
+
         if event.modifierFlags() & AppKit.NSCommandKeyMask:
             newSelection = self._selection ^ {fontItemIdentifier}
         elif fontItemIdentifier in self._selection:
@@ -253,10 +263,6 @@ class FontList(Group):
             self.scrollSelectionToVisible({fontItemIdentifier})
         if glyphSelectionChanged:
             self._glyphSelectionChanged()
-
-    @suppressAndLogException
-    def mouseDown(self, event):
-        ...
 
     @suppressAndLogException
     def keyDown(self, event):
@@ -331,6 +337,9 @@ class FontItem(Group):
     def selection(self, newSelection):
         self.glyphLineView._nsObject.selection = newSelection
 
+    def popDiffSelection(self):
+        return self.glyphLineView._nsObject.popDiffSelection()
+
     @property
     def minimumExtent(self):
         return self.glyphLineView._nsObject.minimumExtent
@@ -368,7 +377,13 @@ class FGGlyphLineView(AppKit.NSView):
         self._glyphs = None
         self._rectTree = None
         self._selection = set()
+        self._lastDiffSelection = None
         return self
+
+    def popDiffSelection(self):
+        diffSelection = self._lastDiffSelection
+        self._lastDiffSelection = None
+        return diffSelection
 
     def isOpaque(self):
         return True
@@ -419,7 +434,13 @@ class FGGlyphLineView(AppKit.NSView):
                 continue
             bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
             self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
+        self._lastDiffSelection = diffSelection
 
+
+    def popDiffSelection(self):
+        diffSelection = self._lastDiffSelection
+        self._lastDiffSelection = None
+        return diffSelection
     @property
     def glyphs(self):
         return self._glyphs
@@ -556,9 +577,10 @@ class FGGlyphLineView(AppKit.NSView):
             if selectionChanged:
                 self.selection = newSelection
 
+        # tell our parent we've been clicked on
         fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
         fontList = self.superview().superview().vanillaWrapper()
-        fontList.listItemMouseDown(event, fontItemIdentifier, selectionChanged)
+        fontList._lastItemClicked = fontItemIdentifier
         super().mouseDown_(event)
 
 
