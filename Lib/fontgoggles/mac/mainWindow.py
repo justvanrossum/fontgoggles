@@ -110,6 +110,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._textEntry.set(initialText)
         self.textEntryChangedCallback(self._textEntry)
         self.loadFonts()
+        self.w.bind("close", self._windowCloseCallback)
+
+    @suppressAndLogException
+    def _windowCloseCallback(self, sender):
+        self.__dict__.clear()
 
     def windowTitleForDocumentDisplayName_(self, displayName):
         return f"FontGoggles — {displayName}"
