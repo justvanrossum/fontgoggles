@@ -26,14 +26,23 @@ class FGFontListView(AppKit.NSView):
     def keyDown_(self, event):
         self.vanillaWrapper().keyDown(event)
 
+    @suppressAndLogException
+    def magnifyWithEvent_(self, event):
+        super().magnifyWithEvent_(event)
+        if event.phase() == AppKit.NSEventPhaseEnded:
+            fontList = self.vanillaWrapper()
+            for fontItem in fontList.iterFontItems():
+                fontItem.fileNameLabel.setZoom(self.enclosingScrollView().magnification())
+
     _savedBounds = None
 
     @suppressAndLogException
-    def magnifyWithEvent_(self, event):
+    def magnifyWithEvent_disabled_(self, event):
         scrollView = self.enclosingScrollView()
         clipView = scrollView.contentView()
         if event.phase() == AppKit.NSEventPhaseBegan:
             scrollView.setMagnification_(1.0)  # !!
+            super().magnifyWithEvent_(event)
             fontList = self.vanillaWrapper()
             minMag = (fontItemMinimumSize / fontList.itemSize)
             maxMag = (fontItemMaximumSize / fontList.itemSize)
@@ -57,6 +66,8 @@ class FGFontListView(AppKit.NSView):
             actualMag = newItemSize / fontList.itemSize
             fontList.resizeFontItems(newItemSize)
             newBounds = ((round(actualMag * scrollX), round(actualMag * scrollY)), self._savedBounds.size)
+            scrollView.setMagnification_(1.0)
+            newBounds = clipView.constrainBoundsRect_(newBounds)
             clipView.setBounds_(newBounds)
             scrollView.setMagnification_(1.0)
             self._savedBounds = None
@@ -330,7 +341,7 @@ class FontItem(Group):
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.fontItemIdentifier = fontItemIdentifier
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
-        self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
+        self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "")
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
 
@@ -384,9 +395,9 @@ class FontItem(Group):
 
     def getFileNameLabelPosSize(self):
         if self.vertical:
-            return (2, 10, 17, -10)
+            return (2, 10, 0, -10)
         else:
-            return (10, 0, -10, 17)
+            return (10, 0, -10, 0)
 
 
 class FGGlyphLineView(AppKit.NSView):
@@ -606,9 +617,15 @@ class UnclickableTextBox(TextBox):
 
     nsTextFieldClass = FGUnclickableTextField
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, fontSize=12, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fontSize = fontSize
+        self.setZoom(1.0)
         self._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
+
+    def setZoom(self, zoom):
+        font = AppKit.NSFont.systemFontOfSize_(self.fontSize / zoom)
+        self._nsObject.cell().setFont_(font)
 
     def set(self, value, tooltip=None):
         super().set(value)
