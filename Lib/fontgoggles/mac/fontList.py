@@ -155,6 +155,42 @@ class FontList(Group):
         self.setPosSize((x, y, w, h))
         self._nsObject.setNeedsDisplay_(True)
 
+    @suppressAndLogException
+    def resizeFontItems(self, itemSize):
+        # XXX unused at the moment, but perhaps we'll come back it it
+        scaleFactor = itemSize / self.itemSize
+        self.itemSize = itemSize
+        pos = [0, 0]
+        for fontItem in self.iterFontItems():
+            x, y, *wh = fontItem.getPosSize()
+            wh[1 - self.vertical] = itemSize
+            fontItem.setPosSize((*pos, *wh))
+            pos[1 - self.vertical] += itemSize
+
+        # calculate the center of our clip view in relative doc coords
+        # so we can set the scroll position and zoom in/out "from the middle"
+        x, y, w, h = self.getPosSize()
+        clipView = self._nsObject.superview()
+        (cx, cy), (cw, ch) = clipView.bounds()
+        cx += cw / 2
+        cy -= ch / 2
+        cx /= w
+        cy /= h
+
+        if not self.vertical:
+            self.setPosSize((x, y, w * scaleFactor, pos[1]))
+            cx *= w * scaleFactor
+            cy *= pos[1]
+        else:
+            self.setPosSize((x, y, pos[0], h * scaleFactor))
+            cx *= pos[0]
+            cy *= h * scaleFactor
+        cx -= cw / 2
+        cy += ch / 2
+        clipBounds = clipView.bounds()
+        clipBounds.origin = (cx, cy)
+        clipView.setBounds_(clipBounds)
+
     @property
     def selection(self):
         return self._selection
