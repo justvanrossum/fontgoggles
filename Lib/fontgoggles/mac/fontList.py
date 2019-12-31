@@ -471,17 +471,27 @@ class FGGlyphLineView(AppKit.NSView):
         self._lastDiffSelection = diffSelection
 
     def getSelectionRect(self):
+        scaleFactor = self.scaleFactor
+        origin = self.origin
+        extent = self.frame().size[1 - self.vertical]
         bounds = None
         for glyphIndex in self.selection:
-            if bounds is None:
-                bounds = self.glyphs[glyphIndex].bounds
+            gi = self.glyphs[glyphIndex]
+            pos = gi.pos[self.vertical] * scaleFactor + origin[self.vertical]
+            adv = [gi.ax, gi.ay][self.vertical] * scaleFactor
+            delta = [gi.dx, gi.dy][self.vertical] * scaleFactor
+            if self.vertical:
+                box = (0, pos - delta + adv, extent, pos - delta)
             else:
-                bounds = unionRect(bounds, self.glyphs[glyphIndex].bounds)
+                box = (pos + delta, 0, pos + delta + adv, extent)
+            if bounds is None:
+                bounds = box
+            else:
+                bounds = unionRect(bounds, box)
 
         if bounds is None:
             return None
         dx, dy = self.origin
-        bounds = offsetRect(scaleRect(bounds, self.scaleFactor, self.scaleFactor), dx, dy)
         return nsRectFromRect(bounds)
 
     def popDiffSelection(self):
