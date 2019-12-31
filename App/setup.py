@@ -46,6 +46,7 @@ infoplist = dict(
     CFBundleIconFile="fontgoggles.icns",
     NSHumanReadableCopyright=f"Copyright © {datetime.datetime.now().year} Just van Rossum.\nAll rights reserved.",
     NSPrincipalClass="NSApplication",
+    NSRequiresAquaSystemAppearance=False,
     # ATSApplicationFontsPath="Fonts/",
 )
 
