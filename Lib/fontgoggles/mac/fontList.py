@@ -33,6 +33,7 @@ class FGFontListView(AppKit.NSView):
         scrollView = self.enclosingScrollView()
         clipView = scrollView.contentView()
         if event.phase() == AppKit.NSEventPhaseBegan:
+            scrollView.setMagnification_(1.0)  # !!
             fontList = self.vanillaWrapper()
             minMag = (fontItemMinimumSize / fontList.itemSize)
             maxMag = (fontItemMaximumSize / fontList.itemSize)
@@ -43,6 +44,7 @@ class FGFontListView(AppKit.NSView):
             # else:
             #     print("hmhmhm", scrollView.magnification())
         if event.phase() == AppKit.NSEventPhaseEnded:
+            super().magnifyWithEvent_(event)
             finalBounds = clipView.bounds()
             x, y = finalBounds.origin
             dy = clipView.frame().size.height - clipView.bounds().size.height
@@ -54,7 +56,8 @@ class FGFontListView(AppKit.NSView):
                                     min(fontItemMaximumSize, fontList.itemSize * magnification)))
             actualMag = newItemSize / fontList.itemSize
             fontList.resizeFontItems(newItemSize)
-            clipView.setBounds_(((round(actualMag * scrollX), round(actualMag * scrollY)), self._savedBounds.size))
+            newBounds = ((round(actualMag * scrollX), round(actualMag * scrollY)), self._savedBounds.size)
+            clipView.setBounds_(newBounds)
             scrollView.setMagnification_(1.0)
             self._savedBounds = None
         else:
