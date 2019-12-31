@@ -436,6 +436,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             event = transposeArrowKeyEvent(event)
         if len(self.glyphList) > 0:
             self.glyphList._nsObject.documentView().keyDown_(event)
+            self.fontList.scrollGlyphSelectionToVisible()
         elif len(self.unicodeList) > 0:
             if self.textInfo.text == self.textInfo.originalText:
                 # Either automatic direction (by bidi algo + HB) or explicit

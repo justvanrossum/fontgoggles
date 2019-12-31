@@ -1,6 +1,6 @@
 import AppKit
 from vanilla import *
-from fontTools.misc.arrayTools import offsetRect, scaleRect
+from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import textAlignments
 from fontgoggles.misc.decorators import suppressAndLogException
@@ -275,6 +275,12 @@ class FontList(Group):
             selection = self._selection
         self._nsObject.scrollRectToVisible_(self._getSelectionRect(selection))
 
+    def scrollGlyphSelectionToVisible(self):
+        fontItem = self.getSingleSelectedItem()
+        if fontItem is not None:
+            selRect = fontItem.glyphLineView._nsObject.getSelectionRect()
+            fontItem.glyphLineView._nsObject.scrollRectToVisible_(selRect)
+
     @suppressAndLogException
     def mouseDown(self, event):
         glyphSelectionChanged = False
@@ -452,6 +458,20 @@ class FGGlyphLineView(AppKit.NSView):
             bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
             self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
         self._lastDiffSelection = diffSelection
+
+    def getSelectionRect(self):
+        bounds = None
+        for glyphIndex in self.selection:
+            if bounds is None:
+                bounds = self.glyphs[glyphIndex].bounds
+            else:
+                bounds = unionRect(bounds, self.glyphs[glyphIndex].bounds)
+
+        if bounds is None:
+            return None
+        dx, dy = self.origin
+        bounds = offsetRect(scaleRect(bounds, self.scaleFactor, self.scaleFactor), dx, dy)
+        return nsRectFromRect(bounds)
 
     def popDiffSelection(self):
         diffSelection = self._lastDiffSelection
