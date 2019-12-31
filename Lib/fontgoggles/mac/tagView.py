@@ -57,7 +57,7 @@ class FGTagView(AppKit.NSView):
         path = AppKit.NSBezierPath.bezierPathWithRoundedRect_xRadius_yRadius_(self.bounds(), radius, radius)
         path.fill()
 
-        textColor = grayColor(1)
+        textColor = AppKit.NSColor.textBackgroundColor()
         drawText(self.tag, (x + 12, y + 1), textColor, AppKit.NSFont.userFixedPitchFontOfSize_(14))
 
 
