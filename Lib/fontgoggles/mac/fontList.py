@@ -453,7 +453,6 @@ class FGGlyphLineView(AppKit.NSView):
             self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
         self._lastDiffSelection = diffSelection
 
-
     def popDiffSelection(self):
         diffSelection = self._lastDiffSelection
         self._lastDiffSelection = None
