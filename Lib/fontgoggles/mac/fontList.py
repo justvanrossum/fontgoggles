@@ -8,6 +8,10 @@ from fontgoggles.misc.properties import delegateProperty, hookedProperty
 from fontgoggles.misc.rectTree import RectTree
 
 
+fontItemMinimumSize = 60
+fontItemMaximumSize = 1500
+
+
 class FGFontListView(AppKit.NSView):
 
     def acceptsFirstResponder(self):
@@ -22,12 +26,53 @@ class FGFontListView(AppKit.NSView):
     def keyDown_(self, event):
         self.vanillaWrapper().keyDown(event)
 
+    def subscribeToMagnification_(self, scrollView):
+        AppKit.NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(
+                self, "_liveMagnifyWillStart:", AppKit.NSScrollViewWillStartLiveMagnifyNotification,
+                scrollView)
+        AppKit.NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(
+                self, "_liveMagnifyDidEnd:", AppKit.NSScrollViewDidEndLiveMagnifyNotification,
+                scrollView)
+
+    _nestedZoom = 0
+
     @suppressAndLogException
-    def magnifyWithEvent_(self, event):
-        super().magnifyWithEvent_(event)
-        if event.phase() == AppKit.NSEventPhaseEnded:
+    def _liveMagnifyWillStart_(self, notification):
+        if self._nestedZoom == 0:
+            self._savedClipBounds = self.superview().bounds()
+            scrollView = notification.object()
             fontList = self.vanillaWrapper()
-            fontList.setZoom(self.enclosingScrollView().magnification())
+            minMag = (fontItemMinimumSize / fontList.itemSize)
+            maxMag = (fontItemMaximumSize / fontList.itemSize)
+            scrollView.setMinMagnification_(minMag)
+            scrollView.setMaxMagnification_(maxMag)
+        self._nestedZoom += 1
+
+    @suppressAndLogException
+    def _liveMagnifyDidEnd_(self, notification):
+        self._nestedZoom -= 1
+        if self._nestedZoom == 0:
+            scrollView = notification.object()
+            clipView = self.superview()
+
+            finalBounds = clipView.bounds()
+            x, y = finalBounds.origin
+            dy = clipView.frame().size.height - clipView.bounds().size.height
+            scrollX, scrollY = x, y - dy
+            magnification = scrollView.magnification()
+            scrollView.setMagnification_(1.0)
+
+            fontList = self.vanillaWrapper()
+            newItemSize = round(max(fontItemMinimumSize,
+                                    min(fontItemMaximumSize, fontList.itemSize * magnification)))
+            actualMag = newItemSize / fontList.itemSize
+            fontList.resizeFontItems(newItemSize)
+            newBounds = ((round(actualMag * scrollX), round(actualMag * scrollY)), self._savedClipBounds.size)
+            scrollView.setMagnification_(1.0)
+            newBounds = clipView.constrainBoundsRect_(newBounds)
+            clipView.setBounds_(newBounds)
+            scrollView.setMagnification_(1.0)
+            self._savedClipBounds = None
 
 
 arrowKeyDefs = {
@@ -77,10 +122,6 @@ class FontList(Group):
             self._fontItemIdentifiers.append(fontItemIdentifier)
             y += itemSize
         self.setPosSize((0, 0, self.width, y))
-
-    def setZoom(self, zoom):
-        for fontItem in self.iterFontItems():
-            fontItem.fileNameLabel.setZoom(zoom)
 
     @property
     def width(self):
@@ -301,7 +342,7 @@ class FontItem(Group):
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.fontItemIdentifier = fontItemIdentifier
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
-        self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "")
+        self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
 
@@ -355,9 +396,9 @@ class FontItem(Group):
 
     def getFileNameLabelPosSize(self):
         if self.vertical:
-            return (2, 10, 0, -10)
+            return (2, 10, 17, -10)
         else:
-            return (10, 0, -10, 0)
+            return (10, 0, -10, 17)
 
 
 class FGGlyphLineView(AppKit.NSView):
@@ -579,13 +620,7 @@ class UnclickableTextBox(TextBox):
 
     def __init__(self, *args, fontSize=12, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fontSize = fontSize
-        self.setZoom(1.0)
         self._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
-
-    def setZoom(self, zoom):
-        font = AppKit.NSFont.systemFontOfSize_(self.fontSize / zoom)
-        self._nsObject.cell().setFont_(font)
 
     def set(self, value, tooltip=None):
         super().set(value)

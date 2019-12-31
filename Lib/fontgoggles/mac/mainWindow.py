@@ -10,7 +10,7 @@ from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
-from fontgoggles.mac.fontList import FontList
+from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
@@ -174,6 +174,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                                       minMagnification=0.4, maxMagnification=15)
         group.fontList = self._fontListScrollView
         group.textEntry = self._textEntry
+        self.fontList._nsObject.subscribeToMagnification_(self._fontListScrollView._nsObject)
         return group
 
     @objc.python_method
@@ -638,14 +639,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return True
 
     def zoomIn_(self, sender):
-        scrollView = self.fontList._nsObject.enclosingScrollView()
-        scrollView.setMagnification_(scrollView.magnification() * (2 ** (1 / 3)))
-        self.fontList.setZoom(scrollView.magnification())
+        itemSize = min(fontItemMaximumSize, round(self.fontList.itemSize * (2 ** (1 / 3))))
+        self.fontList.resizeFontItems(itemSize)
 
     def zoomOut_(self, sender):
-        scrollView = self.fontList._nsObject.enclosingScrollView()
-        scrollView.setMagnification_(scrollView.magnification() / (2 ** (1 / 3)))
-        self.fontList.setZoom(scrollView.magnification())
+        itemSize = max(fontItemMinimumSize, round(self.fontList.itemSize / (2 ** (1 / 3))))
+        self.fontList.resizeFontItems(itemSize)
 
 
 class LabeledView(Group):
