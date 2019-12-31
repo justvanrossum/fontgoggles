@@ -10,7 +10,7 @@ from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
-from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize
+from fontgoggles.mac.fontList import FontList
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
@@ -171,7 +171,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                   glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                   arrowKeyCallback=self.fontListArrowKeyCallback)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self.fontList, drawBackground=True,
-                                                      minMagnification=0.2)
+                                                      minMagnification=0.4, maxMagnification=15)
         group.fontList = self._fontListScrollView
         group.textEntry = self._textEntry
         return group
@@ -638,12 +638,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return True
 
     def zoomIn_(self, sender):
-        itemSize = min(fontItemMaximumSize, round(self.fontList.itemSize * (2 ** (1 / 3))))
-        self.fontList.resizeFontItems(itemSize)
+        scrollView = self.fontList._nsObject.enclosingScrollView()
+        scrollView.setMagnification_(scrollView.magnification() * (2 ** (1 / 3)))
+        self.fontList.setZoom(scrollView.magnification())
 
     def zoomOut_(self, sender):
-        itemSize = max(fontItemMinimumSize, round(self.fontList.itemSize / (2 ** (1 / 3))))
-        self.fontList.resizeFontItems(itemSize)
+        scrollView = self.fontList._nsObject.enclosingScrollView()
+        scrollView.setMagnification_(scrollView.magnification() / (2 ** (1 / 3)))
+        self.fontList.setZoom(scrollView.magnification())
 
 
 class LabeledView(Group):

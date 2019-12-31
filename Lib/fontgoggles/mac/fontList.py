@@ -8,10 +8,6 @@ from fontgoggles.misc.properties import delegateProperty, hookedProperty
 from fontgoggles.misc.rectTree import RectTree
 
 
-fontItemMinimumSize = 60
-fontItemMaximumSize = 3000
-
-
 class FGFontListView(AppKit.NSView):
 
     def acceptsFirstResponder(self):
@@ -31,48 +27,7 @@ class FGFontListView(AppKit.NSView):
         super().magnifyWithEvent_(event)
         if event.phase() == AppKit.NSEventPhaseEnded:
             fontList = self.vanillaWrapper()
-            for fontItem in fontList.iterFontItems():
-                fontItem.fileNameLabel.setZoom(self.enclosingScrollView().magnification())
-
-    _savedBounds = None
-
-    @suppressAndLogException
-    def magnifyWithEvent_disabled_(self, event):
-        scrollView = self.enclosingScrollView()
-        clipView = scrollView.contentView()
-        if event.phase() == AppKit.NSEventPhaseBegan:
-            scrollView.setMagnification_(1.0)  # !!
-            super().magnifyWithEvent_(event)
-            fontList = self.vanillaWrapper()
-            minMag = (fontItemMinimumSize / fontList.itemSize)
-            maxMag = (fontItemMaximumSize / fontList.itemSize)
-            scrollView.setMinMagnification_(minMag)
-            scrollView.setMaxMagnification_(maxMag)
-            if self._savedBounds is None:
-                self._savedBounds = clipView.bounds()
-            # else:
-            #     print("hmhmhm", scrollView.magnification())
-        if event.phase() == AppKit.NSEventPhaseEnded:
-            super().magnifyWithEvent_(event)
-            finalBounds = clipView.bounds()
-            x, y = finalBounds.origin
-            dy = clipView.frame().size.height - clipView.bounds().size.height
-            scrollX, scrollY = x, y - dy
-            magnification = scrollView.magnification()
-            scrollView.setMagnification_(1.0)
-            fontList = self.vanillaWrapper()
-            newItemSize = round(max(fontItemMinimumSize,
-                                    min(fontItemMaximumSize, fontList.itemSize * magnification)))
-            actualMag = newItemSize / fontList.itemSize
-            fontList.resizeFontItems(newItemSize)
-            newBounds = ((round(actualMag * scrollX), round(actualMag * scrollY)), self._savedBounds.size)
-            scrollView.setMagnification_(1.0)
-            newBounds = clipView.constrainBoundsRect_(newBounds)
-            clipView.setBounds_(newBounds)
-            scrollView.setMagnification_(1.0)
-            self._savedBounds = None
-        else:
-            super().magnifyWithEvent_(event)
+            fontList.setZoom(self.enclosingScrollView().magnification())
 
 
 arrowKeyDefs = {
@@ -122,6 +77,10 @@ class FontList(Group):
             self._fontItemIdentifiers.append(fontItemIdentifier)
             y += itemSize
         self.setPosSize((0, 0, self.width, y))
+
+    def setZoom(self, zoom):
+        for fontItem in self.iterFontItems():
+            fontItem.fileNameLabel.setZoom(zoom)
 
     @property
     def width(self):
