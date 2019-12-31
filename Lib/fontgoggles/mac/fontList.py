@@ -280,6 +280,17 @@ class FontList(Group):
         if fontItem is not None:
             selRect = fontItem.glyphLineView._nsObject.getSelectionRect()
             fontItem.glyphLineView._nsObject.scrollRectToVisible_(selRect)
+        else:
+            rects = []
+            for fontItem in self.iterFontItems():
+                view = fontItem.glyphLineView._nsObject
+                x, y = fontItem._nsObject.frame().origin
+                rects.append(AppKit.NSOffsetRect(view.getSelectionRect(), x, y))
+            if rects:
+                selRect = rects[0]
+                for rect in rects[1:]:
+                    selRect = AppKit.NSUnionRect(selRect, rect)
+                self._nsObject.scrollRectToVisible_(selRect)
 
     @suppressAndLogException
     def mouseDown(self, event):
