@@ -284,7 +284,9 @@ class FontList(Group):
         for fontItem in fontItems:
             view = fontItem.glyphLineView._nsObject
             x, y = fontItem._nsObject.frame().origin
-            rects.append(AppKit.NSOffsetRect(view.getSelectionRect(), x, y))
+            selRect = view.getSelectionRect()
+            if selRect is not None:
+                rects.append(AppKit.NSOffsetRect(selRect, x, y))
         if rects:
             selRect = rects[0]
             for rect in rects[1:]:

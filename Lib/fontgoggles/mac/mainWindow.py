@@ -492,6 +492,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     self.updateUnicodeListSelection(fontItem)
                 else:
                     fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
+        self.fontList.scrollGlyphSelectionToVisible()
 
     @objc.python_method
     def updateUnicodeListSelection(self, fontItem):
@@ -523,6 +524,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 if fontItem is selectedFontItem:
                     self.glyphList.setSelection(selectedGlyphs)
                 fontItem.selection = selectedGlyphs
+        self.fontList.scrollGlyphSelectionToVisible()
 
     @objc.python_method
     def directionPopUpCallback(self, sender):
