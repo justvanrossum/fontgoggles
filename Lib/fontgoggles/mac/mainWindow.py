@@ -81,7 +81,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="glyphList", canCollapse=True,
-                 size=220, resizeFlexibility=False),
+                 size=230, minSize=80, resizeFlexibility=False),
             dict(view=fontListGroup, identifier="fontList", canCollapse=False,
                  size=200),
         ]
@@ -148,7 +148,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         columnDescriptions = [
             # dict(title="index", width=34, cell=makeTextCell("right")),
-            dict(title="glyph", key="name", width=70, minWidth=70, maxWidth=200,
+            dict(title="glyph", key="name", width=80, minWidth=80, maxWidth=200,
                  typingSensitive=True, cell=makeTextCell("left", lineBreakMode="truncmiddle")),
             # "adv" is "ax" or "ay", depending on whether we are in vertical layout mode or not:
             dict(title="adv", key="adv", width=45, cell=makeTextCell("right")),
