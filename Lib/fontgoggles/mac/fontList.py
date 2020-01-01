@@ -276,21 +276,20 @@ class FontList(Group):
         self._nsObject.scrollRectToVisible_(self._getSelectionRect(selection))
 
     def scrollGlyphSelectionToVisible(self):
-        fontItem = self.getSingleSelectedItem()
-        if fontItem is not None:
-            selRect = fontItem.glyphLineView._nsObject.getSelectionRect()
-            fontItem.glyphLineView._nsObject.scrollRectToVisible_(selRect)
+        if self.selection:
+            fontItems = (self.getFontItem(fii) for fii in self.selection)
         else:
-            rects = []
-            for fontItem in self.iterFontItems():
-                view = fontItem.glyphLineView._nsObject
-                x, y = fontItem._nsObject.frame().origin
-                rects.append(AppKit.NSOffsetRect(view.getSelectionRect(), x, y))
-            if rects:
-                selRect = rects[0]
-                for rect in rects[1:]:
-                    selRect = AppKit.NSUnionRect(selRect, rect)
-                self._nsObject.scrollRectToVisible_(selRect)
+            fontItems = (self.getFontItem(fii) for fii in self._fontItemIdentifiers)
+        rects = []
+        for fontItem in fontItems:
+            view = fontItem.glyphLineView._nsObject
+            x, y = fontItem._nsObject.frame().origin
+            rects.append(AppKit.NSOffsetRect(view.getSelectionRect(), x, y))
+        if rects:
+            selRect = rects[0]
+            for rect in rects[1:]:
+                selRect = AppKit.NSUnionRect(selRect, rect)
+            self._nsObject.scrollRectToVisible_(selRect)
 
     @suppressAndLogException
     def mouseDown(self, event):
