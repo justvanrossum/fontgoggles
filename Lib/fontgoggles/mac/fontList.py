@@ -28,11 +28,11 @@ class FGFontListView(AppKit.NSView):
 
     def subscribeToMagnification_(self, scrollView):
         AppKit.NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(
-                self, "_liveMagnifyWillStart:", AppKit.NSScrollViewWillStartLiveMagnifyNotification,
-                scrollView)
+            self, "_liveMagnifyWillStart:", AppKit.NSScrollViewWillStartLiveMagnifyNotification,
+            scrollView)
         AppKit.NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(
-                self, "_liveMagnifyDidEnd:", AppKit.NSScrollViewDidEndLiveMagnifyNotification,
-                scrollView)
+            self, "_liveMagnifyDidEnd:", AppKit.NSScrollViewDidEndLiveMagnifyNotification,
+            scrollView)
 
     _nestedZoom = 0
 
@@ -434,11 +434,6 @@ class FGGlyphLineView(AppKit.NSView):
         self._lastDiffSelection = None
         return self
 
-    def popDiffSelection(self):
-        diffSelection = self._lastDiffSelection
-        self._lastDiffSelection = None
-        return diffSelection
-
     def isOpaque(self):
         return True
 
@@ -552,11 +547,13 @@ class FGGlyphLineView(AppKit.NSView):
 
         if self.selected:
             # Blend color could be a pref from the systemXxxxColor colors
-            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(0.5, AppKit.NSColor.selectedTextBackgroundColor())
+            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(
+                0.5, AppKit.NSColor.selectedTextBackgroundColor())
 
         selection = self._selection
         if selection:
-            selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(0.9, AppKit.NSColor.systemRedColor())
+            selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(
+                0.9, AppKit.NSColor.systemRedColor())
             selectedSpaceColor = selectedColor.colorWithAlphaComponent_(0.2)
         else:
             selectedColor = selectedSpaceColor = None
@@ -627,7 +624,7 @@ class FGGlyphLineView(AppKit.NSView):
             if index is None:
                 newSelection = set()
             elif index in self.selection:
-                newSelection = self.selection  ### ^ {index}
+                newSelection = self.selection
             else:
                 newSelection = {index}
             self.selection = newSelection

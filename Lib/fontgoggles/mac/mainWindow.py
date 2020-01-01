@@ -172,9 +172,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
         self.fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize,
-                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
-                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
-                                  arrowKeyCallback=self.fontListArrowKeyCallback)
+                                 selectionChangedCallback=self.fontListSelectionChangedCallback,
+                                 glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
+                                 arrowKeyCallback=self.fontListArrowKeyCallback)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self.fontList, drawBackground=True,
                                                       minMagnification=0.4, maxMagnification=15)
         group.fontList = self._fontListScrollView
@@ -198,8 +198,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         variationsTab = group.feaVarTabs[1]
         self.variationsGroup = SliderGroup(sidebarWidth - 6, {}, callback=self.varLocationChanged)
         variationsTab.main = AligningScrollView((0, 0, 0, 0), self.variationsGroup, drawBackground=False,
-                                              hasHorizontalScroller=False,
-                                              borderType=AppKit.NSNoBorder)
+                                                hasHorizontalScroller=False,
+                                                borderType=AppKit.NSNoBorder)
 
         return group
 
@@ -246,7 +246,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def loadFonts(self):
         sharableFontData = {}
-        firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
             self.loadingFonts.add(fontKey)
             coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData)
@@ -315,7 +314,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             charSelection = self.unicodeList.getSelection()
         t = time.time()
-        firstKey = self.fontKeys[0] if self.fontKeys else None
         for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
             self.setFontItemText(fontKey, fontItem)
             elapsed = time.time() - t
@@ -346,7 +344,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if font is None:
             return
         glyphs = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
-                                                      varLocation=self.varLocation)
+                                              varLocation=self.varLocation)
         addBoundingBoxes(glyphs)
         fontItem.glyphs = glyphs
         minimumExtent = fontItem.minimumExtent

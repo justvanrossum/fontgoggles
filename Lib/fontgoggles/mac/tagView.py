@@ -1,7 +1,7 @@
 import AppKit
 from vanilla import Group
 from fontgoggles.misc.properties import delegateProperty, hookedProperty, weakrefCallbackProperty
-from fontgoggles.mac.drawing import rgbColor, grayColor, drawText
+from fontgoggles.mac.drawing import drawText
 
 
 class FGTagView(AppKit.NSView):
