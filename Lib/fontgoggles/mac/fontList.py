@@ -652,7 +652,7 @@ class FGGlyphLineView(AppKit.NSView):
             color.set()
             if empty:
                 AppKit.NSRectFillUsingOperation(nsRectFromRect(offsetRect(gi.bounds, -posX, -posY)),
-                                                    AppKit.NSCompositeSourceOver)
+                                                AppKit.NSCompositeSourceOver)
             else:
                 gi.path.fill()
 
