@@ -509,6 +509,9 @@ class FGGlyphLineView(AppKit.NSView):
         return nsRectFromRect(bounds)
 
     def getSelectionRect(self):
+        """This methods returns an NSRect suitable for scrollRectToVisible_.
+        It uses the "advance box" of selected glyphs, not the bounding box.
+        """
         scaleFactor = self.scaleFactor
         origin = self.origin
         extent = self.frame().size[1 - self.vertical]
