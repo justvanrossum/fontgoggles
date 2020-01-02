@@ -477,16 +477,11 @@ class FGGlyphLineView(AppKit.NSView):
 
     @hoveredGlyphIndex.setter
     def hoveredGlyphIndex(self, index):
-        if index == self._hoveredGlyphIndex:
+        hoveredGlyphIndex = self._hoveredGlyphIndex
+        if index == hoveredGlyphIndex:
             return
-        if self._hoveredGlyphIndex is None:
-            prevBounds = None
-        else:
-            prevBounds = self.getGlyphBounds_(self._hoveredGlyphIndex)
-        if index is None:
-            newBounds = None
-        else:
-            newBounds = self.getGlyphBounds_(index)
+        prevBounds = self.getGlyphBounds_(hoveredGlyphIndex)
+        newBounds = self.getGlyphBounds_(index)
         if prevBounds is None:
             bounds = newBounds
         elif newBounds is None:
@@ -498,7 +493,7 @@ class FGGlyphLineView(AppKit.NSView):
             self.setNeedsDisplayInRect_(bounds)
 
     def getGlyphBounds_(self, index):
-        if index >= len(self._glyphs):
+        if index is None or index >= len(self._glyphs):
             return None
         bounds = self._glyphs[index].bounds
         if bounds is None:
