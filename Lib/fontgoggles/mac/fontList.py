@@ -550,7 +550,7 @@ class FGGlyphLineView(AppKit.NSView):
         rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._selection = set()
-        self._hoveredGlyphIndex = None
+        self._hoveredGlyphIndex = None  # no need to trigger smart redraw calculation
         self.setNeedsDisplay_(True)
 
     @property
