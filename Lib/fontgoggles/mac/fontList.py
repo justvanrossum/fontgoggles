@@ -1,6 +1,8 @@
+import pathlib
 import AppKit
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
+from fontgoggles.font import sniffFontType
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import textAlignments
 from fontgoggles.misc.decorators import suppressAndLogException
@@ -717,10 +719,18 @@ class FGGlyphLineView(AppKit.NSView):
         return index
 
     def draggingEntered_(self, draggingInfo):
-        return AppKit.NSDragOperationEvery
+        if any(sniffFontType(path) or path.is_dir() for path in self._iterateFilesFromDraggingInfo(draggingInfo)):
+            self._weHaveValidDrag = True
+            return AppKit.NSDragOperationEvery
+        else:
+            self._weHaveValidDrag = False
+            return AppKit.NSDragOperationNone
 
     def draggingUpdated_(self, draggingInfo):
-        return AppKit.NSDragOperationEvery
+        if self._weHaveValidDrag:
+            return AppKit.NSDragOperationEvery
+        else:
+            return AppKit.NSDragOperationNone
 
     # def prepareForDragOperation_(self, draggingInfo):
     #     return True
@@ -730,6 +740,11 @@ class FGGlyphLineView(AppKit.NSView):
         print("dropped!")
         print("....", list(thefiles))
         return True
+
+    @staticmethod
+    def _iterateFilesFromDraggingInfo(draggingInfo):
+        for path in draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType):
+            yield pathlib.Path(path)
 
 
 class GlyphLine(Group):
