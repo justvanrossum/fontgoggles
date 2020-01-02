@@ -451,6 +451,9 @@ class FGGlyphLineView(AppKit.NSView):
     def acceptsFirstResponder(self):
         return True
 
+    def acceptsFirstMouse(self):
+        return True
+
     def becomeFirstResponder(self):
         # Defer to our FGFontListView
         fontListView = self.superview().superview()
