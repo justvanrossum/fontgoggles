@@ -597,6 +597,7 @@ class FGGlyphLineView(AppKit.NSView):
 
         selection = self._selection
         hoveredGlyphIndex = self._hoveredGlyphIndex
+        selectedColor = selectedSpaceColor = hoverColor = hoverSpaceColor = None
         if selection or hoveredGlyphIndex is not None:
             selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(
                 0.9, AppKit.NSColor.systemRedColor())
@@ -607,10 +608,6 @@ class FGGlyphLineView(AppKit.NSView):
                     hoverColor = hoverColor.blendedColorWithFraction_ofColor_(
                         0.5, selectedColor)
                 hoverSpaceColor = hoverColor.colorWithAlphaComponent_(0.2)
-            else:
-                hoverColor = hoverSpaceColor = None
-        else:
-            selectedColor = selectedSpaceColor = hoverColor = hoverSpaceColor = None
 
         colors = {
             # (empty, selected, hovered)
