@@ -438,7 +438,7 @@ class FGGlyphLineView(AppKit.NSView):
 
         trackingArea = AppKit.NSTrackingArea.alloc().initWithRect_options_owner_userInfo_(
                 self.bounds(),
-                AppKit.NSTrackingActiveAlways | AppKit.NSTrackingMouseMoved |
+                AppKit.NSTrackingActiveInKeyWindow | AppKit.NSTrackingMouseMoved |
                 AppKit.NSTrackingMouseEnteredAndExited | AppKit.NSTrackingInVisibleRect,
                 self, None)
         self.addTrackingArea_(trackingArea)
