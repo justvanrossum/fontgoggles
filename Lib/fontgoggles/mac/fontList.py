@@ -1,4 +1,5 @@
 import pathlib
+import objc
 import AppKit
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
@@ -15,6 +16,11 @@ fontItemMaximumSize = 1500
 
 
 class FGFontListView(AppKit.NSView):
+
+    def init(self):
+        self = super().init()
+        self.registerForDraggedTypes_([AppKit.NSFilenamesPboardType])
+        return self
 
     def acceptsFirstResponder(self):
         return True
@@ -75,6 +81,73 @@ class FGFontListView(AppKit.NSView):
             clipView.setBounds_(newBounds)
             scrollView.setMagnification_(1.0)
             self._savedClipBounds = None
+
+    _dragPosView = None
+
+    @suppressAndLogException
+    def draggingEntered_(self, draggingInfo):
+        if any(sniffFontType(path) or path.is_dir() for path in self._iterateFilesFromDraggingInfo(draggingInfo)):
+            self._weHaveValidDrag = True
+            if self._dragPosView is None:
+                self._dragPosView = AppKit.NSView.alloc().init()
+                self._dragPosView.setBackgroundColor_(AppKit.NSColor.textColor())
+            index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
+            self._dragPosView.setFrame_(frame)
+            self.addSubview_(self._dragPosView)
+            return AppKit.NSDragOperationEvery
+        else:
+            self._weHaveValidDrag = False
+            return AppKit.NSDragOperationNone
+
+    @suppressAndLogException
+    def draggingUpdated_(self, draggingInfo):
+        # print("updated", draggingInfo)
+        if self._weHaveValidDrag:
+            index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
+            self._dragPosView.animator().setFrame_(frame)
+            return AppKit.NSDragOperationEvery
+        else:
+            return AppKit.NSDragOperationNone
+
+    def draggingExited_(self, draggingInfo):
+        self._dragPosView.removeFromSuperview()
+        self._dragPosView = None
+
+    @objc.signature(b"Z@:@")  # PyObjC bug?
+    @suppressAndLogException
+    def draggingEnded_(self, draggingInfo):
+        if self._dragPosView is not None:
+            self._dragPosView.removeFromSuperview()
+            self._dragPosView = None
+
+    def _getDropInsertionIndexAndRect_(self, draggingInfo):
+        point = self.convertPoint_fromView_(draggingInfo.draggingLocation(), None)
+        fontList = self.vanillaWrapper()
+        itemSize = fontList.itemSize
+        vertical = fontList.vertical
+        frame = self._dragPosView.frame()
+        frame.origin[1 - vertical] = max(0, itemSize * round(point[1 - vertical] / itemSize))
+        frame.size[vertical] = self.frame().size[vertical]
+        dropBarSize = 2
+        frame.size[1 - vertical] = dropBarSize
+        index = round(frame.origin[1 - vertical]) // itemSize
+        if frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
+            frame.origin[1 - vertical] = self.frame().size[1 - vertical] - dropBarSize
+        return index, frame
+
+    def prepareForDragOperation_(self, draggingInfo):
+        return True
+
+    def performDragOperation_(self, draggingInfo):
+        thefiles = draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType)
+        print("dropped!")
+        print("....", list(thefiles))
+        return True
+
+    @staticmethod
+    def _iterateFilesFromDraggingInfo(draggingInfo):
+        for path in draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType):
+            yield pathlib.Path(path)
 
 
 arrowKeyDefs = {
@@ -445,7 +518,6 @@ class FGGlyphLineView(AppKit.NSView):
                 self, None)
         self.addTrackingArea_(trackingArea)
 
-        self.registerForDraggedTypes_([AppKit.NSFilenamesPboardType])
         return self
 
     def isOpaque(self):
@@ -665,7 +737,7 @@ class FGGlyphLineView(AppKit.NSView):
         self.hoveredGlyphIndex = self.findGlyph_(self.convertPoint_fromView_(event.locationInWindow(), None))
 
     def mouseEntered_(self, event):
-        self.mouseMoved_(event)
+        pass
 
     def mouseExited_(self, event):
         self.hoveredGlyphIndex = None
@@ -717,34 +789,6 @@ class FGGlyphLineView(AppKit.NSView):
             else:
                 index = indices[-1]
         return index
-
-    def draggingEntered_(self, draggingInfo):
-        if any(sniffFontType(path) or path.is_dir() for path in self._iterateFilesFromDraggingInfo(draggingInfo)):
-            self._weHaveValidDrag = True
-            return AppKit.NSDragOperationEvery
-        else:
-            self._weHaveValidDrag = False
-            return AppKit.NSDragOperationNone
-
-    def draggingUpdated_(self, draggingInfo):
-        if self._weHaveValidDrag:
-            return AppKit.NSDragOperationEvery
-        else:
-            return AppKit.NSDragOperationNone
-
-    # def prepareForDragOperation_(self, draggingInfo):
-    #     return True
-
-    def performDragOperation_(self, draggingInfo):
-        thefiles = draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType)
-        print("dropped!")
-        print("....", list(thefiles))
-        return True
-
-    @staticmethod
-    def _iterateFilesFromDraggingInfo(draggingInfo):
-        for path in draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType):
-            yield pathlib.Path(path)
 
 
 class GlyphLine(Group):
