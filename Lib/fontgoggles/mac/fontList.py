@@ -433,7 +433,16 @@ class FGGlyphLineView(AppKit.NSView):
         self._glyphs = None
         self._rectTree = None
         self._selection = set()
+        self._hoveredGlyphIndex = None
         self._lastDiffSelection = None
+
+        trackingArea = AppKit.NSTrackingArea.alloc().initWithRect_options_owner_userInfo_(
+                self.bounds(),
+                AppKit.NSTrackingActiveAlways | AppKit.NSTrackingMouseMoved |
+                AppKit.NSTrackingMouseEnteredAndExited | AppKit.NSTrackingInVisibleRect,
+                self, None)
+        self.addTrackingArea_(trackingArea)
+
         return self
 
     def isOpaque(self):
@@ -456,15 +465,48 @@ class FGGlyphLineView(AppKit.NSView):
     def selection(self, newSelection):
         diffSelection = self._selection ^ newSelection
         self._selection = newSelection
+        for index in diffSelection:
+            bounds = self.getGlyphBounds_(index)
+            if bounds is not None:
+                self.setNeedsDisplayInRect_(bounds)
+        self._lastDiffSelection = diffSelection
+
+    @property
+    def hoveredGlyphIndex(self):
+        return self._hoveredGlyphIndex
+
+    @hoveredGlyphIndex.setter
+    def hoveredGlyphIndex(self, index):
+        if index == self._hoveredGlyphIndex:
+            return
+        if self._hoveredGlyphIndex is None:
+            prevBounds = None
+        else:
+            prevBounds = self.getGlyphBounds_(self._hoveredGlyphIndex)
+        if index is None:
+            newBounds = None
+        else:
+            newBounds = self.getGlyphBounds_(index)
+        if prevBounds is None:
+            bounds = newBounds
+        elif newBounds is not None:
+            bounds = AppKit.NSUnionRect(prevBounds, newBounds)
+        else:
+            bounds = prevBounds
+        self._hoveredGlyphIndex = index
+        if bounds is not None:
+            self.setNeedsDisplayInRect_(bounds)
+
+    def getGlyphBounds_(self, index):
+        if index >= len(self._glyphs):
+            return None
+        bounds = self._glyphs[index].bounds
+        if bounds is None:
+            return None
         dx, dy = self.origin
         scaleFactor = self.scaleFactor
-        for index in diffSelection:
-            bounds = self._glyphs[index].bounds
-            if bounds is None:
-                continue
-            bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
-            self.setNeedsDisplayInRect_(nsRectFromRect(bounds))
-        self._lastDiffSelection = diffSelection
+        bounds = offsetRect(scaleRect(bounds, scaleFactor, scaleFactor), dx, dy)
+        return nsRectFromRect(bounds)
 
     def getSelectionRect(self):
         scaleFactor = self.scaleFactor
@@ -505,6 +547,7 @@ class FGGlyphLineView(AppKit.NSView):
         rectIndexList = [(gi.bounds, index) for index, gi in enumerate(glyphs) if gi.bounds is not None]
         self._rectTree = RectTree.fromSeq(rectIndexList)
         self._selection = set()
+        self._hoveredGlyphIndex = None
         self.setNeedsDisplay_(True)
 
     @property
@@ -553,7 +596,7 @@ class FGGlyphLineView(AppKit.NSView):
                 0.5, AppKit.NSColor.selectedTextBackgroundColor())
 
         selection = self._selection
-        if selection:
+        if selection or True:
             selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(
                 0.9, AppKit.NSColor.systemRedColor())
             selectedSpaceColor = selectedColor.colorWithAlphaComponent_(0.2)
@@ -579,7 +622,7 @@ class FGGlyphLineView(AppKit.NSView):
         lastPosX = lastPosY = 0
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
-            selected = index in selection
+            selected = index in selection or index == self.hoveredGlyphIndex
             posX, posY = gi.pos
             translate(posX - lastPosX, posY - lastPosY)
             lastPosX, lastPosY = posX, posY
@@ -594,11 +637,40 @@ class FGGlyphLineView(AppKit.NSView):
             if selected:
                 AppKit.NSColor.textColor().set()
 
+    def mouseMoved_(self, event):
+        point = self.convertPoint_fromView_(event.locationInWindow(), None)
+        self.hoveredGlyphIndex = self.findGlyph_(self.convertPoint_fromView_(event.locationInWindow(), None))
+
+    def mouseEntered_(self, event):
+        self.mouseMoved_(event)
+
+    def mouseExited_(self, event):
+        self.hoveredGlyphIndex = None
+
     @suppressAndLogException
     def mouseDown_(self, event):
+        index = self.findGlyph_(self.convertPoint_fromView_(event.locationInWindow(), None))
+
+        if not event.modifierFlags() & AppKit.NSCommandKeyMask:
+            if index is None:
+                newSelection = set()
+            elif index in self.selection:
+                newSelection = self.selection
+            else:
+                newSelection = {index}
+            self.selection = newSelection
+
+        # tell our parent we've been clicked on
+        fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
+        fontList = self.superview().superview().vanillaWrapper()
+        fontList._lastItemClicked = fontItemIdentifier
+        super().mouseDown_(event)
+
+    def findGlyph_(self, point):
         if self._rectTree is None:
-            return
-        x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
+            return None
+
+        x, y = point
         scaleFactor = self.scaleFactor
         dx, dy = self.origin
         x -= dx
@@ -621,21 +693,7 @@ class FGGlyphLineView(AppKit.NSView):
                     break
             else:
                 index = indices[-1]
-
-        if not event.modifierFlags() & AppKit.NSCommandKeyMask:
-            if index is None:
-                newSelection = set()
-            elif index in self.selection:
-                newSelection = self.selection
-            else:
-                newSelection = {index}
-            self.selection = newSelection
-
-        # tell our parent we've been clicked on
-        fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
-        fontList = self.superview().superview().vanillaWrapper()
-        fontList._lastItemClicked = fontItemIdentifier
-        super().mouseDown_(event)
+        return index
 
 
 class GlyphLine(Group):
