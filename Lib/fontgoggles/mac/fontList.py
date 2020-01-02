@@ -443,6 +443,7 @@ class FGGlyphLineView(AppKit.NSView):
                 self, None)
         self.addTrackingArea_(trackingArea)
 
+        self.registerForDraggedTypes_([AppKit.NSFilenamesPboardType])
         return self
 
     def isOpaque(self):
@@ -714,6 +715,21 @@ class FGGlyphLineView(AppKit.NSView):
             else:
                 index = indices[-1]
         return index
+
+    def draggingEntered_(self, draggingInfo):
+        return AppKit.NSDragOperationEvery
+
+    def draggingUpdated_(self, draggingInfo):
+        return AppKit.NSDragOperationEvery
+
+    # def prepareForDragOperation_(self, draggingInfo):
+    #     return True
+
+    def performDragOperation_(self, draggingInfo):
+        thefiles = draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType)
+        print("dropped!")
+        print("....", list(thefiles))
+        return True
 
 
 class GlyphLine(Group):
