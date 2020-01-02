@@ -489,10 +489,10 @@ class FGGlyphLineView(AppKit.NSView):
             newBounds = self.getGlyphBounds_(index)
         if prevBounds is None:
             bounds = newBounds
-        elif newBounds is not None:
-            bounds = AppKit.NSUnionRect(prevBounds, newBounds)
-        else:
+        elif newBounds is None:
             bounds = prevBounds
+        else:
+            bounds = AppKit.NSUnionRect(prevBounds, newBounds)
         self._hoveredGlyphIndex = index
         if bounds is not None:
             self.setNeedsDisplayInRect_(bounds)
