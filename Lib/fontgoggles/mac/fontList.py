@@ -596,12 +596,22 @@ class FGGlyphLineView(AppKit.NSView):
                 0.5, AppKit.NSColor.selectedTextBackgroundColor())
 
         selection = self._selection
-        if selection or True:
+        hoveredGlyphIndex = self._hoveredGlyphIndex
+        if selection or hoveredGlyphIndex is not None:
             selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(
                 0.9, AppKit.NSColor.systemRedColor())
             selectedSpaceColor = selectedColor.colorWithAlphaComponent_(0.2)
+            if hoveredGlyphIndex is not None:
+                hoverColor = AppKit.NSColor.systemBlueColor()
+                if hoveredGlyphIndex in selection:
+                    hoverColor = hoverColor.blendedColorWithFraction_ofColor_(
+                        0.5, selectedColor)
+                hoverSpaceColor = hoverColor.colorWithAlphaComponent_(0.2)
+            else:
+                hoverColor = None
         else:
-            selectedColor = selectedSpaceColor = None
+            selectedColor = selectedSpaceColor = hoverColor = None
+
 
         backgroundColor.set()
         AppKit.NSRectFill(rect)
@@ -622,19 +632,26 @@ class FGGlyphLineView(AppKit.NSView):
         lastPosX = lastPosY = 0
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
-            selected = index in selection or index == self.hoveredGlyphIndex
+            selected = index in selection
+            hovered = index == hoveredGlyphIndex
             posX, posY = gi.pos
             translate(posX - lastPosX, posY - lastPosY)
             lastPosX, lastPosY = posX, posY
-            if selected:
+            if selected or hovered:
                 if gi.path.elementCount():
-                    selectedColor.set()
+                    if hovered:
+                        hoverColor.set()
+                    else:
+                        selectedColor.set()
                 else:
-                    selectedSpaceColor.set()
+                    if hovered:
+                        hoverSpaceColor.set()
+                    else:
+                        selectedSpaceColor.set()
                     AppKit.NSRectFillUsingOperation(nsRectFromRect(offsetRect(gi.bounds, -posX, -posY)),
                                                     AppKit.NSCompositeSourceOver)
             gi.path.fill()
-            if selected:
+            if selected or hovered:
                 AppKit.NSColor.textColor().set()
 
     def mouseMoved_(self, event):
