@@ -80,6 +80,8 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         self.setBounds_(self.constrainBoundsRect_(self.bounds()))
 
     def viewFrameChanged_(self, notification):
+        # This gets called when the frame of our document view gets changed.
+        # We adjust the scroll position depending on our alignment.
         docBounds = self.documentView().bounds()
         if self._prevDocBounds is None:
             self._prevDocBounds = docBounds
@@ -112,6 +114,13 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
         super().viewFrameChanged_(notification)
 
     def constrainBoundsRect_(self, proposedClipBounds):
+        # Our purpose for this method is two-fold:
+        # 1. If the document frame is smaller than he clip view:
+        #    Make sure the document view is aligned in the clip view according to
+        #    our hAlign/vAlign settings.
+        # 2. If the document frame is larger than the clip view:
+        #    If the scroll view/clip view changes in size, keep the desired
+        #    alignment.
         # Partially taken from https://stackoverflow.com/questions/22072105/
         proposedClipBounds = super().constrainBoundsRect_(proposedClipBounds)
         docView = self.documentView()
@@ -139,15 +148,13 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
                 proposedClipBounds.origin.x = (docBounds.size.width - proposedClipBounds.size.width)
         else:
             if self.hAlign == "center":
-                if dw != 0 or dx != 0:
+                if dw != 0:
                     proposedClipBounds.origin.x = self._prevClipBounds.origin.x - dw / 2 + dx
             elif self.hAlign == "right":
-                maxX = docBounds.size.width - clipBounds.size.width
-                if dw == 0 and dx == 0:
-                    newX = proposedClipBounds.origin.x
-                else:
+                if dw != 0:
+                    maxX = docBounds.size.width - clipBounds.size.width
                     newX = self._prevClipBounds.origin.x - dw + dx
-                proposedClipBounds.origin.x = max(min(newX, maxX), -1)
+                    proposedClipBounds.origin.x = max(min(newX, maxX), -1)
 
         if proposedClipBounds.size.height > docBounds.size.height:
             if docView.isFlipped():
