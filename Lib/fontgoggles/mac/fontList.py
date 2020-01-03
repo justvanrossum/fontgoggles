@@ -133,14 +133,16 @@ class FGFontListView(AppKit.NSView):
         index = round(frame.origin[1 - vertical]) // itemSize
         if frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
             frame.origin[1 - vertical] = self.frame().size[1 - vertical] - dropBarSize
+        index = fontList.getNumFontItems() - index
         return index, frame
 
     def prepareForDragOperation_(self, draggingInfo):
         return True
 
     def performDragOperation_(self, draggingInfo):
+        index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
         thefiles = draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType)
-        print("dropped!")
+        print("dropped!", index)
         print("....", list(thefiles))
         return True
 
