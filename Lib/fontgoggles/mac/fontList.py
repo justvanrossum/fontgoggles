@@ -344,6 +344,7 @@ class FontList(Group):
                 else:
                     anyFontsToLoad = True
             else:
+                fontItem.fontListIndex = index
                 x, y, w, h = fontItem.getPosSize()
                 if self.vertical:
                     x = index * itemSize
