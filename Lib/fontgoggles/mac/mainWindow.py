@@ -62,7 +62,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def __init__(self, project):
         self.project = project
-        self.fontKeys = list(self.project.iterFontKeys())
+        self.fontKeys = [fi["fontKey"] for fi in self.project.fontItems]
         self.loadingFonts = set()
         self.allFeatureTagsGSUB = set()
         self.allFeatureTagsGPOS = set()
@@ -171,7 +171,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
-        self.fontList = FontList(self.fontKeys, 300, self.defaultFontItemSize,
+        self.fontList = FontList(self.project, 300, self.defaultFontItemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)

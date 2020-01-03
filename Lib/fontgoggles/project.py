@@ -13,14 +13,17 @@ class Project:
 
     def __init__(self):
         self.fonts = {}
-
-    def iterFontKeys(self):
-        return iter(self.fonts)
+        self.fontItems = []
+        self._fontItemIdentifierGenerator = self._fontItemIdentifierGeneratorFunc()
 
     def addFont(self, path: PathLike, fontNumber: int):
         if not isinstance(path, PathLike):
             raise TypeError("path must be a Path(-like) object")
-        self.fonts[path, fontNumber] = None
+        fontKey = (path, fontNumber)
+        self.fonts[fontKey] = None
+        fontItem = dict(id=next(self._fontItemIdentifierGenerator),
+                        fontKey=fontKey)
+        self.fontItems.append(fontItem)
 
     def getFont(self, path: PathLike, fontNumber: int,
                 notLoadedDefault=_RAISE_NOT_LOADED_ERROR):
@@ -54,3 +57,10 @@ class Project:
         sharableFontData = {}
         for (path, fontNumber) in self.fonts:
             await self.loadFont(path, fontNumber, sharableFontData)
+
+    @staticmethod
+    def _fontItemIdentifierGeneratorFunc():
+        counter = 0
+        while True:
+            yield f"fontItem_{counter}"
+            counter += 1

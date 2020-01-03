@@ -164,10 +164,10 @@ class FontList(Group):
 
     nsViewClass = FGFontListView
 
-    def __init__(self, fontKeys, width, itemSize, selectionChangedCallback=None,
+    def __init__(self, project, width, itemSize, selectionChangedCallback=None,
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
-        self._fontItemIdentifiers = []
+        self.project = None  # Dummy, so we can set up other attrs first
         self._selection = set()  # a set of fontItemIdentifiers
         self.vertical = 0  # 0, 1: it is also an index into (x, y) tuples
         self.itemSize = itemSize
@@ -176,25 +176,24 @@ class FontList(Group):
         self._glyphSelectionChangedCallback = glyphSelectionChangedCallback
         self._arrowKeyCallback = arrowKeyCallback
         self._lastItemClicked = None
-        self.setupFontItems(fontKeys)
+        self.project = project
+        self.setupFontItems()
 
     def _glyphSelectionChanged(self):
         if self._glyphSelectionChangedCallback is not None:
             self._glyphSelectionChangedCallback(self)
 
-    def setupFontItems(self, fontKeys):
+    def setupFontItems(self):
         # clear all subviews
         for attr, value in list(self.__dict__.items()):
             if isinstance(value, VanillaBaseObject):
                 delattr(self, attr)
-        self._fontItemIdentifiers = []
         itemSize = self.itemSize
         y = 0
-        for index, fontKey in enumerate(fontKeys):
-            fontItemIdentifier = fontItemIdentifierTemplate.format(index=index)
-            fontItem = FontItem((0, y, 0, itemSize), fontKey, fontItemIdentifier)
+        for fontItemInfo in self.project.fontItems:
+            fontItemIdentifier = fontItemInfo["id"]
+            fontItem = FontItem((0, y, 0, itemSize), fontItemInfo["fontKey"], fontItemIdentifier)
             setattr(self, fontItemIdentifier, fontItem)
-            self._fontItemIdentifiers.append(fontItemIdentifier)
             y += itemSize
         self.setPosSize((0, 0, self.width, y))
 
@@ -249,8 +248,10 @@ class FontList(Group):
         clipView.setBounds_(clipBounds)
 
     def iterFontItems(self):
-        for fontItemIdentifier in self._fontItemIdentifiers:
-            yield self.getFontItem(fontItemIdentifier)
+        if self.project is None:
+            return
+        for fontItemInfo in self.project.fontItems:
+            yield self.getFontItem(fontItemInfo["id"])
 
     @hookedProperty
     def vertical(self):
@@ -325,11 +326,11 @@ class FontList(Group):
         return getattr(self, fontItemIdentifier)
 
     def getNumFontItems(self):
-        return len(self._fontItemIdentifiers)
+        return len(self.project.fontItems)
 
     def getSingleSelectedItem(self):
-        if len(self._fontItemIdentifiers) == 1:
-            return self.getFontItem(self._fontItemIdentifiers[0])
+        if len(self.project.fontItems) == 1:
+            return self.getFontItem(self.project.fontItems[0]["id"])
         elif len(self.selection) == 1:
             return self.getFontItem(list(self.selection)[0])
         else:
@@ -354,7 +355,7 @@ class FontList(Group):
         if self.selection:
             fontItems = (self.getFontItem(fii) for fii in self.selection)
         else:
-            fontItems = (self.getFontItem(fii) for fii in self._fontItemIdentifiers)
+            fontItems = (self.getFontItem(fiInfo["id"]) for fiInfo in self.project.fontItems)
         rects = []
         for fontItem in fontItems:
             view = fontItem.glyphLineView._nsObject
@@ -406,21 +407,23 @@ class FontList(Group):
                     self._arrowKeyCallback(self, event)
                 return
 
+            fontItemIdentifiers = [fi["id"] for fi in self.project.fontItems]
+
             if not self._selection:
                 if direction == 1:
-                    self.selection = {self._fontItemIdentifiers[0]}
+                    self.selection = {fontItemIdentifiers[0]}
                 else:
-                    self.selection = {self._fontItemIdentifiers[-1]}
+                    self.selection = {fontItemIdentifiers[-1]}
             else:
-                indices = [i for i, fii in enumerate(self._fontItemIdentifiers) if fii in self._selection]
+                indices = [i for i, fii in enumerate(fontItemIdentifiers) if fii in self._selection]
                 if direction == 1:
-                    index = min(len(self._fontItemIdentifiers) - 1, indices[-1] + 1)
+                    index = min(len(fontItemIdentifiers) - 1, indices[-1] + 1)
                 else:
                     index = max(0, indices[0] - 1)
                 if event.modifierFlags() & AppKit.NSShiftKeyMask:
-                    self.selection = self.selection | {self._fontItemIdentifiers[index]}
+                    self.selection = self.selection | {fontItemIdentifiers[index]}
                 else:
-                    self.selection = {self._fontItemIdentifiers[index]}
+                    self.selection = {fontItemIdentifiers[index]}
                 self.scrollSelectionToVisible()
 
 
