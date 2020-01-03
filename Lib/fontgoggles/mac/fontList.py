@@ -326,16 +326,23 @@ class FontList(Group):
         for index, fontItemInfo in enumerate(self.project.fonts):
             fontItem = getattr(self, fontItemInfo.identifier, None)
             if fontItem is None:
-                anyFontsToLoad = True
                 x, y, w, h = self.getPosSize()
                 if self.vertical:
                     x = index * itemSize
                     w = itemSize
+                    h = 0
                 else:
                     y = index * itemSize
+                    w = 0
                     h = itemSize
                 fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index)
                 setattr(self, fontItemInfo.identifier, fontItem)
+                if fontItemInfo.font is not None:
+                    # Font is already loaded. TODO: rethink factorization? See below.
+                    windowController = self._nsObject.window().windowController()
+                    windowController.setFontItemText(fontItemInfo, fontItem)
+                else:
+                    anyFontsToLoad = True
             else:
                 x, y, w, h = fontItem.getPosSize()
                 if self.vertical:
