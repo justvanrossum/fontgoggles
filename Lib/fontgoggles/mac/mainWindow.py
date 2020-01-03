@@ -375,6 +375,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             keyMap = {"ax": "adv"}
         else:
             keyMap = {"ay": "adv"}
+        if glyphs is None:
+            glyphs = []
         glyphListData = [{keyMap.get(k, k): v for k, v in g.__dict__.items()} for g in glyphs]
         with self.blockCallbackRecursion():
             self.glyphList.set(glyphListData)
@@ -419,14 +421,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if selectedFontItem is None:
             self.unicodeList.setSelection([])
             return
-        charIndices = selectedFontItem.glyphs.mapGlyphsToChars(selectedFontItem.selection)
+        if selectedFontItem.glyphs is not None:
+            charIndices = selectedFontItem.glyphs.mapGlyphsToChars(selectedFontItem.selection)
+        else:
+            charIndices = []
 
         with self.blockCallbackRecursion():
             for fontItem in self.iterFontItems():
                 if fontItem is selectedFontItem:
                     self.glyphList.setSelection(fontItem.selection)
                     self.updateUnicodeListSelection(fontItem)
-                else:
+                elif fontItem.glyphs is not None:
                     fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
 
     @objc.python_method
@@ -484,14 +489,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if selectedFontItem is None:
             return
         glyphIndices = self.glyphList.getSelection()
-        charIndices = selectedFontItem.glyphs.mapGlyphsToChars(glyphIndices)
+        if selectedFontItem.glyphs is not None:
+            charIndices = selectedFontItem.glyphs.mapGlyphsToChars(glyphIndices)
+        else:
+            charIndices = []
 
         with self.blockCallbackRecursion():
             for fontItem in self.iterFontItems():
                 if fontItem is selectedFontItem:
                     fontItem.selection = set(glyphIndices)
                     self.updateUnicodeListSelection(fontItem)
-                else:
+                elif fontItem.glyphs is not None:
                     fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
         self.fontList.scrollGlyphSelectionToVisible()
 
