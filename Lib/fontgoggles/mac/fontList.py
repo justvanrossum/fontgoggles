@@ -319,9 +319,11 @@ class FontList(Group):
 
     def refitFontItems(self):
         itemSize = self.itemSize
+        anyFontsToLoad = False
         for index, fontItemInfo in enumerate(self.project.fonts):
             fontItem = getattr(self, fontItemInfo.identifier, None)
             if fontItem is None:
+                anyFontsToLoad = True
                 x, y, w, h = self.getPosSize()
                 if self.vertical:
                     x = index * itemSize
@@ -344,7 +346,10 @@ class FontList(Group):
         else:
             h = len(self.project.fonts) * itemSize
         self.setPosSize((x, y, w, h))
-
+        if anyFontsToLoad:
+            # TODO: rethink factorization?
+            windowController = self._nsObject.window().windowController()
+            windowController.loadFonts()
 
     @property
     def selection(self):
