@@ -24,9 +24,8 @@ class Project:
         fontItemInfo = dict(id=self.nextFontItemIdentifier(),
                         fontKey=fontKey)
         if index is None:
-            self.fontItems.append(fontItemInfo)
-        else:
-            self.fontItems.insert(index, fontItemInfo)
+            index = len(self.fontItems)
+        self.fontItems.insert(index, fontItemInfo)
 
     async def loadFont(self, path: PathLike, fontNumber: int,
                        sharableFontData=None):
