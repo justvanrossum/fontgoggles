@@ -123,17 +123,23 @@ class FGFontListView(AppKit.NSView):
     def _getDropInsertionIndexAndRect_(self, draggingInfo):
         point = self.convertPoint_fromView_(draggingInfo.draggingLocation(), None)
         fontList = self.vanillaWrapper()
+        numFontItems = fontList.getNumFontItems()
         itemSize = fontList.itemSize
         vertical = fontList.vertical
         frame = self._dragPosView.frame()
-        frame.origin[1 - vertical] = max(0, itemSize * round(point[1 - vertical] / itemSize))
+        if numFontItems:
+            flippedIndex = round(point[1 - vertical] / itemSize)
+            flippedIndex = max(0, min(flippedIndex, numFontItems - 1))
+        else:
+            flippedIndex = 0
+        frame.origin[1 - vertical] = max(0, itemSize * flippedIndex)
         frame.size[vertical] = self.frame().size[vertical]
         dropBarSize = 2
         frame.size[1 - vertical] = dropBarSize
-        index = round(frame.origin[1 - vertical]) // itemSize
-        if frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
+        if not numFontItems or frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
             frame.origin[1 - vertical] = self.frame().size[1 - vertical] - dropBarSize
-        index = fontList.getNumFontItems() - index
+        # TODO We could do with a more elegant drop indicator if the current list is empty
+        index = numFontItems - flippedIndex
         return index, frame
 
     def prepareForDragOperation_(self, draggingInfo):
