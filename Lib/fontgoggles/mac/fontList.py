@@ -166,7 +166,7 @@ class FontList(Group):
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
         self.project = None  # Dummy, so we can set up other attrs first
-        self._selection = set()  # a set of fontItemIdentifiers
+        self._selection = set()  # a set of indices
         self.vertical = 0  # 0, 1: it is also an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"
@@ -188,10 +188,9 @@ class FontList(Group):
                 delattr(self, attr)
         itemSize = self.itemSize
         y = 0
-        for fontItemInfo in self.project.fonts:
-            fontItemIdentifier = fontItemInfo.identifier
-            fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, fontItemIdentifier)
-            setattr(self, fontItemIdentifier, fontItem)
+        for index, fontItemInfo in enumerate(self.project.fonts):
+            fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index)
+            setattr(self, fontItemInfo.identifier, fontItem)
             y += itemSize
         self.setPosSize((0, 0, self.width, y))
 
@@ -319,8 +318,8 @@ class FontList(Group):
     def selection(self, newSelection):
         diffSelection = self._selection ^ newSelection
         self._selection = newSelection
-        for fontItemIdentifier in diffSelection:
-            fontItem = self.getFontItem(fontItemIdentifier)
+        for index in diffSelection:
+            fontItem = self.getFontItem(self.project.fonts[index].identifier)
             fontItem.selected = not fontItem.selected
         if self._selectionChangedCallback is not None:
             self._selectionChangedCallback(self)
@@ -335,14 +334,15 @@ class FontList(Group):
         if len(self.project.fonts) == 1:
             return self.getFontItem(self.project.fonts[0].identifier)
         elif len(self.selection) == 1:
-            return self.getFontItem(list(self.selection)[0])
+            index = list(self.selection)[0]
+            return self.getFontItem(self.project.fonts[index].identifier)
         else:
             return None
 
     def _getSelectionRect(self, selection):
         selRect = None
-        for fontItemIdentifier in selection:
-            fontItem = self.getFontItem(fontItemIdentifier)
+        for index in selection:
+            fontItem = self.getFontItem(self.project.fonts[index].identifier)
             if selRect is None:
                 selRect = fontItem._nsObject.frame()
             else:
@@ -356,7 +356,7 @@ class FontList(Group):
 
     def scrollGlyphSelectionToVisible(self):
         if self.selection:
-            fontItems = (self.getFontItem(fii) for fii in self.selection)
+            fontItems = (self.getFontItem(self.project.fonts[index].identifier) for index in self.selection)
         else:
             fontItems = (self.getFontItem(fiInfo.identifier) for fiInfo in self.project.fonts)
         rects = []
@@ -375,12 +375,12 @@ class FontList(Group):
     @suppressAndLogException
     def mouseDown(self, event):
         glyphSelectionChanged = False
-        fontItemIdentifier = self._lastItemClicked
+        index = self._lastItemClicked
         self._lastItemClicked = None
-        if fontItemIdentifier is not None:
-            fontItem = self.getFontItem(fontItemIdentifier)
+        if index is not None:
+            fontItem = self.getFontItem(self.project.fonts[index].identifier)
             glyphSelectionChanged = bool(fontItem.popDiffSelection())
-            clickedSelection = {fontItemIdentifier}
+            clickedSelection = {index}
         else:
             for fontItem in self.iterFontItems():
                 fontItem.selection = set()
@@ -389,7 +389,7 @@ class FontList(Group):
 
         if clickedSelection and event.modifierFlags() & AppKit.NSCommandKeyMask:
             newSelection = self._selection ^ clickedSelection
-        elif fontItemIdentifier in self._selection:
+        elif index in self._selection:
             newSelection = None
         else:
             newSelection = clickedSelection
@@ -410,23 +410,21 @@ class FontList(Group):
                     self._arrowKeyCallback(self, event)
                 return
 
-            fontItemIdentifiers = [fi.identifier for fi in self.project.fonts]
-
+            numFontItems = len(self.project.fonts)
             if not self._selection:
                 if direction == 1:
-                    self.selection = {fontItemIdentifiers[0]}
+                    self.selection = {0}
                 else:
-                    self.selection = {fontItemIdentifiers[-1]}
+                    self.selection = {numFontItems - 1}
             else:
-                indices = [i for i, fii in enumerate(fontItemIdentifiers) if fii in self._selection]
                 if direction == 1:
-                    index = min(len(fontItemIdentifiers) - 1, indices[-1] + 1)
+                    index = min(numFontItems - 1, max(self._selection) + 1)
                 else:
-                    index = max(0, indices[0] - 1)
+                    index = max(0, min(self._selection) - 1)
                 if event.modifierFlags() & AppKit.NSShiftKeyMask:
-                    self.selection = self.selection | {fontItemIdentifiers[index]}
+                    self.selection = self.selection | {index}
                 else:
-                    self.selection = {fontItemIdentifiers[index]}
+                    self.selection = {index}
                 self.scrollSelectionToVisible()
 
 
@@ -435,11 +433,11 @@ class FontItem(Group):
     vertical = delegateProperty("glyphLineView")
     selected = delegateProperty("glyphLineView")
 
-    def __init__(self, posSize, fontKey, fontItemIdentifier):
+    def __init__(self, posSize, fontKey, fontListIndex):
         super().__init__(posSize)
         # self._nsObject.setWantsLayer_(True)
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
-        self.fontItemIdentifier = fontItemIdentifier
+        self.fontListIndex = fontListIndex
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
@@ -762,9 +760,9 @@ class FGGlyphLineView(AppKit.NSView):
             self.selection = newSelection
 
         # tell our parent we've been clicked on
-        fontItemIdentifier = self.superview().vanillaWrapper().fontItemIdentifier
+        fontListIndex = self.superview().vanillaWrapper().fontListIndex
         fontList = self.superview().superview().vanillaWrapper()
-        fontList._lastItemClicked = fontItemIdentifier
+        fontList._lastItemClicked = fontListIndex
         super().mouseDown_(event)
 
     def findGlyph_(self, point):
