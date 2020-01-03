@@ -175,7 +175,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
         self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self.fontList, drawBackground=True,
-                                                      minMagnification=0.4, maxMagnification=15)
+                                                      minMagnification=0.4, maxMagnification=15,
+                                                      forwardDragAndDrop=True)
         group.fontList = self._fontListScrollView
         group.textEntry = self._textEntry
         self.fontList._nsObject.subscribeToMagnification_(self._fontListScrollView._nsObject)

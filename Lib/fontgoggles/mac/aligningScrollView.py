@@ -1,3 +1,4 @@
+import objc
 import AppKit
 import vanilla
 from ..misc.properties import hookedProperty
@@ -14,7 +15,8 @@ class AligningScrollView(vanilla.ScrollView):
 
     def __init__(self, posSize, documentView, hAlign="left", vAlign="top",
                  drawBackground=True, minMagnification=None, maxMagnification=None,
-                 borderType=AppKit.NSBezelBorder, clipview=None, **kwargs):
+                 borderType=AppKit.NSBezelBorder, clipview=None, forwardDragAndDrop=False,
+                 **kwargs):
         self._docRef = [documentView]
         if hasattr(documentView, "_nsObject"):
             x, y, w, h = documentView._posSize
@@ -34,6 +36,10 @@ class AligningScrollView(vanilla.ScrollView):
         if minMagnification is not None:
             scrollView.setAllowsMagnification_(True)
             scrollView.setMinMagnification_(minMagnification)
+        if forwardDragAndDrop:
+            types = documentView.registeredDraggedTypes()
+            if types:
+                clipView.registerForDraggedTypes_(types)
 
     @property
     def hAlign(self):
@@ -179,3 +185,22 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
 
         self._prevClipBounds = proposedClipBounds
         return proposedClipBounds
+
+    def draggingEntered_(self, draggingInfo):
+        return self.documentView().draggingEntered_(draggingInfo)
+
+    def draggingUpdated_(self, draggingInfo):
+        return self.documentView().draggingUpdated_(draggingInfo)
+
+    def draggingExited_(self, draggingInfo):
+        return self.documentView().draggingExited_(draggingInfo)
+
+    @objc.signature(b"Z@:@")  # PyObjC bug?
+    def draggingEnded_(self, draggingInfo):
+        return self.documentView().draggingEnded_(draggingInfo)
+
+    def prepareForDragOperation_(self, draggingInfo):
+        return self.documentView().prepareForDragOperation_(draggingInfo)
+
+    def performDragOperation_(self, draggingInfo):
+        return self.documentView().performDragOperation_(draggingInfo)
