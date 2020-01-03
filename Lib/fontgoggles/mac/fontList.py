@@ -3,7 +3,7 @@ import objc
 import AppKit
 from vanilla import *
 from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
-from fontgoggles.font import sniffFontType
+from fontgoggles.font import defaultSortSpec, sniffFontType, sortedFontPathsAndNumbers
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import textAlignments
 from fontgoggles.misc.decorators import suppressAndLogException
@@ -141,9 +141,7 @@ class FGFontListView(AppKit.NSView):
 
     def performDragOperation_(self, draggingInfo):
         index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
-        thefiles = draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType)
-        print("dropped!", index)
-        print("....", list(thefiles))
+        self.vanillaWrapper().insertFonts(self._iterateFilesFromDraggingInfo(draggingInfo), index)
         return True
 
     @staticmethod
@@ -311,6 +309,42 @@ class FontList(Group):
         clipBounds = clipView.bounds()
         clipBounds.origin = (cx, cy)
         clipView.setBounds_(clipBounds)
+
+    @suppressAndLogException
+    def insertFonts(self, paths, index):
+        for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, defaultSortSpec):
+            self.project.addFont(fontPath, fontNumber, index)
+            index += 1
+        self.refitFontItems()
+
+    def refitFontItems(self):
+        itemSize = self.itemSize
+        for index, fontItemInfo in enumerate(self.project.fonts):
+            fontItem = getattr(self, fontItemInfo.identifier, None)
+            if fontItem is None:
+                x, y, w, h = self.getPosSize()
+                if self.vertical:
+                    x = index * itemSize
+                    w = itemSize
+                else:
+                    y = index * itemSize
+                    h = itemSize
+                fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index)
+                setattr(self, fontItemInfo.identifier, fontItem)
+            else:
+                x, y, w, h = fontItem.getPosSize()
+                if self.vertical:
+                    x = index * itemSize
+                else:
+                    y = index * itemSize
+                fontItem.setPosSize((x, y, w, h))
+        x, y, w, h = self.getPosSize()
+        if self.vertical:
+            w = len(self.project.fonts) * itemSize
+        else:
+            h = len(self.project.fonts) * itemSize
+        self.setPosSize((x, y, w, h))
+
 
     @property
     def selection(self):
