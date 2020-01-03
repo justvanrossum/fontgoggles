@@ -157,8 +157,6 @@ arrowKeyDefs = {
     AppKit.NSRightArrowFunctionKey: (1, 0),
 }
 
-fontItemIdentifierTemplate = "fontItem_{index}"
-
 
 class FontList(Group):
 
