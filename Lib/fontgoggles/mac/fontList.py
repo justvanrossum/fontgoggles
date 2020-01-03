@@ -280,7 +280,6 @@ class FontList(Group):
 
     @suppressAndLogException
     def resizeFontItems(self, itemSize):
-        # XXX unused at the moment, but perhaps we'll come back it it
         scaleFactor = itemSize / self.itemSize
         self.itemSize = itemSize
         pos = [0, 0]
