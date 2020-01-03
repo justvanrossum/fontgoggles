@@ -253,6 +253,12 @@ class FontList(Group):
         for fontItemInfo in self.project.fontItems:
             yield self.getFontItem(fontItemInfo["id"])
 
+    def iterFontKeysAndItems(self):
+        if self.project is None:
+            return
+        for fontItemInfo in self.project.fontItems:
+            yield fontItemInfo["fontKey"], self.getFontItem(fontItemInfo["id"])
+
     @hookedProperty
     def vertical(self):
         # Note that we heavily depend on hookedProperty's property that

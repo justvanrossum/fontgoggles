@@ -62,7 +62,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def __init__(self, project):
         self.project = project
-        self.fontKeys = [fi["fontKey"] for fi in self.project.fontItems]
         self.loadingFonts = set()
         self.allFeatureTagsGSUB = set()
         self.allFeatureTagsGPOS = set()
@@ -246,7 +245,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def loadFonts(self):
         sharableFontData = {}
-        for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
+        for fontKey, fontItem in self.iterFontKeysAndItems():
             self.loadingFonts.add(fontKey)
             coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData)
             asyncio.create_task(coro)
@@ -288,6 +287,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def iterFontItems(self):
         return self.fontList.iterFontItems()
 
+    def iterFontKeysAndItems(self):
+        return self.fontList.iterFontKeysAndItems()
+
     @objc.python_method
     def unicodeShowBiDiCheckBoxCallback(self, sender):
         self.updateUnicodeList()
@@ -314,7 +316,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             charSelection = self.unicodeList.getSelection()
         t = time.time()
-        for fontKey, fontItem in zip(self.fontKeys, self.iterFontItems()):
+        for fontKey, fontItem in self.iterFontKeysAndItems():
             self.setFontItemText(fontKey, fontItem)
             elapsed = time.time() - t
             if elapsed > 0.01:
