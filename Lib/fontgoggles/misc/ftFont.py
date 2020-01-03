@@ -1,4 +1,5 @@
 import io
+import logging
 from fontTools.ttLib import TTFont
 from fontTools.pens.pointPen import PointToSegmentPen
 import freetype
@@ -20,7 +21,10 @@ class FTFont:
         self._ttFont = ttFont
         stream = io.BytesIO(fontData)
         self._ftFace = freetype.Face(stream, index=fontNumber)
-        self._ftFace.set_char_size(self._ftFace.units_per_EM)
+        try:
+            self._ftFace.set_char_size(self._ftFace.units_per_EM)
+        except freetype.FT_Exception as e:
+            logging.warning("FreeType error, possibly with unsupported pixel font: %s", e)
 
     def setVarLocation(self, varLocation):
         if "fvar" not in self._ttFont:
