@@ -245,25 +245,24 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def loadFonts(self):
         sharableFontData = {}
-        for fontKey, fontItem in self.iterFontKeysAndItems():
-            self.loadingFonts.add(fontKey)
-            coro = self._loadFont(fontKey, fontItem, sharableFontData=sharableFontData)
+        for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
+            self.loadingFonts.add(fontItemInfo.identifier)
+            coro = self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData)
             asyncio.create_task(coro)
 
     @objc.python_method
-    async def _loadFont(self, fontKey, fontItem, sharableFontData):
+    async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
-        fontPath, fontNumber = fontKey
-        await self.project.loadFont(fontPath, fontNumber, sharableFontData=sharableFontData)
-        font = self.project.fonts[fontKey]
+        await fontItemInfo.load(sharableFontData=sharableFontData)
+        font = fontItemInfo.font
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
         self.allFeatureTagsGSUB.update(font.featuresGSUB)
         self.allFeatureTagsGPOS.update(font.featuresGPOS)
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
         self.allAxes = mergeAxes(self.allAxes, font.axes)
-        self.setFontItemText(fontKey, fontItem)
-        self.loadingFonts.remove(fontKey)
+        self.setFontItemText(fontItemInfo, fontItem)
+        self.loadingFonts.remove(fontItemInfo.identifier)
         if not self.loadingFonts:
             # All fonts have been loaded
             self.updateSidebarItems()
@@ -287,8 +286,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def iterFontItems(self):
         return self.fontList.iterFontItems()
 
-    def iterFontKeysAndItems(self):
-        return self.fontList.iterFontKeysAndItems()
+    def iterFontItemInfoAndItems(self):
+        return self.fontList.iterFontItemInfoAndItems()
 
     @objc.python_method
     def unicodeShowBiDiCheckBoxCallback(self, sender):
@@ -316,8 +315,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             charSelection = self.unicodeList.getSelection()
         t = time.time()
-        for fontKey, fontItem in self.iterFontKeysAndItems():
-            self.setFontItemText(fontKey, fontItem)
+        for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
+            self.setFontItemText(fontItemInfo, fontItem)
             elapsed = time.time() - t
             if elapsed > 0.01:
                 # time to unblock the event loop
@@ -340,8 +339,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.unicodeListSelectionChangedCallback(self.unicodeList)
 
     @objc.python_method
-    def setFontItemText(self, fontKey, fontItem):
-        font = self.project.fonts.get(fontKey)
+    def setFontItemText(self, fontItemInfo, fontItem):
+        font = fontItemInfo.font
         if font is None:
             return
         glyphs = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,

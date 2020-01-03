@@ -190,9 +190,9 @@ class FontList(Group):
                 delattr(self, attr)
         itemSize = self.itemSize
         y = 0
-        for fontItemInfo in self.project.fontItems:
-            fontItemIdentifier = fontItemInfo["id"]
-            fontItem = FontItem((0, y, 0, itemSize), fontItemInfo["fontKey"], fontItemIdentifier)
+        for fontItemInfo in self.project.fonts:
+            fontItemIdentifier = fontItemInfo.identifier
+            fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, fontItemIdentifier)
             setattr(self, fontItemIdentifier, fontItem)
             y += itemSize
         self.setPosSize((0, 0, self.width, y))
@@ -250,14 +250,14 @@ class FontList(Group):
     def iterFontItems(self):
         if self.project is None:
             return
-        for fontItemInfo in self.project.fontItems:
-            yield self.getFontItem(fontItemInfo["id"])
+        for fontItemInfo in self.project.fonts:
+            yield self.getFontItem(fontItemInfo.identifier)
 
-    def iterFontKeysAndItems(self):
+    def iterFontItemInfoAndItems(self):
         if self.project is None:
             return
-        for fontItemInfo in self.project.fontItems:
-            yield fontItemInfo["fontKey"], self.getFontItem(fontItemInfo["id"])
+        for fontItemInfo in self.project.fonts:
+            yield fontItemInfo, self.getFontItem(fontItemInfo.identifier)
 
     @hookedProperty
     def vertical(self):
@@ -332,11 +332,11 @@ class FontList(Group):
         return getattr(self, fontItemIdentifier)
 
     def getNumFontItems(self):
-        return len(self.project.fontItems)
+        return len(self.project.fonts)
 
     def getSingleSelectedItem(self):
-        if len(self.project.fontItems) == 1:
-            return self.getFontItem(self.project.fontItems[0]["id"])
+        if len(self.project.fonts) == 1:
+            return self.getFontItem(self.project.fonts[0].identifier)
         elif len(self.selection) == 1:
             return self.getFontItem(list(self.selection)[0])
         else:
@@ -361,7 +361,7 @@ class FontList(Group):
         if self.selection:
             fontItems = (self.getFontItem(fii) for fii in self.selection)
         else:
-            fontItems = (self.getFontItem(fiInfo["id"]) for fiInfo in self.project.fontItems)
+            fontItems = (self.getFontItem(fiInfo.identifier) for fiInfo in self.project.fonts)
         rects = []
         for fontItem in fontItems:
             view = fontItem.glyphLineView._nsObject
@@ -413,7 +413,7 @@ class FontList(Group):
                     self._arrowKeyCallback(self, event)
                 return
 
-            fontItemIdentifiers = [fi["id"] for fi in self.project.fontItems]
+            fontItemIdentifiers = [fi.identifier for fi in self.project.fonts]
 
             if not self._selection:
                 if direction == 1:

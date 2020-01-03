@@ -8,13 +8,11 @@ async def test_project_loadFonts():
     pr = Project()
     fontPath = getFontPath("IBMPlexSans-Regular.ttf")
     pr.addFont(fontPath, 0)
-    font = pr.fonts.get((fontPath, 0))
-    assert font is None
+    fii = pr.fonts[0]
+    assert fii.font is None
     await pr.loadFonts()
-    font = pr.fonts[fontPath, 0]
-    assert font.axes == {}  # simple check to see if we have a font at all
-    with pytest.raises(KeyError):
-        await pr.loadFont(fontPath, 1)
+    fii = pr.fonts[0]
+    assert fii.font.axes == {}  # simple check to see if we have a font at all
 
 
 @pytest.mark.asyncio
@@ -22,29 +20,33 @@ async def test_project_loadFont():
     pr = Project()
     fontPath = getFontPath("IBMPlexSans-Regular.ttf")
     pr.addFont(fontPath, 0)
-    await pr.loadFont(fontPath, 0)
+    await pr.fonts[0].load()
     with pytest.raises(TypeError):
         pr.addFont("a string", 0)
-    font = pr.fonts[fontPath, 0]
-    assert font.axes == {}  # simple check to see if we have a font at all
+    fii = pr.fonts[0]
+    assert fii.font.axes == {}  # simple check to see if we have a font at all
 
 
-def test_project_purgeFonts():
+@pytest.mark.asyncio
+async def test_project_purgeFonts():
     pr = Project()
     fontPath1 = getFontPath("IBMPlexSans-Regular.ttf")
     pr.addFont(fontPath1, 0)
     fontPath2 = getFontPath("IBMPlexSans-Regular.otf")
     pr.addFont(fontPath2, 0)
-    assert len(pr.fontItems) == 2
-    assert list(pr.fonts) == [(fontPath1, 0), (fontPath2, 0)]
-    item1 = dict(id="fontItem_0", fontKey=(fontPath1, 0))
-    item2 = dict(id="fontItem_1", fontKey=(fontPath2, 0))
-    assert pr.fontItems == [item1, item2]
-    del pr.fontItems[0]
-    assert list(pr.fonts) == [(fontPath1, 0), (fontPath2, 0)]
+    assert len(pr.fonts) == 2
+    assert [fii.fontKey for fii in pr.fonts] == [(fontPath1, 0), (fontPath2, 0)]
+    assert [fii.identifier for fii in pr.fonts] == ["fontItem_0", "fontItem_1"]
+
+    assert len(pr._fontLoader.fonts) == 0
+    await pr.loadFonts()
+    assert len(pr._fontLoader.fonts) == 2
+
+    del pr.fonts[0]
+    assert list(pr._fontLoader.fonts) == [(fontPath1, 0), (fontPath2, 0)]
     pr.purgeFonts()
-    assert list(pr.fonts) == [(fontPath2, 0)]
-    del pr.fontItems[0]
-    assert list(pr.fonts) == [(fontPath2, 0)]
+    assert list(pr._fontLoader.fonts) == [(fontPath2, 0)]
+    del pr.fonts[0]
+    assert list(pr._fontLoader.fonts) == [(fontPath2, 0)]
     pr.purgeFonts()
-    assert list(pr.fonts) == []
+    assert list(pr._fontLoader.fonts) == []
