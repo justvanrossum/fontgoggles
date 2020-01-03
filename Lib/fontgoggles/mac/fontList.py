@@ -131,6 +131,7 @@ class FGFontListView(AppKit.NSView):
         dropBarSize = 2
         frame.size[1 - vertical] = dropBarSize
         index = round(frame.origin[1 - vertical]) // itemSize
+        print("---------------", tuple(self.frame().size))
         if frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
             frame.origin[1 - vertical] = self.frame().size[1 - vertical] - dropBarSize
         index = fontList.getNumFontItems() - index
