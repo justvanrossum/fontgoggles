@@ -47,6 +47,14 @@ class Project:
         for (path, fontNumber) in self.fonts:
             await self.loadFont(path, fontNumber, sharableFontData)
 
+    def purgeFonts(self):
+        """Remove font objects that are no longer referenced in the fontItems
+        list.
+        """
+        usedKeys = {fii["fontKey"] for fii in self.fontItems}
+        self.fonts = {fontKey: fontObject for fontKey, fontObject in self.fonts.items()
+                      if fontKey in usedKeys}
+
     def nextFontItemIdentifier(self):
         return next(self._fontItemIdentifierGenerator)
 

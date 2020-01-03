@@ -27,3 +27,24 @@ async def test_project_loadFont():
         pr.addFont("a string", 0)
     font = pr.fonts[fontPath, 0]
     assert font.axes == {}  # simple check to see if we have a font at all
+
+
+def test_project_purgeFonts():
+    pr = Project()
+    fontPath1 = getFontPath("IBMPlexSans-Regular.ttf")
+    pr.addFont(fontPath1, 0)
+    fontPath2 = getFontPath("IBMPlexSans-Regular.otf")
+    pr.addFont(fontPath2, 0)
+    assert len(pr.fontItems) == 2
+    assert list(pr.fonts) == [(fontPath1, 0), (fontPath2, 0)]
+    item1 = dict(id="fontItem_0", fontKey=(fontPath1, 0))
+    item2 = dict(id="fontItem_1", fontKey=(fontPath2, 0))
+    assert pr.fontItems == [item1, item2]
+    del pr.fontItems[0]
+    assert list(pr.fonts) == [(fontPath1, 0), (fontPath2, 0)]
+    pr.purgeFonts()
+    assert list(pr.fonts) == [(fontPath2, 0)]
+    del pr.fontItems[0]
+    assert list(pr.fonts) == [(fontPath2, 0)]
+    pr.purgeFonts()
+    assert list(pr.fonts) == []
