@@ -11,7 +11,9 @@ def asyncTask(func):
     @functools.wraps(func)
     def createFuncTask(*args, **kwargs):
         coro = func(*args, **kwargs)
-        return asyncio.create_task(coro)
+        task = asyncio.create_task(coro)
+        task.add_done_callback(_done_callback)
+        return task
     return createFuncTask
 
 
@@ -29,17 +31,17 @@ def asyncTaskAutoCancel(func):
             oldTask.cancel()
         coro = func(self, *args, **kwargs)
         task = asyncio.create_task(coro)
-
-        def _done_callback(task):
-            if task.cancelled():
-                return
-            if task.exception() is not None:
-                task.print_stack()
-
         task.add_done_callback(_done_callback)
         setattr(self, taskAttributeName, task)
         return task
     return createFuncTask
+
+
+def _done_callback(task):
+    if task.cancelled():
+        return
+    if task.exception() is not None:
+        task.print_stack()
 
 
 def suppressAndLogException(func):
