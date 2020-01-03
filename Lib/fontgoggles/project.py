@@ -4,9 +4,6 @@ from .font import getOpener
 from .font.baseFont import BaseFont
 
 
-_RAISE_NOT_LOADED_ERROR = object()
-
-
 class Project:
 
     fonts: Dict[Tuple[PathLike, int], Optional[BaseFont]]
