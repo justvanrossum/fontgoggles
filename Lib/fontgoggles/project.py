@@ -21,7 +21,7 @@ class Project:
             raise TypeError("path must be a Path(-like) object")
         fontKey = (path, fontNumber)
         self.fonts[fontKey] = None
-        fontItem = dict(id=next(self._fontItemIdentifierGenerator),
+        fontItem = dict(id=self.nextFontItemIdentifier(),
                         fontKey=fontKey)
         self.fontItems.append(fontItem)
 
@@ -57,6 +57,9 @@ class Project:
         sharableFontData = {}
         for (path, fontNumber) in self.fonts:
             await self.loadFont(path, fontNumber, sharableFontData)
+
+    def nextFontItemIdentifier(self):
+        return next(self._fontItemIdentifierGenerator)
 
     @staticmethod
     def _fontItemIdentifierGeneratorFunc():
