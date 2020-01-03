@@ -12,18 +12,21 @@ class Project:
     fonts: Dict[Tuple[PathLike, int], Optional[BaseFont]]
 
     def __init__(self):
-        self.fonts = {}
-        self.fontItems = []
+        self.fonts = {}  # Fonts that are or will be loaded
+        self.fontItems = []  # A list representing the font items we're looking at
         self._fontItemIdentifierGenerator = self._fontItemIdentifierGeneratorFunc()
 
-    def addFont(self, path: PathLike, fontNumber: int):
+    def addFont(self, path: PathLike, fontNumber: int, index=None):
         if not isinstance(path, PathLike):
             raise TypeError("path must be a Path(-like) object")
         fontKey = (path, fontNumber)
         self.fonts[fontKey] = None
         fontItemInfo = dict(id=self.nextFontItemIdentifier(),
                         fontKey=fontKey)
-        self.fontItems.append(fontItemInfo)
+        if index is None:
+            self.fontItems.append(fontItemInfo)
+        else:
+            self.fontItems.insert(index, fontItemInfo)
 
     async def loadFont(self, path: PathLike, fontNumber: int,
                        sharableFontData=None):
