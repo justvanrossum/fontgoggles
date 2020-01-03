@@ -13,7 +13,7 @@ from fontgoggles.mac.featureTagGroup import FeatureTagGroup
 from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup
-from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
+from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.textInfo import TextInfo
 from fontgoggles.misc import opentypeTags
 
@@ -249,10 +249,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
             if fontItemInfo.font is None:
                 self.loadingFonts.add(fontItemInfo.identifier)
-                coro = self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData)
-                asyncio.create_task(coro)
+                self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData)
 
-    @objc.python_method
+    @asyncTask
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
         await fontItemInfo.load(sharableFontData=sharableFontData)
