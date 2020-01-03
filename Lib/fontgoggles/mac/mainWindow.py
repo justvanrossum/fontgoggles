@@ -255,7 +255,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontItem.setIsLoading(True)
         fontPath, fontNumber = fontKey
         await self.project.loadFont(fontPath, fontNumber, sharableFontData=sharableFontData)
-        font = self.project.getFont(fontPath, fontNumber)
+        font = self.project.fonts[fontKey]
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
         self.allFeatureTagsGSUB.update(font.featuresGSUB)
@@ -341,8 +341,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def setFontItemText(self, fontKey, fontItem):
-        fontPath, fontNumber = fontKey
-        font = self.project.getFont(fontPath, fontNumber, None)
+        font = self.project.fonts.get(fontKey)
         if font is None:
             return
         glyphs = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,

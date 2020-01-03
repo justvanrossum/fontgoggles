@@ -21,19 +21,9 @@ class Project:
             raise TypeError("path must be a Path(-like) object")
         fontKey = (path, fontNumber)
         self.fonts[fontKey] = None
-        fontItem = dict(id=self.nextFontItemIdentifier(),
+        fontItemInfo = dict(id=self.nextFontItemIdentifier(),
                         fontKey=fontKey)
-        self.fontItems.append(fontItem)
-
-    def getFont(self, path: PathLike, fontNumber: int,
-                notLoadedDefault=_RAISE_NOT_LOADED_ERROR):
-        font = self.fonts[path, fontNumber]
-        if font is None:
-            if notLoadedDefault is _RAISE_NOT_LOADED_ERROR:
-                raise ValueError("font is not loaded")
-            else:
-                return notLoadedDefault
-        return font
+        self.fontItems.append(fontItemInfo)
 
     async def loadFont(self, path: PathLike, fontNumber: int,
                        sharableFontData=None):

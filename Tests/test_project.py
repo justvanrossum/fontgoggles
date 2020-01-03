@@ -8,13 +8,10 @@ async def test_project_loadFonts():
     pr = Project()
     fontPath = getFontPath("IBMPlexSans-Regular.ttf")
     pr.addFont(fontPath, 0)
-    with pytest.raises(ValueError):
-        font = pr.getFont(fontPath, 0)
-    notLoadedMarker = object()
-    font = pr.getFont(fontPath, 0, notLoadedMarker)
-    assert font is notLoadedMarker
+    font = pr.fonts.get((fontPath, 0))
+    assert font is None
     await pr.loadFonts()
-    font = pr.getFont(fontPath, 0)
+    font = pr.fonts[fontPath, 0]
     assert font.axes == {}  # simple check to see if we have a font at all
     with pytest.raises(KeyError):
         await pr.loadFont(fontPath, 1)
@@ -28,5 +25,5 @@ async def test_project_loadFont():
     await pr.loadFont(fontPath, 0)
     with pytest.raises(TypeError):
         pr.addFont("a string", 0)
-    font = pr.getFont(fontPath, 0)
+    font = pr.fonts[fontPath, 0]
     assert font.axes == {}  # simple check to see if we have a font at all
