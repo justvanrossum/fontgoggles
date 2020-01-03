@@ -2,45 +2,6 @@ from os import PathLike
 from .font import getOpener
 
 
-class FontLoader:
-
-    def __init__(self):
-        self.fonts = {}
-
-    async def loadFont(self, fontKey, sharableFontData=None):
-        if fontKey in self.fonts:
-            return
-        if sharableFontData is None:
-            sharableFontData = {}
-        path, fontNumber = fontKey
-        fontData = sharableFontData.get(path)
-        numFonts, opener, getSortInfo = getOpener(path)
-        assert fontNumber < numFonts(path)
-        font, fontData = await opener(path, fontNumber, fontData)
-        if fontData is not None:
-            sharableFontData[path] = fontData
-        self.fonts[fontKey] = font
-
-    def purgeFonts(self, usedKeys):
-        self.fonts = {fontKey: fontObject for fontKey, fontObject in self.fonts.items()
-                      if fontKey in usedKeys}
-
-
-class FontItemInfo:
-
-    def __init__(self, identifier, fontKey, fontLoader):
-        self.identifier = identifier
-        self.fontKey = fontKey
-        self._fontLoader = fontLoader
-
-    @property
-    def font(self):
-        return self._fontLoader.fonts.get(self.fontKey)
-
-    async def load(self, sharableFontData=None):
-        await self._fontLoader.loadFont(self.fontKey, sharableFontData)
-
-
 class Project:
 
     def __init__(self):
@@ -82,3 +43,42 @@ class Project:
         """
         usedKeys = {fii.fontKey for fii in self.fonts}
         self._fontLoader.purgeFonts(usedKeys)
+
+
+class FontItemInfo:
+
+    def __init__(self, identifier, fontKey, fontLoader):
+        self.identifier = identifier
+        self.fontKey = fontKey
+        self._fontLoader = fontLoader
+
+    @property
+    def font(self):
+        return self._fontLoader.fonts.get(self.fontKey)
+
+    async def load(self, sharableFontData=None):
+        await self._fontLoader.loadFont(self.fontKey, sharableFontData)
+
+
+class FontLoader:
+
+    def __init__(self):
+        self.fonts = {}
+
+    async def loadFont(self, fontKey, sharableFontData=None):
+        if fontKey in self.fonts:
+            return
+        if sharableFontData is None:
+            sharableFontData = {}
+        path, fontNumber = fontKey
+        fontData = sharableFontData.get(path)
+        numFonts, opener, getSortInfo = getOpener(path)
+        assert fontNumber < numFonts(path)
+        font, fontData = await opener(path, fontNumber, fontData)
+        if fontData is not None:
+            sharableFontData[path] = fontData
+        self.fonts[fontKey] = font
+
+    def purgeFonts(self, usedKeys):
+        self.fonts = {fontKey: fontObject for fontKey, fontObject in self.fonts.items()
+                      if fontKey in usedKeys}
