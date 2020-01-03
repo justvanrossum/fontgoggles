@@ -312,10 +312,13 @@ class FontList(Group):
 
     @suppressAndLogException
     def insertFonts(self, paths, index):
+        addedIndices = []
         for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, defaultSortSpec):
             self.project.addFont(fontPath, fontNumber, index)
+            addedIndices.append(index)
             index += 1
         self.refitFontItems()
+        self.scrollSelectionToVisible(addedIndices)
 
     def refitFontItems(self):
         itemSize = self.itemSize
