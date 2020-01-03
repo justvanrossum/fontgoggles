@@ -36,7 +36,7 @@ class FontItemInfo:
     @property
     def font(self):
         return self._fontLoader.fonts.get(self.fontKey)
-    
+
     async def load(self, sharableFontData=None):
         await self._fontLoader.loadFont(self.fontKey, sharableFontData)
 
@@ -65,7 +65,6 @@ class Project:
         sharableFontData = {}
         for fontItemInfo in self.fonts:
             await fontItemInfo.load(sharableFontData)
-
 
     def nextFontItemIdentifier(self):
         return next(self._fontItemIdentifierGenerator)

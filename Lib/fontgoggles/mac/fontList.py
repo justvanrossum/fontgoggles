@@ -521,10 +521,10 @@ class FGGlyphLineView(AppKit.NSView):
         self._lastDiffSelection = None
 
         trackingArea = AppKit.NSTrackingArea.alloc().initWithRect_options_owner_userInfo_(
-                self.bounds(),
-                AppKit.NSTrackingActiveInKeyWindow | AppKit.NSTrackingMouseMoved |
-                AppKit.NSTrackingMouseEnteredAndExited | AppKit.NSTrackingInVisibleRect,
-                self, None)
+            self.bounds(),
+            AppKit.NSTrackingActiveInKeyWindow | AppKit.NSTrackingMouseMoved |
+            AppKit.NSTrackingMouseEnteredAndExited | AppKit.NSTrackingInVisibleRect,
+            self, None)
         self.addTrackingArea_(trackingArea)
 
         return self
@@ -743,7 +743,7 @@ class FGGlyphLineView(AppKit.NSView):
 
     def mouseMoved_(self, event):
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
-        self.hoveredGlyphIndex = self.findGlyph_(self.convertPoint_fromView_(event.locationInWindow(), None))
+        self.hoveredGlyphIndex = self.findGlyph_(point)
 
     def mouseEntered_(self, event):
         pass
