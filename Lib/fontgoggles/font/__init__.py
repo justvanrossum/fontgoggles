@@ -17,6 +17,9 @@ def sniffFontType(fontPath: PathLike):
     return openerKey
 
 
+defaultSortSpec = ("familyName", "weight", "width", "italicAngle", "styleName", "suffix")
+
+
 def sortedFontPathsAndNumbers(paths: list, sortSpec: tuple=()):
     expandedPaths = list(iterFontPathsAndNumbers(paths))
 

@@ -3,7 +3,7 @@ import AppKit
 
 from ..project import Project
 from .mainWindow import FGMainWindowController
-from ..font import sortedFontPathsAndNumbers
+from ..font import defaultSortSpec, sortedFontPathsAndNumbers
 
 
 class FGDocument(AppKit.NSDocument):
@@ -18,8 +18,7 @@ class FGDocument(AppKit.NSDocument):
 
     def addSourceFiles_(self, paths):
         paths = [pathlib.Path(path) for path in paths]
-        sortKeys = ("familyName", "weight", "width", "italicAngle", "styleName", "suffix")
-        for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, sortKeys):
+        for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, defaultSortSpec):
             self.project.addFont(fontPath, fontNumber)
 
     def makeWindowControllers(self):
