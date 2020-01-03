@@ -13,7 +13,7 @@ class Project:
         if not isinstance(path, PathLike):
             raise TypeError("path must be a Path(-like) object")
         fontKey = (path, fontNumber)
-        fontItemIdentifier = self.nextFontItemIdentifier()
+        fontItemIdentifier = self._nextFontItemIdentifier()
         fontItemInfo = FontItemInfo(fontItemIdentifier, fontKey, self._fontLoader)
         if index is None:
             index = len(self.fonts)
@@ -27,7 +27,7 @@ class Project:
         for fontItemInfo in self.fonts:
             await fontItemInfo.load(sharableFontData)
 
-    def nextFontItemIdentifier(self):
+    def _nextFontItemIdentifier(self):
         return next(self._fontItemIdentifierGenerator)
 
     @staticmethod
