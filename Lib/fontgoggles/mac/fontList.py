@@ -94,7 +94,7 @@ class FGFontListView(AppKit.NSView):
                 self._dragPosView.setBackgroundColor_(AppKit.NSColor.textColor())
             index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
             self._dragPosView.setFrame_(frame)
-            self.addSubview_(self._dragPosView)
+            self.superview().addSubview_(self._dragPosView)
             return AppKit.NSDragOperationEvery
         else:
             self._weHaveValidDrag = False
@@ -134,16 +134,19 @@ class FGFontListView(AppKit.NSView):
         else:
             flippedIndex = 0
         frame.origin[1 - vertical] = max(0, itemSize * flippedIndex)
-        frame.size[vertical] = self.frame().size[vertical]
         dropBarSize = 2
         frame.size[1 - vertical] = dropBarSize
+
+        frame.origin[vertical] -= frame.size[vertical] * 10
+        frame.size[vertical] *= 20
+
         if not numFontItems or frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
             frame.origin[1 - vertical] = self.frame().size[1 - vertical] - dropBarSize
         if not vertical:
             index = numFontItems - flippedIndex
         else:
             index = flippedIndex
-        # frame = self.superview().convertRect_fromView_(frame, self)
+        frame = self.superview().convertRect_fromView_(frame, self)
         return index, frame
 
     def prepareForDragOperation_(self, draggingInfo):
