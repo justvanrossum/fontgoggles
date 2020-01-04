@@ -35,10 +35,11 @@ class FGFontListView(AppKit.NSView):
         self.vanillaWrapper().keyDown(event)
 
     def subscribeToMagnification_(self, scrollView):
-        AppKit.NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(
+        nc = AppKit.NSNotificationCenter.defaultCenter()
+        nc.addObserver_selector_name_object_(
             self, "_liveMagnifyWillStart:", AppKit.NSScrollViewWillStartLiveMagnifyNotification,
             scrollView)
-        AppKit.NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(
+        nc.addObserver_selector_name_object_(
             self, "_liveMagnifyDidEnd:", AppKit.NSScrollViewDidEndLiveMagnifyNotification,
             scrollView)
 
