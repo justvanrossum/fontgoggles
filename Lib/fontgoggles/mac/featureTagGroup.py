@@ -16,6 +16,10 @@ class FeatureTagGroup(Group):
         self._callback = callback
         self.setTags(tagGroups)
 
+    def _breakCycles(self):
+        del self._callback
+        super()._breakCycles()
+
     def setTags(self, tagGroups):
         # clear all subviews
         for attr, value in list(self.__dict__.items()):
