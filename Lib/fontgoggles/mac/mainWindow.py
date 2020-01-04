@@ -113,6 +113,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @suppressAndLogException
     def _windowCloseCallback(self, sender):
+        # The listView cleanup should no longer be needed once
+        # https://github.com/robotools/vanilla/pull/115 is merged.
         for listView in [self.glyphList, self.unicodeList]:
             listView._selectionCallback = None
             listView._arrayController.removeObserver_forKeyPath_(listView._selectionObserver, "selectionIndexes")
