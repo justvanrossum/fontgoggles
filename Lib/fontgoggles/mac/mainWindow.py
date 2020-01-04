@@ -113,6 +113,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @suppressAndLogException
     def _windowCloseCallback(self, sender):
+        for listView in [self.glyphList, self.unicodeList]:
+            listView._selectionCallback = None
+            listView._arrayController.removeObserver_forKeyPath_(listView._selectionObserver, "selectionIndexes")
+            listView._selectionObserver._targetMethod = None
+            listView._selectionObserver = None
         self.__dict__.clear()
 
     def windowTitleForDocumentDisplayName_(self, displayName):
