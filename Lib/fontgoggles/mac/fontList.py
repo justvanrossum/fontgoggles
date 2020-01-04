@@ -140,7 +140,7 @@ class FGFontListView(AppKit.NSView):
         frame.origin[vertical] -= frame.size[vertical] * 10
         frame.size[vertical] *= 20
 
-        if not numFontItems or frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
+        if not vertical and (not numFontItems or frame.origin[1 - vertical] >= self.frame().size[1 - vertical]):
             frame.origin[1 - vertical] = self.frame().size[1 - vertical] - dropBarSize
         if not vertical:
             index = numFontItems - index
