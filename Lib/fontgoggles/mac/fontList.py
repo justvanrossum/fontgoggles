@@ -129,11 +129,11 @@ class FGFontListView(AppKit.NSView):
         vertical = fontList.vertical
         frame = self.bounds()
         if numFontItems:
-            flippedIndex = round(point[1 - vertical] / itemSize)
-            flippedIndex = max(0, min(flippedIndex, numFontItems))
+            index = round(point[1 - vertical] / itemSize)
+            index = max(0, min(index, numFontItems))
         else:
-            flippedIndex = 0
-        frame.origin[1 - vertical] = max(0, itemSize * flippedIndex)
+            index = 0
+        frame.origin[1 - vertical] = max(0, itemSize * index)
         dropBarSize = 2
         frame.size[1 - vertical] = dropBarSize
 
@@ -143,9 +143,7 @@ class FGFontListView(AppKit.NSView):
         if not numFontItems or frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
             frame.origin[1 - vertical] = self.frame().size[1 - vertical] - dropBarSize
         if not vertical:
-            index = numFontItems - flippedIndex
-        else:
-            index = flippedIndex
+            index = numFontItems - index
         frame = self.superview().convertRect_fromView_(frame, self)
         return index, frame
 
