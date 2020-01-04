@@ -390,22 +390,25 @@ class FontList(Group):
     def getFontItem(self, fontItemIdentifier):
         return getattr(self, fontItemIdentifier)
 
+    def getFontItemByIndex(self, index):
+        return getattr(self, self.project.fonts[index].identifier)
+
     def getNumFontItems(self):
         return len(self.project.fonts)
 
     def getSingleSelectedItem(self):
         if len(self.project.fonts) == 1:
-            return self.getFontItem(self.project.fonts[0].identifier)
+            return self.getFontItemByIndex(0)
         elif len(self.selection) == 1:
             index = list(self.selection)[0]
-            return self.getFontItem(self.project.fonts[index].identifier)
+            return self.getFontItemByIndex(index)
         else:
             return None
 
     def _getSelectionRect(self, selection):
         selRect = None
         for index in selection:
-            fontItem = self.getFontItem(self.project.fonts[index].identifier)
+            fontItem = self.getFontItemByIndex(index)
             if selRect is None:
                 selRect = fontItem._nsObject.frame()
             else:
@@ -419,7 +422,7 @@ class FontList(Group):
 
     def scrollGlyphSelectionToVisible(self):
         if self.selection:
-            fontItems = (self.getFontItem(self.project.fonts[index].identifier) for index in self.selection)
+            fontItems = (self.getFontItemByIndex(index) for index in self.selection)
         else:
             fontItems = (self.getFontItem(fiInfo.identifier) for fiInfo in self.project.fonts)
         rects = []
@@ -441,7 +444,7 @@ class FontList(Group):
         index = self._lastItemClicked
         self._lastItemClicked = None
         if index is not None:
-            fontItem = self.getFontItem(self.project.fonts[index].identifier)
+            fontItem = self.getFontItemByIndex(index)
             glyphSelectionChanged = bool(fontItem.popDiffSelection())
             clickedSelection = {index}
         else:
