@@ -13,6 +13,10 @@ class SliderGroup(Group):
         self._continuous = continuous
         self.setSliderInfo(sliderInfo)
 
+    def _breakCycles(self):
+        del self._callback
+        super()._breakCycles()
+
     def setSliderInfo(self, sliderInfo):
         # clear all subviews
         for attr, value in list(self.__dict__.items()):
