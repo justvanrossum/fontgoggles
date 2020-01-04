@@ -127,10 +127,10 @@ class FGFontListView(AppKit.NSView):
         numFontItems = fontList.getNumFontItems()
         itemSize = fontList.itemSize
         vertical = fontList.vertical
-        frame = self._dragPosView.frame()
+        frame = self.bounds()
         if numFontItems:
             flippedIndex = round(point[1 - vertical] / itemSize)
-            flippedIndex = max(0, min(flippedIndex, numFontItems - 1))
+            flippedIndex = max(0, min(flippedIndex, numFontItems))
         else:
             flippedIndex = 0
         frame.origin[1 - vertical] = max(0, itemSize * flippedIndex)
@@ -139,8 +139,11 @@ class FGFontListView(AppKit.NSView):
         frame.size[1 - vertical] = dropBarSize
         if not numFontItems or frame.origin[1 - vertical] >= self.frame().size[1 - vertical]:
             frame.origin[1 - vertical] = self.frame().size[1 - vertical] - dropBarSize
-        # TODO We could do with a more elegant drop indicator if the current list is empty
-        index = numFontItems - flippedIndex
+        if not vertical:
+            index = numFontItems - flippedIndex
+        else:
+            index = flippedIndex
+        # frame = self.superview().convertRect_fromView_(frame, self)
         return index, frame
 
     def prepareForDragOperation_(self, draggingInfo):
@@ -196,7 +199,7 @@ class FontList(Group):
         itemSize = self.itemSize
         y = 0
         for index, fontItemInfo in enumerate(self.project.fonts):
-            fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index)
+            fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index, self.vertical)
             setattr(self, fontItemInfo.identifier, fontItem)
             y += itemSize
         self.setPosSize((0, 0, self.width, y))
@@ -342,7 +345,7 @@ class FontList(Group):
                     y = index * itemSize
                     w = 0
                     h = itemSize
-                fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index)
+                fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index, self.vertical)
                 setattr(self, fontItemInfo.identifier, fontItem)
                 if fontItemInfo.font is not None:
                     # Font is already loaded. TODO: rethink factorization? See below.
@@ -492,13 +495,16 @@ class FontItem(Group):
     vertical = delegateProperty("glyphLineView")
     selected = delegateProperty("glyphLineView")
 
-    def __init__(self, posSize, fontKey, fontListIndex):
+    def __init__(self, posSize, fontKey, fontListIndex, vertical):
         super().__init__(posSize)
         # self._nsObject.setWantsLayer_(True)
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.fontListIndex = fontListIndex
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
+        self.vertical = vertical
         self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
+        if vertical:
+            self.fileNameLabel.rotate(90)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
 
