@@ -491,7 +491,7 @@ class FontList(Group):
                     self.selection = self.selection | {index}
                 else:
                     self.selection = {index}
-                self.scrollSelectionToVisible()
+            self.scrollSelectionToVisible()
 
 
 class FontItem(Group):
