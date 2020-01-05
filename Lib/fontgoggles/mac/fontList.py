@@ -199,12 +199,23 @@ class FontList(Group):
             if isinstance(value, VanillaBaseObject):
                 delattr(self, attr)
         itemSize = self.itemSize
-        y = 0
-        for index, fontItemInfo in enumerate(self.project.fonts):
-            fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index, self.vertical)
-            setattr(self, fontItemInfo.identifier, fontItem)
-            y += itemSize
+        if self.project.fonts:
+            y = 0
+            for index, fontItemInfo in enumerate(self.project.fonts):
+                fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index, self.vertical)
+                setattr(self, fontItemInfo.identifier, fontItem)
+                y += itemSize
+        else:
+            y = itemSize
+            self.setupDropFontsPlaceholder()
         self.setPosSize((0, 0, self.width, y))
+
+    def setupDropFontsPlaceholder(self):
+        color = AppKit.NSColor.systemGrayColor()
+        color = color.blendedColorWithFraction_ofColor_(0.5, AppKit.NSColor.textBackgroundColor())
+        self.dropFontsPlaceHolder = UnclickableTextBox((10, 10, -10, -10),
+                                                       "Drop some fonts here!", fontSize=24,
+                                                       textColor=color)
 
     @property
     def width(self):
@@ -289,6 +300,8 @@ class FontList(Group):
 
     @suppressAndLogException
     def resizeFontItems(self, itemSize):
+        if not self.project.fonts:
+            return
         scaleFactor = itemSize / self.itemSize
         self.itemSize = itemSize
         pos = [0, 0]
@@ -333,6 +346,8 @@ class FontList(Group):
         self.scrollSelectionToVisible(addedIndices)
 
     def refitFontItems(self):
+        if hasattr(self, "dropFontsPlaceHolder"):
+            del self.dropFontsPlaceHolder
         itemSize = self.itemSize
         anyFontsToLoad = False
         for index, fontItemInfo in enumerate(self.project.fonts):
@@ -885,9 +900,17 @@ class UnclickableTextBox(TextBox):
 
     nsTextFieldClass = FGUnclickableTextField
 
-    def __init__(self, *args, fontSize=12, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
+    def __init__(self, posSize, text="", fontSize=None, textColor=None, **kwargs):
+        attrs = {}
+        if textColor is not None:
+            attrs[AppKit.NSForegroundColorAttributeName] = textColor
+        if fontSize is not None:
+            attrs[AppKit.NSFontAttributeName] = AppKit.NSFont.systemFontOfSize_(fontSize)
+        if attrs:
+            text = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, attrs)
+        super().__init__(posSize, text, **kwargs)
+        cell = self._nsObject.cell()
+        cell.setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
 
     def set(self, value, tooltip=None):
         super().set(value)
