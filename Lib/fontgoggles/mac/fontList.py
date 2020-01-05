@@ -459,7 +459,7 @@ class FontList(Group):
         usedIdentifiers = {fii.identifier for fii in self.project.fonts}
         staleIdentifiers = []
         for attr, value in self.__dict__.items():
-            if isinstance(value, VanillaBaseObject) and attr not in usedIdentifiers:
+            if attr not in usedIdentifiers and isinstance(value, VanillaBaseObject):
                 staleIdentifiers.append(attr)
         for attr in staleIdentifiers:
             delattr(self, attr)
