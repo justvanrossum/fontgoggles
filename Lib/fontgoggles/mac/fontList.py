@@ -33,7 +33,9 @@ class FGFontListView(AppKit.NSView):
         self.vanillaWrapper().mouseDown(event)
 
     def keyDown_(self, event):
-        self.vanillaWrapper().keyDown(event)
+        if not self.vanillaWrapper().keyDown(event):
+            super().keyDown_(event)
+
 
     def subscribeToMagnification_(self, scrollView):
         nc = AppKit.NSNotificationCenter.defaultCenter()
@@ -104,7 +106,6 @@ class FGFontListView(AppKit.NSView):
 
     @suppressAndLogException
     def draggingUpdated_(self, draggingInfo):
-        # print("updated", draggingInfo)
         if self._weHaveValidDrag:
             index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
             self._dragPosView.animator().setFrame_(frame)
@@ -183,8 +184,15 @@ class FGFontListView(AppKit.NSView):
             info = fontList.undoManager.redoInfo()
             sender.setTitle_(_makeUndoTitle("Redo", info))
             return info is not None
+        elif sender.action() == "delete:":
+            fontList = self.vanillaWrapper()
+            return bool(fontList.selection)
         else:
             return super().validateMenuItem_(sender)
+
+    def delete_(self, sender):
+        fontList = self.vanillaWrapper()
+        fontList.removeSelectedFontItems()
 
 
 def _makeUndoTitle(mainTitle, info):
@@ -225,10 +233,12 @@ class FontList(Group):
         self.undoManager = UndoManager(self._projectFontsChanged)
         self.projectFontsProxy = self.undoManager.setModel(project.fonts)
 
+    @suppressAndLogException
     def _projectFontsChanged(self, changeSet):
         if any(change.op == "remove" for change in changeSet):
             self.purgeFontItems()
         self.refitFontItems()
+        self.resetSelection()
 
     def _glyphSelectionChanged(self):
         if self._glyphSelectionChangedCallback is not None:
@@ -387,6 +397,12 @@ class FontList(Group):
                 index += 1
         self.scrollSelectionToVisible(addedIndices)
 
+    def removeSelectedFontItems(self):
+        indicesToDelete = sorted(self.selection, reverse=True)
+        with self.undoManager.changeSet(title="Remove Fonts"):
+            for index in indicesToDelete:
+                del self.projectFontsProxy[index]
+
     def refitFontItems(self):
         if hasattr(self, "dropFontsPlaceHolder"):
             del self.dropFontsPlaceHolder
@@ -453,6 +469,11 @@ class FontList(Group):
             fontItem.selected = not fontItem.selected
         if self._selectionChangedCallback is not None:
             self._selectionChangedCallback(self)
+
+    def resetSelection(self):
+        self._selection = set()
+        for fontItem in self.iterFontItems():
+            fontItem.selected = False
 
     def getFontItem(self, fontItemIdentifier):
         return getattr(self, fontItemIdentifier)
@@ -541,7 +562,7 @@ class FontList(Group):
             if vertical == self.vertical:
                 if self._arrowKeyCallback is not None:
                     self._arrowKeyCallback(self, event)
-                return
+                return True
 
             numFontItems = len(self.project.fonts)
             if not self._selection:
@@ -559,6 +580,8 @@ class FontList(Group):
                 else:
                     self.selection = {index}
             self.scrollSelectionToVisible()
+            return True
+        return False
 
 
 class FontItem(Group):

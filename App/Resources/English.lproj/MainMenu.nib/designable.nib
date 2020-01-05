@@ -147,7 +147,11 @@
                                     <action selector="pasteAsPlainText:" target="-1" id="247"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Delete" id="202">
+                            <menuItem title="Delete" alternate="YES" id="202">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="delete:" target="-1" id="235"/>
                                 </connections>
