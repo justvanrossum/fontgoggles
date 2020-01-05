@@ -91,7 +91,7 @@ class FGFontListView(AppKit.NSView):
             self._weHaveValidDrag = True
             if self._dragPosView is None:
                 self._dragPosView = AppKit.NSView.alloc().init()
-                self._dragPosView.setBackgroundColor_(AppKit.NSColor.textColor())
+                self._dragPosView.setBackgroundColor_(AppKit.NSColor.controlAccentColor())
             index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
             self._dragPosView.setFrame_(frame)
             self.superview().addSubview_(self._dragPosView)
