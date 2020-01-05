@@ -162,6 +162,39 @@ class FGFontListView(AppKit.NSView):
         for path in draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType):
             yield pathlib.Path(path)
 
+    # Undo/Redo
+
+    def undo_(self, sender):
+        fontList = self.vanillaWrapper()
+        fontList.undoManager.undo()
+
+    def redo_(self, sender):
+        fontList = self.vanillaWrapper()
+        fontList.undoManager.redo()
+
+    def validateMenuItem_(self, sender):
+        if sender.action() == "undo:":
+            fontList = self.vanillaWrapper()
+            info = fontList.undoManager.undoInfo()
+            sender.setTitle_(_makeUndoTitle("Undo", info))
+            return info is not None
+        elif sender.action() == "redo:":
+            fontList = self.vanillaWrapper()
+            info = fontList.undoManager.redoInfo()
+            sender.setTitle_(_makeUndoTitle("Redo", info))
+            return info is not None
+        else:
+            return super().validateMenuItem_(sender)
+
+
+def _makeUndoTitle(mainTitle, info):
+    title = [mainTitle]
+    if info:
+        undoName = info.get("title")
+        if undoName:
+            title.append(undoName)
+    return " ".join(title)
+
 
 arrowKeyDefs = {
     AppKit.NSUpArrowFunctionKey: (-1, 1),
@@ -193,7 +226,9 @@ class FontList(Group):
         self.projectFontsProxy = self.undoManager.setModel(project.fonts)
 
     def _projectFontsChanged(self, changeSet):
-        print(changeSet)
+        if any(change.op == "remove" for change in changeSet):
+            self.purgeFontItems()
+        self.refitFontItems()
 
     def _glyphSelectionChanged(self):
         if self._glyphSelectionChangedCallback is not None:
@@ -344,13 +379,12 @@ class FontList(Group):
     @suppressAndLogException
     def insertFonts(self, paths, index):
         addedIndices = []
-        with self.undoManager.changeSet(title="Drop fonts"):
+        with self.undoManager.changeSet(title="Insert Fonts"):
             for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, defaultSortSpec):
                 fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
                 self.projectFontsProxy.insert(index, fontItemInfo)
                 addedIndices.append(index)
                 index += 1
-        self.refitFontItems()
         self.scrollSelectionToVisible(addedIndices)
 
     def refitFontItems(self):
@@ -396,6 +430,15 @@ class FontList(Group):
             # TODO: rethink factorization?
             windowController = self._nsObject.window().windowController()
             windowController.loadFonts()
+
+    def purgeFontItems(self):
+        usedIdentifiers = {fii.identifier for fii in self.project.fonts}
+        staleIdentifiers = []
+        for attr, value in self.__dict__.items():
+            if isinstance(value, VanillaBaseObject) and attr not in usedIdentifiers:
+                staleIdentifiers.append(attr)
+        for attr in staleIdentifiers:
+            delattr(self, attr)
 
     @property
     def selection(self):
