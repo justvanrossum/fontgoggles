@@ -165,14 +165,17 @@ class FGFontListView(AppKit.NSView):
 
     # Undo/Redo
 
+    @suppressAndLogException
     def undo_(self, sender):
         fontList = self.vanillaWrapper()
         fontList.undoManager.undo()
 
+    @suppressAndLogException
     def redo_(self, sender):
         fontList = self.vanillaWrapper()
         fontList.undoManager.redo()
 
+    @suppressAndLogException
     def validateMenuItem_(self, sender):
         if sender.action() == "undo:":
             fontList = self.vanillaWrapper()
@@ -190,6 +193,7 @@ class FGFontListView(AppKit.NSView):
         else:
             return super().validateMenuItem_(sender)
 
+    @suppressAndLogException
     def delete_(self, sender):
         fontList = self.vanillaWrapper()
         fontList.removeSelectedFontItems()
@@ -399,6 +403,10 @@ class FontList(Group):
 
     def removeSelectedFontItems(self):
         indicesToDelete = sorted(self.selection, reverse=True)
+        # One of the font list items is first responder, but it will
+        # get deleted, so it can't stay first responder. Make the font
+        # list itself the first responder and all is fine.
+        self._nsObject.window().makeFirstResponder_(self._nsObject)
         with self.undoManager.changeSet(title="Remove Fonts"):
             for index in indicesToDelete:
                 del self.projectFontsProxy[index]
