@@ -270,7 +270,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
         self.allAxes = mergeAxes(self.allAxes, font.axes)
         self.setFontItemText(fontItemInfo, fontItem)
-        self.loadingFonts.remove(fontItemInfo.identifier)
+        self.loadingFonts.discard(fontItemInfo.identifier)
         if not self.loadingFonts:
             # All fonts have been loaded
             self.updateSidebarItems()
