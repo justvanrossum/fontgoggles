@@ -25,7 +25,7 @@ class FGAppDelegate(NSObject):
             self.application_openFiles_(None, result)
 
     def applicationShouldOpenUntitledFile_(self, app):
-        return False
+        return True
 
     def application_openFiles_(self, app, fileNames):
         if self.filesToOpen is None:
