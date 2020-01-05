@@ -91,7 +91,8 @@ class FGFontListView(AppKit.NSView):
             self._weHaveValidDrag = True
             if self._dragPosView is None:
                 self._dragPosView = AppKit.NSView.alloc().init()
-                self._dragPosView.setBackgroundColor_(AppKit.NSColor.controlAccentColor())
+                self._dragPosView.setWantsLayer_(True)
+                self._dragPosView.setBackgroundColor_(controlAccentColor())
             index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
             self._dragPosView.setFrame_(frame)
             self.superview().addSubview_(self._dragPosView)
@@ -501,8 +502,8 @@ class FontItem(Group):
 
     def __init__(self, posSize, fontKey, fontListIndex, vertical):
         super().__init__(posSize)
-        # self._nsObject.setWantsLayer_(True)
-        # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
+        self._nsObject.setWantsLayer_(True)
+        self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.fontListIndex = fontListIndex
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.vertical = vertical
@@ -904,3 +905,10 @@ class UnclickableTextBox(TextBox):
     def align(self, value):
         nsAlignment = textAlignments.get(value, textAlignments["left"])
         self._nsObject.cell().setAlignment_(nsAlignment)
+
+
+def controlAccentColor():
+    if hasattr(AppKit.NSColor, "controlAccentColor"):
+        return AppKit.NSColor.controlAccentColor()
+    else:
+        return AppKit.NSColor.systemBlueColor()
