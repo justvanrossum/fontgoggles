@@ -191,6 +191,7 @@ class FGFontListView(AppKit.NSView):
             return super().validateMenuItem_(sender)
 
     def delete_(self, sender):
+        print(self.window().firstResponder(), self)
         fontList = self.vanillaWrapper()
         fontList.removeSelectedFontItems()
 
