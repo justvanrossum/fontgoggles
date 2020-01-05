@@ -482,6 +482,8 @@ class FontList(Group):
         self._selection = set()
         for fontItem in self.iterFontItems():
             fontItem.selected = False
+        if self._selectionChangedCallback is not None:
+            self._selectionChangedCallback(self)
 
     def getFontItem(self, fontItemIdentifier):
         return getattr(self, fontItemIdentifier)
