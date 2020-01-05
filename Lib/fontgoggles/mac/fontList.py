@@ -2,6 +2,7 @@ import pathlib
 import objc
 import AppKit
 from vanilla import *
+from jundo import UndoManager
 from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
 from fontgoggles.font import defaultSortSpec, sniffFontType, sortedFontPathsAndNumbers
 from fontgoggles.mac.drawing import *
@@ -188,6 +189,11 @@ class FontList(Group):
         self._lastItemClicked = None
         self.project = project
         self.setupFontItems()
+        self.undoManager = UndoManager(self._projectFontsChanged)
+        self.projectFontsProxy = self.undoManager.setModel(project.fonts)
+
+    def _projectFontsChanged(self, changeSet):
+        print(changeSet)
 
     def _glyphSelectionChanged(self):
         if self._glyphSelectionChangedCallback is not None:
@@ -338,10 +344,12 @@ class FontList(Group):
     @suppressAndLogException
     def insertFonts(self, paths, index):
         addedIndices = []
-        for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, defaultSortSpec):
-            self.project.addFont(fontPath, fontNumber, index)
-            addedIndices.append(index)
-            index += 1
+        with self.undoManager.changeSet(title="Drop fonts"):
+            for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, defaultSortSpec):
+                fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
+                self.projectFontsProxy.insert(index, fontItemInfo)
+                addedIndices.append(index)
+                index += 1
         self.refitFontItems()
         self.scrollSelectionToVisible(addedIndices)
 
