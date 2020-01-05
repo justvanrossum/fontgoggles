@@ -241,6 +241,7 @@ class FontList(Group):
     def _projectFontsChanged(self, changeSet):
         if any(change.op == "remove" for change in changeSet):
             self.purgeFontItems()
+            self.project.purgeFonts()
         self.refitFontItems()
         self.resetSelection()
 
