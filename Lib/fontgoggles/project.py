@@ -10,14 +10,17 @@ class Project:
         self._fontItemIdentifierGenerator = self._fontItemIdentifierGeneratorFunc()
 
     def addFont(self, path: PathLike, fontNumber: int, index=None):
+        fontItemInfo = self.newFontItemInfo(path, fontNumber)
+        if index is None:
+            index = len(self.fonts)
+        self.fonts.insert(index, fontItemInfo)
+
+    def newFontItemInfo(self, path: PathLike, fontNumber: int):
         if not isinstance(path, PathLike):
             raise TypeError("path must be a Path(-like) object")
         fontKey = (path, fontNumber)
         fontItemIdentifier = self._nextFontItemIdentifier()
-        fontItemInfo = FontItemInfo(fontItemIdentifier, fontKey, self._fontLoader)
-        if index is None:
-            index = len(self.fonts)
-        self.fonts.insert(index, fontItemInfo)
+        return FontItemInfo(fontItemIdentifier, fontKey, self._fontLoader)
 
     async def loadFonts(self):
         # Note that this method cannot not load fonts concurrently, and
