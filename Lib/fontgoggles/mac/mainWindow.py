@@ -12,7 +12,7 @@ from fontgoggles.mac.drawing import *
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
 from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
-from fontgoggles.mac.sliderGroup import SliderGroup
+from fontgoggles.mac.sliderGroup import SliderGroup, SliderPlus
 from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.textInfo import TextInfo
 from fontgoggles.misc import opentypeTags
@@ -207,6 +207,19 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         variationsTab.main = AligningScrollView((0, 0, 0, 0), self.variationsGroup, drawBackground=False,
                                                 hasHorizontalScroller=False,
                                                 borderType=AppKit.NSNoBorder)
+
+        optionsTab = group.feaVarTabs[2]
+        # TODO initial value from where?
+        y = 10
+        optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Size", 25, 75, 125,
+                                           callback=self.relativeSizeChangedCallback)
+        y += 50
+        optionsTab.relativeBaselineSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Baseline", 0, 50, 100,
+                                           callback=self.relativeBaselineChangedCallback)
+        y += 50
+        optionsTab.relativeMarginSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Margin", 0, 20, 100,
+                                           callback=self.relativeMarginChangedCallback)
+        y += 50
 
         return group
 
@@ -617,6 +630,18 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def varLocationChanged(self, sender):
         self.varLocation = {k: v for k, v in sender.get().items() if v is not None}
         self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
+
+    @objc.python_method
+    def relativeSizeChangedCallback(self, sender):
+        self.fontList.relativeFontSize = sender.get() / 100
+
+    @objc.python_method
+    def relativeBaselineChangedCallback(self, sender):
+        self.fontList.relativeBaseline = sender.get() / 100
+
+    @objc.python_method
+    def relativeMarginChangedCallback(self, sender):
+        self.fontList.relativeMargin = sender.get() / 100
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):
