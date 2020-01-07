@@ -7,7 +7,7 @@ from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
 from fontgoggles.font import defaultSortSpec, sniffFontType, sortedFontPathsAndNumbers
 from fontgoggles.mac.drawing import *
 from fontgoggles.mac.misc import textAlignments
-from fontgoggles.misc.decorators import suppressAndLogException
+from fontgoggles.misc.decorators import suppressAndLogException, asyncTaskAutoCancel
 from fontgoggles.misc.properties import delegateProperty, hookedProperty
 from fontgoggles.misc.rectTree import RectTree
 
@@ -361,22 +361,26 @@ class FontList(Group):
         self._nsObject.setNeedsDisplay_(True)
 
     @hookedProperty
-    def relativeFontSize(self):
+    @asyncTaskAutoCancel
+    async def relativeFontSize(self):
         for fontItem in self.iterFontItems():
             fontItem.relativeSize = self.relativeFontSize
 
     @hookedProperty
-    def relativeHBaseline(self):
+    @asyncTaskAutoCancel
+    async def relativeHBaseline(self):
         for fontItem in self.iterFontItems():
             fontItem.relativeHBaseline = self.relativeHBaseline
 
     @hookedProperty
-    def relativeVBaseline(self):
+    @asyncTaskAutoCancel
+    async def relativeVBaseline(self):
         for fontItem in self.iterFontItems():
             fontItem.relativeVBaseline = self.relativeVBaseline
 
     @hookedProperty
-    def relativeMargin(self):
+    @asyncTaskAutoCancel
+    async def relativeMargin(self):
         for fontItem in self.iterFontItems():
             fontItem.relativeMargin = self.relativeMargin
 
