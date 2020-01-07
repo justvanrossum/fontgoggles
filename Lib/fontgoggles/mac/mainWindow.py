@@ -270,6 +270,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
         self.allAxes = mergeAxes(self.allAxes, font.axes)
         self.setFontItemText(fontItemInfo, fontItem)
+        self.growFontListFromItem(fontItem)
         self.loadingFonts.discard(fontItemInfo.identifier)
         if not self.loadingFonts:
             # All fonts have been loaded
@@ -334,17 +335,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 # time to unblock the event loop
                 await asyncio.sleep(0)
                 t = time.time()
-        newExtent = 300  # some minimum so that our filename label stays large enough
-        for fontItem in self.iterFontItems():
-            newExtent = max(newExtent, fontItem.minimumExtent)
-        if not self.fontList.vertical:
-            if self.fontList.width > newExtent + fontListSizePadding:
-                # Shrink the font list
-                self.fontList.width = newExtent
-        else:
-            if self.fontList.height > newExtent + fontListSizePadding:
-                # Shrink the font list
-                self.fontList.height = newExtent
+        self.growOrShrinkFontList()
         self.fontListSelectionChangedCallback(self.fontList)
         if not updateUnicodeList:
             self.unicodeList.setSelection(charSelection)
@@ -359,6 +350,24 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                               varLocation=self.varLocation)
         addBoundingBoxes(glyphs)
         fontItem.glyphs = glyphs
+
+    def growOrShrinkFontList(self):
+        newExtent = 300  # some minimum so that our filename label stays large enough
+        for fontItem in self.iterFontItems():
+            newExtent = max(newExtent, fontItem.minimumExtent)
+        if not self.fontList.vertical:
+            if self.fontList.width > newExtent + fontListSizePadding:
+                self.fontList.width = newExtent
+            elif self.fontList.width < newExtent:
+                self.fontList.width = newExtent + fontListSizePadding
+        else:
+            if self.fontList.height > newExtent + fontListSizePadding:
+                self.fontList.height = newExtent
+            elif self.fontList.height < newExtent:
+                self.fontList.height = newExtent + fontListSizePadding
+
+    @objc.python_method
+    def growFontListFromItem(self, fontItem):
         minimumExtent = fontItem.minimumExtent
         if not self.fontList.vertical:
             if minimumExtent > self.fontList.width:
