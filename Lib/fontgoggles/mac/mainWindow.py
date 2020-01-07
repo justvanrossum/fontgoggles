@@ -633,11 +633,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def relativeSizeChangedCallback(self, sender):
+        if not hasattr(self, "fontList"):
+            # Happens when the window is closing and the text field of the slider has focus
+            return
         self.fontList.relativeFontSize = sender.get() / 100
         self.growOrShrinkFontList()
 
     @objc.python_method
     def relativeBaselineChangedCallback(self, sender):
+        if not hasattr(self, "fontList"):
+            # Happens when the window is closing and the text field of the slider has focus
+            return
         value = sender.get() / 100
         if self.fontList.vertical:
             self.fontList.relativeVBaseline = value
@@ -646,6 +652,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def relativeMarginChangedCallback(self, sender):
+        if not hasattr(self, "fontList"):
+            # Happens when the window is closing and the text field of the slider has focus
+            return
         self.fontList.relativeMargin = sender.get() / 100
         self.growOrShrinkFontList()
 

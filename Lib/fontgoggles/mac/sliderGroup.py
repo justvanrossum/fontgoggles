@@ -14,7 +14,7 @@ class SliderGroup(Group):
         self.setSliderInfo(sliderInfo)
 
     def _breakCycles(self):
-        del self._callback
+        self._callback = None
         super()._breakCycles()
 
     def setSliderInfo(self, sliderInfo):
@@ -67,6 +67,10 @@ class SliderPlus(Group):
         self.editField._nsObject.setAlignment_(AppKit.NSRightTextAlignment)
         self._setSliderFromValue(value)
         self._setEditFieldFromValue(value)
+
+    def _breakCycles(self):
+        self._callback = None
+        super()._breakCycles()
 
     def _sliderCallback(self, sender):
         value = sender.get()
