@@ -637,7 +637,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def relativeBaselineChangedCallback(self, sender):
-        self.fontList.relativeBaseline = sender.get() / 100
+        value = sender.get() / 100
+        if self.fontList.vertical:
+            self.fontList.relativeVBaseline = value
+        else:
+            self.fontList.relativeHBaseline = value
 
     @objc.python_method
     def relativeMarginChangedCallback(self, sender):

@@ -353,6 +353,22 @@ class FontList(Group):
         self.setPosSize((x, y, w, h))
         self._nsObject.setNeedsDisplay_(True)
 
+    @hookedProperty
+    def relativeFontSize(self):
+        print("---- relativeFontSize hook", self.relativeFontSize)
+
+    @hookedProperty
+    def relativeHBaseline(self):
+        print("---- relativeHBaseline hook", self.relativeHBaseline)
+
+    @hookedProperty
+    def relativeVBaseline(self):
+        print("---- relativeVBaseline hook", self.relativeVBaseline)
+
+    @hookedProperty
+    def relativeMargin(self):
+        print("---- relativeMargin hook", self.relativeMargin)
+
     @suppressAndLogException
     def resizeFontItems(self, itemSize):
         if not self.project.fonts:
