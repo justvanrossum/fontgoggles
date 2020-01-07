@@ -211,13 +211,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         optionsTab = group.feaVarTabs[2]
         # TODO initial value from where?
         y = 10
-        optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Size", 25, 75, 125,
+        optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Size", 25, 70, 125,
                                            callback=self.relativeSizeChangedCallback)
         y += 50
-        optionsTab.relativeBaselineSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Baseline", 0, 50, 100,
+        optionsTab.relativeBaselineSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Baseline", 0, 25, 100,
                                            callback=self.relativeBaselineChangedCallback)
         y += 50
-        optionsTab.relativeMarginSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Margin", 0, 20, 100,
+        optionsTab.relativeMarginSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Margin", 0, 10, 100,
                                            callback=self.relativeMarginChangedCallback)
         y += 50
 
@@ -634,6 +634,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def relativeSizeChangedCallback(self, sender):
         self.fontList.relativeFontSize = sender.get() / 100
+        self.growOrShrinkFontList()
 
     @objc.python_method
     def relativeBaselineChangedCallback(self, sender):
@@ -646,6 +647,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def relativeMarginChangedCallback(self, sender):
         self.fontList.relativeMargin = sender.get() / 100
+        self.growOrShrinkFontList()
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):

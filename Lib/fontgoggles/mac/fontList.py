@@ -355,19 +355,23 @@ class FontList(Group):
 
     @hookedProperty
     def relativeFontSize(self):
-        print("---- relativeFontSize hook", self.relativeFontSize)
+        for fontItem in self.iterFontItems():
+            fontItem.relativeSize = self.relativeFontSize
 
     @hookedProperty
     def relativeHBaseline(self):
-        print("---- relativeHBaseline hook", self.relativeHBaseline)
+        for fontItem in self.iterFontItems():
+            fontItem.relativeHBaseline = self.relativeHBaseline
 
     @hookedProperty
     def relativeVBaseline(self):
-        print("---- relativeVBaseline hook", self.relativeVBaseline)
+        for fontItem in self.iterFontItems():
+            fontItem.relativeVBaseline = self.relativeVBaseline
 
     @hookedProperty
     def relativeMargin(self):
-        print("---- relativeMargin hook", self.relativeMargin)
+        for fontItem in self.iterFontItems():
+            fontItem.relativeMargin = self.relativeMargin
 
     @suppressAndLogException
     def resizeFontItems(self, itemSize):
@@ -614,6 +618,10 @@ class FontItem(Group):
 
     vertical = delegateProperty("glyphLineView")
     selected = delegateProperty("glyphLineView")
+    relativeSize = delegateProperty("glyphLineView")
+    relativeHBaseline = delegateProperty("glyphLineView")
+    relativeVBaseline = delegateProperty("glyphLineView")
+    relativeMargin = delegateProperty("glyphLineView")
 
     def __init__(self, posSize, fontKey, fontListIndex, vertical):
         super().__init__(posSize)
@@ -690,6 +698,10 @@ class FGGlyphLineView(AppKit.NSView):
 
     selected = hookedProperty(_scheduleRedraw, default=False)
     align = hookedProperty(_scheduleRedraw, default="left")
+    relativeSize = hookedProperty(_scheduleRedraw, default=0.7)
+    relativeHBaseline = hookedProperty(_scheduleRedraw, default=0.25)
+    relativeVBaseline = hookedProperty(_scheduleRedraw, default=0.5)
+    relativeMargin = hookedProperty(_scheduleRedraw, default=0.1)
 
     def init(self):
         self = super().init()
@@ -827,12 +839,12 @@ class FGGlyphLineView(AppKit.NSView):
     @property
     def scaleFactor(self):
         itemSize = self.frame().size[1 - self.vertical]
-        return 0.7 * itemSize / self._glyphs.unitsPerEm
+        return self.relativeSize * itemSize / self._glyphs.unitsPerEm
 
     @property
     def margin(self):
         itemSize = self.frame().size[1 - self.vertical]
-        return 0.1 * itemSize
+        return self.relativeMargin * itemSize
 
     @property
     def origin(self):
@@ -848,9 +860,9 @@ class FGGlyphLineView(AppKit.NSView):
         else:  # align == "left" or align == "top"
             pos = margin
         if not self.vertical:
-            return pos, 0.25 * itemSize  # TODO: something with hhea/OS/2 ascender/descender
+            return pos, self.relativeHBaseline * itemSize  # TODO: something with hhea/OS/2 ascender/descender
         else:
-            return 0.5 * itemSize, itemExtent - pos  # TODO: something with vhea ascender/descender
+            return self.relativeVBaseline * itemSize, itemExtent - pos  # TODO: something with vhea ascender/descender
 
     @suppressAndLogException
     def drawRect_(self, rect):
@@ -986,6 +998,10 @@ class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
     vertical = delegateProperty("_nsObject")
     selected = delegateProperty("_nsObject")
+    relativeSize = delegateProperty("_nsObject")
+    relativeHBaseline = delegateProperty("_nsObject")
+    relativeVBaseline = delegateProperty("_nsObject")
+    relativeMargin = delegateProperty("_nsObject")
 
 
 class FGUnclickableTextField(AppKit.NSTextField):
