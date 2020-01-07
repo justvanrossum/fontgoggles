@@ -337,6 +337,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.updateTextEntryAlignment(align)
 
         if updateUnicodeList:
+            # Immediately reset selection, so that delayed async clients
+            # won't get a stale selection.
+            self.unicodeList.setSelection([])
             self.updateUnicodeList(delay=0.05)
         else:
             charSelection = self.unicodeList.getSelection()
