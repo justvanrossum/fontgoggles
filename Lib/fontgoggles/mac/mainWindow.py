@@ -408,6 +408,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @asyncTaskAutoCancel
     async def updateGlyphList(self, glyphs, delay=0):
+        if not hasattr(self, "fontList"):
+            # Window closed before we got to run
+            return
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
@@ -426,6 +429,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @asyncTaskAutoCancel
     async def updateUnicodeList(self, selection=None, delay=0):
+        if not hasattr(self, "unicodeShowBiDiCheckBox"):
+            # Window closed before we got to run
+            return
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
