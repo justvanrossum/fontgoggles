@@ -366,6 +366,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                               varLocation=self.varLocation)
         addBoundingBoxes(glyphs)
         fontItem.glyphs = glyphs
+        charSelection = self.unicodeList.getSelection()
+        if charSelection:
+            fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charSelection)
 
     def growOrShrinkFontList(self):
         newExtent = 300  # some minimum so that our filename label stays large enough
