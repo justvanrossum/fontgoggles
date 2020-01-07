@@ -219,10 +219,15 @@ class FontList(Group):
 
     nsViewClass = FGFontListView
 
-    def __init__(self, project, width, itemSize, selectionChangedCallback=None,
+    def __init__(self, project, width, itemSize, relativeFontSize=0.7, relativeHBaseline=0.25,
+                 relativeVBaseline=0.5, relativeMargin=0.1, selectionChangedCallback=None,
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
         self.project = None  # Dummy, so we can set up other attrs first
+        self.relativeFontSize = relativeFontSize
+        self.relativeHBaseline = relativeHBaseline
+        self.relativeVBaseline = relativeVBaseline
+        self.relativeMargin = relativeMargin
         self._selection = set()  # a set of indices
         self.vertical = 0  # 0, 1: it is also an index into (x, y) tuples
         self.itemSize = itemSize
@@ -257,7 +262,9 @@ class FontList(Group):
         if self.project.fonts:
             y = 0
             for index, fontItemInfo in enumerate(self.project.fonts):
-                fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index, self.vertical)
+                fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index, self.vertical,
+                                    self.relativeFontSize, self.relativeHBaseline,
+                                    self.relativeVBaseline, self.relativeMargin)
                 setattr(self, fontItemInfo.identifier, fontItem)
                 y += itemSize
         else:
@@ -448,7 +455,9 @@ class FontList(Group):
                     y = index * itemSize
                     w = 0
                     h = itemSize
-                fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index, self.vertical)
+                fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index, self.vertical,
+                                    self.relativeFontSize, self.relativeHBaseline,
+                                    self.relativeVBaseline, self.relativeMargin)
                 setattr(self, fontItemInfo.identifier, fontItem)
                 if fontItemInfo.font is not None:
                     # Font is already loaded. TODO: rethink factorization? See below.
@@ -623,13 +632,18 @@ class FontItem(Group):
     relativeVBaseline = delegateProperty("glyphLineView")
     relativeMargin = delegateProperty("glyphLineView")
 
-    def __init__(self, posSize, fontKey, fontListIndex, vertical):
+    def __init__(self, posSize, fontKey, fontListIndex, vertical,
+                 relativeSize, relativeHBaseline, relativeVBaseline, relativeMargin):
         super().__init__(posSize)
         self._nsObject.setWantsLayer_(True)
         self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.fontListIndex = fontListIndex
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.vertical = vertical
+        self.relativeSize = relativeSize
+        self.relativeHBaseline = relativeHBaseline
+        self.relativeVBaseline = relativeVBaseline
+        self.relativeMargin = relativeMargin
         self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
         if vertical:
             self.fileNameLabel.rotate(90)
