@@ -349,7 +349,7 @@ class FontList(Group):
         pos = [0, 0]
         for fontItem in self.iterFontItems():
             fontItem.vertical = vertical
-            fontItem.fileNameLabel.setPosSize(fontItem.getFileNameLabelPosSize())
+            fontItem.fileNameLabel.setPosSize(getFileNameLabelPosSize(vertical))
             fontItem.fileNameLabel.rotate([-90, 90][vertical])
             x, y, w, h = fontItem.getPosSize()
             w, h = h, w
@@ -642,14 +642,14 @@ class FontItem(Group):
         self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self._nsObject.setBackgroundColor_(AppKit.NSColor.systemGrayColor())
         self.fontListIndex = fontListIndex
+        self.fileNameLabel = UnclickableTextBox(getFileNameLabelPosSize(vertical), "", sizeStyle="small",
+                                                textColor=AppKit.NSColor.systemGrayColor())
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.vertical = vertical
         self.relativeSize = relativeSize
         self.relativeHBaseline = relativeHBaseline
         self.relativeVBaseline = relativeVBaseline
         self.relativeMargin = relativeMargin
-        self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small",
-                                                textColor=AppKit.NSColor.systemGrayColor())
         self.align = align
         self.selected = False
         if vertical:
@@ -715,11 +715,12 @@ class FontItem(Group):
         self.fileNameLabel.align = value
         self.glyphLineView._nsObject.align = value
 
-    def getFileNameLabelPosSize(self):
-        if self.vertical:
-            return (2, 10, 17, -10)
-        else:
-            return (10, 0, -10, 17)
+
+def getFileNameLabelPosSize(vertical):
+    if vertical:
+        return (2, 10, 17, -10)
+    else:
+        return (10, 0, -10, 17)
 
 
 class FGGlyphLineView(AppKit.NSView):
@@ -1046,7 +1047,7 @@ class UnclickableTextBox(TextBox):
         cell.setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
 
     def makeAttrString(self, text):
-        if self.textAttributes:
+        if text and self.textAttributes:
             text = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, self.textAttributes)
         return text
 
@@ -1065,7 +1066,10 @@ class UnclickableTextBox(TextBox):
     @align.setter
     def align(self, value):
         nsAlignment = textAlignments.get(value, textAlignments["left"])
-        self._nsObject.cell().setAlignment_(nsAlignment)
+        parStyle = AppKit.NSMutableParagraphStyle.alloc().init()
+        parStyle.setAlignment_(nsAlignment)
+        self.textAttributes[AppKit.NSParagraphStyleAttributeName] = parStyle
+        self.set(self.get())
 
 
 def controlAccentColor():
