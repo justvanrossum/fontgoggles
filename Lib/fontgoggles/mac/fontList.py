@@ -263,7 +263,7 @@ class FontList(Group):
             y = 0
             for index, fontItemInfo in enumerate(self.project.fonts):
                 fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index, self.vertical,
-                                    self.relativeFontSize, self.relativeHBaseline,
+                                    self.align, self.relativeFontSize, self.relativeHBaseline,
                                     self.relativeVBaseline, self.relativeMargin)
                 setattr(self, fontItemInfo.identifier, fontItem)
                 y += itemSize
@@ -460,7 +460,7 @@ class FontList(Group):
                     w = 0
                     h = itemSize
                 fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index, self.vertical,
-                                    self.relativeFontSize, self.relativeHBaseline,
+                                    self.align, self.relativeFontSize, self.relativeHBaseline,
                                     self.relativeVBaseline, self.relativeMargin)
                 setattr(self, fontItemInfo.identifier, fontItem)
                 if fontItemInfo.font is not None:
@@ -636,7 +636,7 @@ class FontItem(Group):
     relativeVBaseline = delegateProperty("glyphLineView")
     relativeMargin = delegateProperty("glyphLineView")
 
-    def __init__(self, posSize, fontKey, fontListIndex, vertical,
+    def __init__(self, posSize, fontKey, fontListIndex, vertical, align,
                  relativeSize, relativeHBaseline, relativeVBaseline, relativeMargin):
         super().__init__(posSize)
         self._nsObject.setWantsLayer_(True)
@@ -649,6 +649,7 @@ class FontItem(Group):
         self.relativeVBaseline = relativeVBaseline
         self.relativeMargin = relativeMargin
         self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
+        self.align = align
         if vertical:
             self.fileNameLabel.rotate(90)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
