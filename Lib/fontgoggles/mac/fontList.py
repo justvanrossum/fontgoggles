@@ -648,7 +648,8 @@ class FontItem(Group):
         self.relativeHBaseline = relativeHBaseline
         self.relativeVBaseline = relativeVBaseline
         self.relativeMargin = relativeMargin
-        self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small")
+        self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small",
+                                                textColor=AppKit.NSColor.systemGrayColor())
         self.align = align
         if vertical:
             self.fileNameLabel.rotate(90)
@@ -1041,14 +1042,19 @@ class UnclickableTextBox(TextBox):
             attrs[AppKit.NSForegroundColorAttributeName] = textColor
         if fontSize is not None:
             attrs[AppKit.NSFontAttributeName] = AppKit.NSFont.systemFontOfSize_(fontSize)
-        if attrs:
-            text = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, attrs)
+        self.textAttributes = attrs
+        text = self.makeAttrString(text)
         super().__init__(posSize, text, **kwargs)
         cell = self._nsObject.cell()
         cell.setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
 
+    def makeAttrString(self, text):
+        if self.textAttributes:
+            text = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, self.textAttributes)
+        return text
+
     def set(self, value, tooltip=None):
-        super().set(value)
+        super().set(self.makeAttrString(value))
         if tooltip is not None:
             self._nsObject.setToolTip_(tooltip)
 
