@@ -13,8 +13,11 @@ class Project:
         self._fontItemIdentifierGenerator = self._fontItemIdentifierGeneratorFunc()
 
     @classmethod
-    def loads(cls, data, rootPath):
-        root = json.loads(data)
+    def fromJSON(cls, data, rootPath):
+        return cls.fromDict(json.loads(data), rootPath)
+
+    @classmethod
+    def fromDict(cls, root, rootPath):
         self = cls()
         for fontItemInfoDict in root["fonts"]:
             fontPath = pathlib.Path(os.path.abspath(os.path.join(rootPath, fontItemInfoDict["path"])))

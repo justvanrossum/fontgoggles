@@ -61,6 +61,6 @@ def test_project_dump_load(tmpdir):
     fontPath2 = getFontPath("IBMPlexSans-Regular.otf")
     pr.addFont(fontPath2, 0)
     json = pr.asJSON(destPath.parent)
-    pr2 = Project.loads(json, destPath.parent)
+    pr2 = Project.fromJSON(json, destPath.parent)
     for f1, f2 in zip(pr.fonts, pr2.fonts):
         assert f1.fontKey == f2.fontKey
