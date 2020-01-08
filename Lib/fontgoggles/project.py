@@ -21,7 +21,7 @@ class Project:
             self.addFont(fontPath, fontItemInfoDict["fontNumber"])
         return self
 
-    def dumps(self, rootPath):
+    def asJSON(self, rootPath):
         root = self.asDict(rootPath)
         return json.dumps(root, indent=2, ensure_ascii=False).encode("utf=8")
 
