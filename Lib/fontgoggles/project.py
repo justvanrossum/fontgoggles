@@ -20,7 +20,7 @@ class Project:
     def fromDict(cls, root, rootPath):
         self = cls()
         for fontItemInfoDict in root["fonts"]:
-            fontPath = pathlib.Path(os.path.abspath(os.path.join(rootPath, fontItemInfoDict["path"])))
+            fontPath = pathlib.Path(os.path.normpath(os.path.join(rootPath, fontItemInfoDict["path"])))
             self.addFont(fontPath, fontItemInfoDict["fontNumber"])
         return self
 
