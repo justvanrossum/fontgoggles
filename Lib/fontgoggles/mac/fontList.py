@@ -630,7 +630,6 @@ class FontList(Group):
 class FontItem(Group):
 
     vertical = delegateProperty("glyphLineView")
-    selected = delegateProperty("glyphLineView")
     relativeSize = delegateProperty("glyphLineView")
     relativeHBaseline = delegateProperty("glyphLineView")
     relativeVBaseline = delegateProperty("glyphLineView")
@@ -641,6 +640,7 @@ class FontItem(Group):
         super().__init__(posSize)
         self._nsObject.setWantsLayer_(True)
         self._nsObject.setCanDrawSubviewsIntoLayer_(True)
+        self._nsObject.setBackgroundColor_(AppKit.NSColor.systemGrayColor())
         self.fontListIndex = fontListIndex
         self.glyphLineView = GlyphLine((0, 0, 0, 0))
         self.vertical = vertical
@@ -651,6 +651,7 @@ class FontItem(Group):
         self.fileNameLabel = UnclickableTextBox(self.getFileNameLabelPosSize(), "", sizeStyle="small",
                                                 textColor=AppKit.NSColor.systemGrayColor())
         self.align = align
+        self.selected = False
         if vertical:
             self.fileNameLabel.rotate(90)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
@@ -676,6 +677,16 @@ class FontItem(Group):
     @glyphs.setter
     def glyphs(self, glyphs):
         self.glyphLineView._nsObject.glyphs = glyphs
+
+    @hookedProperty
+    def selected(self):
+        if self.selected:
+            backgroundColor = AppKit.NSColor.textBackgroundColor()
+            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(
+                0.5, AppKit.NSColor.selectedTextBackgroundColor())
+            self._nsObject.setBackgroundColor_(backgroundColor)
+        else:
+            self._nsObject.setBackgroundColor_(AppKit.NSColor.textBackgroundColor())
 
     @property
     def selection(self):
@@ -716,7 +727,6 @@ class FGGlyphLineView(AppKit.NSView):
     def _scheduleRedraw(self):
         self.setNeedsDisplay_(True)
 
-    selected = hookedProperty(_scheduleRedraw, default=False)
     align = hookedProperty(_scheduleRedraw, default="left")
     relativeSize = hookedProperty(_scheduleRedraw, default=0.7)
     relativeHBaseline = hookedProperty(_scheduleRedraw, default=0.25)
@@ -740,9 +750,6 @@ class FGGlyphLineView(AppKit.NSView):
         self.addTrackingArea_(trackingArea)
 
         return self
-
-    def isOpaque(self):
-        return True
 
     def acceptsFirstResponder(self):
         return True
@@ -886,13 +893,7 @@ class FGGlyphLineView(AppKit.NSView):
 
     @suppressAndLogException
     def drawRect_(self, rect):
-        backgroundColor = AppKit.NSColor.textBackgroundColor()
         foregroundColor = AppKit.NSColor.textColor()
-
-        if self.selected:
-            # Blend color could be a pref from the systemXxxxColor colors
-            backgroundColor = backgroundColor.blendedColorWithFraction_ofColor_(
-                0.5, AppKit.NSColor.selectedTextBackgroundColor())
 
         selection = self._selection
         hoveredGlyphIndex = self._hoveredGlyphIndex
@@ -919,9 +920,6 @@ class FGGlyphLineView(AppKit.NSView):
             (1, 1, 0): selectedSpaceColor,
             (1, 1, 1): hoverSpaceColor,
         }
-
-        backgroundColor.set()
-        AppKit.NSRectFill(rect)
 
         if not self._glyphs:
             return
@@ -1017,7 +1015,6 @@ class FGGlyphLineView(AppKit.NSView):
 class GlyphLine(Group):
     nsViewClass = FGGlyphLineView
     vertical = delegateProperty("_nsObject")
-    selected = delegateProperty("_nsObject")
     relativeSize = delegateProperty("_nsObject")
     relativeHBaseline = delegateProperty("_nsObject")
     relativeVBaseline = delegateProperty("_nsObject")
