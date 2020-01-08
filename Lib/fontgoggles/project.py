@@ -22,6 +22,10 @@ class Project:
         return self
 
     def dumps(self, rootPath):
+        root = self.asDict(rootPath)
+        return json.dumps(root, indent=2, ensure_ascii=False).encode("utf=8")
+
+    def asDict(self, rootPath):
         root = {}
         root["fonts"] = []
         root["settings"] = {}
@@ -30,7 +34,7 @@ class Project:
             relFontPath = os.path.relpath(fontPath, rootPath)
             fontItemInfoDict = dict(path=relFontPath, fontNumber=fontNumber)
             root["fonts"].append(fontItemInfoDict)
-        return json.dumps(root, indent=2, ensure_ascii=False).encode("utf=8")
+        return root
 
     def addFont(self, path: PathLike, fontNumber: int, index=None):
         fontItemInfo = self.newFontItemInfo(path, fontNumber)
