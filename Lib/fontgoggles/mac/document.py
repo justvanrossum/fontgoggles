@@ -33,4 +33,4 @@ class FGDocument(AppKit.NSDocument):
 
     def dataOfType_error_(self, type, error):
         rootPath = pathlib.Path(self._savePath).parent
-        return AppKit.NSData.dataWithData_(self.project.dumps(rootPath)), error
+        return AppKit.NSData.dataWithData_(self.project.asJSON(rootPath)), error
