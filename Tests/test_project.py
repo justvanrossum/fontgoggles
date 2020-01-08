@@ -1,3 +1,4 @@
+import pathlib
 import pytest
 from fontgoggles.project import Project
 from testSupport import getFontPath
@@ -50,3 +51,13 @@ async def test_project_purgeFonts():
     assert list(pr._fontLoader.fonts) == [(fontPath2, 0)]
     pr.purgeFonts()
     assert list(pr._fontLoader.fonts) == []
+
+
+def test_project_write(tmpdir):
+    destPath = pathlib.Path(tmpdir / "test.gggls")
+    pr = Project()
+    fontPath1 = getFontPath("IBMPlexSans-Regular.ttf")
+    pr.addFont(fontPath1, 0)
+    fontPath2 = getFontPath("IBMPlexSans-Regular.otf")
+    pr.addFont(fontPath2, 0)
+    json = pr.dumps(destPath.parent)

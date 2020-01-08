@@ -1,4 +1,6 @@
+import json
 from os import PathLike
+import os
 from .font import getOpener
 
 
@@ -8,6 +10,17 @@ class Project:
         self.fonts = []
         self._fontLoader = FontLoader()
         self._fontItemIdentifierGenerator = self._fontItemIdentifierGeneratorFunc()
+
+    def dumps(self, rootPath):
+        root = {}
+        root["fonts"] = []
+        root["settings"] = {}
+        for fontItemInfo in self.fonts:
+            fontPath, fontNumber = fontItemInfo.fontKey
+            relFontPath = os.path.relpath(fontPath, rootPath)
+            fontItemInfoDict = dict(path=relFontPath, fontNumber=fontNumber)
+            root["fonts"].append(fontItemInfoDict)
+        return json.dumps(root, indent=2, ensure_ascii=False).encode("utf=8")
 
     def addFont(self, path: PathLike, fontNumber: int, index=None):
         fontItemInfo = self.newFontItemInfo(path, fontNumber)
