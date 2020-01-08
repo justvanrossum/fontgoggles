@@ -15,7 +15,7 @@ class FGAppDelegate(NSObject):
 
     def openDocument_(self, sender):
         result = getFile(allowsMultipleSelection=True,
-                         fileTypes=fileTypes)  # resultCallback=self.getFileResultCallback_)
+                         fileTypes=fileTypes + ["gggls"])  # resultCallback=self.getFileResultCallback_)
         # NOTE: ideally we would use a result callback, but vanilla's
         # getFile() only supports result callbacks in the presence of
         # parent window, which we obviously do not have here.
@@ -28,14 +28,24 @@ class FGAppDelegate(NSObject):
         return True
 
     def application_openFiles_(self, app, fileNames):
+        nonProjectFileNames = [f for f in fileNames if not f.endswith(".gggls")]
+        projectFileNames = [f for f in fileNames if f.endswith(".gggls")]
+
         if self.filesToOpen is None:
-            self.filesToOpen = list(fileNames)
+            self.filesToOpen = list(nonProjectFileNames)
         else:
-            self.filesToOpen.extend(fileNames)
-        # When the user drops multiple files on the app, application_openFiles_
-        # is sometimes called multiple times. Let's delay a bit and see if
-        # more files came in in the meantime.
-        self.performSelector_withObject_afterDelay_("openQueuedFiles", None, 0.2)
+            self.filesToOpen.extend(nonProjectFileNames)
+        if self.filesToOpen:
+            # When the user drops multiple files on the app, application_openFiles_
+            # is sometimes called multiple times. Let's delay a bit and see if
+            # more files came in in the meantime.
+            self.performSelector_withObject_afterDelay_("openQueuedFiles", None, 0.2)
+        if projectFileNames:
+            docController = NSDocumentController.sharedDocumentController()
+            for path in projectFileNames:
+                url = NSURL.fileURLWithPath_(path)
+                docController.openDocumentWithContentsOfURL_display_completionHandler_(
+                            url, True, None)
 
     @suppressAndLogException
     def openQueuedFiles(self):
