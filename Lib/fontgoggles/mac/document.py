@@ -28,8 +28,6 @@ class FGDocument(AppKit.NSDocument):
     def writeSafelyToURL_ofType_forSaveOperation_error_(self, url, tp, so, error):
         self._savePath = url.path()
         return super().writeSafelyToURL_ofType_forSaveOperation_error_(url, tp, so, error)
-        self.project.write(pathlib.Path(url.path()))
-        return (True, None)
 
     def dataOfType_error_(self, type, error):
         rootPath = pathlib.Path(self._savePath).parent
