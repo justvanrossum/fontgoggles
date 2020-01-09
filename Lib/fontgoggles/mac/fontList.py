@@ -37,10 +37,18 @@ class FGFontListView(AppKit.NSView):
             super().keyDown_(event)
 
     def scrollWheel_(self, event):
-        # if event.modifierFlags() & AppKit.NSEventModifierFlagOption:
-        #     print("-----", event)
-        # else:
-        super().scrollWheel_(event)
+        if event.modifierFlags() & AppKit.NSEventModifierFlagOption:
+            if event.phase() == AppKit.NSEventPhaseBegan:
+                self._originalItemSize = self.vanillaWrapper().itemSize
+                self._magnification = 1.0
+            # centerPoint = self.convertPoint_fromView_(event.locationInWindow(), None)
+            by = event.scrollingDeltaY() * 0.001  #
+            self._magnification += by
+            newItemSize = round(max(fontItemMinimumSize,
+                                    min(fontItemMaximumSize, self._originalItemSize * self._magnification)))
+            self.vanillaWrapper().resizeFontItems(newItemSize)
+        else:
+            super().scrollWheel_(event)
 
     def subscribeToMagnification_(self, scrollView):
         nc = AppKit.NSNotificationCenter.defaultCenter()
