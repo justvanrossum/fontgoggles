@@ -515,7 +515,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     else:
                         newCharselection = [min(len(self.unicodeList) - 1, max(charSelection) + 1)]
                 newCharselection = self.textInfo.mapFromBiDi(newCharselection)
-                if event.modifierFlags() & AppKit.NSShiftKeyMask:
+                if event.modifierFlags() & AppKit.NSEventModifierFlagShift:
                     newCharselection = set(newCharselection + self.unicodeList.getSelection())
                 self.unicodeList.setSelection(newCharselection)
         self.fontList.scrollGlyphSelectionToVisible()

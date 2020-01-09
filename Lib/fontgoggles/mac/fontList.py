@@ -590,7 +590,7 @@ class FontList(Group):
             glyphSelectionChanged = True
             clickedSelection = set()
 
-        if clickedSelection and event.modifierFlags() & AppKit.NSCommandKeyMask:
+        if clickedSelection and event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
             newSelection = self._selection ^ clickedSelection
         elif index in self._selection:
             newSelection = None
@@ -624,7 +624,7 @@ class FontList(Group):
                     index = min(numFontItems - 1, max(self._selection) + 1)
                 else:
                     index = max(0, min(self._selection) - 1)
-                if event.modifierFlags() & AppKit.NSShiftKeyMask:
+                if event.modifierFlags() & AppKit.NSEventModifierFlagShift:
                     self.selection = self.selection | {index}
                 else:
                     self.selection = {index}
@@ -974,7 +974,7 @@ class FGGlyphLineView(AppKit.NSView):
     def mouseDown_(self, event):
         index = self.findGlyph_(self.convertPoint_fromView_(event.locationInWindow(), None))
 
-        if not event.modifierFlags() & AppKit.NSCommandKeyMask:
+        if not event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
             if index is None:
                 newSelection = set()
             elif index in self.selection:
