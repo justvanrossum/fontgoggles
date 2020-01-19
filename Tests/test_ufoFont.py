@@ -8,7 +8,7 @@ def test_ufoCharacterMapping():
     reader = UFOReader(ufoPath)
     cmap, anchors = fetchCharacterMappingAndAnchors(ufoPath, reader.getGlyphSet())
     assert cmap[0x0041] == "A"
-    # MutatorSansBoldWide.ufo/glyphs/A_.glif contains a commented out <unicode>
-    # tag, that must not be parsed.
+    # MutatorSansBoldWide.ufo/glyphs/A_.glif contains a commented-out <unicode>
+    # tag, that must not be parsed, as well as a commented-out <anchor>.
     assert 0x1234 not in cmap
     assert anchors == {"A": [("top", 645, 840)], "E": [("top", 582.5, 841)]}
