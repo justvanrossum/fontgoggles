@@ -100,7 +100,7 @@ _unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+[
 
 def fetchCharacterMappingAndAnchors(ufoPath, glyphSet):
     # This seems about three times faster than reader.getCharacterMapping()
-    # TODO: measurement may have changed since I added anchor parsing and
+    # TODO: performance may have changed since I added anchor parsing and
     # started parsing the fetched element with ET.
     cmap = {}  # unicode: glyphName
     anchors = {}  # glyphName: [(anchorName, x, y), ...]
