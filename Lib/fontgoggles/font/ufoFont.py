@@ -7,7 +7,7 @@ from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
-from fontTools.ufoLib.glifLib import _fetchUnicodes as fetchUnicodes
+from fontTools.ufoLib.glifLib import _BaseParser as BaseGlifParser
 from .baseFont import BaseFont
 from ..misc.hbShape import HBShape
 from ..misc.runInPool import runInProcessPool
@@ -105,7 +105,7 @@ def _getCharacterMapping(ufoPath, glyphSet):
         data = glyphSet.getGLIF(glyphName)
         if b"<!--" in data:
             # Use proper parser
-            unicodes = fetchUnicodes(data)
+            unicodes, anchors = fetchUnicodesAndAnchors(data)
         else:
             # Fast route with regex
             unicodes = [int(s, 16) for s in _unicodeGLIFPattern.findall(data)]
@@ -118,6 +118,36 @@ def _getCharacterMapping(ufoPath, glyphSet):
         logger = logging.getLogger("fontgoggles.font.ufoFont")
         logger.warning("Some code points in '%s' are assigned to multiple glyphs: %s", ufoPath, sorted(duplicateUnicodes))
     return cmap
+
+
+def fetchUnicodesAndAnchors(glif):
+    """
+    Get a list of unicodes listed in glif.
+    """
+    parser = FetchUnicodesAndAnchorsParser()
+    parser.parse(glif)
+    return parser.unicodes, parser.anchors
+
+
+class FetchUnicodesAndAnchorsParser(BaseGlifParser):
+
+    def __init__(self):
+        self.unicodes = []
+        self.anchors = []
+        super().__init__()
+
+    def startElementHandler(self, name, attrs):
+        if self._elementStack and self._elementStack[-1] == "glyph":
+            if name == "unicode":
+                value = attrs.get("hex")
+                if value is not None:
+                    try:
+                        value = int(value, 16)
+                        if value not in self.unicodes:
+                            self.unicodes.append(value)
+                    except ValueError:
+                        pass
+        super().startElementHandler(name, attrs)
 
 
 def compileMinimumFont_captureOutput(ufoPath):
