@@ -3,6 +3,7 @@ import io
 import logging
 import re
 import sys
+import xml.etree.ElementTree as ET
 from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont
@@ -95,6 +96,7 @@ class NotDefGlyph:
 
 
 _unicodeGLIFPattern = re.compile(re.compile(rb'<\s*unicode\s+hex\s*=\s*\"([0-9A-Fa-f]+)\"'))
+_anchorGLIFPattern = re.compile(re.compile(rb'<\s*anchor\s+[^>]+>'))
 
 
 def fetchCharacterMappingAndAnchors(ufoPath, glyphSet):
@@ -110,7 +112,10 @@ def fetchCharacterMappingAndAnchors(ufoPath, glyphSet):
         else:
             # Fast route with regex
             unicodes = [int(s, 16) for s in _unicodeGLIFPattern.findall(data)]
-            glyphAnchors = []  # XXX
+            glyphAnchors = []
+            for rawAnchor in _anchorGLIFPattern.findall(data):
+                root = ET.fromstring(rawAnchor)
+                glyphAnchors.append(_parseAnchorAttrs(root.attrib))
         for codePoint in unicodes:
             if codePoint not in cmap:
                 cmap[codePoint] = glyphName
@@ -144,6 +149,10 @@ def _parseNumber(s):
     return f
 
 
+def _parseAnchorAttrs(attrs):
+    return attrs.get("name"), _parseNumber(attrs.get("x")), _parseNumber(attrs.get("y"))
+
+
 class FetchUnicodesAndAnchorsParser(BaseGlifParser):
 
     def __init__(self):
@@ -163,10 +172,7 @@ class FetchUnicodesAndAnchorsParser(BaseGlifParser):
                     except ValueError:
                         pass
             elif name == "anchor":
-                anchorName = attrs.get("name")
-                anchorX = _parseNumber(attrs.get("x"))
-                anchorY = _parseNumber(attrs.get("y"))
-                self.anchors.append((anchorName, anchorX, anchorY))
+                self.anchors.append(_parseAnchorAttrs(attrs))
         super().startElementHandler(name, attrs)
 
 
