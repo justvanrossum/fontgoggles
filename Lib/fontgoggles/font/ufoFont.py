@@ -95,12 +95,13 @@ class NotDefGlyph:
         pen.closePath()
 
 
-_unicodeGLIFPattern = re.compile(re.compile(rb'<\s*unicode\s+hex\s*=\s*\"([0-9A-Fa-f]+)\"'))
-_anchorGLIFPattern = re.compile(re.compile(rb'<\s*anchor\s+[^>]+>'))
+_unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+[^>]+>)'))
 
 
 def fetchCharacterMappingAndAnchors(ufoPath, glyphSet):
     # This seems about three times faster than reader.getCharacterMapping()
+    # TODO: measurement may have changed since I added anchor parsing and
+    # started parsing the fetched element with ET.
     cmap = {}  # unicode: glyphName
     anchors = {}  # glyphName: [(anchorName, x, y), ...]
     duplicateUnicodes = set()
@@ -111,11 +112,17 @@ def fetchCharacterMappingAndAnchors(ufoPath, glyphSet):
             unicodes, glyphAnchors = fetchUnicodesAndAnchors(data)
         else:
             # Fast route with regex
-            unicodes = [int(s, 16) for s in _unicodeGLIFPattern.findall(data)]
+            unicodes = []
             glyphAnchors = []
-            for rawAnchor in _anchorGLIFPattern.findall(data):
-                root = ET.fromstring(rawAnchor)
-                glyphAnchors.append(_parseAnchorAttrs(root.attrib))
+            for rawElement, tag in _unicodeOrAnchorGLIFPattern.findall(data):
+                root = ET.fromstring(rawElement)
+                if tag == b"unicode":
+                    try:
+                        unicodes.append(int(root.attrib.get("hex", ""), 16))
+                    except ValueError:
+                        pass
+                elif tag == b"anchor":
+                    glyphAnchors.append(_parseAnchorAttrs(root.attrib))
         for codePoint in unicodes:
             if codePoint not in cmap:
                 cmap[codePoint] = glyphName
