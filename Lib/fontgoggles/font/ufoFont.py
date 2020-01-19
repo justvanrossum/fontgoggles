@@ -97,27 +97,32 @@ class NotDefGlyph:
 _unicodeGLIFPattern = re.compile(re.compile(rb'<\s*unicode\s+hex\s*=\s*\"([0-9A-Fa-f]+)\"'))
 
 
-def _getCharacterMapping(ufoPath, glyphSet):
+def fetchCharacterMappingAndAnchors(ufoPath, glyphSet):
     # This seems about three times faster than reader.getCharacterMapping()
-    cmap = {}
+    cmap = {}  # unicode: glyphName
+    anchors = {}  # glyphName: [(anchorName, x, y), ...]
     duplicateUnicodes = set()
     for glyphName in sorted(glyphSet.keys()):
         data = glyphSet.getGLIF(glyphName)
         if b"<!--" in data:
             # Use proper parser
-            unicodes, anchors = fetchUnicodesAndAnchors(data)
+            unicodes, glyphAnchors = fetchUnicodesAndAnchors(data)
         else:
             # Fast route with regex
             unicodes = [int(s, 16) for s in _unicodeGLIFPattern.findall(data)]
+            glyphAnchors = []  # XXX
         for codePoint in unicodes:
             if codePoint not in cmap:
                 cmap[codePoint] = glyphName
             else:
                 duplicateUnicodes.add(codePoint)
+        if glyphAnchors:
+            anchors[glyphName] = glyphAnchors
+
     if duplicateUnicodes:
         logger = logging.getLogger("fontgoggles.font.ufoFont")
         logger.warning("Some code points in '%s' are assigned to multiple glyphs: %s", ufoPath, sorted(duplicateUnicodes))
-    return cmap
+    return cmap, anchors
 
 
 def fetchUnicodesAndAnchors(glif):
@@ -161,7 +166,7 @@ class FetchUnicodesAndAnchorsParser(BaseGlifParser):
                 anchorName = attrs.get("name")
                 anchorX = _parseNumber(attrs.get("x"))
                 anchorY = _parseNumber(attrs.get("y"))
-                self.anchors.append((anchorName, anchorX, anchorX))
+                self.anchors.append((anchorName, anchorX, anchorY))
         super().startElementHandler(name, attrs)
 
 
@@ -191,7 +196,7 @@ def compileMinimumFont(ufoPath):
     if ".notdef" not in glyphOrder:
         # We need a .notdef glyph, so let's make one.
         glyphOrder.insert(0, ".notdef")
-    cmap = _getCharacterMapping(ufoPath, glyphSet)
+    cmap, anchors = fetchCharacterMappingAndAnchors(ufoPath, glyphSet)
     fb = FontBuilder(info.unitsPerEm)
     fb.setupGlyphOrder(glyphOrder)
     fb.setupCharacterMap(cmap)
