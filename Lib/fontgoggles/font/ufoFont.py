@@ -129,6 +129,16 @@ def fetchUnicodesAndAnchors(glif):
     return parser.unicodes, parser.anchors
 
 
+def _parseNumber(s):
+    if not s:
+        return None
+    f = float(s)
+    i = int(f)
+    if i == f:
+        return i
+    return f
+
+
 class FetchUnicodesAndAnchorsParser(BaseGlifParser):
 
     def __init__(self):
@@ -147,6 +157,11 @@ class FetchUnicodesAndAnchorsParser(BaseGlifParser):
                             self.unicodes.append(value)
                     except ValueError:
                         pass
+            elif name == "anchor":
+                anchorName = attrs.get("name")
+                anchorX = _parseNumber(attrs.get("x"))
+                anchorY = _parseNumber(attrs.get("y"))
+                self.anchors.append((anchorName, anchorX, anchorX))
         super().startElementHandler(name, attrs)
 
 
