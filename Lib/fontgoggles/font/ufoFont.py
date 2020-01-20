@@ -9,7 +9,7 @@ from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
-from fontTools.ufoLib.glifLib import _BaseParser as BaseGlifParser
+from fontTools.ufoLib.glifLib import _BaseParser as BaseGlifParser, Glyph as GLIFGlyph
 from ufo2ft.featureCompiler import FeatureCompiler
 from .baseFont import BaseFont
 from ..misc.hbShape import HBShape
@@ -22,6 +22,7 @@ class UFOFont(BaseFont):
         super().__init__()
         self.reader = UFOReader(fontPath)
         self.glyphSet = self.reader.getGlyphSet()
+        self.glyphSet.glyphClass = Glyph
         self.info = UFOInfo()
         self.reader.readInfo(self.info)
         self._fontPath = fontPath
@@ -95,6 +96,11 @@ class NotDefGlyph:
         pen.lineTo((xMax, yMax))
         pen.lineTo((xMin, yMax))
         pen.closePath()
+
+
+class Glyph(GLIFGlyph):
+    width = 0
+    height = None
 
 
 #
