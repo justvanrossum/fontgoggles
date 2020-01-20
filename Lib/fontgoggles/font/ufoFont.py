@@ -98,7 +98,7 @@ class NotDefGlyph:
 _unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+[^>]+>)'))
 
 
-def fetchCharacterMappingAndAnchors(ufoPath, glyphSet):
+def fetchCharacterMappingAndAnchors(glyphSet, ufoPath):
     # This seems about three times faster than reader.getCharacterMapping()
     # TODO: performance may have changed since I added anchor parsing and
     # started parsing the fetched element with ET.
@@ -209,7 +209,7 @@ def compileMinimumFont(ufoPath):
     if ".notdef" not in glyphOrder:
         # We need a .notdef glyph, so let's make one.
         glyphOrder.insert(0, ".notdef")
-    cmap, anchors = fetchCharacterMappingAndAnchors(ufoPath, glyphSet)
+    cmap, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
     fb = FontBuilder(info.unitsPerEm)
     fb.setupGlyphOrder(glyphOrder)
     fb.setupCharacterMap(cmap)

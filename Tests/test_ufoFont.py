@@ -6,7 +6,7 @@ from testSupport import getFontPath
 def test_ufoCharacterMapping():
     ufoPath = getFontPath("MutatorSansBoldWide.ufo")
     reader = UFOReader(ufoPath)
-    cmap, anchors = fetchCharacterMappingAndAnchors(ufoPath, reader.getGlyphSet())
+    cmap, anchors = fetchCharacterMappingAndAnchors(reader.getGlyphSet(), ufoPath)
     assert cmap[0x0041] == "A"
     # MutatorSansBoldWide.ufo/glyphs/A_.glif contains a commented-out <unicode>
     # tag, that must not be parsed, as well as a commented-out <anchor>.
