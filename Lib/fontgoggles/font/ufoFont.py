@@ -1,3 +1,4 @@
+from collections import defaultdict
 from contextlib import redirect_stdout, redirect_stderr
 import io
 import logging
@@ -9,6 +10,7 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.ufoLib.glifLib import _BaseParser as BaseGlifParser
+from ufo2ft.featureCompiler import FeatureCompiler
 from .baseFont import BaseFont
 from ..misc.hbShape import HBShape
 from ..misc.runInPool import runInProcessPool
@@ -118,7 +120,7 @@ def compileMinimumFont(ufoPath):
     elsewhere, too), but having a picklable argument and return value
     allows us to run it in a separate process, enabling parallelism.
     """
-    reader = UFOReader(ufoPath)
+    reader = UFOReader(ufoPath, validate=False)
     glyphSet = reader.getGlyphSet()
     info = UFOInfo()
     reader.readInfo(info)
@@ -132,11 +134,15 @@ def compileMinimumFont(ufoPath):
     fb.setupGlyphOrder(glyphOrder)
     fb.setupCharacterMap(cmap)
     fb.setupPost()  # This makes sure we store the glyph names
-    features = reader.readFeatures()
-    if features:
-        fb.addOpenTypeFeatures(features, ufoPath)
+    ttFont = fb.font
+    ufo = MinimalFontObject(ufoPath, reader, cmap, anchors)
+    feaComp = FeatureCompiler(ufo, ttFont)
+    feaComp.compile()
+    # features = reader.readFeatures()
+    # if features:
+    #     fb.addOpenTypeFeatures(features, ufoPath)
     strm = io.BytesIO()
-    fb.save(strm)
+    ttFont.save(strm)
     return strm.getvalue()
 
 
@@ -226,3 +232,60 @@ class FetchUnicodesAndAnchorsParser(BaseGlifParser):
             elif name == "anchor":
                 self.anchors.append(_parseAnchorAttrs(attrs))
         super().startElementHandler(name, attrs)
+
+
+class MinimalFontObject:
+
+    def __init__(self, ufoPath, reader, cmap, anchors):
+        self.path = ufoPath
+        self._reader = reader
+        self._cmap = cmap
+        # TODO: Can we avoid reversing again?
+        revCmap = defaultdict(list)
+        for uni, glyphName in cmap.items():
+            revCmap[glyphName].append(uni)
+        self._revCmap = revCmap
+        self._anchors = anchors
+        self._glyphSet = reader.getGlyphSet()
+        self.features = MinimalFeaturesObject(reader.readFeatures())
+        self.groups = reader.readGroups()
+        self.kerning = reader.readKerning()
+        self.lib = reader.readLib()
+        self._glyphs = {}
+
+    def keys(self):
+        return self._glyphSet.contents.keys()
+
+    def __getitem__(self, glyphName):
+        # TODO: should we even bother caching?
+        glyph = self._glyphs.get(glyphName)
+        if glyph is None:
+            glyph = MinimalGlyphObject(glyphName, self._revCmap.get(glyphName), self._anchors.get(glyphName, ()))
+            self._glyphs[glyphName] = glyphName
+        return glyph
+
+
+class MinimalGlyphObject:
+
+    def __init__(self, name, unicodes, anchors):
+        self.name = name
+        self.unicodes = unicodes
+        self.anchors = [MinimalAnchorObject(name, x, y) for name, x, y in anchors]
+
+    @property
+    def unicode(self):
+        return self.unicodes[0] if self.unicodes else None
+
+
+class MinimalAnchorObject:
+
+    def __init__(self, name, x, y):
+        self.name = name
+        self.x = x
+        self.y = y
+
+
+class MinimalFeaturesObject:
+
+    def __init__(self, featureText):
+        self.text = featureText
