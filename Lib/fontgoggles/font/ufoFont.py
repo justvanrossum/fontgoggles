@@ -129,7 +129,7 @@ def compileMinimumFont(ufoPath):
     if ".notdef" not in glyphOrder:
         # We need a .notdef glyph, so let's make one.
         glyphOrder.insert(0, ".notdef")
-    cmap, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
+    cmap, revCmap, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
     fb = FontBuilder(info.unitsPerEm)
     fb.setupGlyphOrder(glyphOrder)
     fb.setupCharacterMap(cmap)
@@ -153,6 +153,7 @@ _unicodeAttributeGLIFPattern = re.compile(re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]
 def fetchCharacterMappingAndAnchors(glyphSet, ufoPath):
     # This seems about 2.3 times faster than reader.getCharacterMapping()
     cmap = {}  # unicode: glyphName
+    revCmap = {}
     anchors = {}  # glyphName: [(anchorName, x, y), ...]
     duplicateUnicodes = set()
     for glyphName in sorted(glyphSet.keys()):
@@ -181,11 +182,13 @@ def fetchCharacterMappingAndAnchors(glyphSet, ufoPath):
                 duplicateUnicodes.add(codePoint)
         if glyphAnchors:
             anchors[glyphName] = glyphAnchors
+        if unicodes:
+            revCmap[glyphName] = unicodes
 
     if duplicateUnicodes:
         logger = logging.getLogger("fontgoggles.font.ufoFont")
         logger.warning("Some code points in '%s' are assigned to multiple glyphs: %s", ufoPath, sorted(duplicateUnicodes))
-    return cmap, anchors
+    return cmap, revCmap, anchors
 
 
 def fetchUnicodesAndAnchors(glif):
