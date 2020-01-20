@@ -95,8 +95,8 @@ class NotDefGlyph:
         pen.closePath()
 
 
-_unicodeGLIFPattern = re.compile(re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"'))
 _unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)'))
+_unicodeAttributeGLIFPattern = re.compile(re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"'))
 
 
 def fetchCharacterMappingAndAnchors(glyphSet, ufoPath):
@@ -115,7 +115,7 @@ def fetchCharacterMappingAndAnchors(glyphSet, ufoPath):
             glyphAnchors = []
             for rawElement, tag, rawAttributes in _unicodeOrAnchorGLIFPattern.findall(data):
                 if tag == b"unicode":
-                    m = _unicodeGLIFPattern.match(rawAttributes)
+                    m = _unicodeAttributeGLIFPattern.match(rawAttributes)
                     try:
                         unicodes.append(int(m.group(1), 16))
                     except ValueError:
