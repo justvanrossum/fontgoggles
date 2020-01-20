@@ -135,7 +135,7 @@ def compileMinimumFont(ufoPath):
     fb.setupCharacterMap(cmap)
     fb.setupPost()  # This makes sure we store the glyph names
     ttFont = fb.font
-    ufo = MinimalFontObject(ufoPath, reader, cmap, anchors)
+    ufo = MinimalFontObject(ufoPath, reader, revCmap, anchors)
     feaComp = FeatureCompiler(ufo, ttFont)
     feaComp.compile()
     # features = reader.readFeatures()
@@ -239,14 +239,9 @@ class FetchUnicodesAndAnchorsParser(BaseGlifParser):
 
 class MinimalFontObject:
 
-    def __init__(self, ufoPath, reader, cmap, anchors):
+    def __init__(self, ufoPath, reader, revCmap, anchors):
         self.path = ufoPath
         self._reader = reader
-        self._cmap = cmap
-        # TODO: Can we avoid reversing again?
-        revCmap = defaultdict(list)
-        for uni, glyphName in cmap.items():
-            revCmap[glyphName].append(uni)
         self._revCmap = revCmap
         self._anchors = anchors
         self._glyphSet = reader.getGlyphSet()
