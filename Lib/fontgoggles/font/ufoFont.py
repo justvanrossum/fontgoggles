@@ -172,15 +172,17 @@ def fetchCharacterMappingAndAnchors(glyphSet, ufoPath):
                 elif tag == b"anchor":
                     root = ET.fromstring(rawElement)
                     glyphAnchors.append(_parseAnchorAttrs(root.attrib))
+        uniqueUnicodes = []
         for codePoint in unicodes:
             if codePoint not in cmap:
                 cmap[codePoint] = glyphName
+                uniqueUnicodes.append(codePoint)
             else:
                 duplicateUnicodes.add(codePoint)
         if glyphAnchors:
             anchors[glyphName] = glyphAnchors
-        if unicodes:
-            revCmap[glyphName] = unicodes
+        if uniqueUnicodes:
+            revCmap[glyphName] = uniqueUnicodes
 
     if duplicateUnicodes:
         logger = logging.getLogger("fontgoggles.font.ufoFont")
