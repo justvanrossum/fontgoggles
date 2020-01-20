@@ -95,6 +95,51 @@ class NotDefGlyph:
         pen.closePath()
 
 
+#
+# Tools to compile a UFO's features as quickly as possible.
+# TODO: perhaps move to a dedicated module.
+#
+
+
+def compileMinimumFont_captureOutput(ufoPath):
+    f = io.StringIO()
+    with redirect_stdout(f), redirect_stderr(f):
+        data = compileMinimumFont(ufoPath)
+    return data, f.getvalue()
+
+
+def compileMinimumFont(ufoPath):
+    """Compile the source UFO to a TTF with the smallest amount of tables
+    needed to let HarfBuzz do its work. That would be 'cmap', 'post' and
+    whatever OTL tables are needed for the features. Return the compiled
+    font data.
+
+    This function may do some redundant work (eg. we need an UFOReader
+    elsewhere, too), but having a picklable argument and return value
+    allows us to run it in a separate process, enabling parallelism.
+    """
+    reader = UFOReader(ufoPath)
+    glyphSet = reader.getGlyphSet()
+    info = UFOInfo()
+    reader.readInfo(info)
+
+    glyphOrder = sorted(glyphSet.keys())  # no need for the "real" glyph order
+    if ".notdef" not in glyphOrder:
+        # We need a .notdef glyph, so let's make one.
+        glyphOrder.insert(0, ".notdef")
+    cmap, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
+    fb = FontBuilder(info.unitsPerEm)
+    fb.setupGlyphOrder(glyphOrder)
+    fb.setupCharacterMap(cmap)
+    fb.setupPost()  # This makes sure we store the glyph names
+    features = reader.readFeatures()
+    if features:
+        fb.addOpenTypeFeatures(features, ufoPath)
+    strm = io.BytesIO()
+    fb.save(strm)
+    return strm.getvalue()
+
+
 _unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)'))
 _unicodeAttributeGLIFPattern = re.compile(re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"'))
 
@@ -181,42 +226,3 @@ class FetchUnicodesAndAnchorsParser(BaseGlifParser):
             elif name == "anchor":
                 self.anchors.append(_parseAnchorAttrs(attrs))
         super().startElementHandler(name, attrs)
-
-
-def compileMinimumFont_captureOutput(ufoPath):
-    f = io.StringIO()
-    with redirect_stdout(f), redirect_stderr(f):
-        data = compileMinimumFont(ufoPath)
-    return data, f.getvalue()
-
-
-def compileMinimumFont(ufoPath):
-    """Compile the source UFO to a TTF with the smallest amount of tables
-    needed to let HarfBuzz do its work. That would be 'cmap', 'post' and
-    whatever OTL tables are needed for the features. Return the compiled
-    font data.
-
-    This function may do some redundant work (eg. we need an UFOReader
-    elsewhere, too), but having a picklable argument and return value
-    allows us to run it in a separate process, enabling parallelism.
-    """
-    reader = UFOReader(ufoPath)
-    glyphSet = reader.getGlyphSet()
-    info = UFOInfo()
-    reader.readInfo(info)
-
-    glyphOrder = sorted(glyphSet.keys())  # no need for the "real" glyph order
-    if ".notdef" not in glyphOrder:
-        # We need a .notdef glyph, so let's make one.
-        glyphOrder.insert(0, ".notdef")
-    cmap, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
-    fb = FontBuilder(info.unitsPerEm)
-    fb.setupGlyphOrder(glyphOrder)
-    fb.setupCharacterMap(cmap)
-    fb.setupPost()  # This makes sure we store the glyph names
-    features = reader.readFeatures()
-    if features:
-        fb.addOpenTypeFeatures(features, ufoPath)
-    strm = io.BytesIO()
-    fb.save(strm)
-    return strm.getvalue()
