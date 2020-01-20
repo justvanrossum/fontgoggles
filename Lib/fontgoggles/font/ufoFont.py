@@ -107,7 +107,7 @@ def fetchCharacterMappingAndAnchors(glyphSet, ufoPath):
     for glyphName in sorted(glyphSet.keys()):
         data = glyphSet.getGLIF(glyphName)
         if b"<!--" in data:
-            # Use proper parser
+            # Fall back to proper parser, assuming this to be uncommon
             unicodes, glyphAnchors = fetchUnicodesAndAnchors(data)
         else:
             # Fast route with regex
