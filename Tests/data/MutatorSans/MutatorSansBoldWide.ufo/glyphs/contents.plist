@@ -86,6 +86,8 @@
     <string>dot.glif</string>
     <key>em</key>
     <string>em.glif</string>
+    <key>macroncmb</key>
+    <string>macroncmb.glif</string>
     <key>period</key>
     <string>period.glif</string>
     <key>quotedblbase</key>

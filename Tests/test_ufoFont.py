@@ -12,4 +12,4 @@ def test_ufoCharacterMapping():
     # MutatorSansBoldWide.ufo/glyphs/A_.glif contains a commented-out <unicode>
     # tag, that must not be parsed, as well as a commented-out <anchor>.
     assert 0x1234 not in cmap
-    assert anchors == {"A": [("top", 645, 840)], "E": [("top", 582.5, 841)]}
+    assert anchors == {"A": [("top", 645, 815)], "E": [("top", 582.5, 815)], "macroncmb": [("_top", 0, 815)]}

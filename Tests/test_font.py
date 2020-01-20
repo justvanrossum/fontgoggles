@@ -76,7 +76,7 @@ openFontsTestData = [
          'styleName': 'BoldWide',
          'suffix': 'ufo'},
         {'calt', 'ss01'},
-        {'kern'},
+        {'kern', 'mark'},
         {'DFLT': set()},
         {},
         "HIiIII", ["H", "I", ".notdef", "I", "I.narrow", "I"])
