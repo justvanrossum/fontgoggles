@@ -138,9 +138,6 @@ def compileMinimumFont(ufoPath):
     ufo = MinimalFontObject(ufoPath, reader, revCmap, anchors)
     feaComp = FeatureCompiler(ufo, ttFont)
     feaComp.compile()
-    # features = reader.readFeatures()
-    # if features:
-    #     fb.addOpenTypeFeatures(features, ufoPath)
     strm = io.BytesIO()
     ttFont.save(strm)
     return strm.getvalue()
