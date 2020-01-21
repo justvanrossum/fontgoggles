@@ -246,10 +246,10 @@ class MinimalFontObject:
 
     def __init__(self, ufoPath, reader, revCmap, anchors):
         self.path = ufoPath
-        self._reader = reader
         self._revCmap = revCmap
         self._anchors = anchors
-        self._glyphSet = reader.getGlyphSet()
+        self._glyphNames = set(reader.getGlyphSet().contents.keys())
+        self._glyphNames.add(".notdef")  # ensure we have .notdef
         self.features = MinimalFeaturesObject(reader.readFeatures())
         self.groups = reader.readGroups()
         self.kerning = reader.readKerning()
@@ -257,9 +257,11 @@ class MinimalFontObject:
         self._glyphs = {}
 
     def keys(self):
-        return self._glyphSet.contents.keys()
+        return self._glyphNames
 
     def __getitem__(self, glyphName):
+        if glyphName not in self._glyphNames:
+            raise KeyError(glyphName)
         # TODO: should we even bother caching?
         glyph = self._glyphs.get(glyphName)
         if glyph is None:
