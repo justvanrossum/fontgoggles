@@ -1,4 +1,3 @@
-from collections import defaultdict
 from contextlib import redirect_stdout, redirect_stderr
 import io
 import logging
