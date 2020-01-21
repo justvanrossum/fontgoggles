@@ -5,7 +5,7 @@ pyobjc
 corefoundationasyncio
 git+https://github.com/robotools/vanilla
 fonttools[ufo,lxml,woff,unicode,type1]
-freetype-py
+freetype-py==2.1.0
 uharfbuzz
 git+git://github.com/justvanrossum/python-bidi.git@implement-L3
 git+git://github.com/justvanrossum/jundo.git
