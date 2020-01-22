@@ -34,4 +34,5 @@ jobs:
     - name: Build application
       run: |
         python -c "import sys; print('\n'.join(sys.path))"
-        python App/setup.py py2app
+        # python App/setup.py py2app
+        # doesn't work: https://github.com/justvanrossum/fontgoggles/issues/14
