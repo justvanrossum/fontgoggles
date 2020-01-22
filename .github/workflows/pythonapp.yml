@@ -17,6 +17,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        python freetypecrutch/copyftdylib.py # see https://github.com/justvanrossum/fontgoggles/issues/20
         pip install .
         python -c "import platform; print(platform.platform())"
     - name: Lint with flake8
