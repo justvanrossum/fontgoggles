@@ -83,7 +83,7 @@ openFontsTestData = [
         # Replace the previous line with the following, once
         # https://github.com/harfbuzz/uharfbuzz/pull/24
         # lands in PyPI:
-        # "HIiIIIA\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb"])
+        # "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"])
 ]
 
 @pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,text,glyphNames",
