@@ -125,8 +125,6 @@ def compileMinimumFont_captureOutput(ufoPath):
         except Exception:
             data = None
             error = traceback.format_exc()
-        else:
-            error = None
     return data, f.getvalue(), error
 
 
