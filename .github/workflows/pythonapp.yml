@@ -15,9 +15,8 @@ jobs:
         python-version: 3.7
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install pip==19.3.1
         pip install -r requirements.txt
-        python freetypecrutch/copyftdylib.py # see https://github.com/justvanrossum/fontgoggles/issues/20
         pip install .
         python -c "import platform; print(platform.platform())"
     - name: Lint with flake8
