@@ -80,7 +80,7 @@ openFontsTestData = [
         {'DFLT': set()},
         {},
         "HIiIII", ["H", "I", ".notdef", "I", "I.narrow", "I"])
-        # Replace the previous line with the following once
+        # Replace the previous line with the following, once
         # https://github.com/harfbuzz/uharfbuzz/pull/24
         # lands in PyPI:
         # "HIiIIIA\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb"])
