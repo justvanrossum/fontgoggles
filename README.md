@@ -20,9 +20,11 @@ FontGoggles: Visual OTL Preview and QA
 
 	`$ source venv/bin/activate`
 
-- Update `pip`:
+- ~~Update `pip`~~ Pin `pip` to version 19.3.1 for now:
 
-	`$ pip install --upgrade pip`
+	~~`$ pip install --upgrade pip`~~
+
+	`$ pip install pip==19.3.1`
 
 - Install dependencies:
 
