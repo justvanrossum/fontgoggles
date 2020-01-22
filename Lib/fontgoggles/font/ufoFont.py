@@ -3,6 +3,7 @@ import io
 import logging
 import re
 import sys
+import traceback
 import xml.etree.ElementTree as ET
 from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.fontBuilder import FontBuilder
@@ -36,12 +37,20 @@ class UFOFont(BaseFont):
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
 
-        fontData, output = await runInProcessPool(compileMinimumFont_captureOutput, self._fontPath)
+        fontData, output, error = await runInProcessPool(compileMinimumFont_captureOutput, self._fontPath)
         if output:
             print(output, file=sys.stderr)
-        f = io.BytesIO(fontData)
-        self.ttFont = TTFont(f, lazy=True)
-        self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
+        if error:
+            # TODO: where/how to report to the user?
+            print(error, file=sys.stderr)
+        if fontData is None:
+            # TODO: this cannot work down the line, how to handle?
+            self.ttFont = None
+            self.shaper = None
+        else:
+            f = io.BytesIO(fontData)
+            self.ttFont = TTFont(f, lazy=True)
+            self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
@@ -111,8 +120,14 @@ class Glyph(GLIFGlyph):
 def compileMinimumFont_captureOutput(ufoPath):
     f = io.StringIO()
     with redirect_stdout(f), redirect_stderr(f):
-        data = compileMinimumFont(ufoPath)
-    return data, f.getvalue()
+        try:
+            data, error = compileMinimumFont(ufoPath)
+        except Exception:
+            data = None
+            error = traceback.format_exc()
+        else:
+            error = None
+    return data, f.getvalue(), error
 
 
 def compileMinimumFont(ufoPath):
@@ -142,10 +157,15 @@ def compileMinimumFont(ufoPath):
     ttFont = fb.font
     ufo = MinimalFontObject(ufoPath, reader, revCmap, anchors)
     feaComp = FeatureCompiler(ufo, ttFont)
-    feaComp.compile()
+    try:
+        feaComp.compile()
+    except Exception:
+        error = traceback.format_exc()
+    else:
+        error = None
     strm = io.BytesIO()
     ttFont.save(strm)
-    return strm.getvalue()
+    return strm.getvalue(), error
 
 
 _unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)'))
