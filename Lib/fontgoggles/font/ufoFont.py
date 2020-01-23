@@ -18,7 +18,7 @@ from ..misc.runInPool import runInProcessPool
 
 class UFOFont(BaseFont):
 
-    def __init__(self, fontPath):
+    def __init__(self, fontPath, needsShaper=True):
         super().__init__()
         self.reader = UFOReader(fontPath)
         self.glyphSet = self.reader.getGlyphSet()
@@ -27,6 +27,7 @@ class UFOFont(BaseFont):
         self.reader.readInfo(self.info)
         self._fontPath = fontPath
         self._cachedGlyphs = {}
+        self._needsShaper = needsShaper
 
     async def load(self):
         glyphOrder = sorted(self.glyphSet.keys())  # no need for the "real" glyph order
@@ -50,7 +51,8 @@ class UFOFont(BaseFont):
         else:
             f = io.BytesIO(fontData)
             self.ttFont = TTFont(f, lazy=True)
-            self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
+            if self._needsShaper:
+                self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
