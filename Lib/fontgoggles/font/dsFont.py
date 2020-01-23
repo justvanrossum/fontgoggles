@@ -21,6 +21,10 @@ class DSFont(BaseFont):
         self.shaper = self.defaultUFO.shaper
 
     @readOnlyCachedProperty
+    def unitsPerEm(self):
+        return self.defaultUFO.info.unitsPerEm
+
+    @readOnlyCachedProperty
     def axes(self):
         axes = {}
         for axis in self.doc.axes:
