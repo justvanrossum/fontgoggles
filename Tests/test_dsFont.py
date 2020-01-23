@@ -11,6 +11,7 @@ def test_pointCollector():
     glyphSet["B"].draw(pen)
     points = pen.getPointsArray()
     assert len(points) == 38
+
     pen = PointCollector(glyphSet)
     glyphSet["Aacute"].draw(pen)
     points = pen.getPointsArray()
@@ -28,11 +29,18 @@ def test_pointAndStructureCollector():
     assert len(pen.getTagsArray()) == 38
     assert list(pen.getContoursArray()) == [3, 37]
     assert list(pen.getTagsArray())[:12] == [1, 1, 1, 1, 1, 1, 2, 2, 1, 2, 2, 1]
+
     pen = PointAndStructureCollector(glyphSet)
     glyphSet["Aacute"].draw(pen)
     points = pen.getPointsArray()
     assert len(points) == 20
     assert list(pen.getContoursArray()) == [3, 7, 11, 15, 19]
+
+    pen = PointAndStructureCollector(glyphSet)
+    glyphSet["O"].draw(pen)
+    points = pen.getPointsArray()
+    assert len(points) == 29
+    assert list(pen.getContoursArray()) == [14, 28]
 
 
 def test_pointAndStructureCollectorQuad():
