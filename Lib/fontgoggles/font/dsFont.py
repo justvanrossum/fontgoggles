@@ -34,6 +34,9 @@ class DSFont(BaseFont):
                                   name=axis.name)
         return axes
 
+    def _setVarLocation(self, varLocation):
+        print(varLocation)
+
     def _getOutlinePath(self, glyphName, colorLayers):
         return self.defaultUFO._getOutlinePath(glyphName, colorLayers)
 
