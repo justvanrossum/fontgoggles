@@ -22,6 +22,7 @@ class DSFont(BaseFont):
         # - call varLib.build(self.doc)
         # - varLib.build() should also run in the process pool, but then
         #   we need the raw fontData from the ufo, not ttFont.
+        # - exclude: MVAR HVAR VVAR
         # - note ufos may occur more than once in the sources list, we
         #   should only load once.
         self.defaultUFO = UFOFont(defaultSource.path)
