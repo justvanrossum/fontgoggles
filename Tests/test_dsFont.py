@@ -1,5 +1,5 @@
 from fontTools.ufoLib import UFOReader
-from fontgoggles.font.dsFont import PointCollector, PointAndStructureCollector
+from fontgoggles.font.dsFont import PointCollector
 from testSupport import getFontPath
 
 
@@ -11,43 +11,28 @@ def test_pointCollector():
     glyphSet["B"].draw(pen)
     points = pen.getPointsArray()
     assert len(points) == 38
+    assert len(pen.getTagsArray()) == 38
+    assert list(pen.getContoursArray()) == [3, 37]
+    assert list(pen.getTagsArray())[:12] == [1, 1, 1, 1, 1, 1, 2, 2, 1, 2, 2, 1]
 
     pen = PointCollector(glyphSet)
     glyphSet["Aacute"].draw(pen)
     points = pen.getPointsArray()
     assert len(points) == 20
-
-
-def test_pointAndStructureCollector():
-    ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
-    reader = UFOReader(ufoPath)
-    glyphSet = reader.getGlyphSet()
-    pen = PointAndStructureCollector(glyphSet)
-    glyphSet["B"].draw(pen)
-    points = pen.getPointsArray()
-    assert len(points) == 38
-    assert len(pen.getTagsArray()) == 38
-    assert list(pen.getContoursArray()) == [3, 37]
-    assert list(pen.getTagsArray())[:12] == [1, 1, 1, 1, 1, 1, 2, 2, 1, 2, 2, 1]
-
-    pen = PointAndStructureCollector(glyphSet)
-    glyphSet["Aacute"].draw(pen)
-    points = pen.getPointsArray()
-    assert len(points) == 20
     assert list(pen.getContoursArray()) == [3, 7, 11, 15, 19]
 
-    pen = PointAndStructureCollector(glyphSet)
+    pen = PointCollector(glyphSet)
     glyphSet["O"].draw(pen)
     points = pen.getPointsArray()
-    assert len(points) == 29
-    assert list(pen.getContoursArray()) == [14, 28]
+    assert len(points) == 28
+    assert list(pen.getContoursArray()) == [13, 27]
 
 
-def test_pointAndStructureCollectorQuad():
+def test_pointCollectorQuad():
     ufoPath = getFontPath("QuadTest-Regular.ufo")
     reader = UFOReader(ufoPath)
     glyphSet = reader.getGlyphSet()
-    pen = PointAndStructureCollector(glyphSet)
+    pen = PointCollector(glyphSet)
     glyphSet["a"].draw(pen)
     points = pen.getPointsArray()
     assert len(points) == 4
