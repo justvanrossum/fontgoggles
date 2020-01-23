@@ -161,9 +161,9 @@ def compileMinimumFont(ufoPath):
         error = traceback.format_exc()
     else:
         error = None
-    strm = io.BytesIO()
-    ttFont.save(strm, reorderTables=False)
-    return strm.getvalue(), error
+    f = io.BytesIO()
+    ttFont.save(f, reorderTables=False)
+    return f.getvalue(), error
 
 
 _unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)'))
