@@ -27,7 +27,7 @@ class UFOFont(BaseFont):
         self.reader.readInfo(self.info)
         self._fontPath = fontPath
         self._cachedGlyphs = {}
-        self._needsShaper = needsShaper
+        self._needsShaper = needsShaper  # TODO: could be arg to self.load()
 
     async def load(self):
         glyphOrder = sorted(self.glyphSet.keys())  # no need for the "real" glyph order

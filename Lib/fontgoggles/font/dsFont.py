@@ -15,6 +15,15 @@ class DSFont(BaseFont):
     async def load(self):
         self.doc = DesignSpaceDocument.fromfile(self._fontPath)
         defaultSource = self.doc.findDefault()
+        # Steps:
+        # - load all master ufos, asyncio.gather(...)
+        # - for source in self.doc.sources:
+        #       source.font = ufo.ttFont
+        # - call varLib.build(self.doc)
+        # - varLib.build() should also run in the process pool, but then
+        #   we need the raw fontData from the ufo, not ttFont.
+        # - note ufos may occur more than once in the sources list, we
+        #   should only load once.
         self.defaultUFO = UFOFont(defaultSource.path)
         await self.defaultUFO.load()
         # XXX temp
