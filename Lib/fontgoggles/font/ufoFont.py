@@ -261,6 +261,12 @@ class FetchUnicodesAndAnchorsParser(BaseGlifParser):
 
 class MinimalFontObject:
 
+    # This class and its relatives implement a defcon-like font object, but
+    # only support the bare minimum for ufo2ft's FeatureCompiler to do its
+    # work. No outlines are needed, no advances, no glyph.lib, only glyph
+    # unicodes and anchors, and at the font level, only features, groups,
+    # kerning and lib are needed.
+
     def __init__(self, ufoPath, reader, revCmap, anchors):
         self.path = ufoPath
         self._revCmap = revCmap
