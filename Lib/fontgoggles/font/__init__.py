@@ -67,6 +67,14 @@ async def openUFO(fontPath: PathLike, fontNumber: int, fontData=None):
     return (font, None)
 
 
+async def openDS(fontPath: PathLike, fontNumber: int, fontData=None):
+    from .dsFont import DSFont
+    assert fontData is None  # dummy
+    font = DSFont(fontPath)
+    await font.load()
+    return (font, None)
+
+
 def numFontsOne(fontPath: PathLike):
     return 1
 
@@ -129,6 +137,11 @@ def getSortInfoUFO(fontPath: PathLike, fontNum: int):
     return sortInfo
 
 
+def getSortInfoDS(fontPath: PathLike, fontNum: int):
+    assert fontNum == 0
+    return {}  # TODO
+
+
 fontOpeners = {
     "ttf": (numFontsOne, openOTF, getSortInfoOTF),
     "otf": (numFontsOne, openOTF, getSortInfoOTF),
@@ -138,6 +151,7 @@ fontOpeners = {
     "ufos": (numFontsOne, openUFO, getSortInfoUFO),
     "ttc": (numFontsTTC, openOTF, getSortInfoOTF),
     "otc": (numFontsTTC, openOTF, getSortInfoOTF),
+    "designspace": (numFontsOne, openDS, getSortInfoDS),
 }
 
 fileTypes = sorted(fontOpeners)

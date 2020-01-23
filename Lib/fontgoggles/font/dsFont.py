@@ -1,5 +1,10 @@
 import numpy
 from fontTools.pens.basePen import BasePen
+from .baseFont import BaseFont
+
+
+class DSFont(BaseFont):
+    ...
 
 
 # From FreeType:

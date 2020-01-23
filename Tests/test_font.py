@@ -124,6 +124,7 @@ def test_iterFontPathsAndNumbers():
         results.append((fontPath.name, fontNumber))
     # TODO: add .ttc test font
     expectedResults = [
+        ('MutatorSans.designspace', 0),
         ('IBMPlexSans-Regular.otf', 0),
         ('Amiri-Regular.ttf', 0),
         ('IBMPlexSans-Regular.ttf', 0),
