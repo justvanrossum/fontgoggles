@@ -148,7 +148,7 @@ def compileMinimumFont(ufoPath):
         # We need a .notdef glyph, so let's make one.
         glyphOrder.insert(0, ".notdef")
     cmap, revCmap, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
-    fb = FontBuilder(info.unitsPerEm)
+    fb = FontBuilder(round(info.unitsPerEm))
     fb.setupGlyphOrder(glyphOrder)
     fb.setupCharacterMap(cmap)
     fb.setupPost()  # This makes sure we store the glyph names
@@ -162,7 +162,7 @@ def compileMinimumFont(ufoPath):
     else:
         error = None
     strm = io.BytesIO()
-    ttFont.save(strm)
+    ttFont.save(strm, reorderTables=False)
     return strm.getvalue(), error
 
 
