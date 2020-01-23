@@ -1,10 +1,34 @@
 import numpy
 from fontTools.pens.basePen import BasePen
+from fontTools.designspaceLib import DesignSpaceDocument
 from .baseFont import BaseFont
+from .ufoFont import UFOFont
+from ..misc.properties import readOnlyCachedProperty
 
 
 class DSFont(BaseFont):
-    ...
+
+    def __init__(self, fontPath):
+        super().__init__()
+        self._fontPath = fontPath
+
+    async def load(self):
+        self.doc = DesignSpaceDocument.fromfile(self._fontPath)
+        defaultSource = self.doc.findDefault()
+        self.defaultUFO = UFOFont(defaultSource.path)
+        await self.defaultUFO.load()
+        # XXX temp
+        self.shaper = self.defaultUFO.shaper
+
+    @readOnlyCachedProperty
+    def axes(self):
+        axes = {}
+        for axis in self.doc.axes:
+            axes[axis.tag] = dict(defaultValue=axis.default,
+                                  minValue=axis.minimum,
+                                  maxValue=axis.maximum,
+                                  name=axis.name)
+        return axes
 
 
 # From FreeType:

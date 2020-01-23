@@ -79,11 +79,25 @@ openFontsTestData = [
         {'kern', 'mark'},
         {'DFLT': set()},
         {},
-        "HIiIII", ["H", "I", ".notdef", "I", "I.narrow", "I"])
+        "HIiIII", ["H", "I", ".notdef", "I", "I.narrow", "I"]),
         # Replace the previous line with the following, once
         # https://github.com/harfbuzz/uharfbuzz/pull/24
         # lands in PyPI:
         # "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"])
+    ('MutatorSans.designspace',
+        {},
+        set(),
+        {'kern'},
+        {'DFLT': set()},
+        {'wdth': {'defaultValue': 0.0,
+                  'maxValue': 1000.0,
+                  'minValue': 0.0,
+                  'name': 'width'},
+         'wght': {'defaultValue': 0.0,
+                  'maxValue': 1000.0,
+                  'minValue': 0.0,
+                  'name': 'weight'}},
+        "", []),
 ]
 
 @pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,text,glyphNames",
