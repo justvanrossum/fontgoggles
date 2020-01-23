@@ -26,6 +26,7 @@ class DSFont(BaseFont):
 
     @readOnlyCachedProperty
     def axes(self):
+        # TODO: remove this method because self.ttFont will have an 'fvar' table
         axes = {}
         for axis in self.doc.axes:
             axes[axis.tag] = dict(defaultValue=axis.default,
