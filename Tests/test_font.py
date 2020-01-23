@@ -131,7 +131,16 @@ def test_iterFontPathsAndNumbers():
         ('MutatorSans.ttf', 0),
         ('NotoNastaliqUrdu-Regular.ttf', 0),
         ('QuadTest-Regular.ttf', 0),
+        ('MutatorSansIntermediateCondensed.ufo', 0),
+        ('MutatorSansIntermediateWide.ufo', 0),
+        ('MutatorSansBoldCondensed.ufo', 0),
+        ('MutatorSansBoldWide.ufo', 0),
         ('MutatorSansBoldWideMutated.ufo', 0),
+        ('MutatorSansLightCondensed.ufo', 0),
+        ('MutatorSansLightCondensed_support.S.middle.ufo', 0),
+        ('MutatorSansLightCondensed_support.S.wide.ufo', 0),
+        ('MutatorSansLightCondensed_support.crossbar.ufo', 0),
+        ('MutatorSansLightWide.ufo', 0),
     ]
     assert expectedResults == results
 
