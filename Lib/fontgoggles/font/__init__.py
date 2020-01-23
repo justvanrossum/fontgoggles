@@ -132,8 +132,8 @@ def getSortInfoUFO(fontPath: PathLike, fontNum: int):
 fontOpeners = {
     "ttf": (numFontsOne, openOTF, getSortInfoOTF),
     "otf": (numFontsOne, openOTF, getSortInfoOTF),
-    # "woff": (numFontsOne, openOTF, getSortInfoOTF),  # disabled, see #16
-    # "woff2": (numFontsOne, openOTF, getSortInfoOTF),
+    "woff": (numFontsOne, openOTF, getSortInfoOTF),
+    "woff2": (numFontsOne, openOTF, getSortInfoOTF),
     "ufo": (numFontsOne, openUFO, getSortInfoUFO),
     "ufos": (numFontsOne, openUFO, getSortInfoUFO),
     "ttc": (numFontsTTC, openOTF, getSortInfoOTF),
