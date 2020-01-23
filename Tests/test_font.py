@@ -70,7 +70,7 @@ openFontsTestData = [
         {'DFLT': set(), 'arab': {'ARA ', 'FAR ', 'KSH ', 'SND ', 'URD '}, 'latn': set()},
         {},
         "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
-    ("MutatorSansBoldWide.ufo",
+    ("MutatorSansBoldWideMutated.ufo",
         {'familyName': 'MutatorMathTest',
          'italicAngle': 0,
          'styleName': 'BoldWide',
@@ -131,7 +131,7 @@ def test_iterFontPathsAndNumbers():
         ('MutatorSans.ttf', 0),
         ('NotoNastaliqUrdu-Regular.ttf', 0),
         ('QuadTest-Regular.ttf', 0),
-        ('MutatorSansBoldWide.ufo', 0),
+        ('MutatorSansBoldWideMutated.ufo', 0),
     ]
     assert expectedResults == results
 
