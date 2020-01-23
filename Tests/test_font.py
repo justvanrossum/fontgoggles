@@ -97,7 +97,7 @@ openFontsTestData = [
                   'maxValue': 1000.0,
                   'minValue': 0.0,
                   'name': 'weight'}},
-        "", []),
+        "A", ["A"]),
 ]
 
 @pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,text,glyphNames",

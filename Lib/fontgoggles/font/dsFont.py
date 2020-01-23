@@ -30,6 +30,9 @@ class DSFont(BaseFont):
                                   name=axis.name)
         return axes
 
+    def _getOutlinePath(self, glyphName, colorLayers):
+        return self.defaultUFO._getOutlinePath(glyphName, colorLayers)
+
 
 # From FreeType:
 FT_CURVE_TAG_ON = 1
