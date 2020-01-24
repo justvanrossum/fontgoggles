@@ -133,23 +133,29 @@ class VarGlyph:
         self.deltas = self.model.getDeltas(masterPoints)
         self.contours = contours
         self.tags = tags
-        self.varLocation = None
+        self.varLocation = {}
+        self._points = None
 
     def setVarLocation(self, varLocation):
         if varLocation is None:
             varLocation = {}
+        if self.varLocation == varLocation:
+            return
         self.varLocation = varLocation
+
+    def getPoints(self):
+        if self._points is None:
+            self._points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
+        return self._points
 
     @property
     def width(self):
-        # XXX not efficient, see draw
-        points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
-        return points[-1][0]
+        return self.getPoints()[-1][0]
 
     def draw(self, pen):
         ppen = PointToSegmentPen(pen)
         startIndex = 0
-        points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
+        points = self.getPoints()
         for endIndex in self.contours:
             lastTag = self.tags[endIndex]
             endIndex += 1
