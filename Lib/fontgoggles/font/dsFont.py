@@ -139,6 +139,7 @@ def interpolateFromDeltas(model, varLocation, deltas):
 
 NUMPY_IN_PLACE = True
 
+
 class VarGlyph:
 
     def __init__(self, masterModel, contours, masterPoints, tags):
