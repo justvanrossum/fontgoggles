@@ -24,7 +24,6 @@ class DSFont(BaseFont):
         super().__init__()
         self._fontPath = fontPath
         self._varGlyphs = {}
-        self._advanceCache = {}
 
     async def load(self):
         self.doc = DesignSpaceDocument.fromfile(self._fontPath)
@@ -69,10 +68,6 @@ class DSFont(BaseFont):
         vfFontData = f.getvalue()
         self.shaper = HBShape(vfFontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
-    def _purgeCaches(self):
-        super()._purgeCaches()
-        self._advanceCache = {}
-
     def _getVarGlyph(self, glyphName):
         varGlyph = self._varGlyphs.get(glyphName)
         if varGlyph is None:
@@ -100,24 +95,14 @@ class DSFont(BaseFont):
         return varGlyph
 
     def _getAdvanceWidth(self, glyphName):
-        advance = self._advanceCache.get(glyphName)
-        if advance is None:
-            varGlyph = self._getVarGlyph(glyphName)
-            advance = AdvanceTuple(varGlyph.width, None, None)
-            self._advanceCache[glyphName] = advance
-        return advance.width
+        varGlyph = self._getVarGlyph(glyphName)
+        return varGlyph.width
 
     def _getOutlinePath(self, glyphName, colorLayers):
         varGlyph = self._getVarGlyph(glyphName)
         pen = CocoaPen(None)  # by now there are no more composites
         varGlyph.draw(pen)
         return pen.path
-
-
-class AdvanceTuple(NamedTuple):
-    width: None
-    height: None
-    verticalOrigin: None
 
 
 # From FreeType:
