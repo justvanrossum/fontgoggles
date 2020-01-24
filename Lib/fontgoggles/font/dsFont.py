@@ -24,6 +24,7 @@ class DSFont(BaseFont):
         super().__init__()
         self._fontPath = fontPath
         self._varGlyphs = {}
+        self._normalizedLocation = {}
 
     async def load(self):
         self.doc = DesignSpaceDocument.fromfile(self._fontPath)
@@ -68,6 +69,9 @@ class DSFont(BaseFont):
         vfFontData = f.getvalue()
         self.shaper = HBShape(vfFontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
+    def _setVarLocation(self, varLocation):
+        self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})
+
     def _getVarGlyph(self, glyphName):
         varGlyph = self._varGlyphs.get(glyphName)
         if varGlyph is None:
@@ -91,7 +95,7 @@ class DSFont(BaseFont):
 
                 varGlyph = VarGlyph(self.masterModel, contours, masterPoints, tags)
             self._varGlyphs[varGlyph] = varGlyph
-        varGlyph.setVarLocation(normalizeLocation(self.doc, self._currentVarLocation or {}))
+        varGlyph.setVarLocation(self._normalizedLocation)
         return varGlyph
 
     def _getAdvanceWidth(self, glyphName):
