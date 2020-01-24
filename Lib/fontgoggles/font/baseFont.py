@@ -82,22 +82,18 @@ class BaseFont:
         glyphs.endPos = (x, y)
         return glyphs
 
-    def getGlyphRun(self, txt, *, features=None, varLocation=None,
+    def getGlyphRun(self, text, *, features=None, varLocation=None,
                     direction=None, language=None, script=None,
                     colorLayers=False):
-        glyphInfo = self.shape(txt, features=features, varLocation=varLocation,
-                               direction=direction, language=language,
-                               script=script)
+        self.setVarLocation(varLocation)
+        glyphInfo = self.shaper.shape(text, features=features, varLocation=varLocation,
+                                 direction=direction, language=language, script=script)
         glyphNames = (gi.name for gi in glyphInfo)
         for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, varLocation, colorLayers)):
             glyph.path = path
         return glyphInfo
 
-    def shape(self, text, *, features, varLocation, direction, language, script):
-        return self.shaper.shape(text, features=features, varLocation=varLocation,
-                                 direction=direction, language=language, script=script)
-
-    def getOutlinePaths(self, glyphNames, varLocation, colorLayers=False):
+    def setVarLocation(self, varLocation):
         axes = self.axes
         if varLocation:
             # subset to our own axes
@@ -105,7 +101,8 @@ class BaseFont:
         if self._currentVarLocation != varLocation:
             self._purgeCaches()
             self._currentVarLocation = varLocation
-            self._setVarLocation(varLocation)
+
+    def getOutlinePaths(self, glyphNames, varLocation, colorLayers=False):
         for glyphName in glyphNames:
             outline = self._outlinePaths[colorLayers].get(glyphName)
             if outline is None:
@@ -118,9 +115,6 @@ class BaseFont:
 
     def _getOutlinePath(self, glyphName, colorLayers):
         raise NotImplementedError()
-
-    def _setVarLocation(self, varLocation):
-        pass  # optional override
 
 
 class OTFFont(BaseFont):
@@ -155,7 +149,8 @@ class OTFFont(BaseFont):
         else:
             return outline
 
-    def _setVarLocation(self, varLocation):
+    def setVarLocation(self, varLocation):
+        super().setVarLocation(varLocation)
         self.ftFont.setVarLocation(varLocation if varLocation else {})
 
 
