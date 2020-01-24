@@ -16,6 +16,7 @@ from .ufoFont import NotDefGlyph, compileMinimumFont_captureOutput
 from ..misc.hbShape import HBShape
 from ..misc.properties import readOnlyCachedProperty
 from ..misc.runInPool import runInProcessPool
+from ..mac.makePathFromOutline import makePathFromArrays
 
 
 class DSFont(BaseFont):
@@ -104,9 +105,12 @@ class DSFont(BaseFont):
 
     def _getOutlinePath(self, glyphName, colorLayers):
         varGlyph = self._getVarGlyph(glyphName)
-        pen = CocoaPen(None)  # by now there are no more composites
-        varGlyph.draw(pen)
-        return pen.path
+        if True:
+            return varGlyph.getOutline()
+        else:
+            pen = CocoaPen(None)  # by now there are no more composites
+            varGlyph.draw(pen)
+            return pen.path
 
 
 # From FreeType:
@@ -169,6 +173,9 @@ class VarGlyph:
     @property
     def width(self):
         return self.getPoints()[-1][0]
+
+    def getOutline(self):
+        return makePathFromArrays(self.getPoints(), self.tags, self.contours)
 
     def draw(self, pen):
         ppen = PointToSegmentPen(pen)

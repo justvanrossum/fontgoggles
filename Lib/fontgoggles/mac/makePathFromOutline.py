@@ -61,8 +61,8 @@ def makePathFromArrays(points, tags, contours):
     if points.dtype != numpy.long:
         points = numpy.floor(points + [0.5, 0.5])
         points = points.astype(numpy.long)
-    assert tags.dtype == numpy.uint8
-    assert contours.dtype == numpy.uint16
+    assert tags.dtype == numpy.byte
+    assert contours.dtype == numpy.short
     path = objc.objc_object(
         c_void_p=_makePathFromArrays(
             n_contours,
