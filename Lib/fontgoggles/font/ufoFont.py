@@ -107,6 +107,10 @@ class NotDefGlyph:
         pen.lineTo((xMin, yMax))
         pen.closePath()
 
+    def setVarLocation(self, varLocation):
+        # For compatibility with dsFont.VarGlyph
+        pass
+
 
 class Glyph(GLIFGlyph):
     width = 0

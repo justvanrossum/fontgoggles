@@ -1,13 +1,16 @@
 import asyncio
 import io
+from typing import NamedTuple
 import numpy
 from fontTools import varLib
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.cocoaPen import CocoaPen
+from fontTools.pens.pointPen import PointToSegmentPen
 from fontTools.designspaceLib import DesignSpaceDocument
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont, newTable
 from fontTools.ufoLib import UFOReader
+from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph, compileMinimumFont_captureOutput
 from ..misc.hbShape import HBShape
@@ -20,6 +23,8 @@ class DSFont(BaseFont):
     def __init__(self, fontPath):
         super().__init__()
         self._fontPath = fontPath
+        self._varGlyphs = {}
+        self._advanceCache = {}
 
     async def load(self):
         self.doc = DesignSpaceDocument.fromfile(self._fontPath)
@@ -53,31 +58,113 @@ class DSFont(BaseFont):
 
         # - varLib.build() should also run in the process pool, but then
         #   we need the raw fontData from the ufo, not ttFont.
-        self.ttFont, *unused = varLib.build(self.doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
+        self.ttFont, self.masterModel, _ = varLib.build(self.doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
+        assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
         f = io.BytesIO()
         self.ttFont.save(f, reorderTables=False)
         vfFontData = f.getvalue()
         self.shaper = HBShape(vfFontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
+    def _purgeCaches(self):
+        super()._purgeCaches()
+        self._advanceCache = {}
+
+    def _getVarGlyph(self, glyphName):
+        varGlyph = self._varGlyphs.get(glyphName)
+        if varGlyph is None:
+            if glyphName not in self.doc.default.ufoGlyphSet:
+                varGlyph = NotDefGlyph(self.unitsPerEm)
+            else:
+                tags = None
+                contours = None
+                masterPoints = []
+                for source in self.doc.sources:
+                    if glyphName not in source.ufoGlyphSet:
+                        masterPoints.append(None)
+                        continue
+                    glyph = source.ufoGlyphSet[glyphName]
+                    coll = PointCollector(source.ufoGlyphSet)
+                    glyph.draw(coll)
+                    masterPoints.append(coll.points + [(glyph.width, 0)])
+                    if source is self.doc.default:
+                        tags = coll.tags
+                        contours = coll.contours
+
+                varGlyph = VarGlyph(self.masterModel, contours, masterPoints, tags)
+            self._varGlyphs[varGlyph] = varGlyph
+        return varGlyph
+
     def _getAdvanceWidth(self, glyphName):
-        return 500
+        advance = self._advanceCache.get(glyphName)
+        if advance is None:
+            varGlyph = self._getVarGlyph(glyphName)
+            varGlyph.setVarLocation(normalizeLocation(self.doc, self._currentVarLocation or {}))
+            advance = AdvanceTuple(varGlyph.width, None, None)
+            self._advanceCache[glyphName] = advance
+        return advance.width
 
     def _getOutlinePath(self, glyphName, colorLayers):
-        glyphSet = self.doc.default.ufoGlyphSet
-        if glyphName not in glyphSet:
-            glyph = NotDefGlyph(self.unitsPerEm)
-        else:
-            glyph = glyphSet[glyphName]
-        pen = CocoaPen(glyphSet)
-        glyph.draw(pen)
+        varGlyph = self._getVarGlyph(glyphName)
+        varGlyph.setVarLocation(normalizeLocation(self.doc, self._currentVarLocation or {}))
+        pen = CocoaPen(None)  # by now there are no more composites
+        varGlyph.draw(pen)
         return pen.path
 
+
+class AdvanceTuple(NamedTuple):
+    width: None
+    height: None
+    verticalOrigin: None
 
 
 # From FreeType:
 FT_CURVE_TAG_ON = 1
 FT_CURVE_TAG_CONIC = 0
 FT_CURVE_TAG_CUBIC = 2
+
+segmentTypes = {FT_CURVE_TAG_ON: "line", FT_CURVE_TAG_CONIC: "qcurve", FT_CURVE_TAG_CUBIC: "curve"}
+
+
+class VarGlyph:
+
+    def __init__(self, masterModel, contours, masterPoints, tags):
+        self.model, masterPoints = masterModel.getSubModel(masterPoints)
+        masterPoints = [numpy.array(pts, numpy.float32) for pts in masterPoints]
+        self.deltas = self.model.getDeltas(masterPoints)
+        self.contours = contours
+        self.tags = tags
+        self.varLocation = None
+
+    def setVarLocation(self, varLocation):
+        if varLocation is None:
+            varLocation = {}
+        self.varLocation = varLocation
+
+    @property
+    def width(self):
+        # XXX not efficient, see draw
+        points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
+        return points[-1][0]
+
+    def draw(self, pen):
+        ppen = PointToSegmentPen(pen)
+        startIndex = 0
+        points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
+        for endIndex in self.contours:
+            lastTag = self.tags[endIndex]
+            endIndex += 1
+            contourTags = self.tags[startIndex:endIndex]
+            contourPoints = points[startIndex:endIndex]
+            ppen.beginPath()
+            for tag, (x, y) in zip(contourTags, contourPoints):
+                if tag == FT_CURVE_TAG_ON:
+                    segmentType = segmentTypes[lastTag]
+                else:
+                    segmentType = None
+                ppen.addPoint((x, y), segmentType=segmentType)
+                lastTag = tag
+            ppen.endPath()
+            startIndex = endIndex
 
 
 class PointCollector(BasePen):
@@ -125,11 +212,20 @@ class PointCollector(BasePen):
 
     endPath = closePath
 
-    def getPointsArray(self, tp=numpy.float32):
-        return numpy.array(self.points, tp)
 
-    def getTagsArray(self):
-        return numpy.array(self.tags, numpy.uint8)
+def normalizeLocation(doc, location):
+    new = {}
+    for axis in doc.axes:
+        if axis.tag not in location:
+            # skipping this dimension it seems
+            continue
+        value = location[axis.tag]
+        # 'anisotropic' location, take first coord only
+        if isinstance(value, tuple):
+            value = value[0]
+        triple = [
+            axis.map_forward(v) for v in (axis.minimum, axis.default, axis.maximum)
+        ]
+        new[axis.tag] = normalizeValue(value, triple)
+    return new
 
-    def getContoursArray(self):
-        return numpy.array(self.contours, numpy.uint16)
