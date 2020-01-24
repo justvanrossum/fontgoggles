@@ -89,7 +89,7 @@ class BaseFont:
         glyphInfo = self.shaper.shape(text, features=features, varLocation=varLocation,
                                  direction=direction, language=language, script=script)
         glyphNames = (gi.name for gi in glyphInfo)
-        for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, varLocation, colorLayers)):
+        for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, colorLayers)):
             glyph.path = path
         return glyphInfo
 
@@ -101,8 +101,9 @@ class BaseFont:
         if self._currentVarLocation != varLocation:
             self._purgeCaches()
             self._currentVarLocation = varLocation
+            self.varLocationChanged(varLocation)
 
-    def getOutlinePaths(self, glyphNames, varLocation, colorLayers=False):
+    def getOutlinePaths(self, glyphNames, colorLayers=False):
         for glyphName in glyphNames:
             outline = self._outlinePaths[colorLayers].get(glyphName)
             if outline is None:
@@ -115,6 +116,10 @@ class BaseFont:
 
     def _getOutlinePath(self, glyphName, colorLayers):
         raise NotImplementedError()
+
+    def varLocationChanged(self, varLocation):
+        # Optional override
+        pass
 
 
 class OTFFont(BaseFont):
@@ -149,8 +154,7 @@ class OTFFont(BaseFont):
         else:
             return outline
 
-    def setVarLocation(self, varLocation):
-        super().setVarLocation(varLocation)
+    def varLocationChanged(self, varLocation):
         self.ftFont.setVarLocation(varLocation if varLocation else {})
 
 

@@ -69,8 +69,7 @@ class DSFont(BaseFont):
         vfFontData = f.getvalue()
         self.shaper = HBShape(vfFontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
-    def setVarLocation(self, varLocation):
-        super().setVarLocation(varLocation)
+    def varLocationChanged(self, varLocation):
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})
 
     def _getVarGlyph(self, glyphName):
