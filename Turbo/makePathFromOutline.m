@@ -174,18 +174,26 @@ static void drawContour(NSBezierPath* path,
     }
 }
 
-
-void* makePathFromOutline(FT_Outline* outline)
+void* makePathFromArrays(short n_contours, short n_points, FT_Vector* points, char* tags, short* contours)
 {
     int i, j, c_start = 0;
 
     NSBezierPath *path = [[NSBezierPath alloc] init];
 
-    for (i = 0; i < outline->n_contours; i++) {
+    for (i = 0; i < n_contours; i++) {
         int c_end;
-        c_end = outline->contours[i] + 1;
-        drawContour(path, c_end - c_start, &outline->points[c_start], &outline->tags[c_start]);
+        c_end = contours[i] + 1;
+        drawContour(path, c_end - c_start, &points[c_start], &tags[c_start]);
         c_start = c_end;
     }
     return path;
+}
+
+void* makePathFromOutline(FT_Outline* outline)
+{
+    return makePathFromArrays(outline->n_contours,
+                              outline->n_points,
+                              outline->points,
+                              outline->tags,
+                              outline->contours);
 }
