@@ -36,6 +36,10 @@ class DSFont(BaseFont):
         results = await asyncio.gather(*coros)
         fonts = {}
         for path, (fontData, output, error) in zip(ufosToCompile, results):
+            if output or error:
+                print("----- ", path)
+                print(output)
+                print(error)
             f = io.BytesIO(fontData)
             fonts[path] = TTFont(f, lazy=False)  # TODO: https://github.com/fonttools/fonttools/issues/1808
 
