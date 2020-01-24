@@ -96,20 +96,19 @@ class DSFont(BaseFont):
 
                 varGlyph = VarGlyph(self.masterModel, contours, masterPoints, tags)
             self._varGlyphs[varGlyph] = varGlyph
+        varGlyph.setVarLocation(normalizeLocation(self.doc, self._currentVarLocation or {}))
         return varGlyph
 
     def _getAdvanceWidth(self, glyphName):
         advance = self._advanceCache.get(glyphName)
         if advance is None:
             varGlyph = self._getVarGlyph(glyphName)
-            varGlyph.setVarLocation(normalizeLocation(self.doc, self._currentVarLocation or {}))
             advance = AdvanceTuple(varGlyph.width, None, None)
             self._advanceCache[glyphName] = advance
         return advance.width
 
     def _getOutlinePath(self, glyphName, colorLayers):
         varGlyph = self._getVarGlyph(glyphName)
-        varGlyph.setVarLocation(normalizeLocation(self.doc, self._currentVarLocation or {}))
         pen = CocoaPen(None)  # by now there are no more composites
         varGlyph.draw(pen)
         return pen.path
