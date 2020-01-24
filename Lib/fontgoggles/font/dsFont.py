@@ -6,6 +6,7 @@ from fontTools.pens.basePen import BasePen
 from fontTools.designspaceLib import DesignSpaceDocument
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont, newTable
+from fontTools.ufoLib import UFOReader
 from .baseFont import BaseFont
 from .ufoFont import UFOFont, compileMinimumFont_captureOutput
 from ..misc.hbShape import HBShape
@@ -21,10 +22,9 @@ class DSFont(BaseFont):
 
     async def load(self):
         self.doc = DesignSpaceDocument.fromfile(self._fontPath)
-        defaultSource = self.doc.findDefault()
+        self.doc.findDefault()
 
         ufosToCompile = sorted({s.path for s in self.doc.sources if s.layerName is None})
-        haveFeatureLessSources = any(s.layerName is not None for s in self.doc.sources)
 
         coros = (runInProcessPool(compileMinimumFont_captureOutput, path) for path in ufosToCompile)
         results = await asyncio.gather(*coros)
@@ -36,12 +36,12 @@ class DSFont(BaseFont):
         for source in self.doc.sources:
             if source.layerName is None:
                 source.font = fonts[source.path]
-        assert defaultSource.font is not None
-        defaultSource.font["name"] = newTable("name")
+        assert self.doc.default.font is not None
+        self.doc.default.font["name"] = newTable("name")  # This is the template for the VF, and needs a name table
 
-        if haveFeatureLessSources:
-            fb = FontBuilder(unitsPerEm=defaultSource.font["head"].unitsPerEm)  # XXX single source for upm
-            fb.setupGlyphOrder(defaultSource.font.getGlyphOrder())
+        if any(s.layerName is not None for s in self.doc.sources):
+            fb = FontBuilder(unitsPerEm=self.doc.default.font["head"].unitsPerEm)
+            fb.setupGlyphOrder(self.doc.default.font.getGlyphOrder())
             fb.setupPost()  # This makes sure we store the glyph names
             font = fb.font
             for source in self.doc.sources:
@@ -56,7 +56,7 @@ class DSFont(BaseFont):
         vfFontData = f.getvalue()
 
         # XXX temp
-        self.defaultUFO = UFOFont(defaultSource.path)
+        self.defaultUFO = UFOFont(self.doc.default.path)
         await self.defaultUFO.load()
         self.shaper = HBShape(vfFontData, getAdvanceWidth=self.defaultUFO._getAdvanceWidth, ttFont=self.ttFont)
 
