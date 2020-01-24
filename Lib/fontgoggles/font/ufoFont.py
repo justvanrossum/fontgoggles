@@ -38,8 +38,7 @@ class UFOFont(BaseFont):
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
 
-        # fontData, output, error = await runInProcessPool(compileMinimumFont_captureOutput, self._fontPath)
-        fontData, output, error = compileMinimumFont_captureOutput(self._fontPath)
+        fontData, output, error = await runInProcessPool(compileMinimumFont_captureOutput, self._fontPath)
         if output or error:
             # TODO: where/how to report to the user?
             print("----- ", self._fontPath, file=sys.stderr)
