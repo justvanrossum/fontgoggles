@@ -146,8 +146,8 @@ class VarGlyph:
         self.model, masterPoints = masterModel.getSubModel(masterPoints)
         masterPoints = [numpy.array(pts, numpy.float32) for pts in masterPoints]
         self.deltas = self.model.getDeltas(masterPoints)
-        self.contours = contours
-        self.tags = tags
+        self.contours = numpy.array(contours, numpy.short)
+        self.tags = numpy.array(tags, numpy.byte)
         self.varLocation = {}
         self._points = None
 
