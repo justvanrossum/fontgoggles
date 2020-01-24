@@ -86,17 +86,17 @@ openFontsTestData = [
         # "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"])
     ('MutatorSans.designspace',
         {},
-        set(),
+        {'rvrn'},
         {'kern'},
         {'DFLT': set()},
         {'wdth': {'defaultValue': 0.0,
                   'maxValue': 1000.0,
                   'minValue': 0.0,
-                  'name': 'width'},
+                  'name': 'Width'},
          'wght': {'defaultValue': 0.0,
                   'maxValue': 1000.0,
                   'minValue': 0.0,
-                  'name': 'weight'}},
+                  'name': 'Weight'}},
         "A", ["A"]),
 ]
 

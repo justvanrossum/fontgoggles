@@ -1,9 +1,16 @@
+import asyncio
+import io
 import numpy
+from fontTools import varLib
 from fontTools.pens.basePen import BasePen
 from fontTools.designspaceLib import DesignSpaceDocument
+from fontTools.fontBuilder import FontBuilder
+from fontTools.ttLib import TTFont, newTable
 from .baseFont import BaseFont
-from .ufoFont import UFOFont
+from .ufoFont import UFOFont, compileMinimumFont_captureOutput
+from ..misc.hbShape import HBShape
 from ..misc.properties import readOnlyCachedProperty
+from ..misc.runInPool import runInProcessPool
 
 
 class DSFont(BaseFont):
@@ -15,35 +22,43 @@ class DSFont(BaseFont):
     async def load(self):
         self.doc = DesignSpaceDocument.fromfile(self._fontPath)
         defaultSource = self.doc.findDefault()
-        # Steps:
-        # - load all master ufos, asyncio.gather(...)
-        # - for source in self.doc.sources:
-        #       source.font = ufo.ttFont
-        # - call varLib.build(self.doc)
+
+        ufosToCompile = sorted({s.path for s in self.doc.sources if s.layerName is None})
+        haveFeatureLessSources = any(s.layerName is not None for s in self.doc.sources)
+
+        coros = (runInProcessPool(compileMinimumFont_captureOutput, path) for path in ufosToCompile)
+        results = await asyncio.gather(*coros)
+        fonts = {}
+        for path, (fontData, output, error) in zip(ufosToCompile, results):
+            f = io.BytesIO(fontData)
+            fonts[path] = TTFont(f, lazy=False)  # TODO: https://github.com/fonttools/fonttools/issues/1808
+
+        for source in self.doc.sources:
+            if source.layerName is None:
+                source.font = fonts[source.path]
+        assert defaultSource.font is not None
+        defaultSource.font["name"] = newTable("name")
+
+        if haveFeatureLessSources:
+            fb = FontBuilder(unitsPerEm=defaultSource.font["head"].unitsPerEm)  # XXX single source for upm
+            fb.setupGlyphOrder(defaultSource.font.getGlyphOrder())
+            fb.setupPost()  # This makes sure we store the glyph names
+            font = fb.font
+            for source in self.doc.sources:
+                if source.font is None:
+                    source.font = font
+
         # - varLib.build() should also run in the process pool, but then
         #   we need the raw fontData from the ufo, not ttFont.
-        # - exclude: MVAR HVAR VVAR
-        # - note ufos may occur more than once in the sources list, we
-        #   should only load once.
+        self.ttFont, _, _ = varLib.build(self.doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
+        f = io.BytesIO()
+        self.ttFont.save(f, reorderTables=False)
+        vfFontData = f.getvalue()
+
+        # XXX temp
         self.defaultUFO = UFOFont(defaultSource.path)
         await self.defaultUFO.load()
-        # XXX temp
-        self.shaper = self.defaultUFO.shaper
-
-    @readOnlyCachedProperty
-    def unitsPerEm(self):
-        return self.defaultUFO.info.unitsPerEm
-
-    @readOnlyCachedProperty
-    def axes(self):
-        # TODO: remove this method because self.ttFont will have an 'fvar' table
-        axes = {}
-        for axis in self.doc.axes:
-            axes[axis.tag] = dict(defaultValue=axis.default,
-                                  minValue=axis.minimum,
-                                  maxValue=axis.maximum,
-                                  name=axis.name)
-        return axes
+        self.shaper = HBShape(vfFontData, getAdvanceWidth=self.defaultUFO._getAdvanceWidth, ttFont=self.ttFont)
 
     def _getOutlinePath(self, glyphName, colorLayers):
         # print("---", self._currentVarLocation)
