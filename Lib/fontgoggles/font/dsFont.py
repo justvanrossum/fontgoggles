@@ -1,6 +1,7 @@
 import asyncio
 import io
 from typing import NamedTuple
+import sys
 import numpy
 from fontTools import varLib
 from fontTools.pens.basePen import BasePen
@@ -38,9 +39,9 @@ class DSFont(BaseFont):
         fonts = {}
         for path, (fontData, output, error) in zip(ufosToCompile, results):
             if output or error:
-                print("----- ", path)
-                print(output)
-                print(error)
+                print("----- ", path, file=sys.stderr)
+                print(output, file=sys.stderr)
+                print(error, file=sys.stderr)
             f = io.BytesIO(fontData)
             fonts[path] = TTFont(f, lazy=False)  # TODO: https://github.com/fonttools/fonttools/issues/1808
 
