@@ -95,7 +95,7 @@ class DSFont(BaseFont):
                         contours = coll.contours
 
                 varGlyph = VarGlyph(self.masterModel, contours, masterPoints, tags)
-            self._varGlyphs[varGlyph] = varGlyph
+            self._varGlyphs[glyphName] = varGlyph
         varGlyph.setVarLocation(self._normalizedLocation)
         return varGlyph
 
@@ -105,12 +105,7 @@ class DSFont(BaseFont):
 
     def _getOutlinePath(self, glyphName, colorLayers):
         varGlyph = self._getVarGlyph(glyphName)
-        if True:
-            return varGlyph.getOutline()
-        else:
-            pen = CocoaPen(None)  # by now there are no more composites
-            varGlyph.draw(pen)
-            return pen.path
+        return varGlyph.getOutline()
 
 
 # From FreeType:
@@ -119,6 +114,7 @@ FT_CURVE_TAG_CONIC = 0
 FT_CURVE_TAG_CUBIC = 2
 
 segmentTypes = {FT_CURVE_TAG_ON: "line", FT_CURVE_TAG_CONIC: "qcurve", FT_CURVE_TAG_CUBIC: "curve"}
+coordinateType = numpy.float
 
 
 def interpolateFromDeltas(model, varLocation, deltas):
@@ -126,8 +122,8 @@ def interpolateFromDeltas(model, varLocation, deltas):
     # It should be a better improvement if there are many deltas
     # and if the outlines are complex.
     deltas = deltas
-    temp = numpy.zeros(deltas[0].shape, numpy.float32)
-    v = numpy.zeros(deltas[0].shape, numpy.float32)
+    temp = numpy.zeros(deltas[0].shape, coordinateType)
+    v = numpy.zeros(deltas[0].shape, coordinateType)
     scalars = model.getScalars(varLocation)
     for delta, scalar in zip(deltas, scalars):
         if not scalar:
@@ -141,14 +137,14 @@ def interpolateFromDeltas(model, varLocation, deltas):
     return v
 
 
-NUMPY_IN_PLACE = True
+NUMPY_IN_PLACE = True  # dubious improvement
 
 
 class VarGlyph:
 
     def __init__(self, masterModel, contours, masterPoints, tags):
         self.model, masterPoints = masterModel.getSubModel(masterPoints)
-        masterPoints = [numpy.array(pts, numpy.float32) for pts in masterPoints]
+        masterPoints = [numpy.array(pts, coordinateType) for pts in masterPoints]
         self.deltas = self.model.getDeltas(masterPoints)
         self.contours = numpy.array(contours, numpy.short)
         self.tags = numpy.array(tags, numpy.byte)
@@ -160,6 +156,7 @@ class VarGlyph:
             varLocation = {}
         if self.varLocation == varLocation:
             return
+        self._points = None
         self.varLocation = varLocation
 
     def getPoints(self):
