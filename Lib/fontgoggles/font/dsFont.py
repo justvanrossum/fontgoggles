@@ -3,12 +3,13 @@ import io
 import numpy
 from fontTools import varLib
 from fontTools.pens.basePen import BasePen
+from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.designspaceLib import DesignSpaceDocument
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont, newTable
 from fontTools.ufoLib import UFOReader
 from .baseFont import BaseFont
-from .ufoFont import UFOFont, compileMinimumFont_captureOutput
+from .ufoFont import NotDefGlyph, compileMinimumFont_captureOutput
 from ..misc.hbShape import HBShape
 from ..misc.properties import readOnlyCachedProperty
 from ..misc.runInPool import runInProcessPool
@@ -36,6 +37,8 @@ class DSFont(BaseFont):
         for source in self.doc.sources:
             if source.layerName is None:
                 source.font = fonts[source.path]
+            reader = UFOReader(source.path, validate=False)
+            source.ufoGlyphSet = reader.getGlyphSet(layerName=source.layerName)
         assert self.doc.default.font is not None
         self.doc.default.font["name"] = newTable("name")  # This is the template for the VF, and needs a name table
 
@@ -50,19 +53,25 @@ class DSFont(BaseFont):
 
         # - varLib.build() should also run in the process pool, but then
         #   we need the raw fontData from the ufo, not ttFont.
-        self.ttFont, _, _ = varLib.build(self.doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
+        self.ttFont, *unused = varLib.build(self.doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
         f = io.BytesIO()
         self.ttFont.save(f, reorderTables=False)
         vfFontData = f.getvalue()
+        self.shaper = HBShape(vfFontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
-        # XXX temp
-        self.defaultUFO = UFOFont(self.doc.default.path)
-        await self.defaultUFO.load()
-        self.shaper = HBShape(vfFontData, getAdvanceWidth=self.defaultUFO._getAdvanceWidth, ttFont=self.ttFont)
+    def _getAdvanceWidth(self, glyphName):
+        return 500
 
     def _getOutlinePath(self, glyphName, colorLayers):
-        # print("---", self._currentVarLocation)
-        return self.defaultUFO._getOutlinePath(glyphName, colorLayers)
+        glyphSet = self.doc.default.ufoGlyphSet
+        if glyphName not in glyphSet:
+            glyph = NotDefGlyph(self.unitsPerEm)
+        else:
+            glyph = glyphSet[glyphName]
+        pen = CocoaPen(glyphSet)
+        glyph.draw(pen)
+        return pen.path
+
 
 
 # From FreeType:
