@@ -103,8 +103,7 @@ class BaseFont:
             # subset to our own axes
             varLocation = {k: v for k, v in varLocation.items() if k in axes}
         if self._currentVarLocation != varLocation:
-            # purge outline cache
-            self._outlinePaths = [{}, {}]
+            self._purgeCaches()
             self._currentVarLocation = varLocation
             self._setVarLocation(varLocation)
         for glyphName in glyphNames:
@@ -113,6 +112,9 @@ class BaseFont:
                 outline = self._getOutlinePath(glyphName, colorLayers)
                 self._outlinePaths[colorLayers][glyphName] = outline
             yield outline
+
+    def _purgeCaches(self):
+        self._outlinePaths = [{}, {}]
 
     def _getOutlinePath(self, glyphName, colorLayers):
         raise NotImplementedError()
