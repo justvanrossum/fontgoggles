@@ -117,6 +117,28 @@ FT_CURVE_TAG_CUBIC = 2
 segmentTypes = {FT_CURVE_TAG_ON: "line", FT_CURVE_TAG_CONIC: "qcurve", FT_CURVE_TAG_CUBIC: "curve"}
 
 
+def interpolateFromDeltas(model, varLocation, deltas):
+    # So far this is not the speedup I had hoped...
+    # It should be a better improvement if there are many deltas
+    # and if the outlines are complex.
+    deltas = deltas
+    temp = numpy.zeros(deltas[0].shape, numpy.float32)
+    v = numpy.zeros(deltas[0].shape, numpy.float32)
+    scalars = model.getScalars(varLocation)
+    for delta, scalar in zip(deltas, scalars):
+        if not scalar:
+            continue
+        if scalar == 1.0:
+            contribution = delta
+        else:
+            numpy.multiply(delta, scalar, temp)
+            contribution = temp
+        numpy.add(v, contribution, v)
+    return v
+
+
+NUMPY_IN_PLACE = True
+
 class VarGlyph:
 
     def __init__(self, masterModel, contours, masterPoints, tags):
@@ -137,7 +159,10 @@ class VarGlyph:
 
     def getPoints(self):
         if self._points is None:
-            self._points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
+            if NUMPY_IN_PLACE:
+                self._points = interpolateFromDeltas(self.model, self.varLocation, self.deltas)
+            else:
+                self._points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
         return self._points
 
     @property
