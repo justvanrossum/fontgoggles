@@ -79,11 +79,7 @@ openFontsTestData = [
         {'kern', 'mark'},
         {'DFLT': set()},
         {},
-        "HIiIII", ["H", "I", ".notdef", "I", "I.narrow", "I"]),
-        # Replace the previous line with the following, once
-        # https://github.com/harfbuzz/uharfbuzz/pull/24
-        # lands in PyPI:
-        # "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"])
+        "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"]), 
     ('MutatorSans.designspace',
         {},
         {'rvrn'},
