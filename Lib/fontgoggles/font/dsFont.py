@@ -146,7 +146,11 @@ class VarGlyph:
     def __init__(self, masterModel, contours, masterPoints, tags):
         self.model, masterPoints = masterModel.getSubModel(masterPoints)
         masterPoints = [numpy.array(pts, coordinateType) for pts in masterPoints]
-        self.deltas = self.model.getDeltas(masterPoints)
+        try:
+            self.deltas = self.model.getDeltas(masterPoints)
+        except ValueError:
+            # outlines are not compatible, fall back to the default master
+            self.deltas = [masterPoints[self.model.reverseMapping[0]]]
         self.contours = numpy.array(contours, numpy.short)
         self.tags = numpy.array(tags, numpy.byte)
         self.varLocation = {}
