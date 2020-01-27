@@ -20,7 +20,7 @@ def test_ufoCharacterMapping():
 
 
 @pytest.mark.asyncio
-async def test_ufoCompilerPool(tmpdir):
+async def test_compileUFOToPath(tmpdir):
     ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
     ttPath = tmpdir / "test.ttf"
     output, error = await compileUFOToPath(ufoPath, ttPath)
@@ -31,7 +31,7 @@ async def test_ufoCompilerPool(tmpdir):
 
 
 @pytest.mark.asyncio
-async def test_compileMultiple(tmpdir):
+async def test_compileUFOToPathMultiple(tmpdir):
     ufoPaths = [
         getFontPath("MutatorSansBoldCondensed.ufo"),
         getFontPath("MutatorSansBoldWide.ufo"),
