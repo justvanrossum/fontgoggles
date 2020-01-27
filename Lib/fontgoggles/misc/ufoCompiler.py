@@ -5,6 +5,7 @@ import re
 import shlex
 import sys
 import traceback
+from types import SimpleNamespace
 import xml.etree.ElementTree as ET
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ufoLib import UFOReader
@@ -24,7 +25,7 @@ def compileMinimumFont(ufoPath):
     """
     reader = UFOReader(ufoPath, validate=False)
     glyphSet = reader.getGlyphSet()
-    info = UFOInfo()
+    info = SimpleNamespace()
     reader.readInfo(info)
 
     glyphOrder = sorted(glyphSet.keys())  # no need for the "real" glyph order
@@ -53,10 +54,6 @@ def compileMinimumFontToPath(ufoPath, ttPath):
     if error:
         print(error, file=sys.stderr)
     ttFont.save(ttPath, reorderTables=False)
-
-
-class UFOInfo:
-    pass
 
 
 _unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)'))

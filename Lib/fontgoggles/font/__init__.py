@@ -1,4 +1,5 @@
 from os import PathLike
+from types import SimpleNamespace
 
 
 def getOpener(fontPath: PathLike):
@@ -114,11 +115,10 @@ def getSortInfoOTF(fontPath: PathLike, fontNum: int):
 
 def getSortInfoUFO(fontPath: PathLike, fontNum: int):
     from fontTools.ufoLib import UFOReader
-    from .ufoFont import UFOInfo
     assert fontNum == 0
     suffix = fontPath.suffix.lower().lstrip(".")
     reader = UFOReader(fontPath, validate=False)
-    info = UFOInfo()
+    info = SimpleNamespace()
     reader.readInfo(info)
     sortInfo = dict(suffix=suffix)
     ufoAttrs = [

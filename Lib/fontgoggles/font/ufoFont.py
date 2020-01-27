@@ -1,12 +1,12 @@
 import io
 import sys
+from types import SimpleNamespace
 from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph
 from .baseFont import BaseFont
 from ..misc.hbShape import HBShape
-from ..misc.ufoCompiler import UFOInfo
 from ..misc.compilerPool import compileUFOToBytes
 
 
@@ -17,7 +17,7 @@ class UFOFont(BaseFont):
         self.reader = UFOReader(fontPath)
         self.glyphSet = self.reader.getGlyphSet()
         self.glyphSet.glyphClass = Glyph
-        self.info = UFOInfo()
+        self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
         self._fontPath = fontPath
         self._cachedGlyphs = {}
