@@ -1,5 +1,5 @@
 from fontTools.ufoLib import UFOReader
-from fontgoggles.font.ufoFont import fetchCharacterMappingAndAnchors
+from fontgoggles.misc.ufoCompiler import fetchCharacterMappingAndAnchors
 from testSupport import getFontPath
 
 
