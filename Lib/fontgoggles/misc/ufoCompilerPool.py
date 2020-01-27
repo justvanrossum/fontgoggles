@@ -2,11 +2,22 @@ import asyncio
 import os
 import shlex
 import sys
+import tempfile
 from .ufoCompiler import ERROR_MARKER, SUCCESS_MARKER
 
 
-async def compileUFO(ufoPath, ttPath):
+async def compileUFOToPath(ufoPath, ttPath):
     return await _pool.compileUFO(ufoPath, ttPath)
+
+
+async def compileUFOToBytes(ufoPath):
+    with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
+        output, error = await compileUFOToPath(ufoPath, tmp.name)
+        with open(tmp.name, "rb") as f:
+            fontData = f.read()
+            if not fontData:
+                fontData = None
+    return fontData, output, error
 
 
 class UFOCompilerPool:

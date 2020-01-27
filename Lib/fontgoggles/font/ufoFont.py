@@ -6,8 +6,8 @@ from fontTools.ufoLib import UFOReader
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph
 from .baseFont import BaseFont
 from ..misc.hbShape import HBShape
-from ..misc.runInPool import runInProcessPool
-from ..misc.ufoCompiler import UFOInfo, compileMinimumFont_captureOutput
+from ..misc.ufoCompiler import UFOInfo
+from ..misc.ufoCompilerPool import compileUFOToBytes
 
 
 class UFOFont(BaseFont):
@@ -32,12 +32,12 @@ class UFOFont(BaseFont):
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
 
-        fontData, output, error = await runInProcessPool(compileMinimumFont_captureOutput, self._fontPath)
+        fontData, output, error = await compileUFOToBytes(self._fontPath)
+
         if output or error:
             # TODO: where/how to report to the user?
             print("----- ", self._fontPath, file=sys.stderr)
             print(output, file=sys.stderr)
-            print(error, file=sys.stderr)
         if fontData is None:
             # TODO: this cannot work down the line, how to handle?
             self.ttFont = None

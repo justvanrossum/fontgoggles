@@ -3,7 +3,7 @@ import os
 import pytest
 from fontTools.ufoLib import UFOReader
 from fontgoggles.misc.ufoCompiler import fetchCharacterMappingAndAnchors
-from fontgoggles.misc.ufoCompilerPool import compileUFO, _resetPool
+from fontgoggles.misc.ufoCompilerPool import compileUFOToPath, _resetPool
 from testSupport import getFontPath
 
 
@@ -24,7 +24,7 @@ async def test_ufoCompilerPool(tmpdir):
     _resetPool()
     ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
     ttPath = tmpdir / "test.ttf"
-    output, error = await compileUFO(ufoPath, ttPath)
+    output, error = await compileUFOToPath(ufoPath, ttPath)
     assert ttPath.exists()
     assert os.stat(ttPath).st_size > 0
     assert not error
@@ -46,7 +46,7 @@ async def test_compileMultiple(tmpdir):
         getFontPath("MutatorSansLightWide.ufo"),
     ]
     ttPaths = [tmpdir / (u.name + ".ttf") for u in ufoPaths]
-    coros = (compileUFO(u, t) for u, t in zip(ufoPaths, ttPaths))
+    coros = (compileUFOToPath(u, t) for u, t in zip(ufoPaths, ttPaths))
     results = await asyncio.gather(*coros)
     assert len(results) == len(ufoPaths)
     assert [error for p, error in results] == [False] * len(results)
