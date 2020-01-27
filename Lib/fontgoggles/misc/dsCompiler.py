@@ -31,6 +31,7 @@ def compileMinimumFont(dsPath, ttFolder):
     ttFont, masterModel, _ = varLib.build(doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
 
     with open(os.path.join(ttFolder, "masterModel.pickle"), "wb") as f:
+        # Our client needs the masterModel, so we save a pickle.
         pickle.dump(masterModel, f)
 
     return ttFont
