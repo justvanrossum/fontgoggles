@@ -2,6 +2,8 @@ from contextlib import redirect_stdout, redirect_stderr
 import io
 import logging
 import re
+import shlex
+import sys
 import traceback
 import xml.etree.ElementTree as ET
 from fontTools.fontBuilder import FontBuilder
@@ -220,3 +222,30 @@ class MinimalFeaturesObject:
 
     def __init__(self, featureText):
         self.text = featureText
+
+
+ERROR_MARKER = "---- ERROR ----"
+SUCCESS_MARKER = "---- SUCCESS ----"
+
+
+def ufoCompileServer():
+    while True:
+        input = sys.stdin.readline()
+        input = input.strip()
+        if not input:
+            break
+        try:
+            ufoPath, ttPath = shlex.split(input)
+            ttFont, error = compileMinimumFont(ufoPath)
+            if error:
+                print(error)
+            ttFont.save(ttPath, reorderTables=False)
+        except:
+            traceback.print_exc()
+            print(ERROR_MARKER)
+        else:
+            print(SUCCESS_MARKER)
+
+
+if __name__ == "__main__":
+    ufoCompileServer()
