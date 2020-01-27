@@ -17,7 +17,13 @@ def _getPool():
 
 async def compileUFOToPath(ufoPath, ttPath):
     pool = _getPool()
-    return await pool.compileUFO(ufoPath, ttPath)
+
+    func = "fontgoggles.misc.ufoCompiler.compileMinimumFontToPath"
+    args = [
+        os.fspath(ufoPath),
+        os.fspath(ttPath),
+    ]
+    return await pool.callFunction(func, args)
 
 
 async def compileUFOToBytes(ufoPath):
@@ -32,7 +38,13 @@ async def compileUFOToBytes(ufoPath):
 
 async def compileDSToPath(dsPath, ttFolder, ttPath):
     pool = _getPool()
-    return await pool.compileDS(dsPath, ttFolder, ttPath)
+    func = "fontgoggles.misc.dsCompiler.compileMinimumFontToPath"
+    args = [
+        os.fspath(dsPath),
+        os.fspath(ttFolder),
+        os.fspath(ttPath),
+    ]
+    return await pool.callFunction(func, args)
 
 
 async def compileDSToBytes(dsPath, ttFolder):
@@ -64,15 +76,9 @@ class CompilerPool:
         else:
             return await self.availableWorkers.get()
 
-    async def compileUFO(self, ufoPath, ttPath):
+    async def callFunction(self, func, args):
         worker = await self.getWorker()
-        output, error = await worker.compileUFO(ufoPath, ttPath)
-        await self.availableWorkers.put(worker)
-        return output, error
-
-    async def compileDS(self, dsPath, ttFolder, ttPath):
-        worker = await self.getWorker()
-        output, error = await worker.compileDS(dsPath, ttFolder, ttPath)
+        output, error = await worker.callFunction(func, args)
         await self.availableWorkers.put(worker)
         return output, error
 
@@ -89,24 +95,8 @@ class CompilerWorker:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT)
 
-    async def compileUFO(self, ufoPath, ttPath):
-        args = [
-            "fontgoggles.misc.ufoCompiler.compileMinimumFontToPath",
-            os.fspath(ufoPath),
-            os.fspath(ttPath),
-        ]
-        return await self._doWork(args)
-
-    async def compileDS(self, dsPath, ttFolder, ttPath):
-        args = [
-            "fontgoggles.misc.dsCompiler.compileMinimumFontToPath",
-            os.fspath(dsPath),
-            os.fspath(ttFolder),
-            os.fspath(ttPath),
-        ]
-        return await self._doWork(args)
-
-    async def _doWork(self, args):
+    async def callFunction(self, func, args):
+        args = [func] + args
         inData = " ".join(shlex.quote(item) for item in args)
         self.process.stdin.write((inData + "\n").encode("utf-8"))
         await self.process.stdin.drain()
