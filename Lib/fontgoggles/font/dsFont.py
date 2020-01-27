@@ -14,10 +14,9 @@ from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph
-from ..misc.ufoCompiler import compileMinimumFont_captureOutput
+from ..misc.ufoCompilerPool import compileUFOToBytes
 from ..misc.hbShape import HBShape
 from ..misc.properties import readOnlyCachedProperty
-from ..misc.runInPool import runInProcessPool
 from ..mac.makePathFromOutline import makePathFromArrays
 
 
@@ -35,7 +34,7 @@ class DSFont(BaseFont):
 
         ufosToCompile = sorted({s.path for s in self.doc.sources if s.layerName is None})
 
-        coros = (runInProcessPool(compileMinimumFont_captureOutput, path) for path in ufosToCompile)
+        coros = (compileUFOToBytes(path) for path in ufosToCompile)
         results = await asyncio.gather(*coros)
         fonts = {}
         for path, (fontData, output, error) in zip(ufosToCompile, results):
