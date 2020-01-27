@@ -14,30 +14,23 @@ class UFOCompilerPool:
     def __init__(self, maxWorkers=5):
         self.maxWorkers = maxWorkers
         self.workers = []
-        self.availableWorkers = None
+        self.availableWorkers = asyncio.Queue()
 
     async def getWorker(self):
-        if self.availableWorkers is None:
-            self.availableWorkers = asyncio.Queue()
-            # Populate queue with dummies
-            for i in range(self.maxWorkers):
-                await self.availableWorkers.put(None)  # worker-to-be-created
-        worker = await self.availableWorkers.get()
-        if worker is None:
+        if self.availableWorkers.empty() and len(self.workers) < self.maxWorkers:
+            # Add a worker process
             worker = UFOCompilerWorker()
-            await worker.start()
             self.workers.append(worker)
             assert len(self.workers) <= self.maxWorkers
-        return worker
+            await worker.start()
+            await self.availableWorkers.put(worker)
+        return await self.availableWorkers.get()
 
     async def compileUFO(self, ufoPath, ttPath):
         worker = await self.getWorker()
         output, error = await worker.compileUFO(ufoPath, ttPath)
         await self.availableWorkers.put(worker)
         return output, error
-
-
-_pool = UFOCompilerPool()
 
 
 class UFOCompilerWorker:
@@ -72,3 +65,11 @@ class UFOCompilerWorker:
                 break
             output.append(line)
         return "\n".join(output), error
+
+
+def _resetPool():
+    global _pool
+    _pool = UFOCompilerPool()
+
+
+_resetPool()

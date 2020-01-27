@@ -1,8 +1,9 @@
+import asyncio
 import os
 import pytest
 from fontTools.ufoLib import UFOReader
 from fontgoggles.misc.ufoCompiler import fetchCharacterMappingAndAnchors
-from fontgoggles.misc.ufoCompilerPool import compileUFO
+from fontgoggles.misc.ufoCompilerPool import compileUFO, _resetPool
 from testSupport import getFontPath
 
 
@@ -20,6 +21,7 @@ def test_ufoCharacterMapping():
 
 @pytest.mark.asyncio
 async def test_ufoCompilerPool(tmpdir):
+    _resetPool()
     ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
     ttPath = tmpdir / "test.ttf"
     output, error = await compileUFO(ufoPath, ttPath)
@@ -27,3 +29,25 @@ async def test_ufoCompilerPool(tmpdir):
     assert os.stat(ttPath).st_size > 0
     assert not error
     assert output == ""
+
+
+@pytest.mark.asyncio
+async def test_compileMultiple(tmpdir):
+    _resetPool()
+    ufoPaths = [
+        getFontPath("MutatorSansBoldCondensed.ufo"),
+        getFontPath("MutatorSansBoldWide.ufo"),
+        getFontPath("MutatorSansIntermediateCondensed.ufo"),
+        getFontPath("MutatorSansIntermediateWide.ufo"),
+        getFontPath("MutatorSansLightCondensed.ufo"),
+        getFontPath("MutatorSansLightCondensed_support.S.middle.ufo"),
+        getFontPath("MutatorSansLightCondensed_support.S.wide.ufo"),
+        getFontPath("MutatorSansLightCondensed_support.crossbar.ufo"),
+        getFontPath("MutatorSansLightWide.ufo"),
+    ]
+    ttPaths = [tmpdir / (u.name + ".ttf") for u in ufoPaths]
+    coros = (compileUFO(u, t) for u, t in zip(ufoPaths, ttPaths))
+    results = await asyncio.gather(*coros)
+    assert len(results) == len(ufoPaths)
+    assert [error for p, error in results] == [False] * len(results)
+    assert [(os.stat(p).st_size > 0) for p in ttPaths] == [True] * len(results)
