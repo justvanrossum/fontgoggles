@@ -1,6 +1,7 @@
 import importlib
 import shlex
 import sys
+import traceback
 
 
 ERROR_MARKER = "---- ERROR ----"

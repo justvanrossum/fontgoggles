@@ -69,6 +69,9 @@ class UFOCompilerWorker:
             os.fspath(ufoPath),
             os.fspath(ttPath),
         ]
+        return await self._doWork(args)
+
+    async def _doWork(self, args):
         inData = " ".join(shlex.quote(item) for item in args)
         self.process.stdin.write((inData + "\n").encode("utf-8"))
         await self.process.stdin.drain()
