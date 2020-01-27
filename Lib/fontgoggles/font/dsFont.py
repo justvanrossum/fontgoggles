@@ -1,11 +1,9 @@
 import asyncio
 import io
-from typing import NamedTuple
 import sys
 import numpy
 from fontTools import varLib
 from fontTools.pens.basePen import BasePen
-from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.pens.pointPen import PointToSegmentPen
 from fontTools.designspaceLib import DesignSpaceDocument
 from fontTools.fontBuilder import FontBuilder
@@ -16,7 +14,6 @@ from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph
 from ..misc.ufoCompilerPool import compileUFOToBytes
 from ..misc.hbShape import HBShape
-from ..misc.properties import readOnlyCachedProperty
 from ..mac.makePathFromOutline import makePathFromArrays
 
 
@@ -238,8 +235,8 @@ class PointCollector(BasePen):
         assert self.contourStartPointIndex is not None
         currentPointIndex = len(self.points) - 1
         if (self.contourStartPointIndex != currentPointIndex and
-            self.points[self.contourStartPointIndex] == self.points[currentPointIndex] and
-            self.tags[self.contourStartPointIndex] == self.tags[currentPointIndex]):
+                self.points[self.contourStartPointIndex] == self.points[currentPointIndex] and
+                self.tags[self.contourStartPointIndex] == self.tags[currentPointIndex]):
             self.points.pop()
             self.tags.pop()
         self.contours.append(len(self.points) - 1)
@@ -263,4 +260,3 @@ def normalizeLocation(doc, location):
         ]
         new[axis.tag] = normalizeValue(value, triple)
     return new
-
