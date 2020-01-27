@@ -5,11 +5,10 @@ import pickle
 import sys
 import tempfile
 import numpy
-from fontTools import varLib
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.pointPen import PointToSegmentPen
 from fontTools.designspaceLib import DesignSpaceDocument
-from fontTools.ttLib import TTFont, newTable
+from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
@@ -36,11 +35,17 @@ class DSFont(BaseFont):
             ttPaths = [os.path.join(ttFolder, os.path.basename(u) + ".ttf") for u in ufosToCompile]
             coros = (compileUFOToPath(ufoPath, ttPath) for ufoPath, ttPath in zip(ufosToCompile, ttPaths))
             results = await asyncio.gather(*coros)
+            for ufoPath, (output, error) in zip(ufosToCompile, results):
+                if output:
+                    print(f"compile output for {ufoPath}:", file=sys.stderr)
+                    print(output, file=sys.stderr)
 
             vfFontData, output, error = await compileDSToBytes(self._fontPath, ttFolder)
             if output or error:
                 print(output, file=sys.stderr)
             with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
+                # masterModel is created by varLib.build(), and we communicate it
+                # to here via a tempfile pickle
                 self.masterModel = pickle.load(f)
 
         assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
