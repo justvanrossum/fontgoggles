@@ -8,7 +8,6 @@ from .workServer import ERROR_MARKER, SUCCESS_MARKER
 
 async def compileUFOToPath(ufoPath, ttPath):
     pool = getCompilerPool()
-
     func = "fontgoggles.misc.ufoCompiler.compileMinimumFontToPath"
     args = [
         os.fspath(ufoPath),
