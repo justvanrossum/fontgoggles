@@ -6,18 +6,38 @@ import tempfile
 from .workServer import ERROR_MARKER, SUCCESS_MARKER
 
 
-async def compileUFOToPath(ufoPath, ttPath):
+def _getPool():
     loop = asyncio.get_running_loop()
     pool = getattr(loop, "__FG_compiler_pool", None)
     if pool is None:
         pool = CompilerPool()
         loop.__FG_compiler_pool = pool
+    return pool
+
+
+async def compileUFOToPath(ufoPath, ttPath):
+    pool = _getPool()
     return await pool.compileUFO(ufoPath, ttPath)
 
 
 async def compileUFOToBytes(ufoPath):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
         output, error = await compileUFOToPath(ufoPath, tmp.name)
+        with open(tmp.name, "rb") as f:
+            fontData = f.read()
+            if not fontData:
+                fontData = None
+    return fontData, output, error
+
+
+async def compileDSToPath(dsPath, ttFolder, ttPath):
+    pool = _getPool()
+    return await pool.compileDS(dsPath, ttFolder, ttPath)
+
+
+async def compileDSToBytes(dsPath, ttFolder):
+    with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
+        output, error = await compileDSToPath(dsPath, ttFolder, tmp.name)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:
@@ -50,6 +70,12 @@ class CompilerPool:
         await self.availableWorkers.put(worker)
         return output, error
 
+    async def compileDS(self, dsPath, ttFolder, ttPath):
+        worker = await self.getWorker()
+        output, error = await worker.compileDS(dsPath, ttFolder, ttPath)
+        await self.availableWorkers.put(worker)
+        return output, error
+
 
 class CompilerWorker:
 
@@ -67,6 +93,15 @@ class CompilerWorker:
         args = [
             "fontgoggles.misc.ufoCompiler.compileMinimumFontToPath",
             os.fspath(ufoPath),
+            os.fspath(ttPath),
+        ]
+        return await self._doWork(args)
+
+    async def compileDS(self, dsPath, ttFolder, ttPath):
+        args = [
+            "fontgoggles.misc.dsCompiler.compileMinimumFontToPath",
+            os.fspath(dsPath),
+            os.fspath(ttFolder),
             os.fspath(ttPath),
         ]
         return await self._doWork(args)

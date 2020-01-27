@@ -1,18 +1,20 @@
 import asyncio
 import io
+import os
+import pickle
 import sys
+import tempfile
 import numpy
 from fontTools import varLib
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.pointPen import PointToSegmentPen
 from fontTools.designspaceLib import DesignSpaceDocument
-from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont, newTable
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph
-from ..misc.compilerPool import compileUFOToBytes
+from ..misc.compilerPool import compileUFOToPath, compileDSToBytes
 from ..misc.hbShape import HBShape
 from ..mac.makePathFromOutline import makePathFromArrays
 
@@ -29,43 +31,26 @@ class DSFont(BaseFont):
         self.doc = DesignSpaceDocument.fromfile(self._fontPath)
         self.doc.findDefault()
 
-        ufosToCompile = sorted({s.path for s in self.doc.sources if s.layerName is None})
+        with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
+            ufosToCompile = sorted({s.path for s in self.doc.sources if s.layerName is None})
+            ttPaths = [os.path.join(ttFolder, os.path.basename(u) + ".ttf") for u in ufosToCompile]
+            coros = (compileUFOToPath(ufoPath, ttPath) for ufoPath, ttPath in zip(ufosToCompile, ttPaths))
+            results = await asyncio.gather(*coros)
 
-        coros = (compileUFOToBytes(path) for path in ufosToCompile)
-        results = await asyncio.gather(*coros)
-        fonts = {}
-        for path, (fontData, output, error) in zip(ufosToCompile, results):
+            vfFontData, output, error = await compileDSToBytes(self._fontPath, ttFolder)
             if output or error:
-                print("----- ", path, file=sys.stderr)
                 print(output, file=sys.stderr)
-                print(error, file=sys.stderr)
-            f = io.BytesIO(fontData)
-            fonts[path] = TTFont(f, lazy=False)  # TODO: https://github.com/fonttools/fonttools/issues/1808
+            with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
+                self.masterModel = pickle.load(f)
+
+        assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
+        f = io.BytesIO(vfFontData)
+        self.ttFont = TTFont(f, lazy=True)
 
         for source in self.doc.sources:
-            if source.layerName is None:
-                source.font = fonts[source.path]
             reader = UFOReader(source.path, validate=False)
             source.ufoGlyphSet = reader.getGlyphSet(layerName=source.layerName)
-        assert self.doc.default.font is not None
-        self.doc.default.font["name"] = newTable("name")  # This is the template for the VF, and needs a name table
 
-        if any(s.layerName is not None for s in self.doc.sources):
-            fb = FontBuilder(unitsPerEm=self.doc.default.font["head"].unitsPerEm)
-            fb.setupGlyphOrder(self.doc.default.font.getGlyphOrder())
-            fb.setupPost()  # This makes sure we store the glyph names
-            font = fb.font
-            for source in self.doc.sources:
-                if source.font is None:
-                    source.font = font
-
-        # - varLib.build() should also run in the process pool, but then
-        #   we need the raw fontData from the ufo, not ttFont.
-        self.ttFont, self.masterModel, _ = varLib.build(self.doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
-        assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
-        f = io.BytesIO()
-        self.ttFont.save(f, reorderTables=False)
-        vfFontData = f.getvalue()
         self.shaper = HBShape(vfFontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
     def varLocationChanged(self, varLocation):
