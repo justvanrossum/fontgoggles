@@ -1,5 +1,4 @@
 import io
-import logging
 import sys
 from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.ttLib import TTFont

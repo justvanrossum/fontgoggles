@@ -1,5 +1,6 @@
 from contextlib import redirect_stdout, redirect_stderr
 import io
+import logging
 import re
 import traceback
 import xml.etree.ElementTree as ET
