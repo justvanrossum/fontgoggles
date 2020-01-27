@@ -2,7 +2,6 @@
 
 import logging
 import re
-import shlex
 import sys
 import traceback
 from types import SimpleNamespace
