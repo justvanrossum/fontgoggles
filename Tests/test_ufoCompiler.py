@@ -3,7 +3,7 @@ import os
 import pytest
 from fontTools.ufoLib import UFOReader
 from fontgoggles.misc.ufoCompiler import fetchCharacterMappingAndAnchors
-from fontgoggles.misc.ufoCompilerPool import compileUFOToPath, _resetPool
+from fontgoggles.misc.ufoCompilerPool import compileUFOToPath
 from testSupport import getFontPath
 
 
@@ -21,7 +21,6 @@ def test_ufoCharacterMapping():
 
 @pytest.mark.asyncio
 async def test_ufoCompilerPool(tmpdir):
-    _resetPool()
     ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
     ttPath = tmpdir / "test.ttf"
     output, error = await compileUFOToPath(ufoPath, ttPath)
@@ -33,7 +32,6 @@ async def test_ufoCompilerPool(tmpdir):
 
 @pytest.mark.asyncio
 async def test_compileMultiple(tmpdir):
-    _resetPool()
     ufoPaths = [
         getFontPath("MutatorSansBoldCondensed.ufo"),
         getFontPath("MutatorSansBoldWide.ufo"),

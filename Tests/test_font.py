@@ -2,7 +2,6 @@ import pytest
 from fontgoggles.font import getOpener, sniffFontType, sortedFontPathsAndNumbers
 from fontgoggles.misc.textInfo import TextInfo
 from testSupport import getFontPath, testDataFolder
-from fontgoggles.misc.ufoCompilerPool import _resetPool
 
 
 def test_sniffFontType():
@@ -108,7 +107,6 @@ async def test_openFonts(fileName,
                          axes,
                          text,
                          glyphNames):
-    _resetPool()
     fontPath = getFontPath(fileName)
     numFonts, opener, getSortInfo = getOpener(fontPath)
     assert numFonts(fontPath) == 1

@@ -7,7 +7,12 @@ from .ufoCompiler import ERROR_MARKER, SUCCESS_MARKER
 
 
 async def compileUFOToPath(ufoPath, ttPath):
-    return await _pool.compileUFO(ufoPath, ttPath)
+    loop = asyncio.get_running_loop()
+    pool = getattr(loop, "__FG_compiler_pool", None)
+    if pool is None:
+        pool = UFOCompilerPool()
+        loop.__FG_compiler_pool = pool
+    return await pool.compileUFO(ufoPath, ttPath)
 
 
 async def compileUFOToBytes(ufoPath):
@@ -23,6 +28,7 @@ async def compileUFOToBytes(ufoPath):
 class UFOCompilerPool:
 
     def __init__(self, maxWorkers=5):
+        self.loop = asyncio.get_running_loop()
         self.maxWorkers = maxWorkers
         self.workers = []
         self.availableWorkers = asyncio.Queue()
@@ -76,11 +82,3 @@ class UFOCompilerWorker:
                 break
             output.append(line)
         return "\n".join(output), error
-
-
-def _resetPool():
-    global _pool
-    _pool = UFOCompilerPool()
-
-
-_resetPool()
