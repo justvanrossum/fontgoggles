@@ -13,7 +13,8 @@ from fontTools.ttLib import TTFont, newTable
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
-from .ufoFont import NotDefGlyph, compileMinimumFont_captureOutput
+from .ufoFont import NotDefGlyph
+from ..misc.ufoCompiler import compileMinimumFont_captureOutput
 from ..misc.hbShape import HBShape
 from ..misc.properties import readOnlyCachedProperty
 from ..misc.runInPool import runInProcessPool
