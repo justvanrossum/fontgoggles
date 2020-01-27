@@ -3,7 +3,7 @@ import os
 import pytest
 from fontTools.ufoLib import UFOReader
 from fontgoggles.misc.ufoCompiler import fetchCharacterMappingAndAnchors
-from fontgoggles.misc.ufoCompilerPool import compileUFOToPath
+from fontgoggles.misc.compilerPool import compileUFOToPath
 from testSupport import getFontPath
 
 

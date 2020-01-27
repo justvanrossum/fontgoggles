@@ -12,7 +12,7 @@ from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph
-from ..misc.ufoCompilerPool import compileUFOToBytes
+from ..misc.compilerPool import compileUFOToBytes
 from ..misc.hbShape import HBShape
 from ..mac.makePathFromOutline import makePathFromArrays
 

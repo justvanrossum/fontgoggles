@@ -7,7 +7,7 @@ from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph
 from .baseFont import BaseFont
 from ..misc.hbShape import HBShape
 from ..misc.ufoCompiler import UFOInfo
-from ..misc.ufoCompilerPool import compileUFOToBytes
+from ..misc.compilerPool import compileUFOToBytes
 
 
 class UFOFont(BaseFont):
