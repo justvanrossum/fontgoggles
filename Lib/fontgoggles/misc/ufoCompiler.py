@@ -18,10 +18,14 @@ def compileMinimumFont_captureOutput(ufoPath):
     f = io.StringIO()
     with redirect_stdout(f), redirect_stderr(f):
         try:
-            data, error = compileMinimumFont(ufoPath)
+            ttFont, error = compileMinimumFont(ufoPath)
         except Exception:
             data = None
             error = traceback.format_exc()
+        else:
+            f = io.BytesIO()
+            ttFont.save(f, reorderTables=False)
+            data = f.getvalue()
     return data, f.getvalue(), error
 
 
@@ -58,9 +62,7 @@ def compileMinimumFont(ufoPath):
         error = traceback.format_exc()
     else:
         error = None
-    f = io.BytesIO()
-    ttFont.save(f, reorderTables=False)
-    return f.getvalue(), error
+    return ttFont, error
 
 
 class UFOInfo:
