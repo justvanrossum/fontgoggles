@@ -40,8 +40,9 @@ class UFOCompilerPool:
             self.workers.append(worker)
             assert len(self.workers) <= self.maxWorkers
             await worker.start()
-            await self.availableWorkers.put(worker)
-        return await self.availableWorkers.get()
+            return worker
+        else:
+            return await self.availableWorkers.get()
 
     async def compileUFO(self, ufoPath, ttPath):
         worker = await self.getWorker()
