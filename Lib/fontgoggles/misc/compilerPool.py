@@ -6,17 +6,8 @@ import tempfile
 from .workServer import ERROR_MARKER, SUCCESS_MARKER
 
 
-def _getPool():
-    loop = asyncio.get_running_loop()
-    pool = getattr(loop, "__FG_compiler_pool", None)
-    if pool is None:
-        pool = CompilerPool()
-        loop.__FG_compiler_pool = pool
-    return pool
-
-
 async def compileUFOToPath(ufoPath, ttPath):
-    pool = _getPool()
+    pool = getCompilerPool()
 
     func = "fontgoggles.misc.ufoCompiler.compileMinimumFontToPath"
     args = [
@@ -37,7 +28,7 @@ async def compileUFOToBytes(ufoPath):
 
 
 async def compileDSToPath(dsPath, ttFolder, ttPath):
-    pool = _getPool()
+    pool = getCompilerPool()
     func = "fontgoggles.misc.dsCompiler.compileMinimumFontToPath"
     args = [
         os.fspath(dsPath),
@@ -55,6 +46,15 @@ async def compileDSToBytes(dsPath, ttFolder):
             if not fontData:
                 fontData = None
     return fontData, output, error
+
+
+def getCompilerPool():
+    loop = asyncio.get_running_loop()
+    pool = getattr(loop, "__FG_compiler_pool", None)
+    if pool is None:
+        pool = CompilerPool()
+        loop.__FG_compiler_pool = pool
+    return pool
 
 
 class CompilerPool:
