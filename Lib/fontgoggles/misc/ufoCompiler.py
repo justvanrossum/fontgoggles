@@ -48,6 +48,13 @@ def compileMinimumFont(ufoPath):
     return ttFont, error
 
 
+def compileMinimumFontToPath(ufoPath, ttPath):
+    ttFont, error = compileMinimumFont(ufoPath)
+    if error:
+        print(error, file=sys.stderr)
+    ttFont.save(ttPath, reorderTables=False)
+
+
 class UFOInfo:
     pass
 
@@ -203,30 +210,3 @@ class MinimalFeaturesObject:
 
     def __init__(self, featureText):
         self.text = featureText
-
-
-ERROR_MARKER = "---- ERROR ----"
-SUCCESS_MARKER = "---- SUCCESS ----"
-
-
-def ufoCompileServer():
-    while True:
-        input = sys.stdin.readline()
-        input = input.strip()
-        if not input:
-            break
-        try:
-            ufoPath, ttPath = shlex.split(input)
-            ttFont, error = compileMinimumFont(ufoPath)
-            if error:
-                print(error)
-            ttFont.save(ttPath, reorderTables=False)
-        except:
-            traceback.print_exc()
-            print(ERROR_MARKER)
-        else:
-            print(SUCCESS_MARKER)
-
-
-if __name__ == "__main__":
-    ufoCompileServer()

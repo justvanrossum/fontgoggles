@@ -3,7 +3,7 @@ import os
 import shlex
 import sys
 import tempfile
-from .ufoCompiler import ERROR_MARKER, SUCCESS_MARKER
+from .workServer import ERROR_MARKER, SUCCESS_MARKER
 
 
 async def compileUFOToPath(ufoPath, ttPath):
@@ -55,7 +55,7 @@ class UFOCompilerWorker:
 
     async def start(self):
         env = dict(PYTHONPATH=":".join(sys.path))
-        args = ["-u", "-m", "fontgoggles.misc.ufoCompiler"]
+        args = ["-u", "-m", "fontgoggles.misc.workServer"]
         self.process = await asyncio.create_subprocess_exec(
             sys.executable, *args,
             env=env,
@@ -64,10 +64,16 @@ class UFOCompilerWorker:
             stderr=asyncio.subprocess.STDOUT)
 
     async def compileUFO(self, ufoPath, ttPath):
-        inData = " ".join(shlex.quote(os.fspath(p)) for p in (ufoPath, ttPath))
+        args = [
+            "fontgoggles.misc.ufoCompiler.compileMinimumFontToPath",
+            os.fspath(ufoPath),
+            os.fspath(ttPath),
+        ]
+        inData = " ".join(shlex.quote(item) for item in args)
         self.process.stdin.write((inData + "\n").encode("utf-8"))
         await self.process.stdin.drain()
         output = []
+        error = True
         while True:
             line = await self.process.stdout.readline()
             if not line:
