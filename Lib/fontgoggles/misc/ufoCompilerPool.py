@@ -10,7 +10,7 @@ async def compileUFOToPath(ufoPath, ttPath):
     loop = asyncio.get_running_loop()
     pool = getattr(loop, "__FG_compiler_pool", None)
     if pool is None:
-        pool = UFOCompilerPool()
+        pool = CompilerPool()
         loop.__FG_compiler_pool = pool
     return await pool.compileUFO(ufoPath, ttPath)
 
@@ -25,7 +25,7 @@ async def compileUFOToBytes(ufoPath):
     return fontData, output, error
 
 
-class UFOCompilerPool:
+class CompilerPool:
 
     def __init__(self, maxWorkers=5):
         self.loop = asyncio.get_running_loop()
@@ -36,7 +36,7 @@ class UFOCompilerPool:
     async def getWorker(self):
         if self.availableWorkers.empty() and len(self.workers) < self.maxWorkers:
             # Add a worker process
-            worker = UFOCompilerWorker()
+            worker = CompilerWorker()
             self.workers.append(worker)
             assert len(self.workers) <= self.maxWorkers
             await worker.start()
@@ -51,7 +51,7 @@ class UFOCompilerPool:
         return output, error
 
 
-class UFOCompilerWorker:
+class CompilerWorker:
 
     async def start(self):
         env = dict(PYTHONPATH=":".join(sys.path))
