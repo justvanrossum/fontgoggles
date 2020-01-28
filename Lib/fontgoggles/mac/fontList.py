@@ -1,4 +1,5 @@
 import pathlib
+from types import SimpleNamespace
 import objc
 import AppKit
 from vanilla import *
@@ -756,6 +757,7 @@ class FGGlyphLineView(AppKit.NSView):
         self._selection = set()
         self._hoveredGlyphIndex = None
         self._lastDiffSelection = None
+        self._lastAppearanceName = None
 
         trackingArea = AppKit.NSTrackingArea.alloc().initWithRect_options_owner_userInfo_(
             self.bounds(),
@@ -906,38 +908,43 @@ class FGGlyphLineView(AppKit.NSView):
         else:
             return self.relativeVBaseline * itemSize, itemExtent - pos  # TODO: something with vhea ascender/descender
 
+    def getColors(self):
+        appearanceName = AppKit.NSAppearance.currentAppearance().name()
+        if appearanceName != self._lastAppearanceName:
+            self._lastAppearanceName = appearanceName
+            colors = SimpleNamespace()
+            colors.foregroundColor = AppKit.NSColor.textColor()
+            colors.selectedColor = colors.foregroundColor.blendedColorWithFraction_ofColor_(
+                0.9, AppKit.NSColor.systemRedColor())
+            colors.selectedSpaceColor = colors.selectedColor.colorWithAlphaComponent_(0.2)
+            colors.hoverColor = AppKit.NSColor.systemBlueColor()
+            colors.hoverSelectedColor = colors.hoverColor.blendedColorWithFraction_ofColor_(
+                0.5, colors.selectedColor)
+            colors.hoverSpaceColor = colors.hoverColor.colorWithAlphaComponent_(0.2)
+            colors.hoverSelectedSpaceColor = colors.hoverSelectedColor.colorWithAlphaComponent_(0.2)
+            self._colors = colors
+        return self._colors
+
     @suppressAndLogException
     def drawRect_(self, rect):
-        foregroundColor = AppKit.NSColor.textColor()
+        if not self._glyphs:
+            return
+
+        colors = self.getColors()
+        colorTable = {
+            # (empty, selected, hovered)
+            (0, 0, 0): colors.foregroundColor,
+            (0, 0, 1): colors.hoverColor,
+            (0, 1, 0): colors.selectedColor,
+            (0, 1, 1): colors.hoverSelectedColor,
+            (1, 0, 0): None,
+            (1, 0, 1): colors.hoverSpaceColor,
+            (1, 1, 0): colors.selectedSpaceColor,
+            (1, 1, 1): colors.hoverSelectedSpaceColor,
+        }
 
         selection = self._selection
         hoveredGlyphIndex = self._hoveredGlyphIndex
-        selectedColor = selectedSpaceColor = hoverColor = hoverSpaceColor = None
-        if selection:
-            selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(
-                0.9, AppKit.NSColor.systemRedColor())
-            selectedSpaceColor = selectedColor.colorWithAlphaComponent_(0.2)
-        if hoveredGlyphIndex is not None:
-            hoverColor = AppKit.NSColor.systemBlueColor()
-            if hoveredGlyphIndex in selection:
-                hoverColor = hoverColor.blendedColorWithFraction_ofColor_(
-                    0.5, selectedColor)
-            hoverSpaceColor = hoverColor.colorWithAlphaComponent_(0.2)
-
-        colors = {
-            # (empty, selected, hovered)
-            (0, 0, 0): foregroundColor,
-            (0, 0, 1): hoverColor,
-            (0, 1, 0): selectedColor,
-            (0, 1, 1): hoverColor,
-            (1, 0, 0): None,
-            (1, 0, 1): hoverSpaceColor,
-            (1, 1, 0): selectedSpaceColor,
-            (1, 1, 1): hoverSpaceColor,
-        }
-
-        if not self._glyphs:
-            return
 
         dx, dy = self.origin
 
@@ -948,7 +955,7 @@ class FGGlyphLineView(AppKit.NSView):
         translate(dx, dy)
         scale(self.scaleFactor)
 
-        foregroundColor.set()
+        colors.foregroundColor.set()
         lastPosX = lastPosY = 0
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
@@ -958,7 +965,7 @@ class FGGlyphLineView(AppKit.NSView):
             posX, posY = gi.pos
             translate(posX - lastPosX, posY - lastPosY)
             lastPosX, lastPosY = posX, posY
-            color = colors[empty, selected, hovered]
+            color = colorTable[empty, selected, hovered]
             if color is None:
                 continue
             color.set()
