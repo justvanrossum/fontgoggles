@@ -61,14 +61,8 @@ async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
 
 
 async def openTTX(fontPath: PathLike, fontNumber: int, fontData=None):
-    import io
-    from fontTools.ttLib import TTFont
-    from .otfFont import OTFFont
-    ttFont = TTFont()
-    ttFont.importXML(fontPath)
-    buf = io.BytesIO()
-    ttFont.save(buf, reorderTables=False)
-    font = OTFFont(buf.getvalue(), fontNumber)
+    from .otfFont import TTXFont
+    font = TTXFont(fontPath, 0)
     return (font, None)
 
 
