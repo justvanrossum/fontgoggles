@@ -47,6 +47,26 @@ async def compileDSToBytes(dsPath, ttFolder):
     return fontData, output, error
 
 
+async def compileTTXToPath(ttxPath, ttPath):
+    pool = getCompilerPool()
+    func = "fontgoggles.misc.ttxCompiler.compileFontToPath"
+    args = [
+        os.fspath(ttxPath),
+        os.fspath(ttPath),
+    ]
+    return await pool.callFunction(func, args)
+
+
+async def compileTTXToBytes(ttxPath):
+    with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
+        output, error = await compileTTXToPath(ttxPath, tmp.name)
+        with open(tmp.name, "rb") as f:
+            fontData = f.read()
+            if not fontData:
+                fontData = None
+    return fontData, output, error
+
+
 def getCompilerPool():
     loop = asyncio.get_running_loop()
     pool = getattr(loop, "__FG_compiler_pool", None)
