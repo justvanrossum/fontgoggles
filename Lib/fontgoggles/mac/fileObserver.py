@@ -14,8 +14,6 @@ class FileObserver:
 
     def __init__(self):
         self.directories = {}
-        self.inodeToPath = {}
-        self.inodeToModTime = {}
         self.observedFolders = set()
         self.eventStreamRef = None
 
