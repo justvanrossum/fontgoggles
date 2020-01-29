@@ -21,7 +21,6 @@ class UFOFont(BaseFont):
         self.reader.readInfo(self.info)
         self._fontPath = fontPath
         self._cachedGlyphs = {}
-        self._needsShaper = needsShaper  # TODO: could be arg to self.load()
 
     async def load(self):
         glyphOrder = sorted(self.glyphSet.keys())  # no need for the "real" glyph order
@@ -45,8 +44,7 @@ class UFOFont(BaseFont):
         else:
             f = io.BytesIO(fontData)
             self.ttFont = TTFont(f, lazy=True)
-            if self._needsShaper:
-                self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
+            self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
