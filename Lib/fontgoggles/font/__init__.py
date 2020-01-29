@@ -60,6 +60,18 @@ async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
     return (font, fontData)
 
 
+async def openTTX(fontPath: PathLike, fontNumber: int, fontData=None):
+    import io
+    from fontTools.ttLib import TTFont
+    from .baseFont import OTFFont
+    ttFont = TTFont()
+    ttFont.importXML(fontPath)
+    buf = io.BytesIO()
+    ttFont.save(buf, reorderTables=False)
+    font = OTFFont(buf.getvalue(), fontNumber)
+    return (font, None)
+
+
 async def openUFO(fontPath: PathLike, fontNumber: int, fontData=None):
     from .ufoFont import UFOFont
     assert fontData is None  # dummy
@@ -142,6 +154,11 @@ def getSortInfoDS(fontPath: PathLike, fontNum: int):
     return {}  # TODO
 
 
+def getSortInfoTTX(fontPath: PathLike, fontNum: int):
+    assert fontNum == 0
+    return {}  # not really possible in a fast way
+
+
 fontOpeners = {
     "ttf": (numFontsOne, openOTF, getSortInfoOTF),
     "otf": (numFontsOne, openOTF, getSortInfoOTF),
@@ -152,6 +169,7 @@ fontOpeners = {
     "ttc": (numFontsTTC, openOTF, getSortInfoOTF),
     "otc": (numFontsTTC, openOTF, getSortInfoOTF),
     "designspace": (numFontsOne, openDS, getSortInfoDS),
+    "ttx": (numFontsOne, openTTX, getSortInfoTTX),
 }
 
 fileTypes = sorted(fontOpeners)
