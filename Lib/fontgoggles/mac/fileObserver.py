@@ -19,14 +19,6 @@ class FileObserver:
         self.observedFolders = set()
         self.eventStreamRef = None
 
-    def getDirectory(self, path):
-        assert os.path.isdir(path)
-        dirInfo = self.directories.get(path)
-        if dirInfo is None:
-            dirInfo = Directory(path)
-            self.directories[path] = dirInfo
-        return dirInfo
-
     def addObserver(self, path, callback):
         path = os.path.normpath(path)
         assert os.path.exists(path)
@@ -44,6 +36,14 @@ class FileObserver:
         if not directory.children:
             del self.directories[parent]
         self._update()
+
+    def getDirectory(self, path):
+        assert os.path.isdir(path)
+        dirInfo = self.directories.get(path)
+        if dirInfo is None:
+            dirInfo = Directory(path)
+            self.directories[path] = dirInfo
+        return dirInfo
 
     def _update(self):
         newObservedFolders = set(self.directories)
