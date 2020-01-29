@@ -28,6 +28,11 @@ infoplist = dict(
             CFBundleTypeRole="Viewer",
         ),
         dict(
+            CFBundleTypeExtensions=["ttx"],
+            CFBundleTypeName="TTX Source File",
+            CFBundleTypeRole="Viewer",
+        ),
+        dict(
             CFBundleTypeExtensions=["designspace"],
             CFBundleTypeName="Designspace File",
             CFBundleTypeRole="Viewer",
