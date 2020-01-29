@@ -136,6 +136,7 @@ class Directory:
         self.children[inode].callbacks.append(callback)
 
     def removeChildObserver(self, name, callback):
+        # TODO: keep a childrenByName dict so we won't have to loop
         for inode, child in list(self.children.items()):
             if child.name == name:
                 self.children[inode].callbacks.remove(callback)
@@ -146,6 +147,7 @@ class Directory:
         if childName:
             # If we're observing a folder and something changes (deep)
             # inside of it, notify.
+            # TODO: keep a childrenByName dict so we won't have to loop
             for child in self.children.values():
                 if child.name == childName:
                     childPath = os.path.join(self.path, child.name)
