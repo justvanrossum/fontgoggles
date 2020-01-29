@@ -123,7 +123,7 @@ class Directory:
         url = NSURL.fileURLWithPath_(childPath)
         bookmarkData, error = url.bookmarkDataWithOptions_includingResourceValuesForKeys_relativeToURL_error_(
                 0, None, None, None)
-        assert not error
+        assert error is None, error
         st = os.stat(childPath)
         inode = st.st_ino
         modTime = st.st_mtime
@@ -184,6 +184,10 @@ class Directory:
                     # os.listdir() will fail on a Trash folder
                     newPath = url.path()
                     child.name = os.path.basename(newPath)  # update name
+                    bookmarkData, error = url.bookmarkDataWithOptions_includingResourceValuesForKeys_relativeToURL_error_(
+                            0, None, None, None)
+                    assert error is None, error
+                    child.bookmarkData = bookmarkData
                     wasModified = child.modTime != os.stat(newPath).st_mtime
                 wasRenamed = True
                 movedOrDeleted.append((inode, child, newPath))
