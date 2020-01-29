@@ -51,7 +51,7 @@ def iterFontNumbers(path):
 
 
 async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
-    from .baseFont import OTFFont
+    from .otfFont import OTFFont
     if fontData is not None:
         font = OTFFont(fontData, fontNumber)
     else:
@@ -63,7 +63,7 @@ async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
 async def openTTX(fontPath: PathLike, fontNumber: int, fontData=None):
     import io
     from fontTools.ttLib import TTFont
-    from .baseFont import OTFFont
+    from .otfFont import OTFFont
     ttFont = TTFont()
     ttFont.importXML(fontPath)
     buf = io.BytesIO()
