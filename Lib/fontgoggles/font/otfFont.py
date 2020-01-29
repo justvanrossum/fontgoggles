@@ -45,10 +45,14 @@ class TTXFont(OTFFont):
 
     def __init__(self, fontPath, fontNumber):
         BaseFont.__init__()  # not calling OTFFont.__init__
+        self.fontPath = fontPath
+        self.fontNumber = fontNumber
+
+    async def load(self):
         self.ttFont = TTFont()
-        self.ttFont.fromXML(fontPath)
+        self.ttFont.fromXML(self.fontPath)
         f = io.BytesIO()
         self.ttFont.save(f, reorderTables=False)
         fontData = f.getvalue()
-        self.ftFont = FTFont(fontData, fontNumber=fontNumber, ttFont=self.ttFont)
-        self.shaper = HBShape(fontData, fontNumber=fontNumber, ttFont=self.ttFont)
+        self.ftFont = FTFont(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
+        self.shaper = HBShape(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)

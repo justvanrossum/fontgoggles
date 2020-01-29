@@ -63,6 +63,7 @@ async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
 async def openTTX(fontPath: PathLike, fontNumber: int, fontData=None):
     from .otfFont import TTXFont
     font = TTXFont(fontPath, 0)
+    await font.load()
     return (font, None)
 
 
