@@ -23,7 +23,7 @@ class FileObserver:
         path = os.path.normpath(path)
         assert os.path.exists(path)
         parent, name = os.path.split(path)
-        directory = self.getDirectory(parent)
+        directory = self._getDirectory(parent)
         directory.addChildObserver(name, callback)
         self._update()
 
@@ -31,13 +31,13 @@ class FileObserver:
         path = os.path.normpath(path)
         assert os.path.exists(path)
         parent, name = os.path.split(path)
-        directory = self.getDirectory(parent)
+        directory = self._getDirectory(parent)
         directory.removeChildObserver(name, callback)
         if not directory.children:
             del self.directories[parent]
         self._update()
 
-    def getDirectory(self, path):
+    def _getDirectory(self, path):
         assert os.path.isdir(path)
         dirInfo = self.directories.get(path)
         if dirInfo is None:
@@ -93,7 +93,7 @@ class FileObserver:
                 for inode, child, newPath in movedOrDeleted:
                     newParent = os.path.dirname(newPath)
                     # TODO: check whether newParent is a Trash folder
-                    directory = self.getDirectory(newParent)
+                    directory = self._getDirectory(newParent)
                     directory.children[inode] = child
                 self._update()
 
