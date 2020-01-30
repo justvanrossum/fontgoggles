@@ -1,6 +1,6 @@
 from collections import defaultdict
 import AppKit
-from vanilla import *
+from vanilla import Button, Group, TextBox, VanillaBaseObject, Window
 from fontgoggles.mac.tagView import TagView
 from fontgoggles.misc.opentypeTags import features
 from fontgoggles.misc.properties import weakrefCallbackProperty
