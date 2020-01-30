@@ -17,6 +17,31 @@ fontItemMinimumSize = 60
 fontItemMaximumSize = 1500
 
 
+def makeUndoProxy(model, changeMonitor=None):
+    um = UndoManager(changeMonitor)
+    return um.setModel(model)
+
+
+def recordChanges(proxy, **kwargs):
+    return proxy._undoManager.changeSet(**kwargs)
+
+
+def undoChanges(proxy):
+    proxy._undoManager.undo()
+
+
+def redoChanges(proxy):
+    proxy._undoManager.redo()
+
+
+def undoInfo(proxy):
+    return proxy._undoManager.undoInfo()
+
+
+def redoInfo(proxy):
+    return proxy._undoManager.redoInfo()
+
+
 class FGFontListView(AppKit.NSView):
 
     def init(self):
@@ -182,23 +207,23 @@ class FGFontListView(AppKit.NSView):
     @suppressAndLogException
     def undo_(self, sender):
         fontList = self.vanillaWrapper()
-        fontList.undoManager.undo()
+        undoChanges(fontList.projectFontsProxy)
 
     @suppressAndLogException
     def redo_(self, sender):
         fontList = self.vanillaWrapper()
-        fontList.undoManager.redo()
+        redoChanges(fontList.projectFontsProxy)
 
     @suppressAndLogException
     def validateMenuItem_(self, sender):
         if sender.action() == "undo:":
             fontList = self.vanillaWrapper()
-            info = fontList.undoManager.undoInfo()
+            info = undoInfo(fontList.projectFontsProxy)
             sender.setTitle_(_makeUndoTitle("Undo", info))
             return info is not None
         elif sender.action() == "redo:":
             fontList = self.vanillaWrapper()
-            info = fontList.undoManager.redoInfo()
+            info = redoInfo(fontList.projectFontsProxy)
             sender.setTitle_(_makeUndoTitle("Redo", info))
             return info is not None
         elif sender.action() == "delete:":
@@ -253,8 +278,7 @@ class FontList(Group):
         self._lastItemClicked = None
         self.project = project
         self.setupFontItems()
-        self.undoManager = UndoManager(self._projectFontsChanged)
-        self.projectFontsProxy = self.undoManager.setModel(project.fonts)
+        self.projectFontsProxy = makeUndoProxy(project.fonts, self._projectFontsChanged)
 
     @suppressAndLogException
     def _projectFontsChanged(self, changeSet):
@@ -452,7 +476,7 @@ class FontList(Group):
     @suppressAndLogException
     def insertFonts(self, paths, index):
         addedIndices = []
-        with self.undoManager.changeSet(title="Insert Fonts"):
+        with recordChanges(self.projectFontsProxy, title="Insert Fonts"):
             for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, defaultSortSpec):
                 fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
                 self.projectFontsProxy.insert(index, fontItemInfo)
@@ -466,7 +490,7 @@ class FontList(Group):
         # get deleted, so it can't stay first responder. Make the font
         # list itself the first responder and all is fine.
         self._nsObject.window().makeFirstResponder_(self._nsObject)
-        with self.undoManager.changeSet(title="Remove Fonts"):
+        with recordChanges(self.projectFontsProxy, title="Remove Fonts"):
             for index in indicesToDelete:
                 del self.projectFontsProxy[index]
 
