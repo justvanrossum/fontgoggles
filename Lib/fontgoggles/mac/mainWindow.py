@@ -257,14 +257,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.setPosSize((0, 0, 0, y))
         return group
 
-    def loadFonts(self):
+    @asyncTask
+    async def loadFonts(self):
         sharableFontData = {}
+        coros = []
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
             if fontItemInfo.font is None:
                 self.loadingFonts.add(fontItemInfo.identifier)
-                self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData)
+                coros.append(self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData))
+        await asyncio.gather(*coros)
 
-    @asyncTask
+    @objc.python_method
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
         await fontItemInfo.load(sharableFontData=sharableFontData)
