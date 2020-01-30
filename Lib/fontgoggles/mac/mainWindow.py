@@ -10,6 +10,7 @@ from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import rectFromNSRect
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
+from fontgoggles.mac.fileObserver import getFileObserver
 from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize, makeUndoProxy
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup, SliderPlus
@@ -63,6 +64,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def __init__(self, project):
         self.project = project
         self.projectFontsProxy = makeUndoProxy(self.project.fonts, self._projectFontsChanged)
+        self.observedPaths = set()
         self.defaultFontItemSize = 150
         self.alignmentOverride = None
         self.featureState = {}
@@ -105,6 +107,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._textEntry.set(initialText)
         self.textEntryChangedCallback(self._textEntry)
         self.w.bind("close", self._windowCloseCallback)
+        self.monitorFileChanges()
         self.loadFonts()
 
     @suppressAndLogException
@@ -253,6 +256,19 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.setPosSize((0, 0, 0, y))
         return group
 
+    def monitorFileChanges(self):
+        obs = getFileObserver()
+        paths = {fontItemInfo.fontKey[0] for fontItemInfo in self.project.fonts}
+        for path in paths - self.observedPaths:
+            obs.addObserver(path, self._fileChanged)
+        for path in self.observedPaths - paths:
+            obs.removeObserver(path, self._fileChanged)
+        self.observedPaths = paths
+
+    @objc.python_method
+    def _fileChanged(self, oldPath, newPath, wasModified):
+        print("---", oldPath, newPath, wasModified)
+
     @suppressAndLogException
     def _projectFontsChanged(self, changeSet):
         if any(change.op == "remove" for change in changeSet):
@@ -271,6 +287,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # - if loaded, the text needs to be set separately
         for fontItemInfo, fontItem in fontItemsNeedingTextUpdate:
             self.setFontItemText(fontItemInfo, fontItem)
+        self.monitorFileChanges()
         self.loadFonts()
 
     @asyncTask
