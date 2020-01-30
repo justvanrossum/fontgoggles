@@ -62,10 +62,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def __init__(self, project):
         self.project = project
-        self.allFeatureTagsGSUB = set()
-        self.allFeatureTagsGPOS = set()
-        self.allScriptsAndLanguages = {}
-        self.allAxes = {}
         self.defaultFontItemSize = 150
         self.alignmentOverride = None
         self.featureState = {}
@@ -258,6 +254,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @asyncTask
     async def loadFonts(self):
+        """This loads fonts that aren't yet loaded, and updates all information
+        regarding features, scripts/languages and variations.
+        """
         sharableFontData = {}
         coros = []
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
