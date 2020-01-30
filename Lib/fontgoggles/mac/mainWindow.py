@@ -200,13 +200,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # TODO initial value from where?
         y = 10
         optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Size", 25, 70, 125,
-                                           callback=self.relativeSizeChangedCallback)
+                                                   callback=self.relativeSizeChangedCallback)
         y += 50
         optionsTab.relativeBaselineSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Baseline", 0, 25, 100,
-                                           callback=self.relativeBaselineChangedCallback)
+                                                       callback=self.relativeBaselineChangedCallback)
         y += 50
         optionsTab.relativeMarginSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Margin", 0, 10, 100,
-                                           callback=self.relativeMarginChangedCallback)
+                                                     callback=self.relativeMarginChangedCallback)
         y += 50
 
         return group
