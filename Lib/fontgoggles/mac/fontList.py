@@ -2,11 +2,11 @@ import pathlib
 from types import SimpleNamespace
 import objc
 import AppKit
-from vanilla import *
+from vanilla import Group, ProgressSpinner, TextBox, VanillaBaseObject
 from jundo import UndoManager
 from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
 from fontgoggles.font import defaultSortSpec, sniffFontType, sortedFontPathsAndNumbers
-from fontgoggles.mac.drawing import *
+from fontgoggles.mac.drawing import nsRectFromRect, rectFromNSRect, scale, translate
 from fontgoggles.mac.misc import textAlignments
 from fontgoggles.misc.decorators import suppressAndLogException, asyncTaskAutoCancel
 from fontgoggles.misc.properties import delegateProperty, hookedProperty
