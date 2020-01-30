@@ -284,11 +284,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             if fontItemInfo.font is None:
                 coros.append(self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData))
         await asyncio.gather(*coros)
-        self._updateSidebarItems(*self._gatherMiscInfo(self.project.fonts))
+        self._updateSidebarItems(*self._gatherSidebarInfo(self.project.fonts))
         self.fontListSelectionChangedCallback(self.fontList)
 
     @staticmethod
-    def _gatherMiscInfo(fonts):
+    def _gatherSidebarInfo(fonts):
         allFeatureTagsGSUB = set()
         allFeatureTagsGPOS = set()
         allAxes = []
