@@ -84,6 +84,12 @@ class FontItemInfo:
         self.fontKey = fontKey
         self._fontLoader = fontLoader
 
+    def renameSource(self, newFontPath):
+        oldFontKey = self.fontKey
+        oldFontPath, fontNumber = oldFontKey
+        self.fontKey = newFontPath, fontNumber
+        self._fontLoader.renameSource(oldFontKey, self.fontKey)
+
     @property
     def font(self):
         return self._fontLoader.fonts.get(self.fontKey)
@@ -114,3 +120,9 @@ class FontLoader:
     def purgeFonts(self, usedKeys):
         self.fonts = {fontKey: fontObject for fontKey, fontObject in self.fonts.items()
                       if fontKey in usedKeys}
+
+    def renameSource(self, oldFontKey, newFontKey):
+        if oldFontKey not in self.fonts:
+            # Font was not loaded, nothing to rename
+            return
+        self.fonts[newFontKey] = self.fonts.pop(oldFontKey)
