@@ -171,6 +171,8 @@ fileTypes = sorted(fontOpeners)
 
 
 def mergeScriptsAndLanguages(*dicts):
+    if not dicts:
+        return dict()
     merged = dict(dicts[0])
     for d in dicts[1:]:
         for k, v in d.items():
@@ -185,17 +187,16 @@ def _defaultValueToSet(axis):
     return {k: v if k != "defaultValue" or isinstance(v, set) else {v} for k, v in axis.items()}
 
 
-def mergeAxes(axes1, axes2):
+def mergeAxes(*axesList):
     merged = {}
-    for tag, axis in axes1.items():
-        merged[tag] = _defaultValueToSet(axis)
-    for tag, axis in axes2.items():
-        axis = _defaultValueToSet(axis)
-        if tag in merged:
-            mergedAxis = merged[tag]
-            mergedAxis["defaultValue"] | axis["defaultValue"]
-            mergedAxis["minValue"] = min(mergedAxis["minValue"], axis["minValue"])
-            mergedAxis["maxValue"] = min(mergedAxis["maxValue"], axis["maxValue"])
-        else:
-            merged[tag] = axis
+    for axes in axesList:
+        for tag, axis in axes.items():
+            axis = _defaultValueToSet(axis)
+            if tag in merged:
+                mergedAxis = merged[tag]
+                mergedAxis["defaultValue"] | axis["defaultValue"]
+                mergedAxis["minValue"] = min(mergedAxis["minValue"], axis["minValue"])
+                mergedAxis["maxValue"] = max(mergedAxis["maxValue"], axis["maxValue"])
+            else:
+                merged[tag] = axis
     return merged
