@@ -262,8 +262,16 @@ class FontList(Group):
             self.purgeFontItems()
             self.project.purgeFonts()
         fontItemsNeedingTextUpdate = self.refitFontItems()
+        # TODO: Consider keeping selection, which can only work if we store
+        # the selection as a set of identifiers instead of indices, because
+        # once we get here the indices are no longer valid, hence the need
+        # to completely reset the selection.
         self.resetSelection()
-        # TODO: rethink factorization?
+        # TODO: rethink factorization of the next bit.
+        # - refitFontItems() added new items
+        # - the font for the new item may or may not be loaded
+        # - if not loaded, loadFonts() will load it and will also set the text
+        # - if loaded, the text needs to be set separately
         windowController = self._nsObject.window().windowController()
         for fontItemInfo, fontItem in fontItemsNeedingTextUpdate:
             windowController.setFontItemText(fontItemInfo, fontItem)
