@@ -271,15 +271,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         allFeatureTagsGSUB = set()
         allFeatureTagsGPOS = set()
         allAxes = {}
-        allScriptsAndLanguages = {}
-
+        allScriptsAndLanguages = []
         for fontItemInfo in fonts:
             font = fontItemInfo.font
             allFeatureTagsGSUB.update(font.featuresGSUB)
             allFeatureTagsGPOS.update(font.featuresGPOS)
             allAxes = mergeAxes(allAxes, font.axes)
-            allScriptsAndLanguages = mergeScriptsAndLanguages(allScriptsAndLanguages, font.scripts)
-
+            allScriptsAndLanguages.append(font.scripts)
+        allScriptsAndLanguages = mergeScriptsAndLanguages(*allScriptsAndLanguages)
         return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages
 
     @objc.python_method
