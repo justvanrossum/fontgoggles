@@ -1,3 +1,4 @@
+import asyncio
 import json
 from os import PathLike
 import os
@@ -53,12 +54,10 @@ class Project:
         return FontItemInfo(fontItemIdentifier, fontKey, self._fontLoader)
 
     async def loadFonts(self):
-        # Note that this method cannot not load fonts concurrently, and
-        # should be seen as a lazy convenience method, good enough for
-        # testing.
+        """Load font as concurrently as possible."""
         sharableFontData = {}
-        for fontItemInfo in self.fonts:
-            await fontItemInfo.load(sharableFontData)
+        await asyncio.gather(*(fontItemInfo.load(sharableFontData)
+                               for fontItemInfo in self.fonts))
 
     def _nextFontItemIdentifier(self):
         return next(self._fontItemIdentifierGenerator)
