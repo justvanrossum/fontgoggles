@@ -83,7 +83,7 @@ class BaseFont:
                     colorLayers=False):
         self.setVarLocation(varLocation)
         glyphInfo = self.shaper.shape(text, features=features, varLocation=varLocation,
-                                 direction=direction, language=language, script=script)
+                                      direction=direction, language=language, script=script)
         glyphNames = (gi.name for gi in glyphInfo)
         for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, colorLayers)):
             glyph.path = path
