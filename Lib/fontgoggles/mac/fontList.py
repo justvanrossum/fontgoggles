@@ -261,10 +261,12 @@ class FontList(Group):
         if any(change.op == "remove" for change in changeSet):
             self.purgeFontItems()
             self.project.purgeFonts()
-        self.refitFontItems()
+        fontItemsNeedingTextUpdate = self.refitFontItems()
         self.resetSelection()
         # TODO: rethink factorization?
         windowController = self._nsObject.window().windowController()
+        for fontItemInfo, fontItem in fontItemsNeedingTextUpdate:
+            windowController.setFontItemText(fontItemInfo, fontItem)
         windowController.loadFonts()
 
     def _glyphSelectionChanged(self):
@@ -464,6 +466,7 @@ class FontList(Group):
         if hasattr(self, "dropFontsPlaceHolder"):
             del self.dropFontsPlaceHolder
         itemSize = self.itemSize
+        fontItemsNeedingTextUpdate = []
         for index, fontItemInfo in enumerate(self.project.fonts):
             fontItem = getattr(self, fontItemInfo.identifier, None)
             if fontItem is None:
@@ -481,9 +484,8 @@ class FontList(Group):
                                     self.relativeVBaseline, self.relativeMargin)
                 setattr(self, fontItemInfo.identifier, fontItem)
                 if fontItemInfo.font is not None:
-                    # Font is already loaded. TODO: rethink factorization? See below.
-                    windowController = self._nsObject.window().windowController()
-                    windowController.setFontItemText(fontItemInfo, fontItem)
+                    # Font is already loaded, but the text needs to be updated.
+                    fontItemsNeedingTextUpdate.append((fontItemInfo, fontItem))
             else:
                 fontItem.fontListIndex = index
                 x, y, w, h = fontItem.getPosSize()
@@ -498,6 +500,7 @@ class FontList(Group):
         else:
             h = len(self.project.fonts) * itemSize
         self.setPosSize((x, y, w, h))
+        return fontItemsNeedingTextUpdate
 
     def purgeFontItems(self):
         usedIdentifiers = {fii.identifier for fii in self.project.fonts}
