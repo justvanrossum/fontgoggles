@@ -194,7 +194,7 @@ def mergeAxes(*axesList):
             axis = _defaultValueToSet(axis)
             if tag in merged:
                 mergedAxis = merged[tag]
-                mergedAxis["defaultValue"] | axis["defaultValue"]
+                mergedAxis["defaultValue"] |= axis["defaultValue"]
                 mergedAxis["minValue"] = min(mergedAxis["minValue"], axis["minValue"])
                 mergedAxis["maxValue"] = max(mergedAxis["maxValue"], axis["maxValue"])
             else:
