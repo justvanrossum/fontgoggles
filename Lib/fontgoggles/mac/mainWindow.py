@@ -62,7 +62,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def __init__(self, project):
         self.project = project
-        self.loadingFonts = set()
         self.allFeatureTagsGSUB = set()
         self.allFeatureTagsGPOS = set()
         self.allScriptsAndLanguages = {}
@@ -263,9 +262,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         coros = []
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
             if fontItemInfo.font is None:
-                self.loadingFonts.add(fontItemInfo.identifier)
                 coros.append(self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData))
         await asyncio.gather(*coros)
+        self.updateSidebarItems()
+        self.fontListSelectionChangedCallback(self.fontList)
 
     @objc.python_method
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
@@ -280,11 +280,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allAxes = mergeAxes(self.allAxes, font.axes)
         self.setFontItemText(fontItemInfo, fontItem)
         self.growFontListFromItem(fontItem)
-        self.loadingFonts.discard(fontItemInfo.identifier)
-        if not self.loadingFonts:
-            # All fonts have been loaded
-            self.updateSidebarItems()
-            self.fontListSelectionChangedCallback(self.fontList)
 
     def updateSidebarItems(self):
         self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
