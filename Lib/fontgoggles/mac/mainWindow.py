@@ -4,11 +4,11 @@ import unicodedata
 import time
 import AppKit
 import objc
-from vanilla import *
+from vanilla import CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs, TextBox, Window
 from fontTools.misc.arrayTools import offsetRect
 from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
-from fontgoggles.mac.drawing import *
+from fontgoggles.mac.drawing import rectFromNSRect
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
 from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
@@ -286,7 +286,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
         await fontItemInfo.load(sharableFontData=sharableFontData)
-        font = fontItemInfo.font
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
         self.setFontItemText(fontItemInfo, fontItem)
