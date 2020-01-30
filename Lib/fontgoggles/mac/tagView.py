@@ -81,7 +81,7 @@ class TagView(Group):
 
 
 if __name__ == "__main__":
-    from vanilla import *
+    from vanilla import Window
 
     class Test:
 
