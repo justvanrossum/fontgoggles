@@ -57,7 +57,7 @@ class Project:
         """Load fonts as concurrently as possible."""
         sharableFontData = {}
         await asyncio.gather(*(fontItemInfo.load(sharableFontData)
-                               for fontItemInfo in self.fonts))
+                               for fontItemInfo in self.fonts if fontItemInfo.font is None))
 
     def _nextFontItemIdentifier(self):
         return next(self._fontItemIdentifierGenerator)
