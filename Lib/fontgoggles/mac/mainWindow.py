@@ -10,7 +10,7 @@ from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import rectFromNSRect
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
-from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize
+from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize, makeUndoProxy
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup, SliderPlus
 from fontgoggles.misc.decorators import asyncTask, asyncTaskAutoCancel, suppressAndLogException
@@ -62,6 +62,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def __init__(self, project):
         self.project = project
+        self.projectFontsProxy = makeUndoProxy(self.project.fonts, self._projectFontsChanged)
         self.defaultFontItemSize = 150
         self.alignmentOverride = None
         self.featureState = {}
@@ -165,7 +166,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
-        self.fontList = FontList(self.project, 300, self.defaultFontItemSize,
+        self.fontList = FontList(self.project, self.projectFontsProxy, 300, self.defaultFontItemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
@@ -251,6 +252,26 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         group.setPosSize((0, 0, 0, y))
         return group
+
+    @suppressAndLogException
+    def _projectFontsChanged(self, changeSet):
+        if any(change.op == "remove" for change in changeSet):
+            self.fontList.purgeFontItems()
+            self.project.purgeFonts()
+        fontItemsNeedingTextUpdate = self.fontList.refitFontItems()
+        # TODO: Consider keeping selection, which can only work if we store
+        # the selection as a set of identifiers instead of indices, because
+        # once we get here the indices are no longer valid, hence the need
+        # to completely reset the selection.
+        self.fontList.resetSelection()
+        # TODO: rethink factorization of the next bit.
+        # - refitFontItems() added new items
+        # - the font for the new item may or may not be loaded
+        # - if not loaded, loadFonts() will load it and will also set the text
+        # - if loaded, the text needs to be set separately
+        for fontItemInfo, fontItem in fontItemsNeedingTextUpdate:
+            self.setFontItemText(fontItemInfo, fontItem)
+        self.loadFonts()
 
     @asyncTask
     async def loadFonts(self):

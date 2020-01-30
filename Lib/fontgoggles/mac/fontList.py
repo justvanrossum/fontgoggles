@@ -259,7 +259,7 @@ class FontList(Group):
 
     nsViewClass = FGFontListView
 
-    def __init__(self, project, width, itemSize, relativeFontSize=0.7, relativeHBaseline=0.25,
+    def __init__(self, project, projectFontsProxy, width, itemSize, relativeFontSize=0.7, relativeHBaseline=0.25,
                  relativeVBaseline=0.5, relativeMargin=0.1, selectionChangedCallback=None,
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
@@ -277,29 +277,8 @@ class FontList(Group):
         self._arrowKeyCallback = arrowKeyCallback
         self._lastItemClicked = None
         self.project = project
+        self.projectFontsProxy = projectFontsProxy
         self.setupFontItems()
-        self.projectFontsProxy = makeUndoProxy(project.fonts, self._projectFontsChanged)
-
-    @suppressAndLogException
-    def _projectFontsChanged(self, changeSet):
-        if any(change.op == "remove" for change in changeSet):
-            self.purgeFontItems()
-            self.project.purgeFonts()
-        fontItemsNeedingTextUpdate = self.refitFontItems()
-        # TODO: Consider keeping selection, which can only work if we store
-        # the selection as a set of identifiers instead of indices, because
-        # once we get here the indices are no longer valid, hence the need
-        # to completely reset the selection.
-        self.resetSelection()
-        # TODO: rethink factorization of the next bit.
-        # - refitFontItems() added new items
-        # - the font for the new item may or may not be loaded
-        # - if not loaded, loadFonts() will load it and will also set the text
-        # - if loaded, the text needs to be set separately
-        windowController = self._nsObject.window().windowController()
-        for fontItemInfo, fontItem in fontItemsNeedingTextUpdate:
-            windowController.setFontItemText(fontItemInfo, fontItem)
-        windowController.loadFonts()
 
     def _glyphSelectionChanged(self):
         if self._glyphSelectionChangedCallback is not None:
