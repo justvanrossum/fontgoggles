@@ -263,6 +263,9 @@ class FontList(Group):
             self.project.purgeFonts()
         self.refitFontItems()
         self.resetSelection()
+        # TODO: rethink factorization?
+        windowController = self._nsObject.window().windowController()
+        windowController.loadFonts()
 
     def _glyphSelectionChanged(self):
         if self._glyphSelectionChangedCallback is not None:
@@ -461,7 +464,6 @@ class FontList(Group):
         if hasattr(self, "dropFontsPlaceHolder"):
             del self.dropFontsPlaceHolder
         itemSize = self.itemSize
-        anyFontsToLoad = False
         for index, fontItemInfo in enumerate(self.project.fonts):
             fontItem = getattr(self, fontItemInfo.identifier, None)
             if fontItem is None:
@@ -482,8 +484,6 @@ class FontList(Group):
                     # Font is already loaded. TODO: rethink factorization? See below.
                     windowController = self._nsObject.window().windowController()
                     windowController.setFontItemText(fontItemInfo, fontItem)
-                else:
-                    anyFontsToLoad = True
             else:
                 fontItem.fontListIndex = index
                 x, y, w, h = fontItem.getPosSize()
@@ -498,10 +498,6 @@ class FontList(Group):
         else:
             h = len(self.project.fonts) * itemSize
         self.setPosSize((x, y, w, h))
-        if anyFontsToLoad:
-            # TODO: rethink factorization?
-            windowController = self._nsObject.window().windowController()
-            windowController.loadFonts()
 
     def purgeFontItems(self):
         usedIdentifiers = {fii.identifier for fii in self.project.fonts}

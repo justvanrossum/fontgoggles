@@ -264,8 +264,22 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             if fontItemInfo.font is None:
                 coros.append(self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData))
         await asyncio.gather(*coros)
+        self._gatherMiscInfo()
         self.updateSidebarItems()
         self.fontListSelectionChangedCallback(self.fontList)
+
+    def _gatherMiscInfo(self):
+        self.allFeatureTagsGSUB = set()
+        self.allFeatureTagsGPOS = set()
+        self.allScriptsAndLanguages = {}
+        self.allAxes = {}
+
+        for fontItemInfo in self.project.fonts:
+            font = fontItemInfo.font
+            self.allFeatureTagsGSUB.update(font.featuresGSUB)
+            self.allFeatureTagsGPOS.update(font.featuresGPOS)
+            self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
+            self.allAxes = mergeAxes(self.allAxes, font.axes)
 
     @objc.python_method
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
@@ -274,10 +288,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = fontItemInfo.font
         await asyncio.sleep(0)
         fontItem.setIsLoading(False)
-        self.allFeatureTagsGSUB.update(font.featuresGSUB)
-        self.allFeatureTagsGPOS.update(font.featuresGPOS)
-        self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
-        self.allAxes = mergeAxes(self.allAxes, font.axes)
         self.setFontItemText(fontItemInfo, fontItem)
         self.growFontListFromItem(fontItem)
 
