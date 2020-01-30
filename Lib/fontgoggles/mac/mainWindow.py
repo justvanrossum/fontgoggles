@@ -104,8 +104,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         initialText = "ABC abc 0123 :;?"
         self._textEntry.set(initialText)
         self.textEntryChangedCallback(self._textEntry)
-        self.loadFonts()
         self.w.bind("close", self._windowCloseCallback)
+        self.loadFonts()
 
     @suppressAndLogException
     def _windowCloseCallback(self, sender):
