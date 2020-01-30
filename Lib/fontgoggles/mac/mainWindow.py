@@ -263,22 +263,24 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             if fontItemInfo.font is None:
                 coros.append(self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData))
         await asyncio.gather(*coros)
-        self._gatherMiscInfo()
-        self.updateSidebarItems()
+        self._updateSidebarItems(*self._gatherMiscInfo(self.project.fonts))
         self.fontListSelectionChangedCallback(self.fontList)
 
-    def _gatherMiscInfo(self):
-        self.allFeatureTagsGSUB = set()
-        self.allFeatureTagsGPOS = set()
-        self.allScriptsAndLanguages = {}
-        self.allAxes = {}
+    @staticmethod
+    def _gatherMiscInfo(fonts):
+        allFeatureTagsGSUB = set()
+        allFeatureTagsGPOS = set()
+        allAxes = {}
+        allScriptsAndLanguages = {}
 
-        for fontItemInfo in self.project.fonts:
+        for fontItemInfo in fonts:
             font = fontItemInfo.font
-            self.allFeatureTagsGSUB.update(font.featuresGSUB)
-            self.allFeatureTagsGPOS.update(font.featuresGPOS)
-            self.allScriptsAndLanguages = mergeScriptsAndLanguages(self.allScriptsAndLanguages, font.scripts)
-            self.allAxes = mergeAxes(self.allAxes, font.axes)
+            allFeatureTagsGSUB.update(font.featuresGSUB)
+            allFeatureTagsGPOS.update(font.featuresGPOS)
+            allAxes = mergeAxes(allAxes, font.axes)
+            allScriptsAndLanguages = mergeScriptsAndLanguages(allScriptsAndLanguages, font.scripts)
+
+        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages
 
     @objc.python_method
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
@@ -290,10 +292,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.setFontItemText(fontItemInfo, fontItem)
         self.growFontListFromItem(fontItem)
 
-    def updateSidebarItems(self):
-        self.featuresGroup.setTags({"GSUB": self.allFeatureTagsGSUB, "GPOS": self.allFeatureTagsGPOS})
+    @objc.python_method
+    def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes,
+                            allScriptsAndLanguages):
+        self.featuresGroup.setTags({"GSUB": allFeatureTagsGSUB, "GPOS": allFeatureTagsGPOS})
         sliderInfo = {}
-        for tag, axis in self.allAxes.items():
+        for tag, axis in allAxes.items():
             defaultValue = axis["defaultValue"]
             if len(defaultValue) == 1:
                 defaultValue = next(iter(defaultValue))
@@ -301,9 +305,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 defaultValue = None  # mixed default values
             sliderInfo[tag] = (f"{axis['name']} ({tag})", axis["minValue"], defaultValue, axis["maxValue"])
         self.variationsGroup.setSliderInfo(sliderInfo)
-        scriptTags = sorted(self.allScriptsAndLanguages)
+        scriptTags = sorted(allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
         self.scriptsPopup.setItems(scriptMenuTitles)
+        self.allScriptsAndLanguages = allScriptsAndLanguages
 
     def iterFontItems(self):
         return self.fontList.iterFontItems()
