@@ -270,14 +270,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def _gatherMiscInfo(fonts):
         allFeatureTagsGSUB = set()
         allFeatureTagsGPOS = set()
-        allAxes = {}
+        allAxes = []
         allScriptsAndLanguages = []
         for fontItemInfo in fonts:
             font = fontItemInfo.font
             allFeatureTagsGSUB.update(font.featuresGSUB)
             allFeatureTagsGPOS.update(font.featuresGPOS)
-            allAxes = mergeAxes(allAxes, font.axes)
+            allAxes.append(font.axes)
             allScriptsAndLanguages.append(font.scripts)
+        allAxes = mergeAxes(*allAxes)
         allScriptsAndLanguages = mergeScriptsAndLanguages(*allScriptsAndLanguages)
         return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages
 
