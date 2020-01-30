@@ -1,7 +1,7 @@
 import re
 import unicodedata
 import AppKit
-from vanilla import *
+from vanilla import Button, EditText, FloatingWindow, List, TextBox
 from ..misc.unicodeNameList import findPrefix
 from .misc import makeTextCell
 
