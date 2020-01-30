@@ -170,14 +170,15 @@ fontOpeners = {
 fileTypes = sorted(fontOpeners)
 
 
-def mergeScriptsAndLanguages(d1, d2):
-    d = dict(d1)
-    for k, v in d2.items():
-        if k in d:
-            d[k] = d[k] | v
-        else:
-            d[k] = v
-    return d
+def mergeScriptsAndLanguages(*dicts):
+    merged = dict(dicts[0])
+    for d in dicts[1:]:
+        for k, v in d.items():
+            if k in merged:
+                merged[k] = merged[k] | v  # not |= as we _don't_ want to modify in-place!
+            else:
+                merged[k] = v
+    return merged
 
 
 def _defaultValueToSet(axis):
