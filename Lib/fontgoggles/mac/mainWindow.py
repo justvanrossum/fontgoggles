@@ -269,7 +269,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             obs.removeObserver(path, self._fileChanged)
         self.observedPaths = paths
 
-    @objc.python_method
+    @suppressAndLogException
     def _fileChanged(self, oldPath, newPath, wasModified):
         oldPath = pathlib.Path(oldPath)
         if newPath is not None:
@@ -280,6 +280,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     fontItemInfo.fontPath = newPath
                     fontItem = self.fontList.getFontItem(fontItemInfo.identifier)
                     fontItem.setFontKey(fontItemInfo.fontKey)
+                if wasModified:
+                    fontItemInfo.unload()
+                    assert fontItemInfo.font is None
+        if wasModified:
+            self.loadFonts()
 
     @suppressAndLogException
     def _projectFontsChanged(self, changeSet):

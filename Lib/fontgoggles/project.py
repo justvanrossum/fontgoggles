@@ -105,6 +105,9 @@ class FontItemInfo:
     async def load(self, sharableFontData=None):
         await self._fontLoader.loadFont(self.fontKey, sharableFontData)
 
+    def unload(self):
+        self._fontLoader.unloadFont(self.fontKey)
+
 
 class FontLoader:
 
@@ -124,6 +127,9 @@ class FontLoader:
         if fontData is not None:
             sharableFontData[path] = fontData
         self.fonts[fontKey] = font
+
+    def unloadFont(self, fontKey):
+        del self.fonts[fontKey]
 
     def purgeFonts(self, usedKeys):
         self.fonts = {fontKey: fontObject for fontKey, fontObject in self.fonts.items()
