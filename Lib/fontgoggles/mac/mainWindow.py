@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import pathlib
 import unicodedata
 import time
 import AppKit
@@ -267,7 +268,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def _fileChanged(self, oldPath, newPath, wasModified):
-        print("---", oldPath, newPath, wasModified)
+        oldPath = pathlib.Path(oldPath)
+        if newPath is not None:
+            newPath = pathlib.Path(newPath)
+        for fontItemInfo in self.project.fonts:
+            if fontItemInfo.fontPath == oldPath:
+                if oldPath != newPath and newPath is not None:
+                    fontItemInfo.fontPath = newPath
+                    fontItem = self.fontList.getFontItem(fontItemInfo.identifier)
+                    fontItem.setFontKey(fontItemInfo.fontKey)
 
     @suppressAndLogException
     def _projectFontsChanged(self, changeSet):
