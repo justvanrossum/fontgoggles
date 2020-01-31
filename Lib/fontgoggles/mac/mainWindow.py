@@ -397,7 +397,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @asyncTaskAutoCancel
     async def textEntryChangedCallback(self, sender, updateUnicodeList=True):
         if not hasattr(self, "directionPopUp"):
-            # Our window already closed, but our poor async task is too
+            # Our window already closed, and our poor async task is too
             # late. Nothing left to do.
             return
         self.textInfo = TextInfo(sender.get())
