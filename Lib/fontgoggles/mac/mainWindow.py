@@ -338,9 +338,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
-        await fontItemInfo.load(sharableFontData=sharableFontData)
-        await asyncio.sleep(0)
-        fontItem.setIsLoading(False)
+        try:
+            await fontItemInfo.load(sharableFontData=sharableFontData)
+            await asyncio.sleep(0)
+        finally:
+            fontItem.setIsLoading(False)
         self.setFontItemText(fontItemInfo, fontItem)
         self.growFontListFromItem(fontItem)
 
