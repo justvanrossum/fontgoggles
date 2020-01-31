@@ -28,7 +28,6 @@ class FeatureTagGroup(Group):
                 delattr(self, attr)
         self._titles = list(tagGroups)
         self._tagIdentifiers = defaultdict(list)
-        savedState = dict(self._state)
         margin = 10
         tagWidth = 60
         y = margin
@@ -50,7 +49,7 @@ class FeatureTagGroup(Group):
             y += 6
         posSize = (0, 0, self.getPosSize()[2], y)
         self.setPosSize(posSize)
-        self.set(savedState)
+        self._updateState()
 
     def _tagStateChanged(self, tagView):
         tag = tagView.tag
@@ -70,6 +69,12 @@ class FeatureTagGroup(Group):
 
     def get(self):
         return dict(self._state)
+
+    def _updateState(self):
+        for tag, value in self._state.items():
+            for tagIdentifier in self._tagIdentifiers.get(tag, ()):
+                tagView = getattr(self, tagIdentifier)
+                tagView.state = value
 
     def set(self, state):
         for tag, tagIdentifiers in self._tagIdentifiers.items():
