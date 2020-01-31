@@ -94,6 +94,9 @@ class FontItemInfo:
         fontNumber = oldFontKey[1]
         self.fontKey = newFontPath, fontNumber
         self._fontLoader.updateFontKey(oldFontKey, self.fontKey)
+        font = self.font
+        if font is not None:
+            font.updateFontPath(newFontPath)
 
     @property
     def font(self):

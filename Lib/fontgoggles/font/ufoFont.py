@@ -14,13 +14,17 @@ class UFOFont(BaseFont):
 
     def __init__(self, fontPath, needsShaper=True):
         super().__init__()
-        self.reader = UFOReader(fontPath)
-        self.glyphSet = self.reader.getGlyphSet()
-        self.glyphSet.glyphClass = Glyph
+        self.updateFontPath(fontPath)
         self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
         self._fontPath = fontPath
         self._cachedGlyphs = {}
+
+    def updateFontPath(self, newFontPath):
+        """This also gets called when the source file was moved."""
+        self.reader = UFOReader(newFontPath)
+        self.glyphSet = self.reader.getGlyphSet()
+        self.glyphSet.glyphClass = Glyph
 
     async def load(self):
         glyphOrder = sorted(self.glyphSet.keys())  # no need for the "real" glyph order

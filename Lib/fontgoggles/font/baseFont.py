@@ -12,6 +12,10 @@ class BaseFont:
     def close(self):
         pass
 
+    def updateFontPath(self, newFontPath):
+        """This gets called when the source file was moved."""
+        pass
+
     @readOnlyCachedProperty
     def unitsPerEm(self):
         return self.ttFont["head"].unitsPerEm

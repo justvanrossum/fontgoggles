@@ -113,6 +113,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @suppressAndLogException
     def _windowCloseCallback(self, sender):
+        obs = getFileObserver()
+        for path in self.observedPaths:
+            obs.removeObserver(path, self._fileChanged)
         self.__dict__.clear()
 
     def windowTitleForDocumentDisplayName_(self, displayName):
