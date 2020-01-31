@@ -27,7 +27,6 @@ class FileObserver:
 
     def removeObserver(self, path, callback):
         path = os.path.normpath(path)
-        assert os.path.exists(path)
         parent, name = os.path.split(path)
         directory = self._getDirectory(parent)
         directory.removeChildObserver(name, callback)
@@ -128,7 +127,7 @@ class Directory:
         if inode in self.children:
             assert self.children[inode].name == name
             assert self.children[inode].modTime == modTime
-            assert self.children[inode].bookmarkData == bookmarkData
+            self.children[inode].bookmarkData = bookmarkData
         else:
             self.children[inode] = DirectoryEntry(name, modTime, bookmarkData)
         self.children[inode].callbacks.append(callback)
