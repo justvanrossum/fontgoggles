@@ -98,11 +98,12 @@ class CompilerPool:
 
     async def callFunction(self, func, args):
         worker = await self.getWorker()
+        output = []
         try:
-            output, error = await worker.callFunction(func, args)
+            error = await worker.callFunction(func, args, output.append)
         finally:
             await self.availableWorkers.put(worker)
-        return output, error
+        return "".join(output), error
 
 
 class CompilerWorker:
@@ -117,12 +118,11 @@ class CompilerWorker:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT)
 
-    async def callFunction(self, func, args):
+    async def callFunction(self, func, args, outputWriter):
         args = [func] + args
         inData = " ".join(shlex.quote(item) for item in args)
         self.process.stdin.write((inData + "\n").encode("utf-8"))
         await self.process.stdin.drain()
-        output = []
         error = True
         cancelling = False
         while True:
@@ -146,7 +146,7 @@ class CompilerWorker:
             if line == SUCCESS_MARKER:
                 error = False
                 break
-            output.append(line)
+            outputWriter(line + "\n")
         if cancelling:
             raise asyncio.CancelledError()
-        return "\n".join(output), error
+        return error
