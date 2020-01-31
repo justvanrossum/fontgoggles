@@ -374,7 +374,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.variationsGroup.setSliderInfo(sliderInfo)
         scriptTags = sorted(allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
+        selectedItem = self.scriptsPopup.getItem()
+        if selectedItem in scriptMenuTitles:
+            newSelectedIndex = scriptMenuTitles.index(selectedItem)
+        else:
+            newSelectedIndex = 0
         self.scriptsPopup.setItems(scriptMenuTitles)
+        self.scriptsPopup.set(newSelectedIndex)
         self.allScriptsAndLanguages = allScriptsAndLanguages
 
     def iterFontItems(self):
@@ -824,6 +830,9 @@ class LabeledView(Group):
 
     def getItem(self):
         return self.view.getItem()
+
+    def setItem(self, item):
+        self.view.setItem(item)
 
     def getItems(self):
         return self.view.getItems()
