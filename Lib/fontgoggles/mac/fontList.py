@@ -675,6 +675,23 @@ class FGFontItemView(AppKit.NSView):
         backgroundColor.set()
         AppKit.NSRectFill(rect)
 
+    @suppressAndLogException
+    def revealInFinder_(self, sender):
+        fontPath = os.fspath(self.vanillaWrapper().fontPath)
+        workspace = AppKit.NSWorkspace.sharedWorkspace()
+        workspace.selectFile_inFileViewerRootedAtPath_(fontPath, "")
+
+    @suppressAndLogException
+    def mouseDown_(self, event):
+        if event.modifierFlags() & AppKit.NSEventModifierFlagControl:
+            fileName = self.vanillaWrapper().fontPath.name
+            menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
+            menu.insertItemWithTitle_action_keyEquivalent_atIndex_(f"Reveal ‘{fileName}’ in Finder",
+                                                                   "revealInFinder:", "", 0)
+            AppKit.NSMenu.popUpContextMenu_withEvent_forView_(menu, event, self)
+        else:
+            super().mouseDown_(event)
+
 
 class FontItem(Group):
 
@@ -1009,19 +1026,10 @@ class FGGlyphLineView(AppKit.NSView):
         self.hoveredGlyphIndex = None
 
     @suppressAndLogException
-    def revealInFinder_(self, sender):
-        fontPath = os.fspath(self.superview().vanillaWrapper().fontPath)
-        workspace = AppKit.NSWorkspace.sharedWorkspace()
-        workspace.selectFile_inFileViewerRootedAtPath_(fontPath, "")
-
-    @suppressAndLogException
     def mouseDown_(self, event):
         if event.modifierFlags() & AppKit.NSEventModifierFlagControl:
-            fileName = self.superview().vanillaWrapper().fontPath.name
-            menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
-            menu.insertItemWithTitle_action_keyEquivalent_atIndex_(f"Reveal ‘{fileName}’ in Finder",
-                                                                   "revealInFinder:", "", 0)
-            AppKit.NSMenu.popUpContextMenu_withEvent_forView_(menu, event, self)
+            # The event will be handled by our superview
+            super().mouseDown_(event)
             return
 
         index = self.findGlyph_(self.convertPoint_fromView_(event.locationInWindow(), None))
