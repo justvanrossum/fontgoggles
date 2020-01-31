@@ -1,5 +1,7 @@
 import asyncio
+from collections import defaultdict
 import contextlib
+import logging
 import pathlib
 import unicodedata
 import time
@@ -65,7 +67,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def __init__(self, project):
         self.project = project
         self.projectFontsProxy = makeUndoProxy(self.project.fonts, self._projectFontsChanged)
-        self.observedPaths = set()
+        self.observedPaths = {}
         self.defaultFontItemSize = 150
         self.alignmentOverride = None
         self.featureState = {}
@@ -262,27 +264,38 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def monitorFileChanges(self):
         obs = getFileObserver()
-        paths = {fontItemInfo.fontKey[0] for fontItemInfo in self.project.fonts}
-        for path in paths - self.observedPaths:
+        newObservedPaths = defaultdict(list)
+        for fontItemInfo in self.project.fonts:
+            newObservedPaths[fontItemInfo.fontKey[0]].append(fontItemInfo)
+        newPaths = set(newObservedPaths)
+        oldPaths = set(self.observedPaths)
+        for path in newPaths - oldPaths:
             obs.addObserver(path, self._fileChanged)
-        for path in self.observedPaths - paths:
+        for path in oldPaths - newPaths:
             obs.removeObserver(path, self._fileChanged)
-        self.observedPaths = paths
+        self.observedPaths = newObservedPaths
 
     @suppressAndLogException
     def _fileChanged(self, oldPath, newPath, wasModified):
         oldPath = pathlib.Path(oldPath)
         if newPath is not None:
             newPath = pathlib.Path(newPath)
-        for fontItemInfo in self.project.fonts:
-            if fontItemInfo.fontPath == oldPath:
-                if oldPath != newPath and newPath is not None:
-                    fontItemInfo.fontPath = newPath
-                    fontItem = self.fontList.getFontItem(fontItemInfo.identifier)
-                    fontItem.setFontKey(fontItemInfo.fontKey)
-                if wasModified:
-                    fontItemInfo.unload()
-                    assert fontItemInfo.font is None
+        if oldPath == newPath:
+            logging.info("file changed event: %s wasModified=%s", oldPath, wasModified)
+        else:
+            logging.info("file changed event: %s -> %s wasModified=%s", oldPath, newPath, wasModified)
+        didMove = False
+        for fontItemInfo in self.observedPaths[oldPath]:
+            if oldPath != newPath and newPath is not None:
+                didMove = True
+                fontItemInfo.fontPath = newPath
+                fontItem = self.fontList.getFontItem(fontItemInfo.identifier)
+                fontItem.setFontKey(fontItemInfo.fontKey)
+            if wasModified:
+                fontItemInfo.unload()
+                assert fontItemInfo.font is None
+        if didMove:
+            self.monitorFileChanges()
         if wasModified:
             self.loadFonts()
 
