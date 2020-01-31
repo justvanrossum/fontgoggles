@@ -705,8 +705,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             languages = [f"{tag} – {opentypeTags.languages.get(tag, ['?'])[0]}"
                          for tag in sorted(self.allScriptsAndLanguages[tag])]
-        self.languagesPopup.setItems(['dflt – Default'] + languages)
-        self.languagesPopup.set(0)
+        languages = ['dflt – Default'] + languages
+        selectedItem = self.languagesPopup.getItem()
+        if selectedItem in languages:
+            newSelectedIndex = languages.index(selectedItem)
+        else:
+            newSelectedIndex = 0
+        self.languagesPopup.setItems(languages)
+        self.languagesPopup.set(newSelectedIndex)
         self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
 
     @objc.python_method
