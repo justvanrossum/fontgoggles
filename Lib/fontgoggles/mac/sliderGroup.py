@@ -11,6 +11,7 @@ class SliderGroup(Group):
         super().__init__((0, 0, width, 0))
         self._callback = callback
         self._continuous = continuous
+        self._tags = []
         self.setSliderInfo(sliderInfo)
 
     def _breakCycles(self):
@@ -18,6 +19,7 @@ class SliderGroup(Group):
         super()._breakCycles()
 
     def setSliderInfo(self, sliderInfo):
+        savedState = self.get()
         # clear all subviews
         for attr, value in list(self.__dict__.items()):
             if isinstance(value, VanillaBaseObject):
@@ -34,6 +36,7 @@ class SliderGroup(Group):
             y += 50
         posSize = (0, 0, self.getPosSize()[2], y)
         self.setPosSize(posSize)
+        self._updateState(savedState)
 
     def _sliderChanged(self, sender):
         callCallback(self._callback, self)
@@ -46,11 +49,20 @@ class SliderGroup(Group):
             state[tag] = slider.get()
         return state
 
+    def _updateState(self, state):
+        for tag, value in state.items():
+            attrName = f"slider_{tag}"
+            slider = getattr(self, attrName, None)
+            if slider is not None:
+                slider.set(value)
+
     def set(self, state):
         for tag in self._tags:
             attrName = f"slider_{tag}"
             slider = getattr(self, attrName)
-            slider.set(state[tag])
+            value = state.get(tag)
+            if value is not None:
+                slider.set(value)
 
 
 class SliderPlus(Group):
