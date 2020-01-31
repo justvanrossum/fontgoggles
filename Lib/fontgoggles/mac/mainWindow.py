@@ -110,7 +110,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._textEntry.set(initialText)
         self.textEntryChangedCallback(self._textEntry)
         self.w.bind("close", self._windowCloseCallback)
-        self.monitorFileChanges()
+        self.updateFileObservers()
         self.loadFonts()
 
     @suppressAndLogException
@@ -262,7 +262,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.setPosSize((0, 0, 0, y))
         return group
 
-    def monitorFileChanges(self):
+    def updateFileObservers(self):
         obs = getFileObserver()
         newObservedPaths = defaultdict(list)
         for fontItemInfo in self.project.fonts:
@@ -295,7 +295,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 fontItemInfo.unload()
                 assert fontItemInfo.font is None
         if didMove:
-            self.monitorFileChanges()
+            self.updateFileObservers()
         if wasModified:
             self.loadFonts()
 
@@ -317,7 +317,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # - if loaded, the text needs to be set separately
         for fontItemInfo, fontItem in fontItemsNeedingTextUpdate:
             self.setFontItemText(fontItemInfo, fontItem)
-        self.monitorFileChanges()
+        self.updateFileObservers()
         self.loadFonts()
 
     @asyncTask
