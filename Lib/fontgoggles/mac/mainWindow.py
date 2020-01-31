@@ -320,7 +320,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.updateFileObservers()
         self.loadFonts()
 
-    @asyncTask
+    @asyncTaskAutoCancel
     async def loadFonts(self):
         """This loads fonts that aren't yet loaded, and updates all information
         regarding features, scripts/languages and variations.

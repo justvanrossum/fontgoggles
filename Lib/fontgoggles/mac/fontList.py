@@ -1,3 +1,4 @@
+import os
 import pathlib
 from types import SimpleNamespace
 import objc
@@ -718,6 +719,7 @@ class FontItem(Group):
         if fontNumber or fontPath.suffix.lower() in {".ttc", ".otc"}:
             fileNameLabel += f"#{fontNumber}"
         self.fileNameLabel.set(fileNameLabel, tooltip=str(fontPath))
+        self.fontPath = fontPath
 
     @property
     def glyphs(self):
@@ -1007,7 +1009,21 @@ class FGGlyphLineView(AppKit.NSView):
         self.hoveredGlyphIndex = None
 
     @suppressAndLogException
+    def revealInFinder_(self, sender):
+        fontPath = os.fspath(self.superview().vanillaWrapper().fontPath)
+        workspace = AppKit.NSWorkspace.sharedWorkspace()
+        workspace.selectFile_inFileViewerRootedAtPath_(fontPath, "")
+
+    @suppressAndLogException
     def mouseDown_(self, event):
+        if event.modifierFlags() & AppKit.NSEventModifierFlagControl:
+            fileName = self.superview().vanillaWrapper().fontPath.name
+            menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
+            menu.insertItemWithTitle_action_keyEquivalent_atIndex_(f"Reveal ‘{fileName}’ in Finder",
+                                                                   "revealInFinder:", "", 0)
+            AppKit.NSMenu.popUpContextMenu_withEvent_forView_(menu, event, self)
+            return
+
         index = self.findGlyph_(self.convertPoint_fromView_(event.locationInWindow(), None))
 
         if not event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
