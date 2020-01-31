@@ -260,6 +260,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y += 50
 
         group.setPosSize((0, 0, 0, y))
+        self.scriptsPopupCallback(self.scriptsPopup)
         return group
 
     def updateFileObservers(self):
