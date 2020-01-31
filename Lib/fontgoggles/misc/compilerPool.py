@@ -1,6 +1,7 @@
 import asyncio
 import os
 import shlex
+import signal
 import sys
 import tempfile
 from .workServer import ERROR_MARKER, SUCCESS_MARKER
@@ -97,8 +98,10 @@ class CompilerPool:
 
     async def callFunction(self, func, args):
         worker = await self.getWorker()
-        output, error = await worker.callFunction(func, args)
-        await self.availableWorkers.put(worker)
+        try:
+            output, error = await worker.callFunction(func, args)
+        finally:
+            await self.availableWorkers.put(worker)
         return output, error
 
 
@@ -121,10 +124,19 @@ class CompilerWorker:
         await self.process.stdin.drain()
         output = []
         error = True
+        cancelling = False
         while True:
-            line = await self.process.stdout.readline()
+            try:
+                line = await self.process.stdout.readline()
+            except asyncio.CancelledError:
+                self.process.send_signal(signal.SIGINT)
+                # We will re-raise only after we've received all
+                # our expected output, which should not be much as
+                # we just sent SIGINT to the worker process.
+                cancelling = True
+                continue
             if not line:
-                print("broken subprocess")
+                raise RuntimeError("broken subprocess")
                 break
             line = line.decode("utf-8")
             line = line.rstrip('\n')
@@ -135,4 +147,6 @@ class CompilerWorker:
                 error = False
                 break
             output.append(line)
+        if cancelling:
+            raise asyncio.CancelledError()
         return "\n".join(output), error
