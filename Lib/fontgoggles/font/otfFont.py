@@ -7,7 +7,20 @@ from .baseFont import BaseFont
 from ..misc.compilerPool import compileTTXToBytes
 
 
-class OTFFont(BaseFont):
+class _OTFBaseFont(BaseFont):
+
+    def _getOutlinePath(self, glyphName, colorLayers):
+        outline = self.ftFont.getOutlinePath(glyphName)
+        if colorLayers:
+            return [(outline, 0)]
+        else:
+            return outline
+
+    def varLocationChanged(self, varLocation):
+        self.ftFont.setVarLocation(varLocation if varLocation else {})
+
+
+class OTFFont(_OTFBaseFont):
 
     @classmethod
     def fromPath(cls, fontPath, fontNumber, fontData=None):
@@ -32,21 +45,11 @@ class OTFFont(BaseFont):
         self.ftFont = FTFont(fontData, fontNumber=fontNumber, ttFont=self.ttFont)
         self.shaper = HBShape(fontData, fontNumber=fontNumber, ttFont=self.ttFont)
 
-    def _getOutlinePath(self, glyphName, colorLayers):
-        outline = self.ftFont.getOutlinePath(glyphName)
-        if colorLayers:
-            return [(outline, 0)]
-        else:
-            return outline
 
-    def varLocationChanged(self, varLocation):
-        self.ftFont.setVarLocation(varLocation if varLocation else {})
-
-
-class TTXFont(OTFFont):
+class TTXFont(_OTFBaseFont):
 
     def __init__(self, fontPath, fontNumber):
-        BaseFont.__init__(self)  # not calling OTFFont.__init__
+        super().__init__()
         self._fontPath = fontPath
         self._fontNumber = fontNumber
 
