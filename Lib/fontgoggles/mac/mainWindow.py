@@ -335,6 +335,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._updateSidebarItems(*self._gatherSidebarInfo(self.project.fonts))
         self.fontListSelectionChangedCallback(self.fontList)
 
+    @objc.python_method
+    async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
+        fontItem.setIsLoading(True)
+        await fontItemInfo.load(sharableFontData=sharableFontData)
+        await asyncio.sleep(0)
+        fontItem.setIsLoading(False)
+        self.setFontItemText(fontItemInfo, fontItem)
+        self.growFontListFromItem(fontItem)
+
     @staticmethod
     def _gatherSidebarInfo(fonts):
         allFeatureTagsGSUB = set()
@@ -350,15 +359,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         allAxes = mergeAxes(*allAxes)
         allScriptsAndLanguages = mergeScriptsAndLanguages(*allScriptsAndLanguages)
         return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages
-
-    @objc.python_method
-    async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
-        fontItem.setIsLoading(True)
-        await fontItemInfo.load(sharableFontData=sharableFontData)
-        await asyncio.sleep(0)
-        fontItem.setIsLoading(False)
-        self.setFontItemText(fontItemInfo, fontItem)
-        self.growFontListFromItem(fontItem)
 
     @objc.python_method
     def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes,
