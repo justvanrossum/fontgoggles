@@ -14,6 +14,7 @@ class FeatureTagGroup(Group):
         posSize = (0, 0, width, 50)  # dummy height
         super().__init__(posSize)
         self._callback = callback
+        self._state = {}
         self.setTags(tagGroups)
 
     def _breakCycles(self):
@@ -27,7 +28,7 @@ class FeatureTagGroup(Group):
                 delattr(self, attr)
         self._titles = list(tagGroups)
         self._tagIdentifiers = defaultdict(list)
-        self._state = {}
+        savedState = dict(self._state)
         margin = 10
         tagWidth = 60
         y = margin
@@ -49,6 +50,7 @@ class FeatureTagGroup(Group):
             y += 6
         posSize = (0, 0, self.getPosSize()[2], y)
         self.setPosSize(posSize)
+        self.set(savedState)
 
     def _tagStateChanged(self, tagView):
         tag = tagView.tag
