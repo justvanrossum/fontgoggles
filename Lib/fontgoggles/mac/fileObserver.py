@@ -3,7 +3,7 @@ from CoreFoundation import CFRunLoopGetCurrent
 from Foundation import NSURL
 from FSEvents import (FSEventStreamCreate, FSEventStreamInvalidate, FSEventStreamScheduleWithRunLoop,
                       FSEventStreamStart, FSEventStreamStop, FSEventStreamUnscheduleFromRunLoop,
-                      kCFRunLoopDefaultMode, kFSEventStreamEventIdSinceNow)
+                      kCFRunLoopDefaultMode, kFSEventStreamCreateFlagNone, kFSEventStreamEventIdSinceNow)
 
 
 # Relevant documentation:
@@ -12,7 +12,8 @@ from FSEvents import (FSEventStreamCreate, FSEventStreamInvalidate, FSEventStrea
 
 class FileObserver:
 
-    def __init__(self):
+    def __init__(self, latency=0.25):
+        self.latency = latency
         self.directories = {}
         self.observedFolders = set()
         self.eventStreamRef = None
@@ -63,8 +64,8 @@ class FileObserver:
                                                   None,
                                                   list(newObservedFolders),
                                                   kFSEventStreamEventIdSinceNow,
-                                                  0.5,
-                                                  0)
+                                                  self.latency,
+                                                  kFSEventStreamCreateFlagNone)
         FSEventStreamScheduleWithRunLoop(self.eventStreamRef,
                                          CFRunLoopGetCurrent(),
                                          kCFRunLoopDefaultMode)
