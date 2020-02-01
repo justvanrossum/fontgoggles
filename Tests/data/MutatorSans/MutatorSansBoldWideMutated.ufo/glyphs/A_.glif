@@ -31,4 +31,10 @@
       <point x="410" y="800" type="line"/>
     </contour>
   </outline>
+  <lib>
+    <dict>
+      <key>public.verticalOrigin</key>
+      <integer>822</integer>
+    </dict>
+  </lib>
 </glyph>
