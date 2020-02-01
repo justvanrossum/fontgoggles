@@ -203,7 +203,7 @@ async def test_verticalGlyphMetricsFromUFO():
     dx = [g.dx for g in glyphs]
     dy = [g.dy for g in glyphs]
     expectedAX = [0, 0, 0, 0, 0]
-    expectedAY = [-1000, -1000, -1000, -1000, -1000]
+    expectedAY = [-1022, -1000, -1000, -1000, -1000]
     expectedDX = [-645, -635, -687, -658, -560]
     expectedDY = [-800, -800, -800, -800, -800]
     assert expectedAX == ax
