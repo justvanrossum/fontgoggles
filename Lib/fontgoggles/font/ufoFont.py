@@ -79,26 +79,35 @@ class UFOFont(BaseFont):
         if ascender is None or descender is None:
             return self.info.unitsPerEm
         else:
-            return ascender + descender
+            return ascender + abs(descender)
+
+    @readOnlyCachedProperty
+    def defaultVerticalOriginY(self):
+        ascender = getattr(self.info, "ascender", None)
+        if ascender is None:
+            return self.info.unitsPerEm  # ???
+        else:
+            return ascender
 
     def _getVerticalAdvance(self, glyphName):
         glyph = self._getGlyph(glyphName)
         vAdvance = glyph.height
-        if vAdvance is None:
+        if vAdvance is None or vAdvance == 0:  # XXX default vAdv == 0 -> bad UFO spec
             vAdvance = self.defaultVerticalAdvance
-        return vAdvance
-
-    def _getOutlinePath(self, glyphName, colorLayers):
-        glyph = self._getGlyph(glyphName)
-        return glyph.outline
+        return -abs(vAdvance)
 
     def _getVerticalOrigin(self, glyphName):
         glyph = self._getGlyph(glyphName)
         vOrgX = glyph.width / 2
-        vOrgY = glyph.lib.get("public.verticalOrigin")
+        lib = getattr(glyph, "lib", {})
+        vOrgY = lib.get("public.verticalOrigin")
         if vOrgY is None:
             vOrgY = self.defaultVerticalOriginY
         return True, vOrgX, vOrgY
+
+    def _getOutlinePath(self, glyphName, colorLayers):
+        glyph = self._getGlyph(glyphName)
+        return glyph.outline
 
 
 class NotDefGlyph:

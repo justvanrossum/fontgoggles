@@ -187,3 +187,26 @@ async def test_getGlyphRunFromTextInfo(text, expectedGlyphNames, expectedPositio
     positions = [g.pos for g in glyphs]
     assert expectedGlyphNames == glyphNames
     assert expectedPositions == positions
+
+
+@pytest.mark.asyncio
+async def test_verticalGlyphMetricsFromUFO():
+    fontPath = getFontPath('MutatorSansBoldWideMutated.ufo')
+    numFonts, opener, getSortInfo = getOpener(fontPath)
+    font, fontData = await opener(fontPath, 0)
+    textInfo = TextInfo("ABCDE")
+    textInfo.directionOverride = "TTB"
+    glyphs = font.getGlyphRunFromTextInfo(textInfo)
+    glyphNames = [g.name for g in glyphs]
+    ax = [g.ax for g in glyphs]
+    ay = [g.ay for g in glyphs]
+    dx = [g.dx for g in glyphs]
+    dy = [g.dy for g in glyphs]
+    expectedAX = [0, 0, 0, 0, 0]
+    expectedAY = [-1000, -1000, -1000, -1000, -1000]
+    expectedDX = [-645, -635, -687, -658, -560]
+    expectedDY = [-800, -800, -800, -800, -800]
+    assert expectedAX == ax
+    assert expectedAY == ay
+    assert expectedDX == dx
+    assert expectedDY == dy
