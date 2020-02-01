@@ -48,7 +48,7 @@ class UFOFont(BaseFont):
         else:
             f = io.BytesIO(fontData)
             self.ttFont = TTFont(f, lazy=True)
-            self.shaper = HBShape(fontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
+            self.shaper = HBShape(fontData, getAdvanceWidth=self._getHorizontalAdvance, ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
@@ -63,9 +63,21 @@ class UFOFont(BaseFont):
         glyph.draw(pen)
         glyph.outline = pen.path
 
-    def _getAdvanceWidth(self, glyphName):
+    def _getHorizontalAdvance(self, glyphName):
         glyph = self._getGlyph(glyphName)
         return glyph.width
+
+    def _getVerticalAdvance(self, glyphName):
+        glyph = self._getGlyph(glyphName)
+        height = glyph.height
+        if height is None:
+            ascender = getattr(self.info, "ascender", None)
+            descender = getattr(self.info, "descender", None)
+            if ascender is None or descender is None:
+                height = self.info.unitsPerEm
+            else:
+                height = ascender + descender
+        return height
 
     def _getOutlinePath(self, glyphName, colorLayers):
         glyph = self._getGlyph(glyphName)
