@@ -48,7 +48,7 @@ class UFOFont(BaseFont):
         else:
             f = io.BytesIO(fontData)
             self.ttFont = TTFont(f, lazy=True)
-            self.shaper = HBShape(fontData, getAdvanceWidth=self._getHorizontalAdvance, ttFont=self.ttFont)
+            self.shaper = HBShape(fontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)

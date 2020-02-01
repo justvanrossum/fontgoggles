@@ -56,7 +56,7 @@ class DSFont(BaseFont):
             reader = UFOReader(source.path, validate=False)
             source.ufoGlyphSet = reader.getGlyphSet(layerName=source.layerName)
 
-        self.shaper = HBShape(vfFontData, getAdvanceWidth=self._getAdvanceWidth, ttFont=self.ttFont)
+        self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
 
     def varLocationChanged(self, varLocation):
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})
@@ -87,7 +87,7 @@ class DSFont(BaseFont):
         varGlyph.setVarLocation(self._normalizedLocation)
         return varGlyph
 
-    def _getAdvanceWidth(self, glyphName):
+    def _getHorizontalAdvance(self, glyphName):
         varGlyph = self._getVarGlyph(glyphName)
         return varGlyph.width
 

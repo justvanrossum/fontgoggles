@@ -50,9 +50,9 @@ def _getGlyphIDFunc(font, char, shaper):
     return glyphID
 
 
-def _getAdvanceWidthFunc(font, glyphID, shaper):
+def _getHorizontalAdvanceFunc(font, glyphID, shaper):
     glyphName = shaper.glyphOrder[glyphID]
-    width = shaper.getAdvanceWidth(glyphName)
+    width = shaper.getHorizontalAdvance(glyphName)
     return width
 
 
@@ -66,7 +66,7 @@ class HBShape:
 
     def __init__(self, fontData, *, fontNumber=0,
                  getGlyphNameFromCodePoint=None,
-                 getAdvanceWidth=None, ttFont=None):
+                 getHorizontalAdvance=None, ttFont=None):
         self._fontData = fontData
         self._fontNumber = fontNumber
         self.face = hb.Face(fontData, fontNumber)
@@ -78,28 +78,28 @@ class HBShape:
         self._ttFont = ttFont
         self.glyphOrder = ttFont.getGlyphOrder()
 
-        if getGlyphNameFromCodePoint is None and getAdvanceWidth is not None:
+        if getGlyphNameFromCodePoint is None and getHorizontalAdvance is not None:
             def _getGlyphNameFromCodePoint(cmap, codePoint):
                 return cmap.get(codePoint)
             getGlyphNameFromCodePoint = functools.partial(_getGlyphNameFromCodePoint, self._ttFont.getBestCmap())
 
-        if getAdvanceWidth is None and getGlyphNameFromCodePoint is not None:
+        if getHorizontalAdvance is None and getGlyphNameFromCodePoint is not None:
             # TODO: this is wrong for var fonts, we should not set a width func at all
             # TODO: the problem seems to be we need to set all funcs, or the ones we
             # don't set will misbehave. We currently go through hoops to support glyph
             # name input, but if that is not needed we can skip the advance with func,
             # too.
-            def _getAdvanceWidth(hmtx, glyphName):
+            def _getHorizontalAdvance(hmtx, glyphName):
                 return hmtx[glyphName][0]
-            getAdvanceWidth = functools.partial(_getAdvanceWidth, self._ttFont["hmtx"])
+            getHorizontalAdvance = functools.partial(_getHorizontalAdvance, self._ttFont["hmtx"])
 
         self.getGlyphNameFromCodePoint = getGlyphNameFromCodePoint
-        self.getAdvanceWidth = getAdvanceWidth
+        self.getHorizontalAdvance = getHorizontalAdvance
 
-        if getGlyphNameFromCodePoint is not None and getAdvanceWidth is not None:
+        if getGlyphNameFromCodePoint is not None and getHorizontalAdvance is not None:
             self._funcs = hb.FontFuncs.create()
             self._funcs.set_nominal_glyph_func(_getGlyphIDFunc, self)
-            self._funcs.set_glyph_h_advance_func(_getAdvanceWidthFunc, self)
+            self._funcs.set_glyph_h_advance_func(_getHorizontalAdvanceFunc, self)
         else:
             self._funcs = None
 
