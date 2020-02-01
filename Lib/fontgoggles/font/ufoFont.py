@@ -6,8 +6,9 @@ from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph
 from .baseFont import BaseFont
-from ..misc.hbShape import HBShape
 from ..misc.compilerPool import compileUFOToBytes
+from ..misc.hbShape import HBShape
+from ..misc.properties import readOnlyCachedProperty
 
 
 class UFOFont(BaseFont):
@@ -48,7 +49,11 @@ class UFOFont(BaseFont):
         else:
             f = io.BytesIO(fontData)
             self.ttFont = TTFont(f, lazy=True)
-            self.shaper = HBShape(fontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
+            self.shaper = HBShape(fontData,
+                                  getHorizontalAdvance=self._getHorizontalAdvance,
+                                  getVerticalAdvance=self._getVerticalAdvance,
+                                  getVerticalOrigin=self._getVerticalOrigin,
+                                  ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
@@ -67,21 +72,33 @@ class UFOFont(BaseFont):
         glyph = self._getGlyph(glyphName)
         return glyph.width
 
+    @readOnlyCachedProperty
+    def defaultVerticalAdvance(self):
+        ascender = getattr(self.info, "ascender", None)
+        descender = getattr(self.info, "descender", None)
+        if ascender is None or descender is None:
+            return self.info.unitsPerEm
+        else:
+            return ascender + descender
+
     def _getVerticalAdvance(self, glyphName):
         glyph = self._getGlyph(glyphName)
-        height = glyph.height
-        if height is None:
-            ascender = getattr(self.info, "ascender", None)
-            descender = getattr(self.info, "descender", None)
-            if ascender is None or descender is None:
-                height = self.info.unitsPerEm
-            else:
-                height = ascender + descender
-        return height
+        vAdvance = glyph.height
+        if vAdvance is None:
+            vAdvance = self.defaultVerticalAdvance
+        return vAdvance
 
     def _getOutlinePath(self, glyphName, colorLayers):
         glyph = self._getGlyph(glyphName)
         return glyph.outline
+
+    def _getVerticalOrigin(self, glyphName):
+        glyph = self._getGlyph(glyphName)
+        vOrgX = glyph.width / 2
+        vOrgY = glyph.lib.get("public.verticalOrigin")
+        if vOrgY is None:
+            vOrgY = self.defaultVerticalOriginY
+        return True, vOrgX, vOrgY
 
 
 class NotDefGlyph:
