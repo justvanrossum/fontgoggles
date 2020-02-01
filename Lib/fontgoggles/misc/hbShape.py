@@ -52,8 +52,17 @@ def _getGlyphIDFunc(font, char, shaper):
 
 def _getHorizontalAdvanceFunc(font, glyphID, shaper):
     glyphName = shaper.glyphOrder[glyphID]
-    width = shaper.getHorizontalAdvance(glyphName)
-    return width
+    return shaper.getHorizontalAdvance(glyphName)
+
+
+def _getVerticalAdvanceFunc(font, glyphID, shaper):
+    glyphName = shaper.glyphOrder[glyphID]
+    return shaper.getVerticalAdvance(glyphName)
+
+
+def _getVerticalOriginFunc(font, glyphID, shaper):
+    glyphName = shaper.glyphOrder[glyphID]
+    return shaper.getVerticalOrigin(glyphName)
 
 
 class HBShape:
@@ -66,7 +75,10 @@ class HBShape:
 
     def __init__(self, fontData, *, fontNumber=0,
                  getGlyphNameFromCodePoint=None,
-                 getHorizontalAdvance=None, ttFont=None):
+                 getHorizontalAdvance=None,
+                 getVerticalAdvance=None,
+                 getVerticalOrigin=None,
+                 ttFont=None):
         self._fontData = fontData
         self._fontNumber = fontNumber
         self.face = hb.Face(fontData, fontNumber)
@@ -95,11 +107,17 @@ class HBShape:
 
         self.getGlyphNameFromCodePoint = getGlyphNameFromCodePoint
         self.getHorizontalAdvance = getHorizontalAdvance
+        self.getVerticalAdvance = getVerticalAdvance
+        self.getVerticalOrigin = getVerticalOrigin
 
         if getGlyphNameFromCodePoint is not None and getHorizontalAdvance is not None:
             self._funcs = hb.FontFuncs.create()
             self._funcs.set_nominal_glyph_func(_getGlyphIDFunc, self)
             self._funcs.set_glyph_h_advance_func(_getHorizontalAdvanceFunc, self)
+            if getVerticalAdvance is not None:
+                self._funcs.set_glyph_v_advance_func(_getVerticalAdvanceFunc, self)
+            if getVerticalOrigin is not None:
+                self._funcs.set_glyph_v_origin_func(_getVerticalOriginFunc, self)
         else:
             self._funcs = None
 
