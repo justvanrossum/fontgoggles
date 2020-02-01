@@ -189,6 +189,7 @@ async def test_getGlyphRunFromTextInfo(text, expectedGlyphNames, expectedPositio
     assert expectedPositions == positions
 
 
+@pytest.mark.skip(reason="needs unreleased uharfbuzz PR #26")
 @pytest.mark.asyncio
 async def test_verticalGlyphMetricsFromUFO():
     fontPath = getFontPath('MutatorSansBoldWideMutated.ufo')
