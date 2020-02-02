@@ -33,16 +33,21 @@ class DSFont(BaseFont):
         with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
             ufosToCompile = sorted({s.path for s in self.doc.sources if s.layerName is None})
             ttPaths = [os.path.join(ttFolder, os.path.basename(u) + ".ttf") for u in ufosToCompile]
-            coros = (compileUFOToPath(ufoPath, ttPath) for ufoPath, ttPath in zip(ufosToCompile, ttPaths))
+            outputs = [[] for i in range(len(ufosToCompile))]
+            coros = (compileUFOToPath(ufoPath, ttPath, output.append)
+                     for ufoPath, ttPath, output in zip(ufosToCompile, ttPaths, outputs))
             results = await asyncio.gather(*coros)
-            for ufoPath, (output, error) in zip(ufosToCompile, results):
+            outputs = ["".join(output) for output in outputs]
+            for ufoPath, error, output in zip(ufosToCompile, results, outputs):
                 if output:
                     print(f"compile output for {ufoPath}:", file=sys.stderr)
                     print(output, file=sys.stderr)
 
-            vfFontData, output, error = await compileDSToBytes(self._fontPath, ttFolder)
-            if output or error:
-                print(output, file=sys.stderr)
+            dsOutput = []
+            vfFontData, error = await compileDSToBytes(self._fontPath, ttFolder, dsOutput.append)
+            dsOutput = "".join(dsOutput)
+            if dsOutput or error:
+                print(dsOutput, file=sys.stderr)
             with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
                 # masterModel is created by varLib.build(), and we communicate it
                 # to here via a tempfile pickle

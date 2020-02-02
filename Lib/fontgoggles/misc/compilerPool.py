@@ -7,27 +7,27 @@ import tempfile
 from .workServer import ERROR_MARKER, SUCCESS_MARKER
 
 
-async def compileUFOToPath(ufoPath, ttPath):
+async def compileUFOToPath(ufoPath, ttPath, outputWriter):
     pool = getCompilerPool()
     func = "fontgoggles.misc.ufoCompiler.compileMinimumFontToPath"
     args = [
         os.fspath(ufoPath),
         os.fspath(ttPath),
     ]
-    return await pool.callFunction(func, args)
+    return await pool.callFunction(func, args, outputWriter)
 
 
-async def compileUFOToBytes(ufoPath):
+async def compileUFOToBytes(ufoPath, outputWriter):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
-        output, error = await compileUFOToPath(ufoPath, tmp.name)
+        error = await compileUFOToPath(ufoPath, tmp.name, outputWriter)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:
                 fontData = None
-    return fontData, output, error
+    return fontData, error
 
 
-async def compileDSToPath(dsPath, ttFolder, ttPath):
+async def compileDSToPath(dsPath, ttFolder, ttPath, outputWriter):
     pool = getCompilerPool()
     func = "fontgoggles.misc.dsCompiler.compileMinimumFontToPath"
     args = [
@@ -35,37 +35,37 @@ async def compileDSToPath(dsPath, ttFolder, ttPath):
         os.fspath(ttFolder),
         os.fspath(ttPath),
     ]
-    return await pool.callFunction(func, args)
+    return await pool.callFunction(func, args, outputWriter)
 
 
-async def compileDSToBytes(dsPath, ttFolder):
+async def compileDSToBytes(dsPath, ttFolder, outputWriter):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
-        output, error = await compileDSToPath(dsPath, ttFolder, tmp.name)
+        error = await compileDSToPath(dsPath, ttFolder, tmp.name, outputWriter)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:
                 fontData = None
-    return fontData, output, error
+    return fontData, error
 
 
-async def compileTTXToPath(ttxPath, ttPath):
+async def compileTTXToPath(ttxPath, ttPath, outputWriter):
     pool = getCompilerPool()
     func = "fontgoggles.misc.ttxCompiler.compileFontToPath"
     args = [
         os.fspath(ttxPath),
         os.fspath(ttPath),
     ]
-    return await pool.callFunction(func, args)
+    return await pool.callFunction(func, args, outputWriter)
 
 
-async def compileTTXToBytes(ttxPath):
+async def compileTTXToBytes(ttxPath, outputWriter):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
-        output, error = await compileTTXToPath(ttxPath, tmp.name)
+        error = await compileTTXToPath(ttxPath, tmp.name, outputWriter)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:
                 fontData = None
-    return fontData, output, error
+    return fontData, error
 
 
 def getCompilerPool():
@@ -96,14 +96,13 @@ class CompilerPool:
         else:
             return await self.availableWorkers.get()
 
-    async def callFunction(self, func, args):
+    async def callFunction(self, func, args, outputWriter):
         worker = await self.getWorker()
-        output = []
         try:
-            error = await worker.callFunction(func, args, output.append)
+            error = await worker.callFunction(func, args, outputWriter)
         finally:
             await self.availableWorkers.put(worker)
-        return "".join(output), error
+        return error
 
 
 class CompilerWorker:

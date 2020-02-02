@@ -36,7 +36,9 @@ class UFOFont(BaseFont):
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
 
-        fontData, output, error = await compileUFOToBytes(self._fontPath)
+        output = []
+        fontData, error = await compileUFOToBytes(self._fontPath, output.append)
+        output = "".join(output)
 
         if output or error:
             # TODO: where/how to report to the user?

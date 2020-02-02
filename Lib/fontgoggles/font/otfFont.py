@@ -54,7 +54,9 @@ class TTXFont(_OTFBaseFont):
         self._fontNumber = fontNumber
 
     async def load(self):
-        fontData, output, error = await compileTTXToBytes(self._fontPath)
+        output = []
+        fontData, error = await compileTTXToBytes(self._fontPath, output.append)
+        output = "".join(output)
         if output or error:
             print(output, file=sys.stderr)
         f = io.BytesIO(fontData)
