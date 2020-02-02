@@ -187,9 +187,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         paneDescriptors = [
             dict(view=self._fontListScrollView, identifier="fontList", canCollapse=False,
-                 size=230, minSize=120, resizeFlexibility=True),
+                 size=230, minSize=150),
             dict(view=self.compileOutput, identifier="compileOutput", canCollapse=True,
-                 size=120, minSize=80, resizeFlexibility=False),
+                 size=80, minSize=30, resizeFlexibility=False),
         ]
         self.fontListSplitView = SplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
                                       isVertical=False)
