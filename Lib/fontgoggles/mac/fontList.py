@@ -725,7 +725,7 @@ class FontItem(Group):
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
         self.compileOutput = io.StringIO()
-        self.auxillaryWriter = None
+        self._auxillaryOutput = [None]
 
     def setIsLoading(self, isLoading):
         if isLoading:
@@ -741,10 +741,22 @@ class FontItem(Group):
         self.fileNameLabel.set(fileNameLabel, tooltip=str(fontPath))
         self.fontPath = fontPath
 
-    def writeOutput(self, text):
+    def setAuxillaryOutput(self, outputView):
+        self._auxillaryOutput[0] = outputView
+
+    def writeCompileOutput(self, text):
         self.compileOutput.write(text)
-        if self.auxillaryWriter is not None:
-            self.auxillaryWriter(text)
+        if self._auxillaryOutput[0] is not None:
+            self._auxillaryOutput[0].write(text)
+
+    def getCompileOutput(self):
+        return self.compileOutput.getvalue()
+
+    def clearCompileOutput(self):
+        self.compileOutput.seek(0)
+        self.compileOutput.truncate()
+        if self._auxillaryOutput[0] is not None:
+            self._auxillaryOutput[0].clear()
 
     @property
     def glyphs(self):

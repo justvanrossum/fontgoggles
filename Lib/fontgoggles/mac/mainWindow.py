@@ -353,8 +353,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
         try:
+            fontItem.clearCompileOutput()
             await fontItemInfo.load(sharableFontData=sharableFontData,
-                                    outputWriter=fontItem.writeOutput)
+                                    outputWriter=fontItem.writeCompileOutput)
             await asyncio.sleep(0)
         finally:
             fontItem.setIsLoading(False)
@@ -549,12 +550,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def fontListSelectionChangedCallback(self, sender):
         fontItem = sender.getSingleSelectedItem()
         if self._previouslySingleSelectedItem is not None:
-            self._previouslySingleSelectedItem.auxillaryWriter = None
+            self._previouslySingleSelectedItem.setAuxillaryOutput(None)
         if fontItem is not None:
             glyphs = fontItem.glyphs
             self.updateUnicodeListSelection(fontItem)
-            self.compileOutput.set(fontItem.compileOutput.getvalue())
-            fontItem.auxillaryWriter = self.compileOutput.write
+            self.compileOutput.set(fontItem.getCompileOutput())
+            fontItem.setAuxillaryOutput(self.compileOutput)
         else:
             glyphs = []
             self.compileOutput.set("")
@@ -888,14 +889,17 @@ class OutputText(TextEditor):
         # self.write("Testing a longer line of text, a blank line\n\nand something short.\n" * 20)
 
     def set(self, text):
-        self.write(text, clear=True)
+        self.clear()
+        self.write(text)
         self.scrollToEnd()
 
-    def write(self, text, clear=False):
+    def clear(self):
+        st = self._textView.textStorage()
+        st.deleteCharactersInRange_((0, st.length()))
+
+    def write(self, text):
         attrString = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, self.textAttributes)
         st = self._textView.textStorage()
-        if clear:
-            st.deleteCharactersInRange_((0, st.length()))
         st.appendAttributedString_(attrString)
 
         def deferredScroll():
