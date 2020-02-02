@@ -130,6 +130,7 @@ class GlyphsRun(list):
         self.vertical = vertical
         self._glyphToChars = None
         self._charToGlyphs = None
+        self.endPos = (0, 0)
 
     def mapGlyphsToChars(self, glyphIndices):
         if self._glyphToChars is None:
