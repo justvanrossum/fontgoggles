@@ -23,9 +23,6 @@ class GlyphInfo:
         return f"{self.__class__.__name__}({', '.join(args)})"
 
 
-charToGlyphIDBias = 0x80000000
-
-
 #
 # To generalize, HB needs
 # - a callback to map a character to a glyph ID
@@ -41,8 +38,6 @@ charToGlyphIDBias = 0x80000000
 
 
 def _getGlyphIDFunc(font, char, shaper):
-    if char >= charToGlyphIDBias:
-        return char - charToGlyphIDBias
     glyphName = shaper.getGlyphNameFromCodePoint(char)
     if glyphName is None:
         return 0  # .notdef
@@ -154,18 +149,7 @@ class HBShape:
             self.font.funcs = self._funcs
 
         buf = hb.Buffer.create()
-        if isinstance(text, str):
-            buf.add_str(str(text))  # add_str() does not accept str subclasses
-        else:
-            codePoints = []
-            for char in text:
-                if isinstance(char, str):
-                    # It's a glyph name
-                    codePoint = self.getGlyphID(char, 0) + charToGlyphIDBias
-                else:
-                    codePoint = char
-                codePoints.append(codePoint)
-            buf.add_codepoints(codePoints)
+        buf.add_str(str(text))  # add_str() does not accept str subclasses
         buf.guess_segment_properties()
 
         if direction is not None:
