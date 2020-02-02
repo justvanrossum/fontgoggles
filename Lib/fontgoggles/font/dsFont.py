@@ -80,13 +80,22 @@ class DSFont(BaseFont):
                         continue
                     glyph = source.ufoGlyphSet[glyphName]
                     coll = PointCollector(source.ufoGlyphSet)
-                    glyph.draw(coll)
-                    masterPoints.append(coll.points + [(glyph.width, 0)])
-                    if source is self.doc.default:
-                        tags = coll.tags
-                        contours = coll.contours
+                    try:
+                        glyph.draw(coll)
+                    except Exception as e:
+                        print(f"Glyph '{glyphName}' could not be read: {e!r}", file=sys.stderr)
+                        masterPoints.append(None)
+                    else:
+                        masterPoints.append(coll.points + [(glyph.width, 0)])
+                        if source is self.doc.default:
+                            tags = coll.tags
+                            contours = coll.contours
 
-                varGlyph = VarGlyph(glyphName, self.masterModel, contours, masterPoints, tags)
+                if tags is None:
+                    print(f"Default master glyph '{glyphName}' could not be read", file=sys.stderr)
+                    varGlyph = NotDefGlyph(self.unitsPerEm)
+                else:
+                    varGlyph = VarGlyph(glyphName, self.masterModel, contours, masterPoints, tags)
             self._varGlyphs[glyphName] = varGlyph
         varGlyph.setVarLocation(self._normalizedLocation)
         return varGlyph
