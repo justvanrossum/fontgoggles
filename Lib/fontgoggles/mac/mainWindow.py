@@ -183,7 +183,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                                       minMagnification=0.4, maxMagnification=15,
                                                       forwardDragAndDrop=True)
 
-        self.compileOutput = TextEditor((0, 0, 0, 0), "Compile output", readOnly=True)
+        self.compileOutput = OutputText((0, 0, 0, 0))
 
         paneDescriptors = [
             dict(view=self._fontListScrollView, identifier="fontList", canCollapse=False,
@@ -866,6 +866,21 @@ class LabeledView(Group):
 
     def setItems(self, items):
         self.view.setItems(items)
+
+
+class OutputText(TextEditor):
+
+    def __init__(self, posSize):
+        super().__init__(posSize, readOnly=True)
+        self.textAttributes = {AppKit.NSFontAttributeName: AppKit.NSFont.fontWithName_size_("Menlo", 12)}
+        self._textView.setTypingAttributes_(self.textAttributes)
+
+    def write(self, text):
+        attrString = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, self.textAttributes)
+        st = self._textView.textStorage()
+        oldLength = st.length()
+        st.appendAttributedString_(attrString)
+        self._textView.scrollRangeToVisible_((oldLength, len(text) - 1))
 
 
 _minimalSpaceBox = 12
