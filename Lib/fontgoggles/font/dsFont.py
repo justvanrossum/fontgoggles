@@ -1,6 +1,7 @@
 import asyncio
 import io
 import os
+import pathlib
 import pickle
 import sys
 import tempfile
@@ -71,6 +72,13 @@ class DSFont(BaseFont):
             source.ufoGlyphSet = reader.getGlyphSet(layerName=source.layerName)
 
         self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
+
+    def getExternalFiles(self):
+        return [pathlib.Path(source.path) for source in self.doc.sources]
+
+    def reload(self, externalFilePath):
+        print("DS reload", externalFilePath)
+        return True
 
     def varLocationChanged(self, varLocation):
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})

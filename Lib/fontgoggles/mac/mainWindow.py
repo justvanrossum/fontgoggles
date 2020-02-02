@@ -301,6 +301,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def addExternalFileObservers(self, externalFiles, fontItemInfo):
+        obs = getFileObserver()
         for path in externalFiles:
             assert isinstance(path, os.PathLike), "Path object expected"
             if fontItemInfo not in self.observedPaths[path]:
