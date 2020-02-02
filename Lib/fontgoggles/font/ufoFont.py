@@ -53,7 +53,7 @@ class UFOFont(BaseFont):
                 glyph = self.glyphSet[glyphName]
                 self._addOutlinePathToGlyph(glyph)
             except Exception as e:
-                print(f"glyph '{glyphName}' could not be read: {e!r}", file=sys.stderr)
+                print(f"Glyph '{glyphName}' could not be read: {e!r}", file=sys.stderr)
                 glyph = self._getGlyph(".notdef")
             self._cachedGlyphs[glyphName] = glyph
         return glyph
