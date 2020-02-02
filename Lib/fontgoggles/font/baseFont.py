@@ -16,6 +16,14 @@ class BaseFont:
         """This gets called when the source file was moved."""
         pass
 
+    def reload(self, externalFilePath):
+        """ `externalFilePath` is None or an external file.
+        Subclasses may update their internal data structures and return False,
+        or return True to indicate a full reload is needed, in which case the
+        font object will be discarded and rebuilt from scratch.
+        """
+        return True
+
     @readOnlyCachedProperty
     def unitsPerEm(self):
         return self.ttFont["head"].unitsPerEm

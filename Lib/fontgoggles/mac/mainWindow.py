@@ -305,14 +305,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             logging.info("file changed event: %s -> %s wasModified=%s", oldPath, newPath, wasModified)
         didMove = False
         for fontItemInfo in self.observedPaths[oldPath]:
-            if oldPath != newPath and newPath is not None:
-                didMove = True
-                fontItemInfo.fontPath = newPath
-                fontItem = self.fontList.getFontItem(fontItemInfo.identifier)
-                fontItem.setFontKey(fontItemInfo.fontKey)
+            if oldPath == fontItemInfo.fontPath:
+                externalFile = None
+                if oldPath != newPath and newPath is not None:
+                    didMove = True
+                    fontItemInfo.fontPath = newPath
+                    fontItem = self.fontList.getFontItem(fontItemInfo.identifier)
+                    fontItem.setFontKey(fontItemInfo.fontKey)
+            else:
+                externalFile = oldPath
             if wasModified:
-                fontItemInfo.unload()
-                assert fontItemInfo.font is None
+                font = fontItemInfo.font
+                if font is not None:
+                    if font.reload(externalFile):
+                        fontItemInfo.unload()
+
         if didMove:
             self.updateFileObservers()
         if wasModified:
