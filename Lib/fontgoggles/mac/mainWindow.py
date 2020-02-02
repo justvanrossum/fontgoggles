@@ -73,6 +73,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.featureState = {}
         self.varLocation = {}
         self._callbackRecursionLock = 0
+        self._previouslySingleSelectedItem = None
 
         unicodeListGroup = self.setupUnicodeListGroup()
         glyphListGroup = self.setupGlyphListGroup()
@@ -352,7 +353,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
         try:
-            await fontItemInfo.load(sharableFontData=sharableFontData, outputWriter=self.compileOutput.write)
+            await fontItemInfo.load(sharableFontData=sharableFontData,
+                                    outputWriter=fontItem.writeOutput)
             await asyncio.sleep(0)
         finally:
             fontItem.setIsLoading(False)
@@ -546,11 +548,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def fontListSelectionChangedCallback(self, sender):
         fontItem = sender.getSingleSelectedItem()
+        if self._previouslySingleSelectedItem is not None:
+            self._previouslySingleSelectedItem.auxillaryWriter = None
         if fontItem is not None:
             glyphs = fontItem.glyphs
             self.updateUnicodeListSelection(fontItem)
+            self.compileOutput.set(fontItem.compileOutput.getvalue())
+            fontItem.auxillaryWriter = self.compileOutput.write
         else:
             glyphs = []
+            self.compileOutput.set("")
+        self._previouslySingleSelectedItem = fontItem
         self.updateGlyphList(glyphs, delay=0.05)
 
     @objc.python_method
@@ -879,19 +887,28 @@ class OutputText(TextEditor):
         self._textView.setRichText_(False)
         # self.write("Testing a longer line of text, a blank line\n\nand something short.\n" * 20)
 
-    def write(self, text):
+    def set(self, text):
+        self.write(text, clear=True)
+        self.scrollToEnd()
+
+    def write(self, text, clear=False):
         attrString = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, self.textAttributes)
         st = self._textView.textStorage()
+        if clear:
+            st.deleteCharactersInRange_((0, st.length()))
         st.appendAttributedString_(attrString)
 
         def deferredScroll():
-            # If we do this right away it seems to have no effect. If we defer
-            # to the next opportunity in the event loop it works fine.
             self._textView.scrollRangeToVisible_((st.length(), 0))
 
+        # If we call scrollToEnd right away it seems to have no effect.
+        # If we defer to the next opportunity in the event loop it works fine.
         loop = asyncio.get_running_loop()
-        loop.call_soon(deferredScroll)
+        loop.call_soon(self.scrollToEnd)
 
+    def scrollToEnd(self):
+        st = self._textView.textStorage()
+        self._textView.scrollRangeToVisible_((st.length(), 0))
 
 _minimalSpaceBox = 12
 

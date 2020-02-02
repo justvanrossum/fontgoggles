@@ -1,3 +1,4 @@
+import io
 import os
 import pathlib
 from types import SimpleNamespace
@@ -723,6 +724,8 @@ class FontItem(Group):
             self.fileNameLabel.rotate(90)
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
+        self.compileOutput = io.StringIO()
+        self.auxillaryWriter = None
 
     def setIsLoading(self, isLoading):
         if isLoading:
@@ -737,6 +740,11 @@ class FontItem(Group):
             fileNameLabel += f"#{fontNumber}"
         self.fileNameLabel.set(fileNameLabel, tooltip=str(fontPath))
         self.fontPath = fontPath
+
+    def writeOutput(self, text):
+        self.compileOutput.write(text)
+        if self.auxillaryWriter is not None:
+            self.auxillaryWriter(text)
 
     @property
     def glyphs(self):
