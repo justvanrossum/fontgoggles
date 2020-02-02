@@ -44,7 +44,7 @@ class DSFont(BaseFont):
                     if output:
                         outputWriter(output)
                     if exc is not None:
-                        outputWriter(f"{exc}")
+                        outputWriter(f"{exc!r}")
 
             vfFontData = await compileDSToBytes(self._fontPath, ttFolder, outputWriter)
             with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
