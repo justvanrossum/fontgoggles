@@ -876,14 +876,19 @@ class OutputText(TextEditor):
             AppKit.NSFontAttributeName: AppKit.NSFont.fontWithName_size_("Menlo", 12),
             AppKit.NSForegroundColorAttributeName: AppKit.NSColor.textColor(),
         }
-        self._textView.setTypingAttributes_(self.textAttributes)
+        self._textView.setRichText_(False)
+        # self.write("Testing a longer line of text, a blank line\n\nand something short.\n" * 20)
 
     def write(self, text):
         attrString = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, self.textAttributes)
         st = self._textView.textStorage()
-        oldLength = st.length()
         st.appendAttributedString_(attrString)
-        self._textView.scrollRangeToVisible_((oldLength, len(text) - 1))
+        def deferredScroll():
+            # If we do this right away it seems to have no effect. If we defer
+            # to the next opportunity in the event loop it works fine.
+            self._textView.scrollRangeToVisible_((st.length(), 0))
+        loop = asyncio.get_running_loop()
+        loop.call_soon(deferredScroll)
 
 
 _minimalSpaceBox = 12
