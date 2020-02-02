@@ -86,7 +86,7 @@ class DSFont(BaseFont):
                         tags = coll.tags
                         contours = coll.contours
 
-                varGlyph = VarGlyph(self.masterModel, contours, masterPoints, tags)
+                varGlyph = VarGlyph(glyphName, self.masterModel, contours, masterPoints, tags)
             self._varGlyphs[glyphName] = varGlyph
         varGlyph.setVarLocation(self._normalizedLocation)
         return varGlyph
@@ -136,13 +136,14 @@ NUMPY_IN_PLACE = True  # dubious improvement
 
 class VarGlyph:
 
-    def __init__(self, masterModel, contours, masterPoints, tags):
+    def __init__(self, glyphName, masterModel, contours, masterPoints, tags):
         self.model, masterPoints = masterModel.getSubModel(masterPoints)
         masterPoints = [numpy.array(pts, coordinateType) for pts in masterPoints]
         try:
             self.deltas = self.model.getDeltas(masterPoints)
         except ValueError:
             # outlines are not compatible, fall back to the default master
+            print(f"Glyph '{glyphName}' is not interpolatable", file=sys.stderr)
             self.deltas = [masterPoints[self.model.reverseMapping[0]]]
         self.contours = numpy.array(contours, numpy.short)
         self.tags = numpy.array(tags, numpy.byte)
