@@ -83,7 +83,8 @@ class DSFont(BaseFont):
                     try:
                         glyph.draw(coll)
                     except Exception as e:
-                        print(f"Glyph '{glyphName}' could not be read: {e!r}", file=sys.stderr)
+                        print(f"Glyph '{glyphName}' could not be read from '{os.path.basename(source.path)}': {e!r}",
+                              file=sys.stderr)
                         masterPoints.append(None)
                     else:
                         masterPoints.append(coll.points + [(glyph.width, 0)])
