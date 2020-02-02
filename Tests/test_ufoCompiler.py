@@ -50,5 +50,5 @@ async def test_compileUFOToPathMultiple(tmpdir):
     coros = (compileUFOToPath(u, t, output.append) for u, t in zip(ufoPaths, ttPaths))
     results = await asyncio.gather(*coros)
     assert len(results) == len(ufoPaths)
-    assert results == [False] * len(results)
+    assert results == [None] * len(results)
     assert [(os.stat(p).st_size > 0) for p in ttPaths] == [True] * len(results)
