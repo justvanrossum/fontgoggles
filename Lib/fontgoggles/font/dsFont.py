@@ -26,28 +26,25 @@ class DSFont(BaseFont):
         self._varGlyphs = {}
         self._normalizedLocation = {}
 
-    async def load(self):
+    async def load(self, outputWriter):
         self.doc = DesignSpaceDocument.fromfile(self._fontPath)
         self.doc.findDefault()
 
         with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
             ufosToCompile = sorted({s.path for s in self.doc.sources if s.layerName is None})
             ttPaths = [os.path.join(ttFolder, os.path.basename(u) + ".ttf") for u in ufosToCompile]
-            outputs = [[] for i in range(len(ufosToCompile))]
-            coros = (compileUFOToPath(ufoPath, ttPath, output.append)
+            outputs = [io.StringIO() for i in range(len(ufosToCompile))]
+            coros = (compileUFOToPath(ufoPath, ttPath, output.write)
                      for ufoPath, ttPath, output in zip(ufosToCompile, ttPaths, outputs))
             results = await asyncio.gather(*coros)
-            outputs = ["".join(output) for output in outputs]
             for ufoPath, error, output in zip(ufosToCompile, results, outputs):
+                output = output.getvalue()
                 if output:
-                    print(f"compile output for {ufoPath}:", file=sys.stderr)
-                    print(output, file=sys.stderr)
+                    outputWriter(f"compile output for {ufoPath}:")
+                    outputWriter(output)
 
-            dsOutput = []
-            vfFontData, error = await compileDSToBytes(self._fontPath, ttFolder, dsOutput.append)
-            dsOutput = "".join(dsOutput)
-            if dsOutput or error:
-                print(dsOutput, file=sys.stderr)
+            vfFontData, error = await compileDSToBytes(self._fontPath, ttFolder, outputWriter)
+            # TODO: deal with error
             with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
                 # masterModel is created by varLib.build(), and we communicate it
                 # to here via a tempfile pickle

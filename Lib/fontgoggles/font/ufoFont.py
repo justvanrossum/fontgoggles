@@ -27,7 +27,7 @@ class UFOFont(BaseFont):
         self.glyphSet = self.reader.getGlyphSet()
         self.glyphSet.glyphClass = Glyph
 
-    async def load(self):
+    async def load(self, outputWriter):
         glyphOrder = sorted(self.glyphSet.keys())  # no need for the "real" glyph order
         if ".notdef" not in glyphOrder:
             # We need a .notdef glyph, so let's make one.
@@ -36,15 +36,10 @@ class UFOFont(BaseFont):
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
 
-        output = []
-        fontData, error = await compileUFOToBytes(self._fontPath, output.append)
-        output = "".join(output)
+        fontData, error = await compileUFOToBytes(self._fontPath, outputWriter)
 
-        if output or error:
-            # TODO: where/how to report to the user?
-            print("----- ", self._fontPath, file=sys.stderr)
-            print(output, file=sys.stderr)
         if fontData is None:
+            # TODO: deal with error
             # TODO: this cannot work down the line, how to handle?
             self.ttFont = None
             self.shaper = None

@@ -3,6 +3,7 @@ import json
 from os import PathLike
 import os
 import pathlib
+import sys
 from .font import getOpener
 
 
@@ -53,10 +54,12 @@ class Project:
         fontItemIdentifier = self._nextFontItemIdentifier()
         return FontItemInfo(fontItemIdentifier, fontKey, self._fontLoader)
 
-    async def loadFonts(self):
+    async def loadFonts(self, outputWriter=None):
         """Load fonts as concurrently as possible."""
+        if outputWriter is None:
+            outputWriter = sys.stderr.write
         sharableFontData = {}
-        await asyncio.gather(*(fontItemInfo.load(sharableFontData)
+        await asyncio.gather(*(fontItemInfo.load(sharableFontData, outputWriter)
                                for fontItemInfo in self.fonts if fontItemInfo.font is None))
 
     def _nextFontItemIdentifier(self):
@@ -102,8 +105,12 @@ class FontItemInfo:
     def font(self):
         return self._fontLoader.fonts.get(self.fontKey)
 
-    async def load(self, sharableFontData=None):
-        await self._fontLoader.loadFont(self.fontKey, sharableFontData)
+    async def load(self, sharableFontData=None, outputWriter=None):
+        if sharableFontData is None:
+            sharableFontData = {}
+        if outputWriter is None:
+            outputWriter = sys.stderr.write
+        await self._fontLoader.loadFont(self.fontKey, sharableFontData, outputWriter)
 
     def unload(self):
         self._fontLoader.unloadFont(self.fontKey)
@@ -114,16 +121,14 @@ class FontLoader:
     def __init__(self):
         self.fonts = {}
 
-    async def loadFont(self, fontKey, sharableFontData=None):
+    async def loadFont(self, fontKey, sharableFontData, outputWriter):
         if fontKey in self.fonts:
             return
-        if sharableFontData is None:
-            sharableFontData = {}
         path, fontNumber = fontKey
         fontData = sharableFontData.get(path)
         numFonts, opener, getSortInfo = getOpener(path)
         assert fontNumber < numFonts(path)
-        font, fontData = await opener(path, fontNumber, fontData)
+        font, fontData = await opener(path, fontNumber, fontData, outputWriter)
         if fontData is not None:
             sharableFontData[path] = fontData
         self.fonts[fontKey] = font

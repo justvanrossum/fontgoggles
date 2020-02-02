@@ -50,7 +50,7 @@ def iterFontNumbers(path):
         yield path, i, getSortInfo
 
 
-async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
+async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None, outputWriter=None):
     from .otfFont import OTFFont
     if fontData is not None:
         font = OTFFont(fontData, fontNumber)
@@ -60,26 +60,26 @@ async def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
     return (font, fontData)
 
 
-async def openTTX(fontPath: PathLike, fontNumber: int, fontData=None):
+async def openTTX(fontPath: PathLike, fontNumber: int, fontData=None, outputWriter=None):
     from .otfFont import TTXFont
     font = TTXFont(fontPath, 0)
-    await font.load()
+    await font.load(outputWriter=outputWriter)
     return (font, None)
 
 
-async def openUFO(fontPath: PathLike, fontNumber: int, fontData=None):
+async def openUFO(fontPath: PathLike, fontNumber: int, fontData=None, outputWriter=None):
     from .ufoFont import UFOFont
     assert fontData is None  # dummy
     font = UFOFont(fontPath)
-    await font.load()
+    await font.load(outputWriter=outputWriter)
     return (font, None)
 
 
-async def openDS(fontPath: PathLike, fontNumber: int, fontData=None):
+async def openDS(fontPath: PathLike, fontNumber: int, fontData=None, outputWriter=None):
     from .dsFont import DSFont
     assert fontData is None  # dummy
     font = DSFont(fontPath)
-    await font.load()
+    await font.load(outputWriter)
     return (font, None)
 
 

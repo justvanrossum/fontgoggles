@@ -352,7 +352,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
         try:
-            await fontItemInfo.load(sharableFontData=sharableFontData)
+            await fontItemInfo.load(sharableFontData=sharableFontData, outputWriter=self.compileOutput.write)
             await asyncio.sleep(0)
         finally:
             fontItem.setIsLoading(False)
