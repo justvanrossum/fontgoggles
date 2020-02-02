@@ -7,7 +7,7 @@ import unicodedata
 import time
 import AppKit
 import objc
-from vanilla import CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs, TextBox, Window
+from vanilla import CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs, TextBox, TextEditor, Window
 from fontTools.misc.arrayTools import offsetRect
 from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.mac.aligningScrollView import AligningScrollView
@@ -179,11 +179,24 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
-        self._fontListScrollView = AligningScrollView((0, 40, 0, 0), self.fontList, drawBackground=True,
+        self._fontListScrollView = AligningScrollView((0, 0, 0, 0), self.fontList, drawBackground=True,
                                                       minMagnification=0.4, maxMagnification=15,
                                                       forwardDragAndDrop=True)
-        group.fontList = self._fontListScrollView
+
+        self.compileOutput = TextEditor((0, 0, 0, 0), "Compile output", readOnly=True)
+
+        paneDescriptors = [
+            dict(view=self._fontListScrollView, identifier="fontList", canCollapse=False,
+                 size=230, minSize=120, resizeFlexibility=True),
+            dict(view=self.compileOutput, identifier="compileOutput", canCollapse=True,
+                 size=120, minSize=80, resizeFlexibility=False),
+        ]
+        self.fontListSplitView = SplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
+                                      isVertical=False)
+        self.fontListSplitView.togglePane("compileOutput")
+
         group.textEntry = self._textEntry
+        group.fontListSplitView = self.fontListSplitView
         self.fontList._nsObject.subscribeToMagnification_(self._fontListScrollView._nsObject)
         return group
 
@@ -791,6 +804,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def showGlyphList_(self, sender):
         self.subSplitView.togglePane("glyphList")
 
+    def showCompileOutput_(self, sender):
+        self.fontListSplitView.togglePane("compileOutput")
+
     def showFormattingOptions_(self, sender):
         self.w.mainSplitView.togglePane("formattingOptions")
 
@@ -804,6 +820,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isVisible = not self.w.mainSplitView.isPaneVisible("characterList")
         elif action == "showGlyphList:":
             isVisible = not self.subSplitView.isPaneVisible("glyphList")
+        elif action == "showCompileOutput:":
+            isVisible = not self.fontListSplitView.isPaneVisible("compileOutput")
         elif action == "showFormattingOptions:":
             isVisible = not self.w.mainSplitView.isPaneVisible("formattingOptions")
         if isVisible is not None:
