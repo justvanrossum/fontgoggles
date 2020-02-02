@@ -725,7 +725,7 @@ class FontItem(Group):
         self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
         self.setFontKey(fontKey)
         self.compileOutput = io.StringIO()
-        self._auxillaryOutput = [None]
+        self._auxillaryOutput = [None]  # Avoid vanilla setattr magic
 
     def setIsLoading(self, isLoading):
         if isLoading:
