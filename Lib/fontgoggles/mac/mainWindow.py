@@ -3,6 +3,7 @@ from collections import defaultdict
 import contextlib
 import io
 import logging
+import os
 import pathlib
 import time
 import traceback
@@ -382,7 +383,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                         outputWriter=fontItem.writeCompileOutput)
                 externalFiles = fontItemInfo.font.getExternalFiles()
                 if externalFiles:
-                    self.addExternalFileObservers(externalFiles)
+                    self.addExternalFileObservers(externalFiles, fontItemInfo)
                 await asyncio.sleep(0)
             finally:
                 fontItem.setIsLoading(False)
