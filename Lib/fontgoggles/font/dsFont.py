@@ -241,6 +241,8 @@ class PointCollector(BasePen):
 
 
 def normalizeLocation(doc, location):
+    # Adapted from DesignSpaceDocument.normalizeLocation(), which takes axis
+    # names, yet we need to work with tags here.
     new = {}
     for axis in doc.axes:
         if axis.tag not in location:
