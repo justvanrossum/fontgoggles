@@ -286,6 +286,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         newObservedPaths = defaultdict(list)
         for fontItemInfo in self.project.fonts:
             newObservedPaths[fontItemInfo.fontKey[0]].append(fontItemInfo)
+            if fontItemInfo.font is not None:
+                for path in fontItemInfo.font.getExternalFiles():
+                    assert isinstance(path, os.PathLike)
+                    newObservedPaths[path].append(fontItemInfo)
         newPaths = set(newObservedPaths)
         oldPaths = set(self.observedPaths)
         for path in newPaths - oldPaths:
@@ -293,6 +297,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         for path in oldPaths - newPaths:
             obs.removeObserver(path, self._fileChanged)
         self.observedPaths = newObservedPaths
+
+    @objc.python_method
+    def addExternalFileObservers(self, externalFiles, fontItemInfo):
+        for path in externalFiles:
+            assert isinstance(path, os.PathLike), "Path object expected"
+            if fontItemInfo not in self.observedPaths[path]:
+                self.observedPaths[path].append(fontItemInfo)
+                obs.addObserver(path, self._fileChanged)
 
     @suppressAndLogException
     def _fileChanged(self, oldPath, newPath, wasModified):
@@ -368,6 +380,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 fontItem.clearCompileOutput()
                 await fontItemInfo.load(sharableFontData=sharableFontData,
                                         outputWriter=fontItem.writeCompileOutput)
+                externalFiles = fontItemInfo.font.getExternalFiles()
+                if externalFiles:
+                    self.addExternalFileObservers(externalFiles)
                 await asyncio.sleep(0)
             finally:
                 fontItem.setIsLoading(False)

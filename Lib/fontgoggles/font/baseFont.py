@@ -16,6 +16,13 @@ class BaseFont:
         """This gets called when the source file was moved."""
         pass
 
+
+    def getExternalFiles(self):
+        """Subclasses may override this to return a list of external files,
+        that clients can observe for changes.
+        """
+        return None
+
     def reload(self, externalFilePath):
         """ `externalFilePath` is None or an external file.
         Subclasses may update their internal data structures and return False,
