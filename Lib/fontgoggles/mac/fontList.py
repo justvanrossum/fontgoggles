@@ -726,12 +726,17 @@ class FontItem(Group):
         self.setFontKey(fontKey)
         self.compileOutput = io.StringIO()
         self._auxillaryOutput = [None]  # Avoid vanilla setattr magic
+        self._isLoadingCounter = 0
 
     def setIsLoading(self, isLoading):
         if isLoading:
-            self.progressSpinner.start()
+            if not self._isLoadingCounter:
+                self.progressSpinner.start()
+            self._isLoadingCounter += 1
         else:
-            self.progressSpinner.stop()
+            self._isLoadingCounter -= 1
+            if not self._isLoadingCounter:
+                self.progressSpinner.stop()
 
     def setFontKey(self, fontKey):
         fontPath, fontNumber = fontKey
