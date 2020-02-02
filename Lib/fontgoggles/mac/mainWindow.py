@@ -192,7 +192,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  size=80, minSize=30, resizeFlexibility=False),
         ]
         self.fontListSplitView = SplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
-                                      isVertical=False)
+                                           isVertical=False)
         self.fontListSplitView.togglePane("compileOutput")
 
         group.textEntry = self._textEntry
