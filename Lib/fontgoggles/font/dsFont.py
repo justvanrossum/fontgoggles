@@ -13,9 +13,13 @@ from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph
-from ..misc.compilerPool import compileUFOToPath, compileDSToBytes
+from ..misc.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
 from ..misc.hbShape import HBShape
 from ..mac.makePathFromOutline import makePathFromArrays
+
+
+class DesignSpaceSourceError(CompilerError):
+    pass
 
 
 class DSFont(BaseFont):
@@ -40,11 +44,17 @@ class DSFont(BaseFont):
             for ufoPath, exc, output in zip(ufosToCompile, errors, outputs):
                 output = output.getvalue()
                 if output or exc is not None:
-                    outputWriter(f"compile output for {ufoPath}:")
+                    outputWriter(f"compile output for {ufoPath}:\n")
                     if output:
                         outputWriter(output)
                     if exc is not None:
-                        outputWriter(f"{exc!r}")
+                        outputWriter(f"{exc!r}\n")
+
+            if any(errors):
+                raise DesignSpaceSourceError(
+                    f"Could not build '{os.path.basename(self._fontPath)}': "
+                    "some sources did not successfully compile"
+                )
 
             vfFontData = await compileDSToBytes(self._fontPath, ttFolder, outputWriter)
             with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
