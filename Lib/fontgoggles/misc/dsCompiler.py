@@ -13,7 +13,8 @@ def compileMinimumFont(dsPath, ttFolder):
     for source in doc.sources:
         if source.layerName is None:
             ttPath = os.path.join(ttFolder, os.path.basename(source.path) + ".ttf")
-            assert os.path.exists(ttPath)
+            if not os.path.exists(ttPath):
+                raise FileNotFoundError(ttPath)
             source.font = TTFont(ttPath, lazy=False)  # TODO: https://github.com/fonttools/fonttools/issues/1808
 
     assert doc.default.font is not None
