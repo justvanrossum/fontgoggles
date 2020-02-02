@@ -3,13 +3,15 @@ from collections import defaultdict
 import contextlib
 import logging
 import pathlib
-import unicodedata
 import time
+import traceback
+import unicodedata
 import AppKit
 import objc
 from vanilla import CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs, TextBox, TextEditor, Window
 from fontTools.misc.arrayTools import offsetRect
 from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
+from fontgoggles.font.baseFont import GlyphsRun
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import rectFromNSRect
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
@@ -17,6 +19,7 @@ from fontgoggles.mac.fileObserver import getFileObserver
 from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize, makeUndoProxy
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup, SliderPlus
+from fontgoggles.misc.compilerPool import CompilerError
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.textInfo import TextInfo
 from fontgoggles.misc import opentypeTags
@@ -353,14 +356,24 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
         fontItem.setIsLoading(True)
         try:
-            fontItem.clearCompileOutput()
-            await fontItemInfo.load(sharableFontData=sharableFontData,
-                                    outputWriter=fontItem.writeCompileOutput)
-            await asyncio.sleep(0)
-        finally:
-            fontItem.setIsLoading(False)
-        self.setFontItemText(fontItemInfo, fontItem)
-        self.growFontListFromItem(fontItem)
+            try:
+                fontItem.clearCompileOutput()
+                await fontItemInfo.load(sharableFontData=sharableFontData,
+                                        outputWriter=fontItem.writeCompileOutput)
+                await asyncio.sleep(0)
+            finally:
+                fontItem.setIsLoading(False)
+        except CompilerError as e:
+            fontItem.glyphs = GlyphsRun(0, 1000, False)
+            fontItem.writeCompileOutput(f"{e!r}\n")
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            fontItem.glyphs = GlyphsRun(0, 1000, False)
+            fontItem.writeCompileOutput(traceback.format_exc())
+        else:
+            self.setFontItemText(fontItemInfo, fontItem)
+            self.growFontListFromItem(fontItem)
 
     @staticmethod
     def _gatherSidebarInfo(fonts):
@@ -370,6 +383,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         allScriptsAndLanguages = []
         for fontItemInfo in fonts:
             font = fontItemInfo.font
+            if font is None:
+                continue
             allFeatureTagsGSUB.update(font.featuresGSUB)
             allFeatureTagsGPOS.update(font.featuresGPOS)
             allAxes.append(font.axes)

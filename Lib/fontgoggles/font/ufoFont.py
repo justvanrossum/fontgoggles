@@ -36,21 +36,15 @@ class UFOFont(BaseFont):
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
 
-        fontData, error = await compileUFOToBytes(self._fontPath, outputWriter)
+        fontData = await compileUFOToBytes(self._fontPath, outputWriter)
 
-        if fontData is None:
-            # TODO: deal with error
-            # TODO: this cannot work down the line, how to handle?
-            self.ttFont = None
-            self.shaper = None
-        else:
-            f = io.BytesIO(fontData)
-            self.ttFont = TTFont(f, lazy=True)
-            self.shaper = HBShape(fontData,
-                                  getHorizontalAdvance=self._getHorizontalAdvance,
-                                  getVerticalAdvance=self._getVerticalAdvance,
-                                  getVerticalOrigin=self._getVerticalOrigin,
-                                  ttFont=self.ttFont)
+        f = io.BytesIO(fontData)
+        self.ttFont = TTFont(f, lazy=True)
+        self.shaper = HBShape(fontData,
+                              getHorizontalAdvance=self._getHorizontalAdvance,
+                              getVerticalAdvance=self._getVerticalAdvance,
+                              getVerticalOrigin=self._getVerticalOrigin,
+                              ttFont=self.ttFont)
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)

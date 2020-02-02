@@ -19,12 +19,12 @@ async def compileUFOToPath(ufoPath, ttPath, outputWriter):
 
 async def compileUFOToBytes(ufoPath, outputWriter):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
-        error = await compileUFOToPath(ufoPath, tmp.name, outputWriter)
+        await compileUFOToPath(ufoPath, tmp.name, outputWriter)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:
                 fontData = None
-    return fontData, error
+    return fontData
 
 
 async def compileDSToPath(dsPath, ttFolder, ttPath, outputWriter):
@@ -40,12 +40,12 @@ async def compileDSToPath(dsPath, ttFolder, ttPath, outputWriter):
 
 async def compileDSToBytes(dsPath, ttFolder, outputWriter):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
-        error = await compileDSToPath(dsPath, ttFolder, tmp.name, outputWriter)
+        await compileDSToPath(dsPath, ttFolder, tmp.name, outputWriter)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:
                 fontData = None
-    return fontData, error
+    return fontData
 
 
 async def compileTTXToPath(ttxPath, ttPath, outputWriter):
@@ -60,12 +60,12 @@ async def compileTTXToPath(ttxPath, ttPath, outputWriter):
 
 async def compileTTXToBytes(ttxPath, outputWriter):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
-        error = await compileTTXToPath(ttxPath, tmp.name, outputWriter)
+        await compileTTXToPath(ttxPath, tmp.name, outputWriter)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:
                 fontData = None
-    return fontData, error
+    return fontData
 
 
 def getCompilerPool():
@@ -75,6 +75,10 @@ def getCompilerPool():
         pool = CompilerPool()
         loop.__FG_compiler_pool = pool
     return pool
+
+
+class CompilerError(Exception):
+    pass
 
 
 class CompilerPool:
@@ -102,7 +106,8 @@ class CompilerPool:
             error = await worker.callFunction(func, args, outputWriter)
         finally:
             await self.availableWorkers.put(worker)
-        return error
+        if error:
+            raise CompilerError(func)
 
 
 class CompilerWorker:

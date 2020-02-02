@@ -35,7 +35,6 @@ def workServer():
             finally:
                 signal.signal(signal.SIGINT, ignoreSignal)
         except KeyboardInterrupt:
-            print("Cancelled.")
             print(ERROR_MARKER)
         except:
             traceback.print_exc()

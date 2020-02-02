@@ -36,15 +36,17 @@ class DSFont(BaseFont):
             outputs = [io.StringIO() for i in range(len(ufosToCompile))]
             coros = (compileUFOToPath(ufoPath, ttPath, output.write)
                      for ufoPath, ttPath, output in zip(ufosToCompile, ttPaths, outputs))
-            results = await asyncio.gather(*coros)
-            for ufoPath, error, output in zip(ufosToCompile, results, outputs):
+            errors = await asyncio.gather(*coros, return_exceptions=True)
+            for ufoPath, exc, output in zip(ufosToCompile, errors, outputs):
                 output = output.getvalue()
-                if output:
+                if output or exc is not None:
                     outputWriter(f"compile output for {ufoPath}:")
-                    outputWriter(output)
+                    if output:
+                        outputWriter(output)
+                    if exc is not None:
+                        outputWriter(f"{exc}")
 
-            vfFontData, error = await compileDSToBytes(self._fontPath, ttFolder, outputWriter)
-            # TODO: deal with error
+            vfFontData = await compileDSToBytes(self._fontPath, ttFolder, outputWriter)
             with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
                 # masterModel is created by varLib.build(), and we communicate it
                 # to here via a tempfile pickle
