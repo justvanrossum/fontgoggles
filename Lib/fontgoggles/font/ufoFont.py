@@ -1,7 +1,7 @@
 import io
 import sys
 from types import SimpleNamespace
-from fontTools.pens.cocoaPen import CocoaPen
+from fontTools.pens.cocoaPen import CocoaPen  # TODO: factor out mac-specific code
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph
@@ -49,8 +49,12 @@ class UFOFont(BaseFont):
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
         if glyph is None:
-            glyph = self.glyphSet[glyphName]
-            self._addOutlinePathToGlyph(glyph)
+            try:
+                glyph = self.glyphSet[glyphName]
+                self._addOutlinePathToGlyph(glyph)
+            except Exception as e:
+                print(f"glyph '{glyphName}' could not be read: {e!r}", file=sys.stderr)
+                glyph = self._getGlyph(".notdef")
             self._cachedGlyphs[glyphName] = glyph
         return glyph
 
@@ -112,7 +116,7 @@ class NotDefGlyph:
         inset = 0.05 * self.unitsPerEm
         sideBearing = 0.05 * self.unitsPerEm
         height = 0.75 * self.unitsPerEm
-        xMin, yMin, xMax, yMax = sideBearing, sideBearing, self.width - sideBearing, height
+        xMin, yMin, xMax, yMax = sideBearing, 0, self.width - sideBearing, height
         pen.moveTo((xMin, yMin))
         pen.lineTo((xMin, yMax))
         pen.lineTo((xMax, yMax))
