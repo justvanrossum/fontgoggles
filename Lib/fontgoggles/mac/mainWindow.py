@@ -872,7 +872,10 @@ class OutputText(TextEditor):
 
     def __init__(self, posSize):
         super().__init__(posSize, readOnly=True)
-        self.textAttributes = {AppKit.NSFontAttributeName: AppKit.NSFont.fontWithName_size_("Menlo", 12)}
+        self.textAttributes = {
+            AppKit.NSFontAttributeName: AppKit.NSFont.fontWithName_size_("Menlo", 12),
+            AppKit.NSForegroundColorAttributeName: AppKit.NSColor.textColor(),
+        }
         self._textView.setTypingAttributes_(self.textAttributes)
 
     def write(self, text):
