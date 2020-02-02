@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 import contextlib
+import io
 import logging
 import pathlib
 import time
@@ -474,8 +475,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         font = fontItemInfo.font
         if font is None:
             return
-        glyphs = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
-                                              varLocation=self.varLocation)
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr):
+            glyphs = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
+                                                  varLocation=self.varLocation)
+        stderr = stderr.getvalue()
+        if stderr:
+            fontItem.writeCompileOutput(stderr)
+
         addBoundingBoxes(glyphs)
         fontItem.glyphs = glyphs
         charSelection = self.unicodeList.getSelection()
