@@ -6,8 +6,18 @@ from . import mergeScriptsAndLanguages
 class BaseFont:
 
     def __init__(self):
+        self.resetCache()
+
+    def resetCache(self):
         self._outlinePaths = [{}, {}]  # cache for (outline, colorLayers) objects
         self._currentVarLocation = None  # used to determine whether to purge the outline cache
+        # Invalidate cached properties
+        del self.unitsPerEm
+        del self.colorPalettes
+        del self.featuresGSUB
+        del self.featuresGPOS
+        del self.scripts
+        del self.axes
 
     def close(self):
         pass

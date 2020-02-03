@@ -111,7 +111,9 @@ class FontItemInfo:
             sharableFontData = {}
         if outputWriter is None:
             outputWriter = sys.stderr.write
-        await self._fontLoader.loadFont(self.fontKey, sharableFontData, outputWriter)
+        if self.font is None or self.wantsReload:
+            self.wantsReload = False
+            await self._fontLoader.loadFont(self.fontKey, sharableFontData, outputWriter)
 
     def unload(self):
         self._fontLoader.unloadFont(self.fontKey)
@@ -125,9 +127,7 @@ class FontLoader:
     async def loadFont(self, fontKey, sharableFontData, outputWriter):
         font = self.fonts.get(fontKey)
         if font is not None:
-            if font.wantsReload:
-                font.wantsReload = False
-                await font.load(outputWriter)
+            await font.load(outputWriter)
         else:
             path, fontNumber = fontKey
             fontData = sharableFontData.get(path)

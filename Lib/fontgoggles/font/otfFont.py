@@ -56,6 +56,10 @@ class TTXFont(_OTFBaseFont):
         self._fontPath = fontPath
         self._fontNumber = fontNumber
 
+    def canReloadWithChange(self, externalFilePath):
+        self.resetCache()
+        return True
+
     async def load(self, outputWriter):
         fontData = await compileTTXToBytes(self._fontPath, outputWriter)
         f = io.BytesIO(fontData)

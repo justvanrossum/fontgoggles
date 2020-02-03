@@ -46,7 +46,9 @@ class readOnlyCachedProperty:
         raise AttributeError(f"{self.name} is read-only")
 
     def __delete__(self, obj):
-        raise AttributeError(f"{self.name} is read-only")
+        # Mark cache as stale
+        if self.name in obj.__dict__:
+            del obj.__dict__[self.name]
 
 
 class cachedProperty(readOnlyCachedProperty):
@@ -77,10 +79,6 @@ class cachedProperty(readOnlyCachedProperty):
 
     def __set__(self, obj, value):
         obj.__dict__[self.name] = value
-
-    def __delete__(self, obj):
-        if self.name in obj.__dict__:
-            del obj.__dict__[self.name]
 
 
 class hookedProperty:
