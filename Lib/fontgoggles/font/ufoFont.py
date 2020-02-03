@@ -18,10 +18,30 @@ from ..misc.properties import cachedProperty
 
 class UFOFont(BaseFont):
 
-    async def load(self, outputWriter):
+    def _setupReaderAndGlyphSet(self):
         self.reader = UFOReader(self.fontPath, validate=False)
         self.glyphSet = self.reader.getGlyphSet()
         self.glyphSet.glyphClass = Glyph
+
+    def updateFontPath(self, newFontPath):
+        """This gets called when the source file was moved."""
+        super().updateFontPath(newFontPath)
+        self._setupReaderAndGlyphSet()
+
+    # def canReloadWithChange(self, externalFilePath):
+    #     # Task: find out which files changed, and decide whether to
+    #     # rebuild completely or that we only need to flush the glyph
+    #     # caches. Tricky: is achors have changed the features need to
+    #     # be rebuilt. If unicodes changed we need to update
+    #     # self.ttFont['cmap'].
+    #     self.resetCache()
+    #     return True
+
+    async def load(self, outputWriter):
+        if hasattr(self, "reader"):
+            self._cachedGlyphs = {}
+            return
+        self._setupReaderAndGlyphSet()
         self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
         self._cachedGlyphs = {}
