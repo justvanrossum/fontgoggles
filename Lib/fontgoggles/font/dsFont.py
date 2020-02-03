@@ -13,7 +13,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
-from .ufoFont import NotDefGlyph
+from .ufoFont import NotDefGlyph, extractIncludedFeatureFiles
 from ..misc.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
 from ..misc.hbShape import HBShape
 from ..mac.makePathFromOutline import makePathFromArrays
@@ -67,14 +67,20 @@ class DSFont(BaseFont):
         f = io.BytesIO(vfFontData)
         self.ttFont = TTFont(f, lazy=True)
 
+        includedFeatureFiles = set()
+
         for source in self.doc.sources:
             reader = UFOReader(source.path, validate=False)
+            includedFeatureFiles.update(extractIncludedFeatureFiles(source.path, reader))
             source.ufoGlyphSet = reader.getGlyphSet(layerName=source.layerName)
+
+        self._includedFeatureFiles = sorted(includedFeatureFiles)
 
         self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
 
     def getExternalFiles(self):
-        return [pathlib.Path(source.path) for source in self.doc.sources]
+        sourcePaths = [pathlib.Path(source.path) for source in self.doc.sources]
+        return sourcePaths + self._includedFeatureFiles
 
     def reload(self, externalFilePath):
         print("DS reload", externalFilePath)
