@@ -1,6 +1,10 @@
 import io
+import re
 import sys
 from types import SimpleNamespace
+from fontTools.feaLib.parser import Parser as FeatureParser
+from fontTools.feaLib.ast import IncludeStatement
+from fontTools.feaLib.error import FeatureLibError
 from fontTools.pens.cocoaPen import CocoaPen  # TODO: factor out mac-specific code
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
@@ -23,7 +27,7 @@ class UFOFont(BaseFont):
 
     def updateFontPath(self, newFontPath):
         """This also gets called when the source file was moved."""
-        self.reader = UFOReader(newFontPath)
+        self.reader = UFOReader(newFontPath, validate=False)
         self.glyphSet = self.reader.getGlyphSet()
         self.glyphSet.glyphClass = Glyph
 
@@ -146,3 +150,57 @@ class NotDefGlyph:
 class Glyph(GLIFGlyph):
     width = 0
     height = None
+
+
+def extractIncludedFeatureFiles(ufoPath, reader=None):
+    if reader is None:
+        reader = UFOReader(ufoPath, validate=False)
+    mainFeatures = reader.readFeatures()
+    if not mainFeatures:
+        return ()
+    return sorted(set(_extractIncludedFeatureFiles(mainFeatures, [ufoPath.parent])))
+
+
+def _extractIncludedFeatureFiles(featureSource, searchPaths, recursionLevel=0):
+    if recursionLevel > 50:
+        raise FeatureLibError("Too many recursive includes", None)
+    for fileName in _parseFeaSource(featureSource):
+        for d in searchPaths:
+            p = d / fileName
+            if p.exists():
+                p = p.resolve()
+                yield p
+                yield from _extractIncludedFeatureFiles(p.read_text(), [searchPaths[0], p.parent],
+                                                        recursionLevel+1)
+                break
+
+
+_feaIncludePat = re.compile(r"include\s*\(([^)]+)\)")
+
+
+def _parseFeaSource(featureSource):
+    pos = 0
+    while True:
+        m = _feaIncludePat.search(featureSource, pos)
+        if m is None:
+            break
+        pos = m.end()
+
+        lineStart = featureSource.rfind("\n", 0, m.start())
+        lineEnd = featureSource.find("\n", m.end())
+        if lineStart == -1:
+            lineStart = 0
+        if lineEnd == -1:
+            lineEnd = len(source)
+        line = featureSource[lineStart:lineEnd]
+        f = io.StringIO(line)
+        p = FeatureParser(f, followIncludes=False)
+        for st in p.parse().statements:
+            if isinstance(st, IncludeStatement):
+                yield st.filename
+
+
+if __name__ == "__main__":
+    import pathlib
+    for feaPath in extractIncludedFeatureFiles(pathlib.Path(sys.argv[1])):
+        print(feaPath)
