@@ -1,4 +1,4 @@
-from ..misc.properties import readOnlyCachedProperty
+from ..misc.properties import cachedProperty
 from ..misc.hbShape import characterGlyphMapping
 from . import mergeScriptsAndLanguages
 
@@ -46,29 +46,29 @@ class BaseFont:
         """
         return False
 
-    @readOnlyCachedProperty
+    @cachedProperty
     def unitsPerEm(self):
         return self.ttFont["head"].unitsPerEm
 
-    @readOnlyCachedProperty
+    @cachedProperty
     def colorPalettes(self):
         return [[(0, 0, 0, 1)]]  # default palette [[(r, g, b, a)]]
 
-    @readOnlyCachedProperty
+    @cachedProperty
     def featuresGSUB(self):
         return set(self.shaper.getFeatures("GSUB"))
 
-    @readOnlyCachedProperty
+    @cachedProperty
     def featuresGPOS(self):
         return set(self.shaper.getFeatures("GPOS"))
 
-    @readOnlyCachedProperty
+    @cachedProperty
     def scripts(self):
         gsub = self.shaper.getScriptsAndLanguages("GSUB")
         gpos = self.shaper.getScriptsAndLanguages("GPOS")
         return mergeScriptsAndLanguages(gsub, gpos)
 
-    @readOnlyCachedProperty
+    @cachedProperty
     def axes(self):
         fvar = self.ttFont.get("fvar")
         if fvar is None:

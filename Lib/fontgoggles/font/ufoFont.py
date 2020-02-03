@@ -13,7 +13,7 @@ from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph
 from .baseFont import BaseFont
 from ..misc.compilerPool import compileUFOToBytes
 from ..misc.hbShape import HBShape
-from ..misc.properties import readOnlyCachedProperty
+from ..misc.properties import cachedProperty
 
 
 class UFOFont(BaseFont):
@@ -78,7 +78,7 @@ class UFOFont(BaseFont):
         glyph = self._getGlyph(glyphName)
         return glyph.width
 
-    @readOnlyCachedProperty
+    @cachedProperty
     def defaultVerticalAdvance(self):
         ascender = getattr(self.info, "ascender", None)
         descender = getattr(self.info, "descender", None)
@@ -87,7 +87,7 @@ class UFOFont(BaseFont):
         else:
             return ascender + abs(descender)
 
-    @readOnlyCachedProperty
+    @cachedProperty
     def defaultVerticalOriginY(self):
         ascender = getattr(self.info, "ascender", None)
         if ascender is None:

@@ -4,11 +4,11 @@ import weakref
 _NotFoundToken = object()
 
 
-class readOnlyCachedProperty:
+class cachedProperty:
 
     """
         >>> class Foo:
-        ...     @readOnlyCachedProperty
+        ...     @cachedProperty
         ...     def calcOnce(self):
         ...         print("calculating")
         ...         return 123
@@ -19,14 +19,14 @@ class readOnlyCachedProperty:
         123
         >>> f.calcOnce
         123
-        >>> del f.calcOnce
-        Traceback (most recent call last):
-            ...
-        AttributeError: calcOnce is read-only
         >>> f.calcOnce = 134
         Traceback (most recent call last):
             ...
         AttributeError: calcOnce is read-only
+        >>> del f.calcOnce
+        >>> f.calcOnce
+        calculating
+        123
     """
 
     def __init__(self, func):
@@ -49,36 +49,6 @@ class readOnlyCachedProperty:
         # Mark cache as stale
         if self.name in obj.__dict__:
             del obj.__dict__[self.name]
-
-
-class cachedProperty(readOnlyCachedProperty):
-
-    """
-        >>> class Foo:
-        ...     @cachedProperty
-        ...     def calcOnce(self):
-        ...         print("calculating")
-        ...         return 123
-        ...
-        >>> f = Foo()
-        >>> f.calcOnce
-        calculating
-        123
-        >>> f.calcOnce
-        123
-        >>> del f.calcOnce
-        >>> f.calcOnce
-        calculating
-        123
-        >>> del f.calcOnce
-        >>> del f.calcOnce
-        >>> f.calcOnce = 134
-        >>> f.calcOnce
-        134
-    """
-
-    def __set__(self, obj, value):
-        obj.__dict__[self.name] = value
 
 
 class hookedProperty:
@@ -183,3 +153,8 @@ class weakrefCallbackProperty:
             delattr(obj, self.weakrefCallbackName)
         except AttributeError:
             pass
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
