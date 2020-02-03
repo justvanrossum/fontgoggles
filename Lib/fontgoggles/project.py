@@ -50,6 +50,8 @@ class Project:
     def newFontItemInfo(self, path: PathLike, fontNumber: int):
         if not isinstance(path, PathLike):
             raise TypeError("path must be a Path(-like) object")
+        if not isinstance(fontNumber, int):
+            raise TypeError("fontNumber must be an integer")
         fontKey = (path, fontNumber)
         fontItemIdentifier = self._nextFontItemIdentifier()
         return FontItemInfo(fontItemIdentifier, fontKey, self._fontLoader)
