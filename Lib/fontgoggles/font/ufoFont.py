@@ -64,6 +64,10 @@ class UFOFont(BaseFont):
     def getExternalFiles(self):
         return self._includedFeatureFiles
 
+    @cachedProperty
+    def unitsPerEm(self):
+        return self.info.unitsPerEm
+
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
         if glyph is None:
