@@ -8,7 +8,7 @@ from fontTools.feaLib.ast import IncludeStatement
 from fontTools.feaLib.error import FeatureLibError
 from fontTools.pens.cocoaPen import CocoaPen  # TODO: factor out mac-specific code
 from fontTools.ttLib import TTFont
-from fontTools.ufoLib import UFOReader
+from fontTools.ufoLib import UFOReader, UFOFileStructure
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph
 from .baseFont import BaseFont
 from ..misc.compilerPool import compileUFOToBytes
@@ -34,6 +34,9 @@ class UFOFont(BaseFont):
     #     # caches. Tricky: is achors have changed the features need to
     #     # be rebuilt. If unicodes changed we need to update
     #     # self.ttFont['cmap'].
+    #     if self.reader.fileStructure == UFOFileStructure.ZIP:
+    #         # We can't (won't) partially reload .ufoz
+    #         return False
     #     self.resetCache()
     #     return True
 
