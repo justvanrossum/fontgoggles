@@ -82,9 +82,9 @@ class DSFont(BaseFont):
         sourcePaths = [pathlib.Path(source.path) for source in self.doc.sources]
         return sourcePaths + self._includedFeatureFiles
 
-    def reload(self, externalFilePath):
-        print("DS reload", externalFilePath)
-        return True
+    def canReloadWithChange(self, externalFilePath):
+        print("DS external file changed:", externalFilePath)
+        return False
 
     def varLocationChanged(self, varLocation):
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})

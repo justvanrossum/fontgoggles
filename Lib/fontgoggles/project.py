@@ -85,6 +85,7 @@ class FontItemInfo:
     def __init__(self, identifier, fontKey, fontLoader):
         self.identifier = identifier
         self.fontKey = fontKey
+        self.wantsReload = False
         self._fontLoader = fontLoader
 
     @property
@@ -122,17 +123,21 @@ class FontLoader:
         self.fonts = {}
 
     async def loadFont(self, fontKey, sharableFontData, outputWriter):
-        if fontKey in self.fonts:
-            return
-        path, fontNumber = fontKey
-        fontData = sharableFontData.get(path)
-        numFonts, opener, getSortInfo = getOpener(path)
-        assert fontNumber < numFonts(path)
-        font, fontData = opener(path, fontNumber, fontData)
-        await font.load(outputWriter)
-        if fontData is not None:
-            sharableFontData[path] = fontData
-        self.fonts[fontKey] = font
+        font = self.fonts.get(fontKey)
+        if font is not None:
+            if font.wantsReload:
+                font.wantsReload = False
+                await font.load(outputWriter)
+        else:
+            path, fontNumber = fontKey
+            fontData = sharableFontData.get(path)
+            numFonts, opener, getSortInfo = getOpener(path)
+            assert fontNumber < numFonts(path)
+            font, fontData = opener(path, fontNumber, fontData)
+            await font.load(outputWriter)
+            if fontData is not None:
+                sharableFontData[path] = fontData
+            self.fonts[fontKey] = font
 
     def unloadFont(self, fontKey):
         self.fonts.pop(fontKey, None)  # discard

@@ -25,13 +25,16 @@ class BaseFont:
         """
         return []
 
-    def reload(self, externalFilePath):
-        """ `externalFilePath` is None or an external file.
-        Subclasses may update their internal data structures and return False,
-        or return True to indicate a full reload is needed, in which case the
-        font object will be discarded and rebuilt from scratch.
+    def canReloadWithChange(self, externalFilePath):
+        """ `externalFilePath` is None or an external file. If it is None,
+        the main source file was changed on disk, else the externalFilePath
+        was changed.
+
+        This method should return True if it can update itself, in which case
+        font.load() will be called. If it returns False, the font will be
+        discarded and rebuilt from scratch.
         """
-        return True
+        return False
 
     @readOnlyCachedProperty
     def unitsPerEm(self):

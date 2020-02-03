@@ -331,8 +331,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             if wasModified:
                 font = fontItemInfo.font
                 if font is not None:
-                    if font.reload(externalFile):
+                    if not font.canReloadWithChange(externalFile):
                         fontItemInfo.unload()
+                    else:
+                        fontItemInfo.wantsReload = True
 
         if didMove:
             self.updateFileObservers()
@@ -368,7 +370,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         sharableFontData = {}
         coros = []
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
-            if fontItemInfo.font is None:
+            if fontItemInfo.font is None or fontItemInfo.wantsReload:
                 coros.append(self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData))
         await asyncio.gather(*coros)
         self._updateSidebarItems(*self._gatherSidebarInfo(self.project.fonts))
