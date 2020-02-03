@@ -93,7 +93,7 @@ openFontsTestData = [
         {'kern', 'mark'},
         {'DFLT': set()},
         {},
-        ['features_test.fea'],
+        ['features_test.fea', 'features_test_nested.fea'],
         "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"]), 
     ('MutatorSans.designspace',
         {},
