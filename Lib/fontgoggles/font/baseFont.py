@@ -12,6 +12,9 @@ class BaseFont:
     def close(self):
         pass
 
+    async def load(self, outputWriter):
+        pass
+
     def updateFontPath(self, newFontPath):
         """This gets called when the source file was moved."""
         pass

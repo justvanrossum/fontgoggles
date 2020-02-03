@@ -128,7 +128,8 @@ class FontLoader:
         fontData = sharableFontData.get(path)
         numFonts, opener, getSortInfo = getOpener(path)
         assert fontNumber < numFonts(path)
-        font, fontData = await opener(path, fontNumber, fontData, outputWriter)
+        font, fontData = opener(path, fontNumber, fontData)
+        await font.load(outputWriter)
         if fontData is not None:
             sharableFontData[path] = fontData
         self.fonts[fontKey] = font
