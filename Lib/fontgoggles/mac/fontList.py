@@ -154,9 +154,11 @@ class FGFontListView(AppKit.NSView):
         else:
             return AppKit.NSDragOperationNone
 
+    @suppressAndLogException
     def draggingExited_(self, draggingInfo):
-        self._dragPosView.removeFromSuperview()
-        self._dragPosView = None
+        if self._dragPosView is not None:
+            self._dragPosView.removeFromSuperview()
+            self._dragPosView = None
 
     @objc.signature(b"Z@:@")  # PyObjC bug?
     @suppressAndLogException
@@ -194,6 +196,7 @@ class FGFontListView(AppKit.NSView):
     def prepareForDragOperation_(self, draggingInfo):
         return True
 
+    @suppressAndLogException
     def performDragOperation_(self, draggingInfo):
         index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
         self.vanillaWrapper().insertFonts(self._iterateFilesFromDraggingInfo(draggingInfo), index)
