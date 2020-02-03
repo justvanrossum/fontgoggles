@@ -331,10 +331,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             if wasModified:
                 font = fontItemInfo.font
                 if font is not None:
-                    if not font.canReloadWithChange(externalFile):
-                        fontItemInfo.unload()
-                    else:
+                    if font.canReloadWithChange(externalFile):
+                        # The font will be reloaded in-place
                         fontItemInfo.wantsReload = True
+                    else:
+                        # The font will be reloaded from scratch
+                        fontItemInfo.unload()
 
         if didMove:
             self.updateFileObservers()
