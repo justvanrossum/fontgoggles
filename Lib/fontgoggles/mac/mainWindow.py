@@ -947,10 +947,6 @@ class OutputText(TextEditor):
         attrString = AppKit.NSAttributedString.alloc().initWithString_attributes_(text, self.textAttributes)
         st = self._textView.textStorage()
         st.appendAttributedString_(attrString)
-
-        def deferredScroll():
-            self._textView.scrollRangeToVisible_((st.length(), 0))
-
         # If we call scrollToEnd right away it seems to have no effect.
         # If we defer to the next opportunity in the event loop it works fine.
         loop = asyncio.get_running_loop()
