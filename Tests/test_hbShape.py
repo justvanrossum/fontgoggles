@@ -47,6 +47,7 @@ clusterTestData = [
      []),
 ]
 
+
 @pytest.mark.parametrize("clusters,numChars,expectedGlyphToChars,expectedCharToGlyphs", clusterTestData)
 def test_characterGlyphMapping(clusters, numChars, expectedGlyphToChars, expectedCharToGlyphs):
     glyphToChars, charToGlyphs = characterGlyphMapping(clusters, numChars)

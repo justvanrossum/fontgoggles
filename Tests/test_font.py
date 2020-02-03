@@ -21,7 +21,7 @@ openFontsTestData = [
          'liga', 'medi', 'numr',
          'pnum', 'rlig', 'rtlm', 'ss01', 'ss02', 'ss03',
          'ss04', 'ss05', 'ss06', 'ss07', 'ss08'},
-        {'curs', 'kern','mark', 'mkmk', 'ss05'},
+        {'curs', 'kern', 'mark', 'mkmk', 'ss05'},
         {'DFLT': set(), 'arab': {'ARA ', 'KSH ', 'MLY ', 'SND ', 'URD '}, 'latn': {'TRK '}},
         {},
         [],
@@ -94,7 +94,7 @@ openFontsTestData = [
         {'DFLT': set()},
         {},
         ['features_test.fea', 'features_test_nested.fea'],
-        "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"]), 
+        "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"]),
     ('MutatorSans.designspace',
         {},
         {'rvrn'},
@@ -215,7 +215,6 @@ async def test_verticalGlyphMetricsFromUFO():
     textInfo = TextInfo("ABCDE")
     textInfo.directionOverride = "TTB"
     glyphs = font.getGlyphRunFromTextInfo(textInfo)
-    glyphNames = [g.name for g in glyphs]
     ax = [g.ax for g in glyphs]
     ay = [g.ay for g in glyphs]
     dx = [g.dx for g in glyphs]

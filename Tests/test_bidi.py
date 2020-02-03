@@ -105,8 +105,7 @@ testData = [
                       'length': 3,
                       'sor': 'R',
                       'start': 0,
-                      'type': 'AL'}]),
-     })
+                      'type': 'AL'}])}),
 ]
 
 
