@@ -29,7 +29,7 @@ class BaseFont:
 
     def updateFontPath(self, newFontPath):
         """This gets called when the source file was moved."""
-        self.fontPath = fontPath
+        self.fontPath = newFontPath
 
     def getExternalFiles(self):
         """Subclasses may override this to return a list of external files,
