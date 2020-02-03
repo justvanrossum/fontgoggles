@@ -79,7 +79,7 @@ async def openDS(fontPath: PathLike, fontNumber: int, fontData=None, outputWrite
     from .dsFont import DSFont
     assert fontData is None  # dummy
     font = DSFont(fontPath)
-    await font.load(outputWriter)
+    await font.load(outputWriter=outputWriter)
     return (font, None)
 
 
