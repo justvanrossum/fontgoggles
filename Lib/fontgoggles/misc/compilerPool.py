@@ -101,6 +101,8 @@ class CompilerPool:
             return await self.availableWorkers.get()
 
     async def callFunction(self, func, args, outputWriter):
+        if outputWriter is None:
+            outputWriter = sys.stderr.write
         worker = await self.getWorker()
         try:
             error = await worker.callFunction(func, args, outputWriter)
