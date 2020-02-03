@@ -24,6 +24,7 @@ openFontsTestData = [
         {'curs', 'kern','mark', 'mkmk', 'ss05'},
         {'DFLT': set(), 'arab': {'ARA ', 'KSH ', 'MLY ', 'SND ', 'URD '}, 'latn': {'TRK '}},
         {},
+        [],
         "فعل", ['uni0644.fina', 'uni0639.medi', 'uni0641.init']),
     ("IBMPlexSans-Regular.ttf",
         {'familyName': 'IBM Plex Sans',
@@ -38,6 +39,7 @@ openFontsTestData = [
         {'kern', 'mark'},
         {'DFLT': set(), 'cyrl': set(), 'grek': set(), 'latn': set()},
         {},
+        [],
         "Kofi", ["K", "o", "fi"]),
     ("IBMPlexSans-Regular.ttx",
         {},
@@ -47,6 +49,7 @@ openFontsTestData = [
         {'kern', 'mark'},
         {'DFLT': set(), 'cyrl': set(), 'grek': set(), 'latn': set()},
         {},
+        [],
         "Kofi", ["K", "o", "fi"]),
     ("MutatorSans.ttf",
         {'familyName': 'MutatorMathTest',
@@ -66,6 +69,7 @@ openFontsTestData = [
                   'maxValue': 1000.0,
                   'minValue': 0.0,
                   'name': 'Weight'}},
+        [],
         "HI", ["H", "I.narrow"]),
     ("NotoNastaliqUrdu-Regular.ttf",
         {'familyName': 'Noto Nastaliq Urdu',
@@ -78,6 +82,7 @@ openFontsTestData = [
         {'curs', 'mkmk', 'mark'},
         {'DFLT': set(), 'arab': {'ARA ', 'FAR ', 'KSH ', 'SND ', 'URD '}, 'latn': set()},
         {},
+        [],
         "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
     ("MutatorSansBoldWideMutated.ufo",
         {'familyName': 'MutatorMathTest',
@@ -88,6 +93,7 @@ openFontsTestData = [
         {'kern', 'mark'},
         {'DFLT': set()},
         {},
+        [],
         "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"]), 
     ('MutatorSans.designspace',
         {},
@@ -102,10 +108,17 @@ openFontsTestData = [
                   'maxValue': 1000.0,
                   'minValue': 0.0,
                   'name': 'Weight'}},
+        ['MutatorSansLightCondensed.ufo',
+         'MutatorSansBoldCondensed.ufo',
+         'MutatorSansLightWide.ufo',
+         'MutatorSansBoldWide.ufo',
+         'MutatorSansLightCondensed.ufo',
+         'MutatorSansLightCondensed.ufo',
+         'MutatorSansLightCondensed.ufo'],
         "A", ["A"]),
 ]
 
-@pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,text,glyphNames",
+@pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,ext,text,glyphNames",
                          openFontsTestData)
 @pytest.mark.asyncio
 async def test_openFonts(fileName,
@@ -114,6 +127,7 @@ async def test_openFonts(fileName,
                          featuresGPOS,
                          scripts,
                          axes,
+                         ext,
                          text,
                          glyphNames):
     fontPath = getFontPath(fileName)
@@ -128,6 +142,7 @@ async def test_openFonts(fileName,
     assert font.axes == axes
     run = font.getGlyphRun(text)
     assert [gi.name for gi in run] == glyphNames
+    assert ext == [p.name for p in font.getExternalFiles()]
 
 
 def test_iterFontPathsAndNumbers():
