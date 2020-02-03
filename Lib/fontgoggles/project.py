@@ -135,8 +135,7 @@ class FontLoader:
         self.fonts[fontKey] = font
 
     def unloadFont(self, fontKey):
-        if fontKey in self.fonts:
-            del self.fonts[fontKey]
+        self.fonts.pop(fontKey, None)  # discard
 
     def purgeFonts(self, usedKeys):
         self.fonts = {fontKey: fontObject for fontKey, fontObject in self.fonts.items()
