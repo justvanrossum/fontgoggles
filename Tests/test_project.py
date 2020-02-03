@@ -1,5 +1,6 @@
 import pathlib
 import pytest
+from fontgoggles.font import iterFontNumbers
 from fontgoggles.project import Project
 from testSupport import getFontPath
 
@@ -64,3 +65,12 @@ def test_project_dump_load(tmpdir):
     pr2 = Project.fromJSON(json, destPath.parent)
     for f1, f2 in zip(pr.fonts, pr2.fonts):
         assert f1.fontKey == f2.fontKey
+
+
+@pytest.mark.asyncio
+async def test_project_load_ttc():
+    pr = Project()
+    fontPath = getFontPath("MutatorSans.ttc")
+    for fontPath, fontNumber, getSortInfo in iterFontNumbers(fontPath):
+        pr.addFont(fontPath, fontNumber)
+    await pr.loadFonts()
