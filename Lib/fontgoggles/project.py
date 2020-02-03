@@ -145,6 +145,7 @@ class FontLoader:
 
     def unloadFont(self, fontKey):
         self.fonts.pop(fontKey, None)  # discard
+        self.cachedFontData = {}
 
     def purgeFonts(self, usedKeys):
         self.fonts = {fontKey: fontObject for fontKey, fontObject in self.fonts.items()
