@@ -133,7 +133,7 @@ async def test_openFonts(fileName,
     fontPath = getFontPath(fileName)
     numFonts, opener, getSortInfo = getOpener(fontPath)
     assert numFonts(fontPath) == 1
-    font, fontData = opener(fontPath, 0)
+    font = opener(fontPath, 0)
     await font.load(None)
     sortInfo = getSortInfo(fontPath, 0)
     assert sortInfo == expectedSortInfo
@@ -196,7 +196,7 @@ testDataGetGlyphRun = [
 async def test_getGlyphRunFromTextInfo(text, expectedGlyphNames, expectedPositions):
     fontPath = getFontPath('IBMPlexSansArabic-Regular.ttf')
     numFonts, opener, getSortInfo = getOpener(fontPath)
-    font, fontData = opener(fontPath, 0)
+    font = opener(fontPath, 0)
     await font.load(None)
     textInfo = TextInfo(text)
     glyphs = font.getGlyphRunFromTextInfo(textInfo)
@@ -211,7 +211,7 @@ async def test_getGlyphRunFromTextInfo(text, expectedGlyphNames, expectedPositio
 async def test_verticalGlyphMetricsFromUFO():
     fontPath = getFontPath('MutatorSansBoldWideMutated.ufo')
     numFonts, opener, getSortInfo = getOpener(fontPath)
-    font, fontData = await opener(fontPath, 0)
+    font = await opener(fontPath, 0)
     textInfo = TextInfo("ABCDE")
     textInfo.directionOverride = "TTB"
     glyphs = font.getGlyphRunFromTextInfo(textInfo)

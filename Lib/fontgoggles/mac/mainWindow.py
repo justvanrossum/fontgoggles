@@ -367,23 +367,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         """This loads fonts that aren't yet loaded, and updates all information
         regarding features, scripts/languages and variations.
         """
-        sharableFontData = {}
         coros = []
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
             if fontItemInfo.font is None or fontItemInfo.wantsReload:
-                coros.append(self._loadFont(fontItemInfo, fontItem, sharableFontData=sharableFontData))
+                coros.append(self._loadFont(fontItemInfo, fontItem))
         await asyncio.gather(*coros)
         self._updateSidebarItems(*self._gatherSidebarInfo(self.project.fonts))
         self.fontListSelectionChangedCallback(self.fontList)
 
     @objc.python_method
-    async def _loadFont(self, fontItemInfo, fontItem, sharableFontData):
+    async def _loadFont(self, fontItemInfo, fontItem):
         fontItem.setIsLoading(True)
         try:
             try:
                 fontItem.clearCompileOutput()
-                await fontItemInfo.load(sharableFontData=sharableFontData,
-                                        outputWriter=fontItem.writeCompileOutput)
+                await fontItemInfo.load(outputWriter=fontItem.writeCompileOutput)
                 externalFiles = fontItemInfo.font.getExternalFiles()
                 if externalFiles:
                     self.addExternalFileObservers(externalFiles, fontItemInfo)

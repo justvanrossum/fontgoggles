@@ -58,8 +58,7 @@ class Project:
         """Load fonts as concurrently as possible."""
         if outputWriter is None:
             outputWriter = sys.stderr.write
-        sharableFontData = {}
-        await asyncio.gather(*(fontItemInfo.load(sharableFontData, outputWriter)
+        await asyncio.gather(*(fontItemInfo.load(outputWriter)
                                for fontItemInfo in self.fonts if fontItemInfo.font is None))
 
     def _nextFontItemIdentifier(self):
@@ -106,14 +105,12 @@ class FontItemInfo:
     def font(self):
         return self._fontLoader.fonts.get(self.fontKey)
 
-    async def load(self, sharableFontData=None, outputWriter=None):
-        if sharableFontData is None:
-            sharableFontData = {}
+    async def load(self, outputWriter=None):
         if outputWriter is None:
             outputWriter = sys.stderr.write
         if self.font is None or self.wantsReload:
             self.wantsReload = False
-            await self._fontLoader.loadFont(self.fontKey, sharableFontData, outputWriter)
+            await self._fontLoader.loadFont(self.fontKey, outputWriter)
 
     def unload(self):
         self._fontLoader.unloadFont(self.fontKey)
@@ -124,19 +121,16 @@ class FontLoader:
     def __init__(self):
         self.fonts = {}
 
-    async def loadFont(self, fontKey, sharableFontData, outputWriter):
+    async def loadFont(self, fontKey, outputWriter):
         font = self.fonts.get(fontKey)
         if font is not None:
             await font.load(outputWriter)
         else:
             path, fontNumber = fontKey
-            fontData = sharableFontData.get(path)
             numFonts, opener, getSortInfo = getOpener(path)
             assert fontNumber < numFonts(path)
-            font, fontData = opener(path, fontNumber, fontData)
+            font = opener(path, fontNumber)
             await font.load(outputWriter)
-            if fontData is not None:
-                sharableFontData[path] = fontData
             self.fonts[fontKey] = font
 
     def unloadFont(self, fontKey):

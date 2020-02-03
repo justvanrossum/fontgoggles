@@ -21,23 +21,15 @@ class _OTFBaseFont(BaseFont):
 
 class OTFFont(_OTFBaseFont):
 
-    @classmethod
-    def fromPath(cls, fontPath, fontNumber, fontData=None):
-        if fontData is None:
-            with open(fontPath, "rb") as f:
-                fontData = f.read()
-        self = cls(fontData, fontNumber)
-        return self
-
-    def __init__(self, fontData, fontNumber):
-        super().__init__()
-        self.fontData = fontData
-        self._fontNumber = fontNumber
+    def __init__(self, fontPath, fontNumber):
+        super().__init__(fontPath, fontNumber)
+        with open(fontPath, "rb") as f:
+            self.fontData = f.read()
 
     async def load(self, outputWriter):
         fontData = self.fontData
         f = io.BytesIO(fontData)
-        self.ttFont = TTFont(f, fontNumber=self._fontNumber, lazy=True)
+        self.ttFont = TTFont(f, fontNumber=self.fontNumber, lazy=True)
         if self.ttFont.flavor in ("woff", "woff2"):
             self.ttFont.flavor = None
             self.ttFont.recalcBBoxes = False
@@ -45,19 +37,17 @@ class OTFFont(_OTFBaseFont):
             f = io.BytesIO()
             self.ttFont.save(f, reorderTables=False)
             fontData = f.getvalue()
-        self.ftFont = FTFont(fontData, fontNumber=self._fontNumber, ttFont=self.ttFont)
-        self.shaper = HBShape(fontData, fontNumber=self._fontNumber, ttFont=self.ttFont)
+        self.ftFont = FTFont(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
+        self.shaper = HBShape(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
 
 
 class TTXFont(_OTFBaseFont):
 
     def __init__(self, fontPath, fontNumber):
-        super().__init__()
-        self._fontPath = fontPath
-        self._fontNumber = fontNumber
+        super().__init__(fontPath, fontNumber)
 
     def updateFontPath(self, newFontPath):
-        self._fontPath = newFontPath
+        self.fontPath = newFontPath
 
     def canReloadWithChange(self, externalFilePath):
         # For TTX we might as well return False, but this was a nice test
@@ -66,8 +56,8 @@ class TTXFont(_OTFBaseFont):
         return True
 
     async def load(self, outputWriter):
-        fontData = await compileTTXToBytes(self._fontPath, outputWriter)
+        fontData = await compileTTXToBytes(self.fontPath, outputWriter)
         f = io.BytesIO(fontData)
-        self.ttFont = TTFont(f, fontNumber=self._fontNumber, lazy=True)
-        self.ftFont = FTFont(fontData, fontNumber=self._fontNumber, ttFont=self.ttFont)
-        self.shaper = HBShape(fontData, fontNumber=self._fontNumber, ttFont=self.ttFont)
+        self.ttFont = TTFont(f, fontNumber=self.fontNumber, lazy=True)
+        self.ftFont = FTFont(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
+        self.shaper = HBShape(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)

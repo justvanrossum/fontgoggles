@@ -18,12 +18,11 @@ from ..misc.properties import cachedProperty
 
 class UFOFont(BaseFont):
 
-    def __init__(self, fontPath):
-        super().__init__()
+    def __init__(self, fontPath, fontNumber):
+        super().__init__(fontPath, fontNumber)
         self.updateFontPath(fontPath)
         self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
-        self._fontPath = fontPath
         self._cachedGlyphs = {}
 
     def updateFontPath(self, newFontPath):
@@ -41,9 +40,9 @@ class UFOFont(BaseFont):
             self._addOutlinePathToGlyph(glyph)
             self._cachedGlyphs[".notdef"] = glyph
 
-        fontData = await compileUFOToBytes(self._fontPath, outputWriter)
+        fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
-        self._includedFeatureFiles = extractIncludedFeatureFiles(self._fontPath, self.reader)
+        self._includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
 
         f = io.BytesIO(fontData)
         self.ttFont = TTFont(f, lazy=True)

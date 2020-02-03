@@ -25,14 +25,13 @@ class DesignSpaceSourceError(CompilerError):
 
 class DSFont(BaseFont):
 
-    def __init__(self, fontPath):
-        super().__init__()
-        self._fontPath = fontPath
+    def __init__(self, fontPath, fontNumber):
+        super().__init__(fontPath, fontNumber)
         self._varGlyphs = {}
         self._normalizedLocation = {}
 
     async def load(self, outputWriter):
-        self.doc = DesignSpaceDocument.fromfile(self._fontPath)
+        self.doc = DesignSpaceDocument.fromfile(self.fontPath)
         self.doc.findDefault()
 
         with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
@@ -53,11 +52,11 @@ class DSFont(BaseFont):
 
             if any(errors):
                 raise DesignSpaceSourceError(
-                    f"Could not build '{os.path.basename(self._fontPath)}': "
+                    f"Could not build '{os.path.basename(self.fontPath)}': "
                     "some sources did not successfully compile"
                 )
 
-            vfFontData = await compileDSToBytes(self._fontPath, ttFolder, outputWriter)
+            vfFontData = await compileDSToBytes(self.fontPath, ttFolder, outputWriter)
             with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
                 # masterModel is created by varLib.build(), and we communicate it
                 # to here via a tempfile pickle

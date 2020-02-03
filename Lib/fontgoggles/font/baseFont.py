@@ -5,7 +5,9 @@ from . import mergeScriptsAndLanguages
 
 class BaseFont:
 
-    def __init__(self):
+    def __init__(self, fontPath, fontNumber):
+        self.fontPath = fontPath
+        self.fontNumber = fontNumber
         self.resetCache()
 
     def resetCache(self):

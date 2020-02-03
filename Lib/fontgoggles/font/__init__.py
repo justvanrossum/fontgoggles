@@ -1,3 +1,4 @@
+import importlib
 from os import PathLike
 from types import SimpleNamespace
 
@@ -5,8 +6,11 @@ from types import SimpleNamespace
 def getOpener(fontPath: PathLike):
     openerKey = sniffFontType(fontPath)
     assert openerKey is not None
-    numFontsFunc, openerFunc, getSortInfo = fontOpeners[openerKey]
-    return numFontsFunc, openerFunc, getSortInfo
+    numFontsFunc, openerSpec, getSortInfo = fontOpeners[openerKey]
+    moduleName, className = openerSpec.rsplit(".", 1)
+    module = importlib.import_module(moduleName)
+    openerClass = getattr(module, className)
+    return numFontsFunc, openerClass, getSortInfo
 
 
 def sniffFontType(fontPath: PathLike):
@@ -48,36 +52,6 @@ def iterFontNumbers(path):
     numFonts, opener, getSortInfo = getOpener(path)
     for i in range(numFonts(path)):
         yield path, i, getSortInfo
-
-
-def openOTF(fontPath: PathLike, fontNumber: int, fontData=None):
-    from .otfFont import OTFFont
-    if fontData is not None:
-        font = OTFFont(fontData, fontNumber)
-    else:
-        font = OTFFont.fromPath(fontPath, fontNumber)
-        fontData = font.fontData
-    return (font, fontData)
-
-
-def openTTX(fontPath: PathLike, fontNumber: int, fontData=None):
-    from .otfFont import TTXFont
-    font = TTXFont(fontPath, 0)
-    return (font, None)
-
-
-def openUFO(fontPath: PathLike, fontNumber: int, fontData=None):
-    from .ufoFont import UFOFont
-    assert fontData is None  # dummy
-    font = UFOFont(fontPath)
-    return (font, None)
-
-
-def openDS(fontPath: PathLike, fontNumber: int, fontData=None):
-    from .dsFont import DSFont
-    assert fontData is None  # dummy
-    font = DSFont(fontPath)
-    return (font, None)
 
 
 def numFontsOne(fontPath: PathLike):
@@ -152,16 +126,16 @@ def getSortInfoTTX(fontPath: PathLike, fontNum: int):
 
 
 fontOpeners = {
-    "ttf": (numFontsOne, openOTF, getSortInfoOTF),
-    "otf": (numFontsOne, openOTF, getSortInfoOTF),
-    "woff": (numFontsOne, openOTF, getSortInfoOTF),
-    "woff2": (numFontsOne, openOTF, getSortInfoOTF),
-    "ufo": (numFontsOne, openUFO, getSortInfoUFO),
-    "ufos": (numFontsOne, openUFO, getSortInfoUFO),
-    "ttc": (numFontsTTC, openOTF, getSortInfoOTF),
-    "otc": (numFontsTTC, openOTF, getSortInfoOTF),
-    "designspace": (numFontsOne, openDS, getSortInfoDS),
-    "ttx": (numFontsOne, openTTX, getSortInfoTTX),
+    "ttf": (numFontsOne, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
+    "otf": (numFontsOne, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
+    "woff": (numFontsOne, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
+    "woff2": (numFontsOne, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
+    "ufo": (numFontsOne, "fontgoggles.font.ufoFont.UFOFont", getSortInfoUFO),
+    "ufos": (numFontsOne, "fontgoggles.font.ufoFont.UFOFont", getSortInfoUFO),
+    "ttc": (numFontsTTC, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
+    "otc": (numFontsTTC, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
+    "designspace": (numFontsOne, "fontgoggles.font.dsFont.DSFont", getSortInfoDS),
+    "ttx": (numFontsOne, "fontgoggles.font.otfFont.TTXFont", getSortInfoTTX),
 }
 
 fileTypes = sorted(fontOpeners)
