@@ -182,6 +182,7 @@ def test_iterFontPathsAndNumbers():
         ('MutatorSansLightCondensed_support.crossbar.ufo', 0),
         ('MutatorSansLightWide.ufo', 0),
         ('QuadTest-Regular.ufo', 0),
+        ('MutatorSansBoldWideMutated.ufoz', 0),
     ]
     assert expectedResults == results
 
