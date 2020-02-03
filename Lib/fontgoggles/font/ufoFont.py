@@ -42,6 +42,8 @@ class UFOFont(BaseFont):
 
         fontData = await compileUFOToBytes(self._fontPath, outputWriter)
 
+        self._includedFeatureFiles = extractIncludedFeatureFiles(self._fontPath, self.reader)
+
         f = io.BytesIO(fontData)
         self.ttFont = TTFont(f, lazy=True)
         self.shaper = HBShape(fontData,
@@ -49,6 +51,9 @@ class UFOFont(BaseFont):
                               getVerticalAdvance=self._getVerticalAdvance,
                               getVerticalOrigin=self._getVerticalOrigin,
                               ttFont=self.ttFont)
+
+    def getExternalFiles(self):
+        return self._includedFeatureFiles
 
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
@@ -170,7 +175,8 @@ def _extractIncludedFeatureFiles(featureSource, searchPaths, recursionLevel=0):
             if p.exists():
                 p = p.resolve()
                 yield p
-                yield from _extractIncludedFeatureFiles(p.read_text(), [searchPaths[0], p.parent],
+                yield from _extractIncludedFeatureFiles(p.read_text("utf-8", "replace"),
+                                                        [searchPaths[0], p.parent],
                                                         recursionLevel+1)
                 break
 
