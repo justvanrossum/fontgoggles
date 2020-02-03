@@ -1,4 +1,5 @@
 import io
+import pathlib
 import re
 import sys
 from types import SimpleNamespace
@@ -158,6 +159,8 @@ class Glyph(GLIFGlyph):
 
 
 def extractIncludedFeatureFiles(ufoPath, reader=None):
+    if isinstance(ufoPath, str):
+        ufoPath = pathlib.Path(ufoPath)
     if reader is None:
         reader = UFOReader(ufoPath, validate=False)
     mainFeatures = reader.readFeatures()
@@ -207,6 +210,5 @@ def _parseFeaSource(featureSource):
 
 
 if __name__ == "__main__":
-    import pathlib
-    for feaPath in extractIncludedFeatureFiles(pathlib.Path(sys.argv[1])):
+    for feaPath in extractIncludedFeatureFiles(sys.argv[1]):
         print(feaPath)
