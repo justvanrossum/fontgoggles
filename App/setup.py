@@ -17,7 +17,7 @@ infoplist = dict(
             NSDocumentClass = "FGDocument",
         ),
         dict(
-            CFBundleTypeExtensions=["ufo"],
+            CFBundleTypeExtensions=["ufo", "ufoz"],
             CFBundleTypeName="Unified Font Object",
             CFBundleTypeRole="Viewer",
             LSTypeIsPackage=True,
