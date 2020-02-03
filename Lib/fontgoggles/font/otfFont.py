@@ -21,10 +21,14 @@ class _OTFBaseFont(BaseFont):
 
 class OTFFont(_OTFBaseFont):
 
-    def __init__(self, fontPath, fontNumber):
+    def __init__(self, fontPath, fontNumber, dataProvider=None):
         super().__init__(fontPath, fontNumber)
-        with open(fontPath, "rb") as f:
-            self.fontData = f.read()
+        if dataProvider is not None:
+            # This allows us for TTC fonts to share their raw data
+            self.fontData = dataProvider.getData(fontPath)
+        else:
+            with open(fontPath, "rb") as f:
+                self.fontData = f.read()
 
     async def load(self, outputWriter):
         fontData = self.fontData
@@ -43,7 +47,7 @@ class OTFFont(_OTFBaseFont):
 
 class TTXFont(_OTFBaseFont):
 
-    def __init__(self, fontPath, fontNumber):
+    def __init__(self, fontPath, fontNumber, dataProvider=None):
         super().__init__(fontPath, fontNumber)
 
     def updateFontPath(self, newFontPath):

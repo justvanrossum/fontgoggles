@@ -18,7 +18,7 @@ from ..misc.properties import cachedProperty
 
 class UFOFont(BaseFont):
 
-    def __init__(self, fontPath, fontNumber):
+    def __init__(self, fontPath, fontNumber, dataProvider=None):
         super().__init__(fontPath, fontNumber)
         self.updateFontPath(fontPath)
         self.info = SimpleNamespace()

@@ -120,6 +120,16 @@ class FontLoader:
 
     def __init__(self):
         self.fonts = {}
+        self.cachedFontData = {}
+
+    def getData(self, fontPath):
+        assert isinstance(fontPath, os.PathLike)
+        fontData = self.cachedFontData.get(fontPath)
+        if fontData is None:
+            with open(fontPath, "rb") as f:
+                fontData = f.read()
+            self.cachedFontData[fontPath] = fontData
+        return fontData
 
     async def loadFont(self, fontKey, outputWriter):
         font = self.fonts.get(fontKey)
@@ -129,7 +139,7 @@ class FontLoader:
             path, fontNumber = fontKey
             numFonts, opener, getSortInfo = getOpener(path)
             assert fontNumber < numFonts(path)
-            font = opener(path, fontNumber)
+            font = opener(path, fontNumber, self)
             await font.load(outputWriter)
             self.fonts[fontKey] = font
 
@@ -139,6 +149,7 @@ class FontLoader:
     def purgeFonts(self, usedKeys):
         self.fonts = {fontKey: fontObject for fontKey, fontObject in self.fonts.items()
                       if fontKey in usedKeys}
+        self.cachedFontData = {}
 
     def updateFontKey(self, oldFontKey, newFontKey):
         if oldFontKey not in self.fonts:

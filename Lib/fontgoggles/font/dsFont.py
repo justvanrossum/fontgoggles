@@ -25,7 +25,7 @@ class DesignSpaceSourceError(CompilerError):
 
 class DSFont(BaseFont):
 
-    def __init__(self, fontPath, fontNumber):
+    def __init__(self, fontPath, fontNumber, dataProvider=None):
         super().__init__(fontPath, fontNumber)
         self._varGlyphs = {}
         self._normalizedLocation = {}
