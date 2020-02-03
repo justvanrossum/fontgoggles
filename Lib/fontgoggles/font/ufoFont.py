@@ -18,20 +18,13 @@ from ..misc.properties import cachedProperty
 
 class UFOFont(BaseFont):
 
-    def __init__(self, fontPath, fontNumber, dataProvider=None):
-        super().__init__(fontPath, fontNumber)
-        self.updateFontPath(fontPath)
+    async def load(self, outputWriter):
+        self.reader = UFOReader(self.fontPath, validate=False)
+        self.glyphSet = self.reader.getGlyphSet()
+        self.glyphSet.glyphClass = Glyph
         self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
         self._cachedGlyphs = {}
-
-    def updateFontPath(self, newFontPath):
-        """This also gets called when the source file was moved."""
-        self.reader = UFOReader(newFontPath, validate=False)
-        self.glyphSet = self.reader.getGlyphSet()
-        self.glyphSet.glyphClass = Glyph
-
-    async def load(self, outputWriter):
         glyphOrder = sorted(self.glyphSet.keys())  # no need for the "real" glyph order
         if ".notdef" not in glyphOrder:
             # We need a .notdef glyph, so let's make one.
