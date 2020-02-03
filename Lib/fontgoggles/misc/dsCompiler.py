@@ -15,7 +15,7 @@ def compileMinimumFont(dsPath, ttFolder):
             ttPath = os.path.join(ttFolder, os.path.basename(source.path) + ".ttf")
             if not os.path.exists(ttPath):
                 raise FileNotFoundError(ttPath)
-            source.font = TTFont(ttPath, lazy=False)  # TODO: https://github.com/fonttools/fonttools/issues/1808
+            source.font = TTFont(ttPath, lazy=True)
 
     assert doc.default.font is not None
     doc.default.font["name"] = newTable("name")  # This is the template for the VF, and needs a name table
