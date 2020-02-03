@@ -59,13 +59,15 @@ _unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+(
 _unicodeAttributeGLIFPattern = re.compile(re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"'))
 
 
-def fetchCharacterMappingAndAnchors(glyphSet, ufoPath):
+def fetchCharacterMappingAndAnchors(glyphSet, ufoPath, glyphNames=None):
     # This seems about 2.3 times faster than reader.getCharacterMapping()
     cmap = {}  # unicode: glyphName
     revCmap = {}
     anchors = {}  # glyphName: [(anchorName, x, y), ...]
     duplicateUnicodes = set()
-    for glyphName in sorted(glyphSet.keys()):
+    if glyphNames is None:
+        glyphNames = sorted(glyphSet.keys())
+    for glyphName in glyphNames:
         data = glyphSet.getGLIF(glyphName)
         if b"<!--" in data:
             # Fall back to proper parser, assuming this to be uncommon

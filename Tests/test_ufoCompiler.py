@@ -19,6 +19,15 @@ def test_ufoCharacterMapping():
     assert anchors == {"A": [("top", 645, 815)], "E": [("top", 582.5, 815)], "macroncmb": [("_top", 0, 815)]}
 
 
+def test_ufoCharacterMapping_glyphNames():
+    ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
+    reader = UFOReader(ufoPath)
+    cmap, revCmap, anchors = fetchCharacterMappingAndAnchors(reader.getGlyphSet(), ufoPath, ["A"])
+    assert cmap[0x0041] == "A"
+    assert revCmap["A"] == [0x0041]
+    assert anchors == {"A": [("top", 645, 815)]}
+
+
 @pytest.mark.asyncio
 async def test_compileUFOToPath(tmpdir):
     ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
