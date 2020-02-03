@@ -50,8 +50,8 @@ def iterFontNumbers(path):
     if sniffFontType(path) is None:
         return
     numFonts, opener, getSortInfo = getOpener(path)
-    for i in range(numFonts(path)):
-        yield path, i, getSortInfo
+    for fontNumber in range(numFonts(path)):
+        yield path, fontNumber, getSortInfo
 
 
 def numFontsOne(fontPath: PathLike):
