@@ -1,5 +1,4 @@
 import io
-import sys
 from fontTools.ttLib import TTFont
 from ..misc.ftFont import FTFont
 from ..misc.hbShape import HBShape
