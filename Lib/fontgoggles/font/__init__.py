@@ -131,7 +131,7 @@ fontOpeners = {
     "woff": (numFontsOne, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
     "woff2": (numFontsOne, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
     "ufo": (numFontsOne, "fontgoggles.font.ufoFont.UFOFont", getSortInfoUFO),
-    "ufos": (numFontsOne, "fontgoggles.font.ufoFont.UFOFont", getSortInfoUFO),
+    "ufoz": (numFontsOne, "fontgoggles.font.ufoFont.UFOFont", getSortInfoUFO),
     "ttc": (numFontsTTC, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
     "otc": (numFontsTTC, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
     "designspace": (numFontsOne, "fontgoggles.font.dsFont.DSFont", getSortInfoDS),
