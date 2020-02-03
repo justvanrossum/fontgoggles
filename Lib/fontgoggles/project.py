@@ -84,7 +84,6 @@ class FontItemInfo:
     def __init__(self, identifier, fontKey, fontLoader):
         self.identifier = identifier
         self.fontKey = fontKey
-        self.wantsReload = False
         self._fontLoader = fontLoader
 
     @property
@@ -105,12 +104,21 @@ class FontItemInfo:
     def font(self):
         return self._fontLoader.fonts.get(self.fontKey)
 
+    @property
+    def wantsReload(self):
+        return self.fontKey in self._fontLoader.wantsReload
+
+    @wantsReload.setter
+    def wantsReload(self, value):
+        if value:
+            self._fontLoader.wantsReload.add(self.fontKey)
+        else:
+            self._fontLoader.wantsReload.discard(self.fontKey)
+
     async def load(self, outputWriter=None):
         if outputWriter is None:
             outputWriter = sys.stderr.write
-        if self.font is None or self.wantsReload:
-            self.wantsReload = False
-            await self._fontLoader.loadFont(self.fontKey, outputWriter)
+        await self._fontLoader.loadFont(self.fontKey, outputWriter)
 
     def unload(self):
         self._fontLoader.unloadFont(self.fontKey)
@@ -120,6 +128,7 @@ class FontLoader:
 
     def __init__(self):
         self.fonts = {}
+        self.wantsReload = set()
         self.cachedFontData = {}
 
     def getData(self, fontPath):
@@ -134,7 +143,9 @@ class FontLoader:
     async def loadFont(self, fontKey, outputWriter):
         font = self.fonts.get(fontKey)
         if font is not None:
-            await font.load(outputWriter)
+            if fontKey in self.wantsReload:
+                self.wantsReload.remove(fontKey)
+                await font.load(outputWriter)
         else:
             path, fontNumber = fontKey
             numFonts, opener, getSortInfo = getOpener(path)
