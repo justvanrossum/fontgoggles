@@ -960,6 +960,7 @@ class OutputText(TextEditor):
         st = self._textView.textStorage()
         self._textView.scrollRangeToVisible_((st.length(), 0))
 
+
 _minimalSpaceBox = 12
 
 
