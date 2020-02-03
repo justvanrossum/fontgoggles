@@ -50,9 +50,6 @@ class TTXFont(_OTFBaseFont):
     def __init__(self, fontPath, fontNumber, dataProvider=None):
         super().__init__(fontPath, fontNumber)
 
-    def updateFontPath(self, newFontPath):
-        self.fontPath = newFontPath
-
     def canReloadWithChange(self, externalFilePath):
         # For TTX we might as well return False, but this was a nice test
         # case for resetCache(). More serious usage will follow in UFOFont.
