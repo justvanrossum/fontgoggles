@@ -48,13 +48,6 @@ class UFOFont(BaseFont):
         self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
         self._cachedGlyphs = {}
-        glyphOrder = sorted(self.glyphSet.keys())  # no need for the "real" glyph order
-        if ".notdef" not in glyphOrder:
-            # We need a .notdef glyph, so let's make one.
-            glyphOrder.insert(0, ".notdef")
-            glyph = NotDefGlyph(self.info.unitsPerEm)
-            self._addOutlinePathToGlyph(glyph)
-            self._cachedGlyphs[".notdef"] = glyph
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
@@ -74,13 +67,18 @@ class UFOFont(BaseFont):
     def _getGlyph(self, glyphName):
         glyph = self._cachedGlyphs.get(glyphName)
         if glyph is None:
-            try:
-                glyph = self.glyphSet[glyphName]
+            if glyphName == ".notdef" and glyphName not in self.glyphSet:
+                # We need a .notdef glyph, so let's make one.
+                glyph = NotDefGlyph(self.info.unitsPerEm)
                 self._addOutlinePathToGlyph(glyph)
-            except Exception as e:
-                # TODO: logging would be better but then capturing in mainWindow.py is harder
-                print(f"Glyph '{glyphName}' could not be read: {e!r}", file=sys.stderr)
-                glyph = self._getGlyph(".notdef")
+            else:
+                try:
+                    glyph = self.glyphSet[glyphName]
+                    self._addOutlinePathToGlyph(glyph)
+                except Exception as e:
+                    # TODO: logging would be better but then capturing in mainWindow.py is harder
+                    print(f"Glyph '{glyphName}' could not be read: {e!r}", file=sys.stderr)
+                    glyph = self._getGlyph(".notdef")
             self._cachedGlyphs[glyphName] = glyph
         return glyph
 
