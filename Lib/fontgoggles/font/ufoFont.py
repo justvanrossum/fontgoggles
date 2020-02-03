@@ -200,7 +200,7 @@ def _parseFeaSource(featureSource):
         if lineStart == -1:
             lineStart = 0
         if lineEnd == -1:
-            lineEnd = len(source)
+            lineEnd = len(featureSource)
         line = featureSource[lineStart:lineEnd]
         f = io.StringIO(line)
         p = FeatureParser(f, followIncludes=False)
