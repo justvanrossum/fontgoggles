@@ -69,6 +69,10 @@ class UFOFont(BaseFont):
             if prevAnchors != currentAnchors:
                 return False
 
+            # Look for cmap changes
+            # TODO: this has a bug. If a glyph is changed so it has the same unicode
+            # as an existing glyph, it will take over that unicode, and when it is
+            # changed back the original glyph does _not_ get its unicode back.
             prevCmap = self.ttFont.getBestCmap()
             prevRevCmap = defaultdict(list)
             for code, gn in prevCmap.items():
@@ -83,6 +87,7 @@ class UFOFont(BaseFont):
             currentRevCmap.update(changedRevCmap)
 
             if prevRevCmap != currentRevCmap:
+                # The cmap changed. Let's update it in-place and only rebuild the shaper
                 cmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
                 del self.ttFont["cmap"]
                 fb = FontBuilder(font=self.ttFont)
@@ -97,12 +102,12 @@ class UFOFont(BaseFont):
                                       ttFont=self.ttFont)
 
             self.glyphModTimes = glyphModTimes
+            self.contentsModTime = contentsModTime
             self.resetCache()
             return True
-        # elif anyFileChanged(features.fea, groups.plist, kerning.plist, lib.plist?):
-        #     return False
-        # else:
-        #     return True
+        # if fontinfo.plist changed: reload self.info, self.resetCache(), return True
+        # if kerning, groups, fea changed: return False
+        # else: return True  # nothing really changed that we know of or care about (eg. lib.plist)
         return False
 
     async def load(self, outputWriter):
