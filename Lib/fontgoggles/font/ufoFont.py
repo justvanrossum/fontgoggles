@@ -19,6 +19,8 @@ from ..misc.properties import cachedProperty
 
 class UFOFont(BaseFont):
 
+    glyphModTimes = None
+
     def _setupReaderAndGlyphSet(self):
         self.reader = UFOReader(self.fontPath, validate=False)
         self.glyphSet = self.reader.getGlyphSet()
@@ -29,17 +31,26 @@ class UFOFont(BaseFont):
         super().updateFontPath(newFontPath)
         self._setupReaderAndGlyphSet()
 
-    # def canReloadWithChange(self, externalFilePath):
-    #     # Task: find out which files changed, and decide whether to
-    #     # rebuild completely or that we only need to flush the glyph
-    #     # caches. Tricky: is achors have changed the features need to
-    #     # be rebuilt. If unicodes changed we need to update
-    #     # self.ttFont['cmap'].
-    #     if self.reader.fileStructure == UFOFileStructure.ZIP:
-    #         # We can't (won't) partially reload .ufoz
-    #         return False
-    #     self.resetCache()
-    #     return True
+    def canReloadWithChange(self, externalFilePath):
+        if self.reader.fileStructure != UFOFileStructure.PACKAGE:
+            # We can't (won't) partially reload .ufoz
+            return False
+        if externalFilePath:
+            # Features need to be recompiled no matter what
+            return False
+        glyphModTimes = getGlyphModTimes(self.glyphSet)
+        if glyphModTimes != self.glyphModTimes:
+            # TODO: Check modified glyphs for changed unicodes, anchors
+            # if achors changed: return False
+            # elif unicodes changed: rebuild cmap, recompile ttFont, rebuild shaper
+            self.glyphModTimes = glyphModTimes
+            self.resetCache()
+            return True
+        # elif anyFileChanged(features.fea, groups.plist, kerning.plist, lib.plist?):
+        #     return False
+        # else:
+        #     return True
+        return False
 
     async def load(self, outputWriter):
         if hasattr(self, "reader"):
@@ -49,6 +60,8 @@ class UFOFont(BaseFont):
         self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
         self._cachedGlyphs = {}
+        if self.glyphModTimes is None:
+            self.glyphModTimes = getGlyphModTimes(self.glyphSet)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
