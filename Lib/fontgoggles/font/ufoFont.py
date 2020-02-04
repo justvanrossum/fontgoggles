@@ -30,6 +30,7 @@ class UFOFont(BaseFont):
 
     glyphModTimes = None
     anchors = None
+    revCmap = None
 
     def _setupReaderAndGlyphSet(self):
         self.reader = UFOReader(self.fontPath, validate=False)
@@ -73,13 +74,13 @@ class UFOFont(BaseFont):
                 return False
 
             # Look for cmap changes
-            # TODO: this has a bug. If a glyph is changed so it has the same unicode
-            # as an existing glyph, it will take over that unicode, and when it is
-            # changed back the original glyph does _not_ get its unicode back.
-            prevCmap = self.ttFont.getBestCmap()
-            prevRevCmap = defaultdict(list)
-            for code, gn in prevCmap.items():
-                prevRevCmap[gn].append(code)
+            if self.revCmap is None:
+                prevCmap = self.ttFont.getBestCmap()
+                prevRevCmap = defaultdict(list)
+                for code, gn in prevCmap.items():
+                    prevRevCmap[gn].append(code)
+            else:
+                prevRevCmap = self.revCmap
 
             for gn in prevRevCmap:
                 if gn in changedGlyphNames and gn not in changedRevCmap:
@@ -99,6 +100,7 @@ class UFOFont(BaseFont):
                 self.ttFont.save(f, reorderTables=False)
                 fontData = f.getvalue()
                 self.shaper = self._getShaper(fontData)
+                self.revCmap = currentRevCmap
 
             self.glyphModTimes = glyphModTimes
             self.contentsModTime = contentsModTime
