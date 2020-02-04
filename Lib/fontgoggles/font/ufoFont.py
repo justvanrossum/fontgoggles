@@ -27,9 +27,7 @@ ufoFilesToTrack = [FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURE
 
 class UFOFont(BaseFont):
 
-    glyphModTimes = None
-    anchors = None
-    revCmap = None
+    ufoState = None
 
     def _setupReaderAndGlyphSet(self):
         self.reader = UFOReader(self.fontPath, validate=False)
@@ -43,85 +41,24 @@ class UFOFont(BaseFont):
 
     def canReloadWithChange(self, externalFilePath):
         if self.reader.fileStructure != UFOFileStructure.PACKAGE:
-            # We can't (won't) partially reloadToTrack .ufoz
+            # We can't (won't) partially reload .ufoz
             return False
         if externalFilePath:
             # Features need to be recompiled no matter what
             return False
-        # TODO: much of this logic needs to be factored out so it can be shared
-        # with DSFont, which does not use UFOFont for its sources.
+
         self.glyphSet.rebuildContents()
-        glyphModTimes, contentsModTime = getGlyphModTimes(self.glyphSet)
-        if glyphModTimes != self.glyphModTimes or contentsModTime != self.contentsModTime:
-            changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ self.glyphModTimes}
-            deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in self.glyphSet}
-            changedGlyphNames -= deletedGlyphNames
-            _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(self.glyphSet,
-                                                                                self.fontPath,
-                                                                                changedGlyphNames)
-            if self.anchors is None:
-                prevAnchors = pickle.loads(self.ttFont["FGAx"].data)
-            else:
-                prevAnchors = self.anchors
-
-            for gn in prevAnchors:
-                if gn in changedGlyphNames and gn not in changedAnchors:
-                    changedAnchors[gn] = []  # Anchor(s) got deleted
-
-            currentAnchors = {gn: anchors for gn, anchors in prevAnchors.items()
-                              if gn not in deletedGlyphNames}
-            currentAnchors.update(changedAnchors)
-            if prevAnchors != currentAnchors:
-                return False
-
-            # Look for cmap changes
-            if self.revCmap is None:
-                prevCmap = self.ttFont.getBestCmap()
-                prevRevCmap = defaultdict(list)
-                for code, gn in prevCmap.items():
-                    prevRevCmap[gn].append(code)
-            else:
-                prevRevCmap = self.revCmap
-
-            for gn in prevRevCmap:
-                if gn in changedGlyphNames and gn not in changedRevCmap:
-                    changedRevCmap[gn] = []  # Unicode got deleted
-
-            currentRevCmap = {gn: codes for gn, codes in prevRevCmap.items()
-                              if gn not in deletedGlyphNames}
-            currentRevCmap.update(changedRevCmap)
-
-            if prevRevCmap != currentRevCmap:
-                # The cmap changed. Let's update it in-place and only rebuild the shaper
-                cmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
-                del self.ttFont["cmap"]
-                fb = FontBuilder(font=self.ttFont)
-                fb.setupCharacterMap(cmap)
-                f = io.BytesIO()
-                self.ttFont.save(f, reorderTables=False)
-                fontData = f.getvalue()
-                self.shaper = self._getShaper(fontData)
-                self.revCmap = currentRevCmap
-
-            self.glyphModTimes = glyphModTimes
-            self.contentsModTime = contentsModTime
-            self.resetCache()
-            return True
-
-        fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
-        changedFiles = {fileName for fileName, modTime in fileModTimes ^ self.fileModTimes}
-        self.fileModTimes = fileModTimes
-        if FEATURES_FILENAME in changedFiles or GROUPS_FILENAME in changedFiles or KERNING_FILENAME in changedFiles:
-            return False
-        if FONTINFO_FILENAME in changedFiles:
-            # Only interesting for a potentially changed unitsPerEm
+        canReload, needInfoUpdate, needShaperUpdate = canReloadUFO(self.reader, self.glyphSet, self.ttFont, self.ufoState)
+        if needInfoUpdate:
             self.info = SimpleNamespace()
             self.reader.readInfo(self.info)
+        if needShaperUpdate:
+            f = io.BytesIO()
+            self.ttFont.save(f, reorderTables=False)
+            self.shaper = self._getShaper(f.getvalue())
+        if canReload:
             self.resetCache()
-            return True
-
-        # Nothing changed that we know of or care about (eg. lib.plist)
-        return True
+        return canReload
 
     async def load(self, outputWriter):
         if hasattr(self, "reader"):
@@ -131,9 +68,10 @@ class UFOFont(BaseFont):
         self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
         self._cachedGlyphs = {}
-        if self.glyphModTimes is None:
-            self.glyphModTimes, self.contentsModTime = getGlyphModTimes(self.glyphSet)
-            self.fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
+        if self.ufoState is None:
+            self.ufoState = SimpleNamespace(anchors=None, revCmap=None)
+            self.ufoState.glyphModTimes, self.ufoState.contentsModTime = getGlyphModTimes(self.glyphSet)
+            self.ufoState.fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
@@ -313,6 +251,78 @@ def _parseFeaSource(featureSource):
         for st in p.parse().statements:
             if isinstance(st, IncludeStatement):
                 yield st.filename
+
+
+def canReloadUFO(reader, glyphSet, ttFont, ufoState):
+    needShaperUpdate = False
+    glyphModTimes, contentsModTime = getGlyphModTimes(glyphSet)
+    if glyphModTimes != ufoState.glyphModTimes or contentsModTime != ufoState.contentsModTime:
+        changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ ufoState.glyphModTimes}
+        deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in glyphSet}
+        changedGlyphNames -= deletedGlyphNames
+        _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(glyphSet,
+                                                                            reader.fs.getsyspath("/"),
+                                                                            changedGlyphNames)
+        if ufoState.anchors is None:
+            prevAnchors = pickle.loads(ttFont["FGAx"].data)
+        else:
+            prevAnchors = ufoState.anchors
+
+        for gn in prevAnchors:
+            if gn in changedGlyphNames and gn not in changedAnchors:
+                changedAnchors[gn] = []  # Anchor(s) got deleted
+
+        currentAnchors = {gn: anchors for gn, anchors in prevAnchors.items()
+                          if gn not in deletedGlyphNames}
+        currentAnchors.update(changedAnchors)
+        if prevAnchors != currentAnchors:
+            return False, False, False
+
+        # Look for cmap changes
+        if ufoState.revCmap is None:
+            prevCmap = ttFont.getBestCmap()
+            prevRevCmap = defaultdict(list)
+            for code, gn in prevCmap.items():
+                prevRevCmap[gn].append(code)
+        else:
+            prevRevCmap = ufoState.revCmap
+
+        for gn in prevRevCmap:
+            if gn in changedGlyphNames and gn not in changedRevCmap:
+                changedRevCmap[gn] = []  # Unicode got deleted
+
+        currentRevCmap = {gn: codes for gn, codes in prevRevCmap.items()
+                          if gn not in deletedGlyphNames}
+        currentRevCmap.update(changedRevCmap)
+
+        if prevRevCmap != currentRevCmap:
+            # The cmap changed. Let's update it in-place and only rebuild the shaper
+            cmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
+            del ttFont["cmap"]
+            fb = FontBuilder(font=ttFont)
+            fb.setupCharacterMap(cmap)
+            needShaperUpdate = True
+            ufoState.revCmap = currentRevCmap
+        else:
+            needShaperUpdate = False
+
+        ufoState.glyphModTimes = glyphModTimes
+        ufoState.contentsModTime = contentsModTime
+        return True, False, needShaperUpdate
+
+    fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
+    changedFiles = {fileName for fileName, modTime in fileModTimes ^ ufoState.fileModTimes}
+    ufoState.fileModTimes = fileModTimes
+
+    if FEATURES_FILENAME in changedFiles or GROUPS_FILENAME in changedFiles or KERNING_FILENAME in changedFiles:
+        return False, False, False
+
+    if FONTINFO_FILENAME in changedFiles:
+        # Only interesting for a potentially changed unitsPerEm
+        return True, True, False
+
+    # Nothing changed that we know of or care about (eg. lib.plist)
+    return True, False, False
 
 
 def getModTime(path):
