@@ -39,6 +39,9 @@ def compileMinimumFont(ufoPath):
     fb.setupCharacterMap(cmap)
     fb.setupPost()  # This makes sure we store the glyph names
     ttFont = fb.font
+    # Store anchors in the font as a private table: this is valuable
+    # data that our parent process can use to do faster reloading upon
+    # changes.
     ttFont["FGAx"] = newTable("FGAx")
     ttFont["FGAx"].data = pickle.dumps(anchors)
     ufo = MinimalFontObject(ufoPath, reader, revCmap, anchors)
