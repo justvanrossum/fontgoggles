@@ -1,10 +1,5 @@
 # this is the feature from BoldWide
 
-feature ss01 {
-    sub I by I.narrow;
-    sub J by J.narrow;
-} ss01;
-
 feature calt {
     sub I I' I by I.narrow;
 } calt;
