@@ -43,15 +43,20 @@ class UFOFont(BaseFont):
         if self.reader.fileStructure != UFOFileStructure.PACKAGE:
             # We can't (won't) partially reload .ufoz
             return False
+
         if externalFilePath:
             # Features need to be recompiled no matter what
             return False
 
         self.glyphSet.rebuildContents()
+
         canReload, needsInfoUpdate, newCmap = canReloadUFO(self.reader, self.glyphSet, self.ttFont, self.ufoState)
+
         if needsInfoUpdate:
+            # font.info changed, all we care about is a possibly change unitsPerEm
             self.info = SimpleNamespace()
             self.reader.readInfo(self.info)
+
         if newCmap is not None:
             # The cmap changed. Let's update it in-place and only rebuild the shaper
             fb = FontBuilder(font=self.ttFont)
@@ -59,8 +64,10 @@ class UFOFont(BaseFont):
             f = io.BytesIO()
             self.ttFont.save(f, reorderTables=False)
             self.shaper = self._getShaper(f.getvalue())
+
         if canReload:
             self.resetCache()
+
         return canReload
 
     async def load(self, outputWriter):
