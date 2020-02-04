@@ -23,6 +23,9 @@ from ..misc.properties import cachedProperty
 from ..misc.ufoCompiler import fetchCharacterMappingAndAnchors
 
 
+ufoFilesToTrack = [FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURES_FILENAME]
+
+
 class UFOFont(BaseFont):
 
     glyphModTimes = None
@@ -40,7 +43,7 @@ class UFOFont(BaseFont):
 
     def canReloadWithChange(self, externalFilePath):
         if self.reader.fileStructure != UFOFileStructure.PACKAGE:
-            # We can't (won't) partially reload .ufoz
+            # We can't (won't) partially reloadToTrack .ufoz
             return False
         if externalFilePath:
             # Features need to be recompiled no matter what
@@ -101,10 +104,21 @@ class UFOFont(BaseFont):
             self.contentsModTime = contentsModTime
             self.resetCache()
             return True
-        # if fontinfo.plist changed: reload self.info, self.resetCache(), return True
-        # if kerning, groups, fea changed: return False
-        # else: return True  # nothing really changed that we know of or care about (eg. lib.plist)
-        return False
+
+        fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
+        changedFiles = {fileName for fileName, modTime in fileModTimes ^ self.fileModTimes}
+        self.fileModTimes = fileModTimes
+        if FEATURES_FILENAME in changedFiles or GROUPS_FILENAME in changedFiles or KERNING_FILENAME in changedFiles:
+            return False
+        if FONTINFO_FILENAME in changedFiles:
+            # Only interesting for a potentially changed unitsPerEm
+            self.info = SimpleNamespace()
+            self.reader.readInfo(self.info)
+            self.resetCache()
+            return True
+
+        # Nothing changed that we know of or care about (eg. lib.plist)
+        return True
 
     async def load(self, outputWriter):
         if hasattr(self, "reader"):
@@ -116,7 +130,7 @@ class UFOFont(BaseFont):
         self._cachedGlyphs = {}
         if self.glyphModTimes is None:
             self.glyphModTimes, self.contentsModTime = getGlyphModTimes(self.glyphSet)
-            # self.fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), XXX)
+            self.fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
