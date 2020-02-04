@@ -14,9 +14,6 @@ from fontTools.ufoLib.glifLib import _BaseParser as BaseGlifParser
 from ufo2ft.featureCompiler import FeatureCompiler
 
 
-anchorsTableTag = "FGAx"  # Private table where we store a pickle of the anchors dict
-
-
 def compileMinimumFont(ufoPath):
     """Compile the source UFO to a TTF with the smallest amount of tables
     needed to let HarfBuzz do its work. That would be 'cmap', 'post' and
@@ -42,8 +39,8 @@ def compileMinimumFont(ufoPath):
     fb.setupCharacterMap(cmap)
     fb.setupPost()  # This makes sure we store the glyph names
     ttFont = fb.font
-    ttFont[anchorsTableTag] = newTable(anchorsTableTag)
-    ttFont[anchorsTableTag].data = pickle.dumps(anchors)
+    ttFont["FGAx"] = newTable("FGAx")
+    ttFont["FGAx"].data = pickle.dumps(anchors)
     ufo = MinimalFontObject(ufoPath, reader, revCmap, anchors)
     feaComp = FeatureCompiler(ufo, ttFont)
     try:
