@@ -1,5 +1,7 @@
+from collections import defaultdict
 import io
 import pathlib
+import pickle
 import os
 import re
 import sys
@@ -7,19 +9,24 @@ from types import SimpleNamespace
 from fontTools.feaLib.parser import Parser as FeatureParser
 from fontTools.feaLib.ast import IncludeStatement
 from fontTools.feaLib.error import FeatureLibError
+from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.cocoaPen import CocoaPen  # TODO: factor out mac-specific code
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader, UFOFileStructure
-from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph
+from fontTools.ufoLib import (DEFAULT_GLYPHS_DIRNAME, FONTINFO_FILENAME, GROUPS_FILENAME,
+                              KERNING_FILENAME, FEATURES_FILENAME)
+from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph, CONTENTS_FILENAME
 from .baseFont import BaseFont
 from ..misc.compilerPool import compileUFOToBytes
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
+from ..misc.ufoCompiler import fetchCharacterMappingAndAnchors
 
 
 class UFOFont(BaseFont):
 
     glyphModTimes = None
+    anchors = None
 
     def _setupReaderAndGlyphSet(self):
         self.reader = UFOReader(self.fontPath, validate=False)
@@ -38,11 +45,57 @@ class UFOFont(BaseFont):
         if externalFilePath:
             # Features need to be recompiled no matter what
             return False
-        glyphModTimes = getGlyphModTimes(self.glyphSet)
-        if glyphModTimes != self.glyphModTimes:
-            # TODO: Check modified glyphs for changed unicodes, anchors
-            # if achors changed: return False
-            # elif unicodes changed: rebuild cmap, recompile ttFont, rebuild shaper
+        # TODO: much of this logic needs to be factored out so it can be shared
+        # with DSFont, which does not use UFOFont for its sources.
+        self.glyphSet.rebuildContents()
+        glyphModTimes, contentsModTime = getGlyphModTimes(self.glyphSet)
+        if glyphModTimes != self.glyphModTimes or contentsModTime != self.contentsModTime:
+            changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ self.glyphModTimes}
+            deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in self.glyphSet}
+            changedGlyphNames -= deletedGlyphNames
+            _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(self.glyphSet, self.fontPath, changedGlyphNames)
+            if self.anchors is None:
+                prevAnchors = pickle.loads(self.ttFont["FGAx"].data)
+            else:
+                prevAnchors = self.anchors
+
+            for gn in prevAnchors:
+                if gn in changedGlyphNames and gn not in changedAnchors:
+                    changedAnchors[gn] = []  # Anchor(s) got deleted
+
+            currentAnchors = {gn: anchors for gn, anchors in prevAnchors.items()
+                              if gn not in deletedGlyphNames}
+            currentAnchors.update(changedAnchors)
+            if prevAnchors != currentAnchors:
+                return False
+
+            prevCmap = self.ttFont.getBestCmap()
+            prevRevCmap = defaultdict(list)
+            for code, gn in prevCmap.items():
+                prevRevCmap[gn].append(code)
+
+            for gn in prevRevCmap:
+                if gn in changedGlyphNames and gn not in changedRevCmap:
+                    changedRevCmap[gn] = []  # Unicode got deleted
+
+            currentRevCmap = {gn: codes for gn, codes in prevRevCmap.items()
+                              if gn not in deletedGlyphNames}
+            currentRevCmap.update(changedRevCmap)
+
+            if prevRevCmap != currentRevCmap:
+                cmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
+                del self.ttFont["cmap"]
+                fb = FontBuilder(font=self.ttFont)
+                fb.setupCharacterMap(cmap)
+                f = io.BytesIO()
+                self.ttFont.save(f, reorderTables=False)
+                fontData = f.getvalue()
+                self.shaper = HBShape(fontData,
+                                      getHorizontalAdvance=self._getHorizontalAdvance,
+                                      getVerticalAdvance=self._getVerticalAdvance,
+                                      getVerticalOrigin=self._getVerticalOrigin,
+                                      ttFont=self.ttFont)
+
             self.glyphModTimes = glyphModTimes
             self.resetCache()
             return True
@@ -61,7 +114,8 @@ class UFOFont(BaseFont):
         self.reader.readInfo(self.info)
         self._cachedGlyphs = {}
         if self.glyphModTimes is None:
-            self.glyphModTimes = getGlyphModTimes(self.glyphSet)
+            self.glyphModTimes, self.contentsModTime = getGlyphModTimes(self.glyphSet)
+            # self.fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), XXX)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
@@ -240,10 +294,23 @@ def _parseFeaSource(featureSource):
                 yield st.filename
 
 
+def getModTime(path):
+    try:
+        return os.stat(path).st_mtime
+    except FileNotFoundError:
+        return None
+
+
 def getGlyphModTimes(glyphSet):
     folder = glyphSet.fs.getsyspath("/")  # We don't support .ufoz here
-    return {(glyphName, os.stat(os.path.join(folder, fileName)).st_mtime)
-            for glyphName, fileName in glyphSet.contents.items()}
+    contentsModTime = getModTime(os.path.join(folder, CONTENTS_FILENAME))
+    return {(glyphName, getModTime(os.path.join(folder, fileName)))
+            for glyphName, fileName in glyphSet.contents.items()}, contentsModTime
+
+
+def getFileModTimes(folder, fileNames):
+    return {(fileName, getModTime(os.path.join(folder, fileName)))
+            for fileName in fileNames}
 
 
 if __name__ == "__main__":
