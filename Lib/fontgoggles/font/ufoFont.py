@@ -270,7 +270,7 @@ def canReloadUFO(reader, glyphSet, ttFont, ufoState):
     ufoState.fileModTimes = fileModTimes
 
     if FEATURES_FILENAME in changedFiles or GROUPS_FILENAME in changedFiles or KERNING_FILENAME in changedFiles:
-        # Featureas need to be rebuilt
+        # Features need to be rebuilt
         return False, False, None
 
     needsInfoUpdate = FONTINFO_FILENAME in changedFiles
