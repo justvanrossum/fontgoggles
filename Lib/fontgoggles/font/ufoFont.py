@@ -48,8 +48,8 @@ class UFOFont(BaseFont):
             return False
 
         self.glyphSet.rebuildContents()
-        canReload, needInfoUpdate, newCmap = canReloadUFO(self.reader, self.glyphSet, self.ttFont, self.ufoState)
-        if needInfoUpdate:
+        canReload, needsInfoUpdate, newCmap = canReloadUFO(self.reader, self.glyphSet, self.ttFont, self.ufoState)
+        if needsInfoUpdate:
             self.info = SimpleNamespace()
             self.reader.readInfo(self.info)
         if newCmap is not None:
@@ -262,64 +262,69 @@ def canReloadUFO(reader, glyphSet, ttFont, ufoState):
     changedFiles = {fileName for fileName, modTime in fileModTimes ^ ufoState.fileModTimes}
     ufoState.fileModTimes = fileModTimes
 
-    if glyphModTimes != ufoState.glyphModTimes or contentsModTime != ufoState.contentsModTime:
-        changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ ufoState.glyphModTimes}
-        ufoState.glyphModTimes = glyphModTimes
-        ufoState.contentsModTime = contentsModTime
-        deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in glyphSet}
-        changedGlyphNames -= deletedGlyphNames
-        _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(glyphSet,
-                                                                            reader.fs.getsyspath("/"),
-                                                                            changedGlyphNames)
-        if ufoState.anchors is None:
-            prevAnchors = pickle.loads(ttFont["FGAx"].data)
-        else:
-            prevAnchors = ufoState.anchors
-
-        for gn in prevAnchors:
-            if gn in changedGlyphNames and gn not in changedAnchors:
-                changedAnchors[gn] = []  # Anchor(s) got deleted
-
-        currentAnchors = {gn: anchors for gn, anchors in prevAnchors.items()
-                          if gn not in deletedGlyphNames}
-        currentAnchors.update(changedAnchors)
-        if prevAnchors != currentAnchors:
-            return False, False, None
-
-        # Look for cmap changes
-        if ufoState.revCmap is None:
-            prevCmap = ttFont.getBestCmap()
-            prevRevCmap = defaultdict(list)
-            for code, gn in prevCmap.items():
-                prevRevCmap[gn].append(code)
-        else:
-            prevRevCmap = ufoState.revCmap
-
-        for gn in prevRevCmap:
-            if gn in changedGlyphNames and gn not in changedRevCmap:
-                changedRevCmap[gn] = []  # Unicode got deleted
-
-        currentRevCmap = {gn: codes for gn, codes in prevRevCmap.items()
-                          if gn not in deletedGlyphNames}
-        currentRevCmap.update(changedRevCmap)
-
-        if prevRevCmap != currentRevCmap:
-            ufoState.revCmap = currentRevCmap
-            newCmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
-        else:
-            newCmap = None
-
-        return True, False, newCmap
-
     if FEATURES_FILENAME in changedFiles or GROUPS_FILENAME in changedFiles or KERNING_FILENAME in changedFiles:
+        # Featureas need to be rebuilt
         return False, False, None
 
-    if FONTINFO_FILENAME in changedFiles:
-        # Only interesting for a potentially changed unitsPerEm
-        return True, True, None
+    needsInfoUpdate = FONTINFO_FILENAME in changedFiles
 
-    # Nothing changed that we know of or care about (eg. lib.plist)
-    return True, False, None
+    if glyphModTimes == ufoState.glyphModTimes and contentsModTime == ufoState.contentsModTime:
+        # Nothing changed that we know of or care about
+        return True, needsInfoUpdate, None
+
+    # Let's see which glyphs changed
+    changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ ufoState.glyphModTimes}
+    ufoState.glyphModTimes = glyphModTimes
+    ufoState.contentsModTime = contentsModTime
+    deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in glyphSet}
+    changedGlyphNames -= deletedGlyphNames
+    _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(glyphSet,
+                                                                        reader.fs.getsyspath("/"),
+                                                                        changedGlyphNames)
+    # Within the changed glyphs, let's see if their anchors changed
+    if ufoState.anchors is None:
+        prevAnchors = pickle.loads(ttFont["FGAx"].data)
+    else:
+        prevAnchors = ufoState.anchors
+
+    for gn in prevAnchors:
+        if gn in changedGlyphNames and gn not in changedAnchors:
+            changedAnchors[gn] = []  # Anchor(s) got deleted
+
+    currentAnchors = {gn: anchors for gn, anchors in prevAnchors.items()
+                      if gn not in deletedGlyphNames}
+    currentAnchors.update(changedAnchors)
+
+    if prevAnchors != currentAnchors:
+        # If there's a change in the anchors, mark positioning features
+        # have to be rebuilt, so we can't do a simple reload
+        return False, False, None
+
+    # Within the changed glyphs, let's see if their unicodes changed
+    if ufoState.revCmap is None:
+        prevCmap = ttFont.getBestCmap()
+        prevRevCmap = defaultdict(list)
+        for code, gn in prevCmap.items():
+            prevRevCmap[gn].append(code)
+    else:
+        prevRevCmap = ufoState.revCmap
+
+    for gn in prevRevCmap:
+        if gn in changedGlyphNames and gn not in changedRevCmap:
+            changedRevCmap[gn] = []  # Unicode(s) got deleted
+
+    currentRevCmap = {gn: codes for gn, codes in prevRevCmap.items()
+                      if gn not in deletedGlyphNames}
+    currentRevCmap.update(changedRevCmap)
+
+    if prevRevCmap != currentRevCmap:
+        # The cmap needs updating
+        ufoState.revCmap = currentRevCmap
+        newCmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
+    else:
+        newCmap = None
+
+    return True, needsInfoUpdate, newCmap
 
 
 def getModTime(path):
