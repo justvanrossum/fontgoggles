@@ -1,15 +1,20 @@
 """ Tools to compile a UFO's features as quickly as possible."""
 
 import logging
+import pickle
 import re
 import sys
 import traceback
 from types import SimpleNamespace
 import xml.etree.ElementTree as ET
 from fontTools.fontBuilder import FontBuilder
+from fontTools.ttLib import newTable
 from fontTools.ufoLib import UFOReader
 from fontTools.ufoLib.glifLib import _BaseParser as BaseGlifParser
 from ufo2ft.featureCompiler import FeatureCompiler
+
+
+anchorsTableTag = "FGAx"  # Private table where we store a pickle of the anchors dict
 
 
 def compileMinimumFont(ufoPath):
@@ -37,6 +42,8 @@ def compileMinimumFont(ufoPath):
     fb.setupCharacterMap(cmap)
     fb.setupPost()  # This makes sure we store the glyph names
     ttFont = fb.font
+    ttFont[anchorsTableTag] = newTable(anchorsTableTag)
+    ttFont[anchorsTableTag].data = pickle.dumps(anchors)
     ufo = MinimalFontObject(ufoPath, reader, revCmap, anchors)
     feaComp = FeatureCompiler(ufo, ttFont)
     try:
