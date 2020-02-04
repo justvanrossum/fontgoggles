@@ -258,8 +258,14 @@ def _parseFeaSource(featureSource):
 
 def canReloadUFO(reader, glyphSet, ttFont, ufoState):
     glyphModTimes, contentsModTime = getGlyphModTimes(glyphSet)
+    fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
+    changedFiles = {fileName for fileName, modTime in fileModTimes ^ ufoState.fileModTimes}
+    ufoState.fileModTimes = fileModTimes
+
     if glyphModTimes != ufoState.glyphModTimes or contentsModTime != ufoState.contentsModTime:
         changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ ufoState.glyphModTimes}
+        ufoState.glyphModTimes = glyphModTimes
+        ufoState.contentsModTime = contentsModTime
         deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in glyphSet}
         changedGlyphNames -= deletedGlyphNames
         _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(glyphSet,
@@ -303,13 +309,7 @@ def canReloadUFO(reader, glyphSet, ttFont, ufoState):
         else:
             newCmap = None
 
-        ufoState.glyphModTimes = glyphModTimes
-        ufoState.contentsModTime = contentsModTime
         return True, False, newCmap
-
-    fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
-    changedFiles = {fileName for fileName, modTime in fileModTimes ^ ufoState.fileModTimes}
-    ufoState.fileModTimes = fileModTimes
 
     if FEATURES_FILENAME in changedFiles or GROUPS_FILENAME in changedFiles or KERNING_FILENAME in changedFiles:
         return False, False, None
