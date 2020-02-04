@@ -48,11 +48,14 @@ class UFOFont(BaseFont):
             return False
 
         self.glyphSet.rebuildContents()
-        canReload, needInfoUpdate, needShaperUpdate = canReloadUFO(self.reader, self.glyphSet, self.ttFont, self.ufoState)
+        canReload, needInfoUpdate, newCmap = canReloadUFO(self.reader, self.glyphSet, self.ttFont, self.ufoState)
         if needInfoUpdate:
             self.info = SimpleNamespace()
             self.reader.readInfo(self.info)
-        if needShaperUpdate:
+        if newCmap is not None:
+            # The cmap changed. Let's update it in-place and only rebuild the shaper
+            fb = FontBuilder(font=self.ttFont)
+            fb.setupCharacterMap(newCmap)
             f = io.BytesIO()
             self.ttFont.save(f, reorderTables=False)
             self.shaper = self._getShaper(f.getvalue())
@@ -254,7 +257,6 @@ def _parseFeaSource(featureSource):
 
 
 def canReloadUFO(reader, glyphSet, ttFont, ufoState):
-    needShaperUpdate = False
     glyphModTimes, contentsModTime = getGlyphModTimes(glyphSet)
     if glyphModTimes != ufoState.glyphModTimes or contentsModTime != ufoState.contentsModTime:
         changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ ufoState.glyphModTimes}
@@ -276,7 +278,7 @@ def canReloadUFO(reader, glyphSet, ttFont, ufoState):
                           if gn not in deletedGlyphNames}
         currentAnchors.update(changedAnchors)
         if prevAnchors != currentAnchors:
-            return False, False, False
+            return False, False, None
 
         # Look for cmap changes
         if ufoState.revCmap is None:
@@ -296,33 +298,28 @@ def canReloadUFO(reader, glyphSet, ttFont, ufoState):
         currentRevCmap.update(changedRevCmap)
 
         if prevRevCmap != currentRevCmap:
-            # The cmap changed. Let's update it in-place and only rebuild the shaper
-            cmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
-            del ttFont["cmap"]
-            fb = FontBuilder(font=ttFont)
-            fb.setupCharacterMap(cmap)
-            needShaperUpdate = True
             ufoState.revCmap = currentRevCmap
+            newCmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
         else:
-            needShaperUpdate = False
+            newCmap = None
 
         ufoState.glyphModTimes = glyphModTimes
         ufoState.contentsModTime = contentsModTime
-        return True, False, needShaperUpdate
+        return True, False, newCmap
 
     fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
     changedFiles = {fileName for fileName, modTime in fileModTimes ^ ufoState.fileModTimes}
     ufoState.fileModTimes = fileModTimes
 
     if FEATURES_FILENAME in changedFiles or GROUPS_FILENAME in changedFiles or KERNING_FILENAME in changedFiles:
-        return False, False, False
+        return False, False, None
 
     if FONTINFO_FILENAME in changedFiles:
         # Only interesting for a potentially changed unitsPerEm
-        return True, True, False
+        return True, True, None
 
     # Nothing changed that we know of or care about (eg. lib.plist)
-    return True, False, False
+    return True, False, None
 
 
 def getModTime(path):
