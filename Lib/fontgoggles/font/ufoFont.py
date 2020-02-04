@@ -1,5 +1,6 @@
 import io
 import pathlib
+import os
 import re
 import sys
 from types import SimpleNamespace
@@ -224,6 +225,12 @@ def _parseFeaSource(featureSource):
         for st in p.parse().statements:
             if isinstance(st, IncludeStatement):
                 yield st.filename
+
+
+def getGlyphModTimes(glyphSet):
+    folder = glyphSet.fs.getsyspath("/")  # We don't support .ufoz here
+    return {(glyphName, os.stat(os.path.join(folder, fileName)).st_mtime)
+            for glyphName, fileName in glyphSet.contents.items()}
 
 
 if __name__ == "__main__":
