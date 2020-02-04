@@ -13,7 +13,7 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.cocoaPen import CocoaPen  # TODO: factor out mac-specific code
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader, UFOFileStructure
-from fontTools.ufoLib import (DEFAULT_GLYPHS_DIRNAME, FONTINFO_FILENAME, GROUPS_FILENAME,
+from fontTools.ufoLib import (FONTINFO_FILENAME, GROUPS_FILENAME,
                               KERNING_FILENAME, FEATURES_FILENAME)
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph, CONTENTS_FILENAME
 from .baseFont import BaseFont
@@ -57,7 +57,9 @@ class UFOFont(BaseFont):
             changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ self.glyphModTimes}
             deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in self.glyphSet}
             changedGlyphNames -= deletedGlyphNames
-            _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(self.glyphSet, self.fontPath, changedGlyphNames)
+            _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(self.glyphSet,
+                                                                                self.fontPath,
+                                                                                changedGlyphNames)
             if self.anchors is None:
                 prevAnchors = pickle.loads(self.ttFont["FGAx"].data)
             else:
