@@ -50,7 +50,7 @@ class UFOFont(BaseFont):
 
         self.glyphSet.rebuildContents()
 
-        canReload, needsInfoUpdate, newCmap = canReloadUFO(self.reader, self.glyphSet, self.ttFont, self.ufoState)
+        canReload, needsInfoUpdate, newCmap = canReloadUFO(self.ufoState, self.reader, self.glyphSet, self.ttFont)
 
         if needsInfoUpdate:
             # font.info changed, all we care about is a possibly change unitsPerEm
@@ -263,7 +263,7 @@ def _parseFeaSource(featureSource):
                 yield st.filename
 
 
-def canReloadUFO(reader, glyphSet, ttFont, ufoState):
+def canReloadUFO(ufoState, reader, glyphSet, ttFont):
     glyphModTimes, contentsModTime = getGlyphModTimes(glyphSet)
     fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
     changedFiles = {fileName for fileName, modTime in fileModTimes ^ ufoState.fileModTimes}
