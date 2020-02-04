@@ -95,11 +95,7 @@ class UFOFont(BaseFont):
                 f = io.BytesIO()
                 self.ttFont.save(f, reorderTables=False)
                 fontData = f.getvalue()
-                self.shaper = HBShape(fontData,
-                                      getHorizontalAdvance=self._getHorizontalAdvance,
-                                      getVerticalAdvance=self._getVerticalAdvance,
-                                      getVerticalOrigin=self._getVerticalOrigin,
-                                      ttFont=self.ttFont)
+                self.shaper = self._getShaper(fontData)
 
             self.glyphModTimes = glyphModTimes
             self.contentsModTime = contentsModTime
@@ -128,11 +124,14 @@ class UFOFont(BaseFont):
 
         f = io.BytesIO(fontData)
         self.ttFont = TTFont(f, lazy=True)
-        self.shaper = HBShape(fontData,
-                              getHorizontalAdvance=self._getHorizontalAdvance,
-                              getVerticalAdvance=self._getVerticalAdvance,
-                              getVerticalOrigin=self._getVerticalOrigin,
-                              ttFont=self.ttFont)
+        self.shaper = self._getShaper(fontData)
+
+    def _getShaper(self, fontData):
+        return HBShape(fontData,
+                       getHorizontalAdvance=self._getHorizontalAdvance,
+                       getVerticalAdvance=self._getVerticalAdvance,
+                       getVerticalOrigin=self._getVerticalOrigin,
+                       ttFont=self.ttFont)
 
     def getExternalFiles(self):
         return self._includedFeatureFiles
