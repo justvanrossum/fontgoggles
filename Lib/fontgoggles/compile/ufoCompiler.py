@@ -52,6 +52,8 @@ def compileUFOToFont(ufoPath):
     except FeatureLibError as e:
         error = f"{e.__class__.__name__}: {e}"
     except Exception:
+        # This is most likely a bug, and not an input error, so perhaps
+        # we shouldn't even catch it here.
         error = traceback.format_exc()
     else:
         error = None
