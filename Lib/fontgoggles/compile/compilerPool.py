@@ -50,7 +50,7 @@ async def compileDSToBytes(dsPath, ttFolder, outputWriter):
 
 async def compileTTXToPath(ttxPath, ttPath, outputWriter):
     pool = getCompilerPool()
-    func = "fontgoggles.compile.ttxCompiler.compileFontToPath"
+    func = "fontgoggles.compile.ttxCompiler.compileTTXToPath"
     args = [
         os.fspath(ttxPath),
         os.fspath(ttPath),
