@@ -10,9 +10,9 @@ def compileDSToFont(dsPath, ttFolder):
     doc = DesignSpaceDocument.fromfile(dsPath)
     doc.findDefault()
 
-    for source in doc.sources:
+    for index, source in enumerate(doc.sources):
         if source.layerName is None:
-            ttPath = os.path.join(ttFolder, os.path.basename(source.path) + ".ttf")
+            ttPath = os.path.join(ttFolder, os.path.basename(source.path) + f"_{index}.ttf")
             if not os.path.exists(ttPath):
                 raise FileNotFoundError(ttPath)
             source.font = TTFont(ttPath, lazy=True)

@@ -29,15 +29,24 @@ class DSFont(BaseFont):
         super().__init__(fontPath, fontNumber)
         self._varGlyphs = {}
         self._normalizedLocation = {}
+        self._sourceData = {}
 
     async def load(self, outputWriter):
         self.doc = DesignSpaceDocument.fromfile(self.fontPath)
         self.doc.findDefault()
 
         with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
-            ufosToCompile = sorted({s.path for s in self.doc.sources if s.layerName is None})
-            ttPaths = [os.path.join(ttFolder, os.path.basename(u) + ".ttf") for u in ufosToCompile]
-            outputs = [io.StringIO() for i in range(len(ufosToCompile))]
+            ufosToCompile = []
+            ttPaths = []
+            outputs = []
+            for index, source in enumerate(self.doc.sources):
+                if source.layerName is None:
+                    ufosToCompile.append(source.path)
+                    # Add the source index to the tt path so we're sure file names are unique:
+                    # it's possible for the DS document to refer to two UFOs with the same name
+                    # but in two different folders. Here we flatten everything to one folder.
+                    ttPaths.append(os.path.join(ttFolder, os.path.basename(source.path) + f"_{index}.ttf"))
+                    outputs.append(io.StringIO())
             coros = (compileUFOToPath(ufoPath, ttPath, output.write)
                      for ufoPath, ttPath, output in zip(ufosToCompile, ttPaths, outputs))
             errors = await asyncio.gather(*coros, return_exceptions=True)
