@@ -13,6 +13,7 @@ class build(_build):
 
 setup(
     name="fontgoggles",
+    version="0.9",
     description="fontgoggles is the main library for the FontGoggles application.",
     author="Just van Rossum",
     author_email="justvanrossum@gmail.com",
