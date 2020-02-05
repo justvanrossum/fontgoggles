@@ -57,14 +57,12 @@ class DSFont(BaseFont):
                 )
 
             vfFontData = await compileDSToBytes(self.fontPath, ttFolder, outputWriter)
-            with open(os.path.join(ttFolder, "masterModel.pickle"), "rb") as f:
-                # masterModel is created by varLib.build(), and we communicate it
-                # to here via a tempfile pickle
-                self.masterModel = pickle.load(f)
 
-        assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
         f = io.BytesIO(vfFontData)
         self.ttFont = TTFont(f, lazy=True)
+        # Nice cookie for us from the worker
+        self.masterModel = pickle.loads(self.ttFont["MPcl"].data)
+        assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
 
         includedFeatureFiles = set()
 
