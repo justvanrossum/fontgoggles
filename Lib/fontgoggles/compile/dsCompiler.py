@@ -48,4 +48,4 @@ def compileDSToPath(dsPath, ttFolder, ttPath):
 def getTTPaths(doc, ttFolder):
     ufoPaths = sorted({s.path for s in doc.sources if s.layerName is None})
     return {ufoPath: os.path.join(ttFolder, f"master_{index}.ttf")
-               for index, ufoPath in enumerate(ufoPaths)}
+            for index, ufoPath in enumerate(ufoPaths)}
