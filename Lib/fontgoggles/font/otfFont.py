@@ -47,15 +47,6 @@ class OTFFont(_OTFBaseFont):
 
 class TTXFont(_OTFBaseFont):
 
-    def __init__(self, fontPath, fontNumber, dataProvider=None):
-        super().__init__(fontPath, fontNumber)
-
-    def canReloadWithChange(self, externalFilePath):
-        # For TTX we might as well return False, but this was a nice test
-        # case for resetCache(). More serious usage will follow in UFOFont.
-        self.resetCache()
-        return True
-
     async def load(self, outputWriter):
         fontData = await compileTTXToBytes(self.fontPath, outputWriter)
         f = io.BytesIO(fontData)
