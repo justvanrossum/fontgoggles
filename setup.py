@@ -20,6 +20,7 @@ setup(
     package_dir={"": "Lib"},
     packages=[
         'fontgoggles',
+        'fontgoggles.compile',
         'fontgoggles.font',
         'fontgoggles.mac',
         'fontgoggles.misc',
