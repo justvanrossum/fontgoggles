@@ -55,9 +55,9 @@ class DSFont(BaseFont):
                     with open(ttPath, "wb") as f:
                         f.write(self._sourceData[source.path])
                 else:
-                    output = io.StringIO()
                     ufosToCompile.append(ufoPath)
                     ttPaths.append(ttPath)
+                    output = io.StringIO()
                     outputs.append(output)
                     coros.append(compileUFOToPath(ufoPath, ttPath, output.write))
 
