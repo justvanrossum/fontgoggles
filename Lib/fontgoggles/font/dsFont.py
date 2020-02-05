@@ -100,7 +100,12 @@ class DSFont(BaseFont):
 
     def canReloadWithChange(self, externalFilePath):
         print("DS external file changed:", externalFilePath)
-        return False
+        # TODO:
+        # - check for changes in .doc
+        # - check for changes in sources
+        self.resetCache()
+        self._varGlyphs = {}
+        return True
 
     def varLocationChanged(self, varLocation):
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})
