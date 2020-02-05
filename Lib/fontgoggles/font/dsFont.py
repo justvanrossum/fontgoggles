@@ -5,6 +5,7 @@ import pathlib
 import pickle
 import sys
 import tempfile
+from types import SimpleNamespace
 import numpy
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.pointPen import PointToSegmentPen
@@ -16,6 +17,7 @@ from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph, extractIncludedFeatureFiles
 from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
 from ..misc.hbShape import HBShape
+from ..misc.properties import cachedProperty
 from ..mac.makePathFromOutline import makePathFromArrays
 
 
@@ -88,6 +90,7 @@ class DSFont(BaseFont):
         for source in self.doc.sources:
             reader = UFOReader(source.path, validate=False)
             includedFeatureFiles.update(extractIncludedFeatureFiles(source.path, reader))
+            source.ufoReader = reader
             source.ufoGlyphSet = reader.getGlyphSet(layerName=source.layerName)
 
         self._includedFeatureFiles = sorted(includedFeatureFiles)
@@ -106,6 +109,12 @@ class DSFont(BaseFont):
         self.resetCache()
         self._varGlyphs = {}
         return True
+
+    @cachedProperty
+    def unitsPerEm(self):
+        info = SimpleNamespace()
+        self.doc.default.ufoReader.readInfo(info)
+        return info.unitsPerEm
 
     def varLocationChanged(self, varLocation):
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})
