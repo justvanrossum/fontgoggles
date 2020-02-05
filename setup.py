@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from distutils.command.build import build as _build
-from setuptools import setup
+from setuptools import setup, find_packages
 import subprocess
 
 
@@ -18,13 +18,7 @@ setup(
     author_email="justvanrossum@gmail.com",
     url="https://github.com/justvanrossum/fontgoggles",
     package_dir={"": "Lib"},
-    packages=[
-        'fontgoggles',
-        'fontgoggles.compile',
-        'fontgoggles.font',
-        'fontgoggles.mac',
-        'fontgoggles.misc',
-    ],
+    packages=find_packages("Lib"),
     package_data={'fontgoggles.mac': ['*.dylib']},
     install_requires=[
     ],
