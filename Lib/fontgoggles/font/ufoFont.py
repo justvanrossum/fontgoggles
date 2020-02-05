@@ -34,10 +34,34 @@ class UFOFont(BaseFont):
         self.glyphSet = self.reader.getGlyphSet()
         self.glyphSet.glyphClass = Glyph
 
+    async def load(self, outputWriter):
+        if hasattr(self, "reader"):
+            self._cachedGlyphs = {}
+            return
+        self._setupReaderAndGlyphSet()
+        self.info = SimpleNamespace()
+        self.reader.readInfo(self.info)
+        self._cachedGlyphs = {}
+        if self.ufoState is None:
+            self.ufoState = SimpleNamespace(anchors=None, revCmap=None)
+            self.ufoState.glyphModTimes, self.ufoState.contentsModTime = getGlyphModTimes(self.glyphSet)
+            self.ufoState.fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
+
+        fontData = await compileUFOToBytes(self.fontPath, outputWriter)
+
+        self._includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
+
+        f = io.BytesIO(fontData)
+        self.ttFont = TTFont(f, lazy=True)
+        self.shaper = self._getShaper(fontData)
+
     def updateFontPath(self, newFontPath):
         """This gets called when the source file was moved."""
         super().updateFontPath(newFontPath)
         self._setupReaderAndGlyphSet()
+
+    def getExternalFiles(self):
+        return self._includedFeatureFiles
 
     def canReloadWithChange(self, externalFilePath):
         if self.reader.fileStructure != UFOFileStructure.PACKAGE:
@@ -70,36 +94,12 @@ class UFOFont(BaseFont):
 
         return canReload
 
-    async def load(self, outputWriter):
-        if hasattr(self, "reader"):
-            self._cachedGlyphs = {}
-            return
-        self._setupReaderAndGlyphSet()
-        self.info = SimpleNamespace()
-        self.reader.readInfo(self.info)
-        self._cachedGlyphs = {}
-        if self.ufoState is None:
-            self.ufoState = SimpleNamespace(anchors=None, revCmap=None)
-            self.ufoState.glyphModTimes, self.ufoState.contentsModTime = getGlyphModTimes(self.glyphSet)
-            self.ufoState.fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
-
-        fontData = await compileUFOToBytes(self.fontPath, outputWriter)
-
-        self._includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
-
-        f = io.BytesIO(fontData)
-        self.ttFont = TTFont(f, lazy=True)
-        self.shaper = self._getShaper(fontData)
-
     def _getShaper(self, fontData):
         return HBShape(fontData,
                        getHorizontalAdvance=self._getHorizontalAdvance,
                        getVerticalAdvance=self._getVerticalAdvance,
                        getVerticalOrigin=self._getVerticalOrigin,
                        ttFont=self.ttFont)
-
-    def getExternalFiles(self):
-        return self._includedFeatureFiles
 
     @cachedProperty
     def unitsPerEm(self):
