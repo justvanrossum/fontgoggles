@@ -16,6 +16,7 @@ from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph, extractIncludedFeatureFiles
 from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
+from ..compile.dsCompiler import getTTPaths
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
 from ..mac.makePathFromOutline import makePathFromArrays
@@ -38,24 +39,28 @@ class DSFont(BaseFont):
         self.doc.findDefault()
 
         with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
+            ufoPathToTTPath = getTTPaths(self.doc, ttFolder)
             ufosToCompile = []
             ttPaths = []
             outputs = []
-            for index, source in enumerate(self.doc.sources):
-                if source.layerName is None:
-                    ttPath = os.path.join(ttFolder, os.path.basename(source.path) + f"_{index}.ttf")
-                    if source.path in self._sourceData:
-                        with open(ttPath, "wb") as f:
-                            f.write(self._sourceData[source.path])
-                    else:
-                        ufosToCompile.append(source.path)
-                        # Add the source index to the tt path so we're sure file names are unique:
-                        # it's possible for the DS document to refer to two UFOs with the same name
-                        # but in two different folders. Here we flatten everything to one folder.
-                        ttPaths.append(ttPath)
-                        outputs.append(io.StringIO())
-            coros = (compileUFOToPath(ufoPath, ttPath, output.write)
-                     for ufoPath, ttPath, output in zip(ufosToCompile, ttPaths, outputs))
+            coros = []
+            for source in self.doc.sources:
+                if source.layerName is not None:
+                    continue
+                ufoPath = source.path
+                if ufoPath in ufosToCompile:
+                    continue
+                ttPath = ufoPathToTTPath[source.path]
+                if ufoPath in self._sourceData:
+                    with open(ttPath, "wb") as f:
+                        f.write(self._sourceData[source.path])
+                else:
+                    output = io.StringIO()
+                    ufosToCompile.append(ufoPath)
+                    ttPaths.append(ttPath)
+                    outputs.append(output)
+                    coros.append(compileUFOToPath(ufoPath, ttPath, output.write))
+
             errors = await asyncio.gather(*coros, return_exceptions=True)
             for ufoPath, exc, output in zip(ufosToCompile, errors, outputs):
                 output = output.getvalue()

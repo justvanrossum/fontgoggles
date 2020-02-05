@@ -10,9 +10,11 @@ def compileDSToFont(dsPath, ttFolder):
     doc = DesignSpaceDocument.fromfile(dsPath)
     doc.findDefault()
 
-    for index, source in enumerate(doc.sources):
+    ufoPathToTTPath = getTTPaths(doc, ttFolder)
+
+    for source in doc.sources:
         if source.layerName is None:
-            ttPath = os.path.join(ttFolder, os.path.basename(source.path) + f"_{index}.ttf")
+            ttPath = ufoPathToTTPath[source.path]
             if not os.path.exists(ttPath):
                 raise FileNotFoundError(ttPath)
             source.font = TTFont(ttPath, lazy=True)
@@ -41,3 +43,9 @@ def compileDSToFont(dsPath, ttFolder):
 def compileDSToPath(dsPath, ttFolder, ttPath):
     ttFont = compileDSToFont(dsPath, ttFolder)
     ttFont.save(ttPath, reorderTables=False)
+
+
+def getTTPaths(doc, ttFolder):
+    ufoPaths = sorted({s.path for s in doc.sources if s.layerName is None})
+    return {ufoPath: os.path.join(ttFolder, f"master_{index}.ttf")
+               for index, ufoPath in enumerate(ufoPaths)}
