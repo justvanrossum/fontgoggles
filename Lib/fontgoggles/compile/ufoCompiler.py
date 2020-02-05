@@ -50,7 +50,7 @@ def compileUFOToFont(ufoPath):
     try:
         feaComp.compile()
     except FeatureLibError as e:
-        error = str(e)
+        error = f"{e.__class__.__name__}: {e}"
     except Exception:
         error = traceback.format_exc()
     else:
