@@ -50,7 +50,7 @@ class DSFont(BaseFont):
                 ufoPath = source.path
                 if ufoPath in ufosToCompile:
                     continue
-                ttPath = ufoPathToTTPath[source.path]
+                ttPath = ufoPathToTTPath[ufoPath]
                 if ufoPath in self._sourceData:
                     with open(ttPath, "wb") as f:
                         f.write(self._sourceData[source.path])
