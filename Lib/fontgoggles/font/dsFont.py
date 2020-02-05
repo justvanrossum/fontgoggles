@@ -33,6 +33,8 @@ class DSFont(BaseFont):
         self._varGlyphs = {}
         self._normalizedLocation = {}
         self._sourceData = {}
+        self._ufoReaders = {}
+        self._ufoGlyphSets = {}
 
     async def load(self, outputWriter):
         self.doc = DesignSpaceDocument.fromfile(self.fontPath)
@@ -95,8 +97,8 @@ class DSFont(BaseFont):
         for source in self.doc.sources:
             reader = UFOReader(source.path, validate=False)
             includedFeatureFiles.update(extractIncludedFeatureFiles(source.path, reader))
-            source.ufoReader = reader
-            source.ufoGlyphSet = reader.getGlyphSet(layerName=source.layerName)
+            self._ufoReaders[source.path] = reader
+            self._ufoGlyphSets[source.path] = reader.getGlyphSet(layerName=source.layerName)
 
         self._includedFeatureFiles = sorted(includedFeatureFiles)
 
@@ -118,7 +120,8 @@ class DSFont(BaseFont):
     @cachedProperty
     def unitsPerEm(self):
         info = SimpleNamespace()
-        self.doc.default.ufoReader.readInfo(info)
+        reader = self._ufoReaders[self.doc.default.path]
+        reader.readInfo(info)
         return info.unitsPerEm
 
     def varLocationChanged(self, varLocation):
@@ -127,18 +130,19 @@ class DSFont(BaseFont):
     def _getVarGlyph(self, glyphName):
         varGlyph = self._varGlyphs.get(glyphName)
         if varGlyph is None:
-            if glyphName not in self.doc.default.ufoGlyphSet:
+            if glyphName not in self._ufoGlyphSets[self.doc.default.path]:
                 varGlyph = NotDefGlyph(self.unitsPerEm)
             else:
                 tags = None
                 contours = None
                 masterPoints = []
                 for source in self.doc.sources:
-                    if glyphName not in source.ufoGlyphSet:
+                    glyphSet = self._ufoGlyphSets[source.path]
+                    if glyphName not in glyphSet:
                         masterPoints.append(None)
                         continue
-                    glyph = source.ufoGlyphSet[glyphName]
-                    coll = PointCollector(source.ufoGlyphSet)
+                    glyph = glyphSet[glyphName]
+                    coll = PointCollector(glyphSet)
                     try:
                         glyph.draw(coll)
                     except Exception as e:
