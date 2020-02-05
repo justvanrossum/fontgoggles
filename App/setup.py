@@ -69,6 +69,10 @@ setup(
     options=dict(py2app=dict(
         iconfile="Resources/fontgoggles.icns",
         plist=infoplist,
+        packages=[
+            "fontgoggles",
+            "pkg_resources",
+        ],
         excludes=[
             "scipy",
             "matplotlib",
