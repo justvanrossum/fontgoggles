@@ -155,7 +155,7 @@ class DSFont(BaseFont):
                     print(f"Default master glyph '{glyphName}' could not be read", file=sys.stderr)
                     varGlyph = NotDefGlyph(self.unitsPerEm)
                 else:
-                    varGlyph = VarGlyph(glyphName, self.masterModel, contours, masterPoints, tags)
+                    varGlyph = VarGlyph(glyphName, self.masterModel, masterPoints, contours, tags)
             self._varGlyphs[glyphName] = varGlyph
         varGlyph.setVarLocation(self._normalizedLocation)
         return varGlyph
@@ -205,7 +205,7 @@ NUMPY_IN_PLACE = True  # dubious improvement
 
 class VarGlyph:
 
-    def __init__(self, glyphName, masterModel, contours, masterPoints, tags):
+    def __init__(self, glyphName, masterModel, masterPoints, contours, tags):
         self.model, masterPoints = masterModel.getSubModel(masterPoints)
         masterPoints = [numpy.array(pts, coordinateType) for pts in masterPoints]
         try:
