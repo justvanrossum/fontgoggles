@@ -6,7 +6,7 @@ from fontTools.ttLib import TTFont, newTable
 from fontTools import varLib
 
 
-def compileMinimumFont(dsPath, ttFolder):
+def compileDSToFont(dsPath, ttFolder):
     doc = DesignSpaceDocument.fromfile(dsPath)
     doc.findDefault()
 
@@ -38,6 +38,6 @@ def compileMinimumFont(dsPath, ttFolder):
     return ttFont
 
 
-def compileMinimumFontToPath(dsPath, ttFolder, ttPath):
-    ttFont = compileMinimumFont(dsPath, ttFolder)
+def compileDSToPath(dsPath, ttFolder, ttPath):
+    ttFont = compileDSToFont(dsPath, ttFolder)
     ttFont.save(ttPath, reorderTables=False)

@@ -9,7 +9,7 @@ from .workServer import ERROR_MARKER, SUCCESS_MARKER
 
 async def compileUFOToPath(ufoPath, ttPath, outputWriter):
     pool = getCompilerPool()
-    func = "fontgoggles.compile.ufoCompiler.compileMinimumFontToPath"
+    func = "fontgoggles.compile.ufoCompiler.compileUFOToPath"
     args = [
         os.fspath(ufoPath),
         os.fspath(ttPath),
@@ -29,7 +29,7 @@ async def compileUFOToBytes(ufoPath, outputWriter):
 
 async def compileDSToPath(dsPath, ttFolder, ttPath, outputWriter):
     pool = getCompilerPool()
-    func = "fontgoggles.compile.dsCompiler.compileMinimumFontToPath"
+    func = "fontgoggles.compile.dsCompiler.compileDSToPath"
     args = [
         os.fspath(dsPath),
         os.fspath(ttFolder),
