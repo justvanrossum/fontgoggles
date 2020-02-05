@@ -7,6 +7,7 @@ import sys
 import traceback
 from types import SimpleNamespace
 import xml.etree.ElementTree as ET
+from fontTools.feaLib.error import FeatureLibError
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import newTable
 from fontTools.ufoLib import UFOReader
@@ -48,6 +49,8 @@ def compileUFOToFont(ufoPath):
     feaComp = FeatureCompiler(ufo, ttFont)
     try:
         feaComp.compile()
+    except FeatureLibError as e:
+        error = str(e)
     except Exception:
         error = traceback.format_exc()
     else:
