@@ -21,7 +21,7 @@ from fontgoggles.mac.fileObserver import getFileObserver
 from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize, makeUndoProxy
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup, SliderPlus
-from fontgoggles.misc.compilerPool import CompilerError
+from fontgoggles.compile.compilerPool import CompilerError
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.textInfo import TextInfo
 from fontgoggles.misc import opentypeTags

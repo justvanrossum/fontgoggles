@@ -2,8 +2,8 @@ import asyncio
 import os
 import pytest
 from fontTools.ufoLib import UFOReader
-from fontgoggles.misc.ufoCompiler import fetchCharacterMappingAndAnchors
-from fontgoggles.misc.compilerPool import compileUFOToPath
+from fontgoggles.compile.ufoCompiler import fetchCharacterMappingAndAnchors
+from fontgoggles.compile.compilerPool import compileUFOToPath
 from testSupport import getFontPath
 
 

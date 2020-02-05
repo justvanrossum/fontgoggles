@@ -14,7 +14,7 @@ from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
 from .ufoFont import NotDefGlyph, extractIncludedFeatureFiles
-from ..misc.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
+from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
 from ..misc.hbShape import HBShape
 from ..mac.makePathFromOutline import makePathFromArrays
 

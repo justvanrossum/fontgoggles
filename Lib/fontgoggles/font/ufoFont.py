@@ -16,10 +16,10 @@ from fontTools.ufoLib import UFOReader, UFOFileStructure
 from fontTools.ufoLib import FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURES_FILENAME
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph, CONTENTS_FILENAME
 from .baseFont import BaseFont
-from ..misc.compilerPool import compileUFOToBytes
+from ..compile.compilerPool import compileUFOToBytes
+from ..compile.ufoCompiler import fetchCharacterMappingAndAnchors
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
-from ..misc.ufoCompiler import fetchCharacterMappingAndAnchors
 
 
 ufoFilesToTrack = [FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURES_FILENAME]

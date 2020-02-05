@@ -3,7 +3,7 @@ from fontTools.ttLib import TTFont
 from ..misc.ftFont import FTFont
 from ..misc.hbShape import HBShape
 from .baseFont import BaseFont
-from ..misc.compilerPool import compileTTXToBytes
+from ..compile.compilerPool import compileTTXToBytes
 
 
 class _OTFBaseFont(BaseFont):

@@ -9,7 +9,7 @@ from .workServer import ERROR_MARKER, SUCCESS_MARKER
 
 async def compileUFOToPath(ufoPath, ttPath, outputWriter):
     pool = getCompilerPool()
-    func = "fontgoggles.misc.ufoCompiler.compileMinimumFontToPath"
+    func = "fontgoggles.compile.ufoCompiler.compileMinimumFontToPath"
     args = [
         os.fspath(ufoPath),
         os.fspath(ttPath),
@@ -29,7 +29,7 @@ async def compileUFOToBytes(ufoPath, outputWriter):
 
 async def compileDSToPath(dsPath, ttFolder, ttPath, outputWriter):
     pool = getCompilerPool()
-    func = "fontgoggles.misc.dsCompiler.compileMinimumFontToPath"
+    func = "fontgoggles.compile.dsCompiler.compileMinimumFontToPath"
     args = [
         os.fspath(dsPath),
         os.fspath(ttFolder),
@@ -50,7 +50,7 @@ async def compileDSToBytes(dsPath, ttFolder, outputWriter):
 
 async def compileTTXToPath(ttxPath, ttPath, outputWriter):
     pool = getCompilerPool()
-    func = "fontgoggles.misc.ttxCompiler.compileFontToPath"
+    func = "fontgoggles.compile.ttxCompiler.compileFontToPath"
     args = [
         os.fspath(ttxPath),
         os.fspath(ttPath),
@@ -116,7 +116,7 @@ class CompilerWorker:
 
     async def start(self):
         env = dict(PYTHONPATH=":".join(sys.path))
-        args = ["-u", "-m", "fontgoggles.misc.workServer"]
+        args = ["-u", "-m", "fontgoggles.compile.workServer"]
         self.process = await asyncio.create_subprocess_exec(
             sys.executable, *args,
             env=env,
