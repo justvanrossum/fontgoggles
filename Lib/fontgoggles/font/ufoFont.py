@@ -349,7 +349,7 @@ class UFOState:
                 changedUnicodes[gn] = []  # Unicode(s) got deleted
 
         currentUnicodes = {gn: codes for gn, codes in prevUnicodes.items()
-                          if gn not in deletedGlyphNames}
+                           if gn not in deletedGlyphNames}
         currentUnicodes.update(changedUnicodes)
 
         if prevUnicodes != currentUnicodes:
