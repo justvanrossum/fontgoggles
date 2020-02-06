@@ -264,8 +264,8 @@ ufoFilesToTrack = [FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURE
 class UFOState:
 
     """Object to keep track of various file modification times and miscellaneous
-    other state needed to determine whether a UFO needs its features to be recompiled
-    or not.
+    other state needed to determine how to handle reloading of the UFO data. Sometimes
+    features need to be rebuilt, other times an outline cache flush is enough.
     """
 
     def __init__(self, reader, glyphSet):
