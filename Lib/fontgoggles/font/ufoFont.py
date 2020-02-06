@@ -40,7 +40,8 @@ class UFOFont(BaseFont):
         self.reader.readInfo(self.info)
         self._cachedGlyphs = {}
         if self.ufoState is None:
-            self.ufoState = UFOState(self.reader, self.glyphSet)
+            self.ufoState = UFOState(self.reader, self.glyphSet,
+                                     getAnchors=self._getAnchors, getUnicodes=self._getUnicodes)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
@@ -88,6 +89,15 @@ class UFOFont(BaseFont):
             self.resetCache()
 
         return canReload
+
+    def _getAnchors(self):
+        return pickle.loads(self.ttFont["FGAx"].data)
+
+    def _getUnicodes(self):
+        unicodes = defaultdict(list)
+        for code, gn in self.ttFont.getBestCmap().items():
+            unicodes[gn].append(code)
+        return unicodes
 
     def _getShaper(self, fontData):
         return HBShape(fontData,
@@ -273,14 +283,14 @@ class UFOState:
     #   changes we update the anchor and unicode info from the previous state.
     # - feature compiling is done out-of-process with primitive communications.
     # TODO:
-    # - replace need for ttFont by callbacks so we don't need to deal with
-    #   those details here
     # - see if we can make instances conceptually immutable, and use a new
     #   instance for a new state.
 
-    def __init__(self, reader, glyphSet):
+    def __init__(self, reader, glyphSet, getAnchors=None, getUnicodes=None):
         self.anchors = None
         self.unicodes = None
+        self._getAnchors = getAnchors
+        self._getUnicodes = getUnicodes
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
 
@@ -311,9 +321,9 @@ class UFOState:
                                                                              changedGlyphNames)
         # Within the changed glyphs, let's see if their anchors changed
         if self.anchors is None:
-            prevAnchors = pickle.loads(ttFont["FGAx"].data)
-        else:
-            prevAnchors = self.anchors
+            self.anchors = self._getAnchors()
+            del self._getAnchors
+        prevAnchors = self.anchors
 
         for gn in prevAnchors:
             if gn in changedGlyphNames and gn not in changedAnchors:
@@ -330,12 +340,9 @@ class UFOState:
 
         # Within the changed glyphs, let's see if their unicodes changed
         if self.unicodes is None:
-            prevCmap = ttFont.getBestCmap()
-            prevUnicodes = defaultdict(list)
-            for code, gn in prevCmap.items():
-                prevUnicodes[gn].append(code)
-        else:
-            prevUnicodes = self.unicodes
+            self.unicodes = self._getUnicodes()
+            del self._getUnicodes
+        prevUnicodes = self.unicodes
 
         for gn in prevUnicodes:
             if gn in changedGlyphNames and gn not in changedUnicodes:
