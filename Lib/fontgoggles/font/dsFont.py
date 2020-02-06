@@ -32,7 +32,7 @@ class DSFont(BaseFont):
         super().__init__(fontPath, fontNumber)
         self._varGlyphs = {}
         self._normalizedLocation = {}
-        self._sourceData = {}
+        self._sourceFontData = {}
         self._ufoReaders = {}
         self._ufoGlyphSets = {}
 
@@ -53,9 +53,9 @@ class DSFont(BaseFont):
                 if ufoPath in ufosToCompile:
                     continue
                 ttPath = ufoPathToTTPath[ufoPath]
-                if ufoPath in self._sourceData:
+                if ufoPath in self._sourceFontData:
                     with open(ttPath, "wb") as f:
-                        f.write(self._sourceData[source.path])
+                        f.write(self._sourceFontData[source.path])
                 else:
                     ufosToCompile.append(ufoPath)
                     ttPaths.append(ttPath)
@@ -82,7 +82,7 @@ class DSFont(BaseFont):
                 # Store compiled tt data so we can reuse it to rebuild ourselves
                 # without recompiling the source.
                 with open(ttPath, "rb") as f:
-                    self._sourceData[ufoPath] = f.read()
+                    self._sourceFontData[ufoPath] = f.read()
 
             vfFontData = await compileDSToBytes(self.fontPath, ttFolder, outputWriter)
 
