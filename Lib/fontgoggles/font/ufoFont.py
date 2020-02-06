@@ -70,7 +70,7 @@ class UFOFont(BaseFont):
 
         self.glyphSet.rebuildContents()
 
-        canReload, needsInfoUpdate, newCmap = self.ufoState.canReloadUFO(self.reader, self.glyphSet, self.ttFont)
+        canReload, needsInfoUpdate, newCmap = self.ufoState.canReloadUFO(self.reader, self.glyphSet)
 
         if needsInfoUpdate:
             # font.info changed, all we care about is a possibly change unitsPerEm
@@ -294,7 +294,7 @@ class UFOState:
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
 
-    def canReloadUFO(self, reader, glyphSet, ttFont):
+    def canReloadUFO(self, reader, glyphSet):
         glyphModTimes, contentsModTime = getGlyphModTimes(glyphSet)
         fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
         changedFiles = {fileName for fileName, modTime in fileModTimes ^ self.fileModTimes}
