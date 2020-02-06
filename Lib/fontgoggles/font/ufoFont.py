@@ -268,12 +268,21 @@ class UFOState:
     features need to be rebuilt, other times an outline cache flush is enough.
     """
 
+    # This is rather messy. The challenges (that make factoring non-trivial) are:
+    # - parsing ALL glyphs for anchors and unicodes is expensive, so upon file
+    #   changes we update the enchor and unicode info from the previous state.
+    # - feature compiling is done out-of-process with primitive communications.
+    # TODO:
+    # - replace need for ttFont by callbacks so we don't need to deal with
+    #   those details here
+    # - see if we can make instances conceptually immutable, and use a new
+    #   instance for a new state.
+
     def __init__(self, reader, glyphSet):
         self.anchors = None
         self.revCmap = None
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
-
 
     def canReloadUFO(self, reader, glyphSet, ttFont):
         glyphModTimes, contentsModTime = getGlyphModTimes(glyphSet)
