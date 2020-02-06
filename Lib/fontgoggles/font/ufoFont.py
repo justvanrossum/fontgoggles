@@ -280,7 +280,7 @@ class UFOState:
 
     def __init__(self, reader, glyphSet):
         self.anchors = None
-        self.revCmap = None
+        self.unicodes = None
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
 
@@ -306,9 +306,9 @@ class UFOState:
         self.contentsModTime = contentsModTime
         deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in glyphSet}
         changedGlyphNames -= deletedGlyphNames
-        _, changedRevCmap, changedAnchors = fetchCharacterMappingAndAnchors(glyphSet,
-                                                                            reader.fs.getsyspath("/"),
-                                                                            changedGlyphNames)
+        _, changedUnicodes, changedAnchors = fetchCharacterMappingAndAnchors(glyphSet,
+                                                                             reader.fs.getsyspath("/"),
+                                                                             changedGlyphNames)
         # Within the changed glyphs, let's see if their anchors changed
         if self.anchors is None:
             prevAnchors = pickle.loads(ttFont["FGAx"].data)
@@ -329,26 +329,26 @@ class UFOState:
             return False, False, None
 
         # Within the changed glyphs, let's see if their unicodes changed
-        if self.revCmap is None:
+        if self.unicodes is None:
             prevCmap = ttFont.getBestCmap()
-            prevRevCmap = defaultdict(list)
+            prevUnicodes = defaultdict(list)
             for code, gn in prevCmap.items():
-                prevRevCmap[gn].append(code)
+                prevUnicodes[gn].append(code)
         else:
-            prevRevCmap = self.revCmap
+            prevUnicodes = self.unicodes
 
-        for gn in prevRevCmap:
-            if gn in changedGlyphNames and gn not in changedRevCmap:
-                changedRevCmap[gn] = []  # Unicode(s) got deleted
+        for gn in prevUnicodes:
+            if gn in changedGlyphNames and gn not in changedUnicodes:
+                changedUnicodes[gn] = []  # Unicode(s) got deleted
 
-        currentRevCmap = {gn: codes for gn, codes in prevRevCmap.items()
+        currentUnicodes = {gn: codes for gn, codes in prevUnicodes.items()
                           if gn not in deletedGlyphNames}
-        currentRevCmap.update(changedRevCmap)
+        currentUnicodes.update(changedUnicodes)
 
-        if prevRevCmap != currentRevCmap:
+        if prevUnicodes != currentUnicodes:
             # The cmap needs updating
-            self.revCmap = currentRevCmap
-            newCmap = {code: gn for gn, codes in currentRevCmap.items() for code in codes}
+            self.unicodes = currentUnicodes
+            newCmap = {code: gn for gn, codes in currentUnicodes.items() for code in codes}
         else:
             newCmap = None
 
