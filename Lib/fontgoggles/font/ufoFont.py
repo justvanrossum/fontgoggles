@@ -270,7 +270,7 @@ class UFOState:
 
     # This is rather messy. The challenges (that make factoring non-trivial) are:
     # - parsing ALL glyphs for anchors and unicodes is expensive, so upon file
-    #   changes we update the enchor and unicode info from the previous state.
+    #   changes we update the anchor and unicode info from the previous state.
     # - feature compiling is done out-of-process with primitive communications.
     # TODO:
     # - replace need for ttFont by callbacks so we don't need to deal with
