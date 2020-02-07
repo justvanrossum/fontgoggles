@@ -283,13 +283,19 @@ class UFOState:
     features need to be rebuilt, other times an outline cache flush is enough.
     """
 
-    # This is rather messy. The challenges (that make factoring non-trivial) are:
-    # - parsing ALL glyphs for anchors and unicodes is expensive, so upon file
-    #   changes we update the anchor and unicode info from the previous state.
-    # - feature compiling is done out-of-process with primitive communications.
-    # TODO:
-    # - see if we can make instances conceptually immutable, and use a new
-    #   instance for a new state.
+    #
+    # This is rather intricate as we try to do as little work as possible.
+    # For example, the first time a UFO is loaded, all .glif files are parsed
+    # to collect anchor information (needed for mark features) and unicodes,
+    # to build the cmap. Upon external changes to the UFO, we don't want to
+    # redo all that work (it wouldn't scale to large UFOs) so we keep track
+    # of the anchors and unicodes by only reparsing .glif files that actually
+    # changed.
+    #
+    # This does _not_ track changes to included .fea files. That part is handled
+    # by UFOFont.canReloadWithChange() as we'll get separate file changed events
+    # for that.
+    #
 
     def __init__(self, reader, glyphSet, anchors=None, unicodes=None,
                  getAnchors=None, getUnicodes=None, previousState=None):
