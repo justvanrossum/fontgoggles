@@ -316,30 +316,6 @@ class UFOState:
         self._previousState = None
         return newState
 
-    @property
-    def anchors(self):
-        if self._anchors is None:
-            self._anchors = self._getAnchors()
-            self._getAnchors = None
-        return self._anchors
-
-    @anchors.setter
-    def anchors(self, anchors):
-        self._anchors = anchors
-        self._getAnchors = None
-
-    @property
-    def unicodes(self):
-        if self._unicodes is None:
-            self._unicodes = self._getUnicodes()
-            self._getUnicodes = None
-        return self._unicodes
-
-    @unicodes.setter
-    def unicodes(self, unicodes):
-        self._unicodes = unicodes
-        self._getUnicodes = None
-
     def getUpdateInfo(self):
         # Calling this method has the side effect of updating the internal state
         # to the current state of the UFO.
@@ -388,6 +364,30 @@ class UFOState:
             needsGlyphUpdate = bool(changedGlyphNames)
 
         return needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate
+
+    @property
+    def anchors(self):
+        if self._anchors is None:
+            self._anchors = self._getAnchors()
+            self._getAnchors = None
+        return self._anchors
+
+    @anchors.setter
+    def anchors(self, anchors):
+        self._anchors = anchors
+        self._getAnchors = None
+
+    @property
+    def unicodes(self):
+        if self._unicodes is None:
+            self._unicodes = self._getUnicodes()
+            self._getUnicodes = None
+        return self._unicodes
+
+    @unicodes.setter
+    def unicodes(self, unicodes):
+        self._unicodes = unicodes
+        self._getUnicodes = None
 
 
 def getModTime(path):
