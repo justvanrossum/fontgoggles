@@ -325,7 +325,7 @@ class UFOState:
                             self.anchors, self.unicodes, self._getAnchors, self._getUnicodes)
         return newState
 
-    def getReloadInfo(self, previous):
+    def getUpdateInfo(self, previous):
         return needsFeaturesUpdate, needsInfoUpdate, needsCmapUpdate
 
     def canReloadUFO(self):
