@@ -70,7 +70,7 @@ class UFOFont(BaseFont):
 
         self.glyphSet.rebuildContents()
 
-        canReload, needsInfoUpdate, newCmap = self.ufoState.canReloadUFO(self.reader, self.glyphSet)
+        canReload, needsInfoUpdate, newCmap = self.ufoState.canReloadUFO()
 
         if needsInfoUpdate:
             # font.info changed, all we care about is a possibly change unitsPerEm
@@ -287,6 +287,8 @@ class UFOState:
     #   instance for a new state.
 
     def __init__(self, reader, glyphSet, getAnchors=None, getUnicodes=None):
+        self.reader = reader
+        self.glyphSet = glyphSet
         self.anchors = None
         self.unicodes = None
         self._getAnchors = getAnchors
@@ -294,9 +296,9 @@ class UFOState:
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
 
-    def canReloadUFO(self, reader, glyphSet):
-        glyphModTimes, contentsModTime = getGlyphModTimes(glyphSet)
-        fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
+    def canReloadUFO(self):
+        glyphModTimes, contentsModTime = getGlyphModTimes(self.glyphSet)
+        fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
         changedFiles = {fileName for fileName, modTime in fileModTimes ^ self.fileModTimes}
         self.fileModTimes = fileModTimes
 
@@ -314,10 +316,10 @@ class UFOState:
         changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ self.glyphModTimes}
         self.glyphModTimes = glyphModTimes
         self.contentsModTime = contentsModTime
-        deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in glyphSet}
+        deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in self.glyphSet}
         changedGlyphNames -= deletedGlyphNames
-        _, changedUnicodes, changedAnchors = fetchCharacterMappingAndAnchors(glyphSet,
-                                                                             reader.fs.getsyspath("/"),
+        _, changedUnicodes, changedAnchors = fetchCharacterMappingAndAnchors(self.glyphSet,
+                                                                             self.reader.fs.getsyspath("/"),
                                                                              changedGlyphNames)
         # Within the changed glyphs, let's see if their anchors changed
         if self.anchors is None:
