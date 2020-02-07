@@ -286,14 +286,14 @@ class UFOState:
     #
     # This is rather intricate as we try to do as little work as possible.
     # For example, the first time a UFO is loaded, all .glif files are parsed
-    # to collect anchor information (needed for mark features) and unicodes,
-    # to build the cmap. Upon external changes to the UFO, we don't want to
+    # to collect anchor information (needed for mark features) and unicodes
+    # (to build the cmap). Upon external changes to the UFO, we don't want to
     # redo all that work (it wouldn't scale to large UFOs) so we keep track
     # of the anchors and unicodes by only reparsing .glif files that actually
     # changed.
     #
     # This does _not_ track changes to included .fea files. That part is handled
-    # by UFOFont.canReloadWithChange() as we'll get separate file changed events
+    # by UFOFont.canReloadWithChange() as we'll get separate file-changed events
     # for that.
     #
 
