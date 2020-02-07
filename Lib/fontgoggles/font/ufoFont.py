@@ -310,7 +310,7 @@ class UFOState:
         # state, or on a state that was properly updated via a call to getUpdateInfo()
         assert self._previousState is None, "state was not updated"
         newState = UFOState(self.reader, self.glyphSet,
-                            self.anchors, self.unicodes,
+                            self._anchors, self._unicodes,
                             self._getAnchors, self._getUnicodes,
                             self)
         self._previousState = None
