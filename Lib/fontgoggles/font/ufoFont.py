@@ -383,68 +383,6 @@ class UFOState:
 
         return needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate
 
-    def canReloadUFO(self):
-        glyphModTimes, contentsModTime = getGlyphModTimes(self.glyphSet)
-        fileModTimes = getFileModTimes(self.reader.fs.getsyspath("/"), ufoFilesToTrack)
-        changedFiles = {fileName for fileName, modTime in fileModTimes ^ self.fileModTimes}
-        self.fileModTimes = fileModTimes
-
-        if FEATURES_FILENAME in changedFiles or GROUPS_FILENAME in changedFiles or KERNING_FILENAME in changedFiles:
-            # Features need to be rebuilt
-            return False, False, None
-
-        needsInfoUpdate = FONTINFO_FILENAME in changedFiles
-
-        if glyphModTimes == self.glyphModTimes and contentsModTime == self.contentsModTime:
-            # Nothing changed that we know of or care about
-            return True, needsInfoUpdate, None
-
-        # Let's see which glyphs changed
-        changedGlyphNames = {glyphName for glyphName, mtime in glyphModTimes ^ self.glyphModTimes}
-        self.glyphModTimes = glyphModTimes
-        self.contentsModTime = contentsModTime
-        deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in self.glyphSet}
-        changedGlyphNames -= deletedGlyphNames
-        _, changedUnicodes, changedAnchors = fetchCharacterMappingAndAnchors(self.glyphSet,
-                                                                             self.reader.fs.getsyspath("/"),
-                                                                             changedGlyphNames)
-        # Within the changed glyphs, let's see if their anchors changed
-        prevAnchors = self.anchors
-
-        for gn in prevAnchors:
-            if gn in changedGlyphNames and gn not in changedAnchors:
-                changedAnchors[gn] = []  # Anchor(s) got deleted
-
-        currentAnchors = {gn: anchors for gn, anchors in prevAnchors.items()
-                          if gn not in deletedGlyphNames}
-        currentAnchors.update(changedAnchors)
-
-        if prevAnchors != currentAnchors:
-            # If there's a change in the anchors, mark positioning features
-            # have to be rebuilt, so we can't do a simple reload
-            self.anchors = currentAnchors
-            return False, False, None
-
-        # Within the changed glyphs, let's see if their unicodes changed
-        prevUnicodes = self.unicodes
-
-        for gn in prevUnicodes:
-            if gn in changedGlyphNames and gn not in changedUnicodes:
-                changedUnicodes[gn] = []  # Unicode(s) got deleted
-
-        currentUnicodes = {gn: codes for gn, codes in prevUnicodes.items()
-                           if gn not in deletedGlyphNames}
-        currentUnicodes.update(changedUnicodes)
-
-        if prevUnicodes != currentUnicodes:
-            # The cmap needs updating
-            self.unicodes = currentUnicodes
-            newCmap = {code: gn for gn, codes in currentUnicodes.items() for code in codes}
-        else:
-            newCmap = None
-
-        return True, needsInfoUpdate, newCmap
-
 
 def getModTime(path):
     try:

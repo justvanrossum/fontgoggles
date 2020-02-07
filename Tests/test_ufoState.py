@@ -8,54 +8,6 @@ from fontgoggles.compile.ufoCompiler import fetchCharacterMappingAndAnchors
 from testSupport import getFontPath
 
 
-def test_canReloadUFO(tmpdir):
-    ufoSource = getFontPath("MutatorSansBoldWideMutated.ufo")
-    ufoPath = shutil.copytree(ufoSource, tmpdir / "test.ufo")
-    reader = UFOReader(ufoPath, validate=False)
-    glyphSet = reader.getGlyphSet()
-    cmap, unicodes, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
-
-    state = UFOState(reader, glyphSet, getAnchors=lambda: anchors, getUnicodes=lambda: unicodes)
-    canReload, needsInfoUpdate, newCmap = state.canReloadUFO()
-    assert canReload
-    assert not needsInfoUpdate
-    assert newCmap is None
-
-    feaPath = pathlib.Path(reader.fs.getsyspath("/features.fea"))
-    feaPath.touch()
-    canReload, needsInfoUpdate, newCmap = state.canReloadUFO()
-    assert not canReload
-    assert not needsInfoUpdate
-    assert newCmap is None
-
-    infoPath = pathlib.Path(reader.fs.getsyspath("/fontinfo.plist"))
-    infoPath.touch()
-    canReload, needsInfoUpdate, newCmap = state.canReloadUFO()
-    assert canReload
-    assert needsInfoUpdate
-    assert newCmap is None
-
-    glyphPath = pathlib.Path(glyphSet.fs.getsyspath(glyphSet.contents["A"]))
-    glyph = Glyph("A", None)
-    ppen = RecordingPointPen()
-    glyphSet.readGlyph("A", glyph, ppen)
-    glyph.anchors[0]["x"] = 123
-    glyphSet.writeGlyph("A", glyph, ppen.replay)
-    canReload, needsInfoUpdate, newCmap = state.canReloadUFO()
-    assert not canReload
-
-    cmap, unicodes, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
-    state = UFOState(reader, glyphSet, getAnchors=lambda: anchors, getUnicodes=lambda: unicodes)
-    glyph.unicodes = [123]
-    glyphSet.writeGlyph("A", glyph, ppen.replay)
-    canReload, needsInfoUpdate, newCmap = state.canReloadUFO()
-    assert canReload
-    assert not needsInfoUpdate
-    assert newCmap is not None
-    assert newCmap[123] == "A"
-    assert ord("A") not in newCmap
-
-
 def test_getUpdateInfo(tmpdir):
     ufoSource = getFontPath("MutatorSansBoldWideMutated.ufo")
     ufoPath = shutil.copytree(ufoSource, tmpdir / "test.ufo")
@@ -85,7 +37,6 @@ def test_getUpdateInfo(tmpdir):
     assert needsInfoUpdate
     assert not needsCmapUpdate
 
-    glyphPath = pathlib.Path(glyphSet.fs.getsyspath(glyphSet.contents["A"]))
     glyph = Glyph("A", None)
     ppen = RecordingPointPen()
     glyphSet.readGlyph("A", glyph, ppen)
@@ -99,7 +50,6 @@ def test_getUpdateInfo(tmpdir):
     assert not needsInfoUpdate
     assert not needsCmapUpdate
 
-    glyphPath = pathlib.Path(glyphSet.fs.getsyspath(glyphSet.contents["A"]))
     glyph = Glyph("A", None)
     ppen = RecordingPointPen()
     glyphSet.readGlyph("A", glyph, ppen)
