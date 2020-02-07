@@ -286,15 +286,47 @@ class UFOState:
     # - see if we can make instances conceptually immutable, and use a new
     #   instance for a new state.
 
-    def __init__(self, reader, glyphSet, getAnchors=None, getUnicodes=None):
+    def __init__(self, reader, glyphSet, anchors=None, unicodes=None, getAnchors=None, getUnicodes=None):
         self.reader = reader
         self.glyphSet = glyphSet
-        self.anchors = None
-        self.unicodes = None
+        assert (anchors is not None) == (getAnchors is None)
+        assert (unicodes is not None) == (getUnicodes is None)
+        self._anchors = anchors
+        self._unicodes = unicodes
         self._getAnchors = getAnchors
         self._getUnicodes = getUnicodes
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
+
+    @property
+    def anchors(self):
+        if self._anchors is None:
+            self._anchors = self._getAnchors()
+            self._getAnchors = None
+        return self._anchors
+
+    @anchors.setter
+    def anchors(self, anchors):
+        self._anchors = anchors
+
+    @property
+    def unicodes(self):
+        if self._unicodes is None:
+            self._unicodes = self._getUnicodes()
+            self._getUnicodes = None
+        return self._unicodes
+
+    @unicodes.setter
+    def unicodes(self, unicodes):
+        self._unicodes = unicodes
+
+    def newState(self):
+        newState = UFOState(self.reader, self.glyphSet,
+                            self.anchors, self.unicodes, self._getAnchors, self._getUnicodes)
+        return newState
+
+    def getReloadInfo(self, previous):
+        return needsFeaturesUpdate, needsInfoUpdate, needsCmapUpdate
 
     def canReloadUFO(self):
         glyphModTimes, contentsModTime = getGlyphModTimes(self.glyphSet)
@@ -322,9 +354,6 @@ class UFOState:
                                                                              self.reader.fs.getsyspath("/"),
                                                                              changedGlyphNames)
         # Within the changed glyphs, let's see if their anchors changed
-        if self.anchors is None:
-            self.anchors = self._getAnchors()
-            self._getAnchors = None
         prevAnchors = self.anchors
 
         for gn in prevAnchors:
@@ -338,12 +367,10 @@ class UFOState:
         if prevAnchors != currentAnchors:
             # If there's a change in the anchors, mark positioning features
             # have to be rebuilt, so we can't do a simple reload
+            self.anchors = currentAnchors
             return False, False, None
 
         # Within the changed glyphs, let's see if their unicodes changed
-        if self.unicodes is None:
-            self.unicodes = self._getUnicodes()
-            self._getUnicodes = None
         prevUnicodes = self.unicodes
 
         for gn in prevUnicodes:
