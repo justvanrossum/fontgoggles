@@ -305,14 +305,15 @@ class UFOState:
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
         self._previousState = previousState
 
-    def newState(self, keepPreviousState=False):
+    def newState(self):
+        # This method can only be called on a brand new state without a previous
+        # state, or on a state that was properly updated via a call to getUpdateInfo()
+        assert self._previousState is None, "state was not updated"
         newState = UFOState(self.reader, self.glyphSet,
                             self.anchors, self.unicodes,
                             self._getAnchors, self._getUnicodes,
                             self)
-        if not keepPreviousState:
-            # No need to keep around generally
-            self._previousState = None
+        self._previousState = None
         return newState
 
     @property
@@ -340,7 +341,12 @@ class UFOState:
         self._getUnicodes = None
 
     def getUpdateInfo(self):
+        # Calling this method has the side effect of updating the internal state
+        # to the current state of the UFO.
         prev = self._previousState
+        assert prev is not None, "getUpdateInfo() is a one-shot method"  # Or: memoize
+        self._previousState = None
+
         changedFiles = {fileName for fileName, modTime in prev.fileModTimes ^ self.fileModTimes}
 
         needsInfoUpdate = FONTINFO_FILENAME in changedFiles
