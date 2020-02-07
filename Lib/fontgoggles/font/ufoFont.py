@@ -70,25 +70,30 @@ class UFOFont(BaseFont):
 
         self.glyphSet.rebuildContents()
 
-        canReload, needsInfoUpdate, newCmap = self.ufoState.canReloadUFO()
+        self.ufoState = self.ufoState.newState()
+        needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = self.ufoState.getUpdateInfo()
+
+        if needsFeaturesUpdate:
+            return False
 
         if needsInfoUpdate:
             # font.info changed, all we care about is a possibly change unitsPerEm
             self.info = SimpleNamespace()
             self.reader.readInfo(self.info)
 
-        if newCmap is not None:
+        if needsCmapUpdate:
             # The cmap changed. Let's update it in-place and only rebuild the shaper
+            newCmap = {code: gn for gn, codes in self.ufoState.unicodes.items() for code in codes}
             fb = FontBuilder(font=self.ttFont)
             fb.setupCharacterMap(newCmap)
             f = io.BytesIO()
             self.ttFont.save(f, reorderTables=False)
             self.shaper = self._getShaper(f.getvalue())
 
-        if canReload:
+        if needsGlyphUpdate or needsInfoUpdate or needsCmapUpdate:
             self.resetCache()
 
-        return canReload
+        return True
 
     def _getAnchors(self):
         return pickle.loads(self.ttFont["FGAx"].data)
@@ -344,6 +349,7 @@ class UFOState:
                                GROUPS_FILENAME in changedFiles or
                                KERNING_FILENAME in changedFiles)
 
+        needsGlyphUpdate = False
         needsCmapUpdate = False
 
         if prev.glyphModTimes != self.glyphModTimes or prev.contentsModTime != self.contentsModTime:
@@ -373,8 +379,9 @@ class UFOState:
             unicodes.update(changedUnicodes)
             self.unicodes = {gn: codes for gn, codes in unicodes.items() if codes}
             needsCmapUpdate = prev.unicodes != self.unicodes
+            needsGlyphUpdate = bool(changedGlyphNames)
 
-        return needsFeaturesUpdate, needsInfoUpdate, needsCmapUpdate
+        return needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate
 
     def canReloadUFO(self):
         glyphModTimes, contentsModTime = getGlyphModTimes(self.glyphSet)
