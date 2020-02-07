@@ -324,7 +324,7 @@ class UFOState:
         # Within the changed glyphs, let's see if their anchors changed
         if self.anchors is None:
             self.anchors = self._getAnchors()
-            del self._getAnchors
+            self._getAnchors = None
         prevAnchors = self.anchors
 
         for gn in prevAnchors:
@@ -343,7 +343,7 @@ class UFOState:
         # Within the changed glyphs, let's see if their unicodes changed
         if self.unicodes is None:
             self.unicodes = self._getUnicodes()
-            del self._getUnicodes
+            self._getUnicodes = None
         prevUnicodes = self.unicodes
 
         for gn in prevUnicodes:
