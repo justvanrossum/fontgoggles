@@ -286,7 +286,8 @@ class UFOState:
     # - see if we can make instances conceptually immutable, and use a new
     #   instance for a new state.
 
-    def __init__(self, reader, glyphSet, anchors=None, unicodes=None, getAnchors=None, getUnicodes=None):
+    def __init__(self, reader, glyphSet, anchors=None, unicodes=None,
+                 getAnchors=None, getUnicodes=None, previousState=None):
         self.reader = reader
         self.glyphSet = glyphSet
         assert (anchors is not None) == (getAnchors is None)
@@ -297,6 +298,17 @@ class UFOState:
         self._getUnicodes = getUnicodes
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
+        self._previousState = previousState
+
+    def newState(self, keepPreviousState=False):
+        newState = UFOState(self.reader, self.glyphSet,
+                            self.anchors, self.unicodes,
+                            self._getAnchors, self._getUnicodes,
+                            self)
+        if not keepPreviousState:
+            # No need to keep around generally
+            self._previousState = None
+        return newState
 
     @property
     def anchors(self):
@@ -308,6 +320,7 @@ class UFOState:
     @anchors.setter
     def anchors(self, anchors):
         self._anchors = anchors
+        self._getAnchors = None
 
     @property
     def unicodes(self):
@@ -319,13 +332,48 @@ class UFOState:
     @unicodes.setter
     def unicodes(self, unicodes):
         self._unicodes = unicodes
+        self._getUnicodes = None
 
-    def newState(self):
-        newState = UFOState(self.reader, self.glyphSet,
-                            self.anchors, self.unicodes, self._getAnchors, self._getUnicodes)
-        return newState
+    def getUpdateInfo(self):
+        prev = self._previousState
+        changedFiles = {fileName for fileName, modTime in prev.fileModTimes ^ self.fileModTimes}
 
-    def getUpdateInfo(self, previous):
+        needsInfoUpdate = FONTINFO_FILENAME in changedFiles
+
+        needsFeaturesUpdate = (FEATURES_FILENAME in changedFiles or
+                               GROUPS_FILENAME in changedFiles or
+                               KERNING_FILENAME in changedFiles)
+
+        needsCmapUpdate = False
+
+        if prev.glyphModTimes != self.glyphModTimes or prev.contentsModTime != self.contentsModTime:
+            changedGlyphNames = {glyphName for glyphName, mtime in prev.glyphModTimes ^ self.glyphModTimes}
+            deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in self.glyphSet}
+
+            _, changedUnicodes, changedAnchors = fetchCharacterMappingAndAnchors(self.glyphSet,
+                                                                                 self.reader.fs.getsyspath("/"),
+                                                                                 changedGlyphNames - deletedGlyphNames)
+
+            # Within the changed glyphs, let's see if their anchors changed
+            for gn in changedGlyphNames:
+                if gn in prev.anchors and gn not in changedAnchors:
+                    changedAnchors[gn] = []  # Anchor(s) got deleted
+
+            anchors = dict(prev.anchors)
+            anchors.update(changedAnchors)
+            self.anchors = {gn: anchorList for gn, anchorList in anchors.items() if anchorList}
+            needsFeaturesUpdate = prev.anchors != self.anchors
+
+            # Within the changed glyphs, let's see if their unicodes changed
+            for gn in changedGlyphNames:
+                if gn in prev.unicodes and gn not in changedUnicodes:
+                    changedUnicodes[gn] = []  # Unicode(s) got deleted
+
+            unicodes = dict(prev.unicodes)
+            unicodes.update(changedUnicodes)
+            self.unicodes = {gn: codes for gn, codes in unicodes.items() if codes}
+            needsCmapUpdate = prev.unicodes != self.unicodes
+
         return needsFeaturesUpdate, needsInfoUpdate, needsCmapUpdate
 
     def canReloadUFO(self):

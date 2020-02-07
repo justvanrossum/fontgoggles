@@ -54,3 +54,57 @@ def test_canReloadUFO(tmpdir):
     assert newCmap is not None
     assert newCmap[123] == "A"
     assert ord("A") not in newCmap
+
+
+def test_getUpdateInfo(tmpdir):
+    ufoSource = getFontPath("MutatorSansBoldWideMutated.ufo")
+    ufoPath = shutil.copytree(ufoSource, tmpdir / "test.ufo")
+    reader = UFOReader(ufoPath, validate=False)
+    glyphSet = reader.getGlyphSet()
+    cmap, unicodes, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
+
+    state1 = UFOState(reader, glyphSet, getAnchors=lambda: anchors, getUnicodes=lambda: unicodes)
+
+    feaPath = pathlib.Path(reader.fs.getsyspath("/features.fea"))
+    feaPath.touch()
+
+    state2 = state1.newState()
+    needsFeaturesUpdate, needsInfoUpdate, needsCmapUpdate = state2.getUpdateInfo()
+    assert needsFeaturesUpdate
+    assert not needsInfoUpdate
+    assert not needsCmapUpdate
+
+    infoPath = pathlib.Path(reader.fs.getsyspath("/fontinfo.plist"))
+    infoPath.touch()
+
+    state3 = state2.newState()
+    needsFeaturesUpdate, needsInfoUpdate, needsCmapUpdate = state3.getUpdateInfo()
+    assert not needsFeaturesUpdate
+    assert needsInfoUpdate
+    assert not needsCmapUpdate
+
+    glyphPath = pathlib.Path(glyphSet.fs.getsyspath(glyphSet.contents["A"]))
+    glyph = Glyph("A", None)
+    ppen = RecordingPointPen()
+    glyphSet.readGlyph("A", glyph, ppen)
+    glyph.anchors[0]["x"] = 123
+    glyphSet.writeGlyph("A", glyph, ppen.replay)
+
+    state4 = state3.newState()
+    needsFeaturesUpdate, needsInfoUpdate, needsCmapUpdate = state4.getUpdateInfo()
+    assert needsFeaturesUpdate
+    assert not needsInfoUpdate
+    assert not needsCmapUpdate
+
+    glyphPath = pathlib.Path(glyphSet.fs.getsyspath(glyphSet.contents["A"]))
+    glyph = Glyph("A", None)
+    ppen = RecordingPointPen()
+    glyphSet.readGlyph("A", glyph, ppen)
+    glyph.unicodes = [123]
+    glyphSet.writeGlyph("A", glyph, ppen.replay)
+
+    state5 = state4.newState()
+    needsFeaturesUpdate, needsInfoUpdate, needsCmapUpdate = state5.getUpdateInfo()
+    assert not needsFeaturesUpdate
+    assert not needsInfoUpdate
+    assert needsCmapUpdate
