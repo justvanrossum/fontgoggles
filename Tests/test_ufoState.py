@@ -15,13 +15,13 @@ def test_getUpdateInfo(tmpdir):
     glyphSet = reader.getGlyphSet()
     cmap, unicodes, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
 
-    state1 = UFOState(reader, glyphSet, getAnchors=lambda: anchors, getUnicodes=lambda: unicodes)
+    state = UFOState(reader, glyphSet, getAnchors=lambda: anchors, getUnicodes=lambda: unicodes)
 
     feaPath = pathlib.Path(reader.fs.getsyspath("/features.fea"))
     feaPath.touch()
 
-    state2 = state1.newState()
-    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state2.getUpdateInfo()
+    state = state.newState()
+    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
     assert needsFeaturesUpdate
     assert not needsGlyphUpdate
     assert not needsInfoUpdate
@@ -30,8 +30,8 @@ def test_getUpdateInfo(tmpdir):
     infoPath = pathlib.Path(reader.fs.getsyspath("/fontinfo.plist"))
     infoPath.touch()
 
-    state3 = state2.newState()
-    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state3.getUpdateInfo()
+    state = state.newState()
+    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
     assert not needsFeaturesUpdate
     assert not needsGlyphUpdate
     assert needsInfoUpdate
@@ -43,8 +43,8 @@ def test_getUpdateInfo(tmpdir):
     glyph.anchors[0]["x"] = 123
     glyphSet.writeGlyph("A", glyph, ppen.replay)
 
-    state4 = state3.newState()
-    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state4.getUpdateInfo()
+    state = state.newState()
+    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
     assert needsFeaturesUpdate
     assert needsGlyphUpdate
     assert not needsInfoUpdate
@@ -56,8 +56,8 @@ def test_getUpdateInfo(tmpdir):
     glyph.unicodes = [123]
     glyphSet.writeGlyph("A", glyph, ppen.replay)
 
-    state5 = state4.newState()
-    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state5.getUpdateInfo()
+    state = state.newState()
+    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
     assert not needsFeaturesUpdate
     assert needsGlyphUpdate
     assert not needsInfoUpdate
