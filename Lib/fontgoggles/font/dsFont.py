@@ -90,6 +90,7 @@ class DSFont(BaseFont):
                     coros.append(compileUFOToPath(source.path, ttPath, output.write))
 
             errors = await asyncio.gather(*coros, return_exceptions=True)
+
             for sourcePath, exc, output in zip(ufosToCompile, errors, outputs):
                 output = output.getvalue()
                 if output or exc is not None:
