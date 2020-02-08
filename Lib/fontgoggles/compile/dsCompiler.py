@@ -31,7 +31,7 @@ def compileDSToFont(dsPath, ttFolder):
             if source.font is None:
                 source.font = font
 
-    ttFont, masterModel, _ = varLib.build(doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
+    ttFont, masterModel, _ = varLib.build(doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT', 'avar'])
 
     # Our client needs the masterModel, so we save a pickle into the font
     ttFont["MPcl"] = newTable("MPcl")
