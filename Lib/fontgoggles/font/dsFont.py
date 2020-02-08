@@ -32,14 +32,13 @@ class DSFont(BaseFont):
 
     def __init__(self, fontPath, fontNumber, dataProvider=None):
         super().__init__(fontPath, fontNumber)
-        self.doc = None
         self._varGlyphs = {}
         self._normalizedLocation = {}
         self._sourceFontData = {}
         self._ufos = {}
 
     async def load(self, outputWriter):
-        if self.doc is None:
+        if not hasattr(self, "doc"):
             self.doc = DesignSpaceDocument.fromfile(self.fontPath)
             self.doc.findDefault()
 
@@ -114,6 +113,10 @@ class DSFont(BaseFont):
                 with open(ttPath, "rb") as f:
                     self._sourceFontData[sourcePath] = f.read()
 
+            if not ufosToCompile and hasattr(self, "ttFont"):
+                # self.ttFont and self.shaper should still be up-to-date
+                return
+
             vfFontData = await compileDSToBytes(self.fontPath, ttFolder, outputWriter)
 
         f = io.BytesIO(vfFontData)
@@ -130,7 +133,8 @@ class DSFont(BaseFont):
     def canReloadWithChange(self, externalFilePath):
         if not externalFilePath:
             # Our .designspace file itself changed, let's reload
-            self.doc = None
+            del self.doc
+            del self.ttFont
         else:
             print("DS external file changed:", externalFilePath)
             for sourcePath, sourceLayerName in self._includedFeatureFiles.get(externalFilePath, ()):
