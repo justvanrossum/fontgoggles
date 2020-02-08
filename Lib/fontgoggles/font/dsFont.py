@@ -129,6 +129,7 @@ class DSFont(BaseFont):
 
     def canReloadWithChange(self, externalFilePath):
         if not externalFilePath:
+            # Our .designspace file itself changed, let's reload
             self.doc = None
         else:
             print("DS external file changed:", externalFilePath)
