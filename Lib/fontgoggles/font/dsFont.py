@@ -51,6 +51,8 @@ class DSFont(BaseFont):
             coros = []
             self._sourceFiles = defaultdict(list)
             self._includedFeatureFiles = defaultdict(list)
+            previousUFOs = self._ufos
+            self._ufos = {}
 
             for source in self.doc.sources:
                 sourceKey = (source.path, source.layerName)
@@ -59,15 +61,17 @@ class DSFont(BaseFont):
                 for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
                     self._includedFeatureFiles[includedFeaFile].append(sourceKey)
                 glyphSet = reader.getGlyphSet(layerName=source.layerName)
-                if sourceKey not in self._ufos:
+                ufoState = previousUFOs.get(sourceKey)
+                if ufoState is None:
                     if source.layerName is None:
                         getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
                     else:
                         # We're not compiling features nor do we need cmaps for these sparse layers,
                         # so we don't need need proper anchor or unicode data
                         getUnicodesAndAnchors = lambda: ({}, {})
-                    self._ufos[sourceKey] = UFOState(reader, glyphSet,
-                                                     getUnicodesAndAnchors=getUnicodesAndAnchors)
+                    ufoState = UFOState(reader, glyphSet,
+                                        getUnicodesAndAnchors=getUnicodesAndAnchors)
+                self._ufos[sourceKey] = ufoState
 
                 if source.layerName is not None:
                     continue
