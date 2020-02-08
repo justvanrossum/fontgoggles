@@ -1,5 +1,6 @@
 import asyncio
 from collections import defaultdict
+import functools
 import io
 import os
 import pathlib
@@ -15,7 +16,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
-from .ufoFont import NotDefGlyph, extractIncludedFeatureFiles
+from .ufoFont import NotDefGlyph, UFOState, extractIncludedFeatureFiles
 from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
 from ..compile.dsCompiler import getTTPaths
 from ..misc.hbShape import HBShape
@@ -34,8 +35,7 @@ class DSFont(BaseFont):
         self._varGlyphs = {}
         self._normalizedLocation = {}
         self._sourceFontData = {}
-        self._ufoReaders = {}
-        self._ufoGlyphSets = {}
+        self._ufos = {}
 
     async def load(self, outputWriter):
         self.doc = DesignSpaceDocument.fromfile(self.fontPath)
@@ -53,8 +53,15 @@ class DSFont(BaseFont):
                 reader = UFOReader(source.path, validate=False)
                 for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
                     self._includedFeatureFiles[includedFeaFile].append((source.path, source.layerName))
-                self._ufoReaders[(source.path, source.layerName)] = reader
-                self._ufoGlyphSets[(source.path, source.layerName)] = reader.getGlyphSet(layerName=source.layerName)
+                glyphSet = reader.getGlyphSet(layerName=source.layerName)
+                if source.layerName is None:
+                    getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
+                else:
+                    # We're not compiling features nor do we need cmaps for these sparse layers,
+                    # so we don't need need proper anchor or unicode data
+                    getUnicodesAndAnchors = lambda: ({}, {})
+                self._ufos[(source.path, source.layerName)] = UFOState(reader, glyphSet,
+                                                                       getUnicodesAndAnchors=getUnicodesAndAnchors)
 
                 if source.layerName is not None:
                     continue
@@ -120,7 +127,7 @@ class DSFont(BaseFont):
     @cachedProperty
     def unitsPerEm(self):
         info = SimpleNamespace()
-        reader = self._ufoReaders[(self.doc.default.path, self.doc.default.layerName)]
+        reader = self._ufos[(self.doc.default.path, self.doc.default.layerName)].reader
         reader.readInfo(info)
         return info.unitsPerEm
 
@@ -130,14 +137,14 @@ class DSFont(BaseFont):
     def _getVarGlyph(self, glyphName):
         varGlyph = self._varGlyphs.get(glyphName)
         if varGlyph is None:
-            if glyphName not in self._ufoGlyphSets[(self.doc.default.path, self.doc.default.layerName)]:
+            if glyphName not in self._ufos[(self.doc.default.path, self.doc.default.layerName)].glyphSet:
                 varGlyph = NotDefGlyph(self.unitsPerEm)
             else:
                 tags = None
                 contours = None
                 masterPoints = []
                 for source in self.doc.sources:
-                    glyphSet = self._ufoGlyphSets[(source.path, source.layerName)]
+                    glyphSet = self._ufos[(source.path, source.layerName)].glyphSet
                     if glyphName not in glyphSet:
                         masterPoints.append(None)
                         continue
@@ -173,6 +180,15 @@ class DSFont(BaseFont):
     def _getOutlinePath(self, glyphName, colorLayers):
         varGlyph = self._getVarGlyph(glyphName)
         return varGlyph.getOutline()
+
+    def _getUnicodesAndAnchors(self, sourcePath):
+        f = io.BytesIO(self._sourceFontData[sourcePath])
+        ttFont = TTFont(f, lazy-True)
+        unicodes = defaultdict(list)
+        for code, gn in ttFont.getBestCmap().items():
+            unicodes[gn].append(code)
+        anchors = pickle.loads(ttFont["FGAx"].data)
+        return unicodes, anchors
 
 
 # From FreeType:
