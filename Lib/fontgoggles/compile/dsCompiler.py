@@ -17,7 +17,7 @@ def compileDSToFont(dsPath, ttFolder):
             ttPath = ufoPathToTTPath[source.path]
             if not os.path.exists(ttPath):
                 raise FileNotFoundError(ttPath)
-            source.font = TTFont(ttPath, lazy=True)
+            source.font = TTFont(ttPath, lazy=False)
 
     assert doc.default.font is not None
     doc.default.font["name"] = newTable("name")  # This is the template for the VF, and needs a name table
