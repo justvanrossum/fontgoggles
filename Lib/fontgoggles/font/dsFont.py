@@ -122,7 +122,7 @@ class DSFont(BaseFont):
 
     def canReloadWithChange(self, externalFilePath):
         if not externalFilePath:
-            print("DS doc changed")
+            self.doc = None
         else:
             print("DS external file changed:", externalFilePath)
             for sourcePath, sourceLayerName in self._sourceFiles.get(externalFilePath, ()):
