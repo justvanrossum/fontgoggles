@@ -59,12 +59,12 @@ class DSFont(BaseFont):
             for source in self.doc.sources:
                 sourceKey = (source.path, source.layerName)
                 self._sourceFiles[pathlib.Path(source.path)].append(sourceKey)
-                reader = UFOReader(source.path, validate=False)
-                for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
-                    self._includedFeatureFiles[includedFeaFile].append(sourceKey)
-                glyphSet = reader.getGlyphSet(layerName=source.layerName)
                 ufoState = previousUFOs.get(sourceKey)
                 if ufoState is None:
+                    reader = UFOReader(source.path, validate=False)
+                    for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
+                        self._includedFeatureFiles[includedFeaFile].append(sourceKey)
+                    glyphSet = reader.getGlyphSet(layerName=source.layerName)
                     if source.layerName is None:
                         getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
                     else:
