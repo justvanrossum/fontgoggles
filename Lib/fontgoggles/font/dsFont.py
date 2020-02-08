@@ -1,4 +1,5 @@
 import asyncio
+from collections import defaultdict
 import io
 import os
 import pathlib
@@ -92,21 +93,19 @@ class DSFont(BaseFont):
         self.masterModel = pickle.loads(self.ttFont["MPcl"].data)
         assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
 
-        includedFeatureFiles = set()
-
+        self._includedFeatureFiles = defaultdict(list)
         for source in self.doc.sources:
             reader = UFOReader(source.path, validate=False)
-            includedFeatureFiles.update(extractIncludedFeatureFiles(source.path, reader))
+            for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
+                self._includedFeatureFiles[includedFeaFile].append(source.path)
             self._ufoReaders[source.path] = reader
             self._ufoGlyphSets[source.path] = reader.getGlyphSet(layerName=source.layerName)
-
-        self._includedFeatureFiles = sorted(includedFeatureFiles)
 
         self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
 
     def getExternalFiles(self):
         sourcePaths = [pathlib.Path(source.path) for source in self.doc.sources]
-        return sourcePaths + self._includedFeatureFiles
+        return sourcePaths + sorted(self._includedFeatureFiles)
 
     def canReloadWithChange(self, externalFilePath):
         print("DS external file changed:", externalFilePath)
