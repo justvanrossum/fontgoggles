@@ -41,7 +41,7 @@ class UFOFont(BaseFont):
         self._cachedGlyphs = {}
         if self.ufoState is None:
             self.ufoState = UFOState(self.reader, self.glyphSet,
-                                     getAnchors=self._getAnchors, getUnicodes=self._getUnicodes)
+                                     getUnicodesAndAnchors=self._getUnicodesAndAnchors)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
@@ -95,14 +95,12 @@ class UFOFont(BaseFont):
 
         return True
 
-    def _getAnchors(self):
-        return pickle.loads(self.ttFont["FGAx"].data)
-
-    def _getUnicodes(self):
+    def _getUnicodesAndAnchors(self):
         unicodes = defaultdict(list)
         for code, gn in self.ttFont.getBestCmap().items():
             unicodes[gn].append(code)
-        return unicodes
+        anchors = pickle.loads(self.ttFont["FGAx"].data)
+        return unicodes, anchors
 
     def _getShaper(self, fontData):
         return HBShape(fontData,
@@ -298,15 +296,14 @@ class UFOState:
     #
 
     def __init__(self, reader, glyphSet, anchors=None, unicodes=None,
-                 getAnchors=None, getUnicodes=None, previousState=None):
+                 getUnicodesAndAnchors=None, previousState=None):
         self.reader = reader
         self.glyphSet = glyphSet
-        assert (anchors is not None) == (getAnchors is None)
-        assert (unicodes is not None) == (getUnicodes is None)
+        assert (anchors is not None) == (getUnicodesAndAnchors is None)
+        assert (unicodes is not None) == (getUnicodesAndAnchors is None)
         self._anchors = anchors
         self._unicodes = unicodes
-        self._getAnchors = getAnchors
-        self._getUnicodes = getUnicodes
+        self._getUnicodesAndAnchors = getUnicodesAndAnchors
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
         self._previousState = previousState
@@ -317,7 +314,7 @@ class UFOState:
         assert self._previousState is None, "state was not updated"
         newState = UFOState(self.reader, self.glyphSet,
                             self._anchors, self._unicodes,
-                            self._getAnchors, self._getUnicodes,
+                            self._getUnicodesAndAnchors,
                             self)
         self._previousState = None
         return newState
@@ -374,26 +371,26 @@ class UFOState:
     @property
     def anchors(self):
         if self._anchors is None:
-            self._anchors = self._getAnchors()
-            self._getAnchors = None
+            self._unicodes, self._anchors = self._getUnicodesAndAnchors()
+            self._getUnicodesAndAnchors = None
         return self._anchors
 
     @anchors.setter
     def anchors(self, anchors):
         self._anchors = anchors
-        self._getAnchors = None
+        self._getUnicodesAndAnchors = None
 
     @property
     def unicodes(self):
         if self._unicodes is None:
-            self._unicodes = self._getUnicodes()
-            self._getUnicodes = None
+            self._unicodes, self._anchors = self._getUnicodesAndAnchors()
+            self._getUnicodesAndAnchors = None
         return self._unicodes
 
     @unicodes.setter
     def unicodes(self, unicodes):
         self._unicodes = unicodes
-        self._getUnicodes = None
+        self._getUnicodesAndAnchors = None
 
 
 def getModTime(path):

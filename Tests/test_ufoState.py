@@ -15,7 +15,7 @@ def test_getUpdateInfo(tmpdir):
     glyphSet = reader.getGlyphSet()
     cmap, unicodes, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
 
-    state = UFOState(reader, glyphSet, getAnchors=lambda: anchors, getUnicodes=lambda: unicodes)
+    state = UFOState(reader, glyphSet, getUnicodesAndAnchors=lambda: (unicodes, anchors))
 
     feaPath = pathlib.Path(reader.fs.getsyspath("/features.fea"))
     feaPath.touch()
