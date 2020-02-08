@@ -152,7 +152,7 @@ class DSFont(BaseFont):
                 if needsFeaturesUpdate:
                     del self._sourceFontData[sourcePath]
                     invalidateCaches = True
-                if needsGlyphUpdate or invalidateCaches:
+                if needsGlyphUpdate or needsInfoUpdate:
                     invalidateCaches = True
                 if needsCmapUpdate:
                     # TODO: This could be done more efficiently like how UFOFont
