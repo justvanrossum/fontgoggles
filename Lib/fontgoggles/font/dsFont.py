@@ -64,15 +64,18 @@ class DSFont(BaseFont):
                     reader = UFOReader(source.path, validate=False)
                     glyphSet = reader.getGlyphSet(layerName=source.layerName)
                     if source.layerName is None:
-                        for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
-                            self._includedFeatureFiles[includedFeaFile].append(sourceKey)
+                        includedFeaFiles = extractIncludedFeatureFiles(source.path, reader)
                         getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
                     else:
+                        includedFeaFiles = []
                         # We're not compiling features nor do we need cmaps for these sparse layers,
                         # so we don't need need proper anchor or unicode data
                         getUnicodesAndAnchors = lambda: ({}, {})
                     ufoState = UFOState(reader, glyphSet,
                                         getUnicodesAndAnchors=getUnicodesAndAnchors)
+                    ufoState.includedFeaFiles = includedFeaFiles
+                for includedFeaFile in ufoState.includedFeaFiles:
+                    self._includedFeatureFiles[includedFeaFile].append(sourceKey)
                 self._ufos[sourceKey] = ufoState
 
                 if source.layerName is not None:
