@@ -98,8 +98,8 @@ class DSFont(BaseFont):
             reader = UFOReader(source.path, validate=False)
             for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
                 self._includedFeatureFiles[includedFeaFile].append(source.path)
-            self._ufoReaders[source.path] = reader
-            self._ufoGlyphSets[source.path] = reader.getGlyphSet(layerName=source.layerName)
+            self._ufoReaders[(source.path, source.layerName)] = reader
+            self._ufoGlyphSets[(source.path, source.layerName)] = reader.getGlyphSet(layerName=source.layerName)
 
         self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
 
@@ -119,7 +119,7 @@ class DSFont(BaseFont):
     @cachedProperty
     def unitsPerEm(self):
         info = SimpleNamespace()
-        reader = self._ufoReaders[self.doc.default.path]
+        reader = self._ufoReaders[(self.doc.default.path, self.doc.default.layerName)]
         reader.readInfo(info)
         return info.unitsPerEm
 
@@ -129,14 +129,14 @@ class DSFont(BaseFont):
     def _getVarGlyph(self, glyphName):
         varGlyph = self._varGlyphs.get(glyphName)
         if varGlyph is None:
-            if glyphName not in self._ufoGlyphSets[self.doc.default.path]:
+            if glyphName not in self._ufoGlyphSets[(self.doc.default.path, self.doc.default.layerName)]:
                 varGlyph = NotDefGlyph(self.unitsPerEm)
             else:
                 tags = None
                 contours = None
                 masterPoints = []
                 for source in self.doc.sources:
-                    glyphSet = self._ufoGlyphSets[source.path]
+                    glyphSet = self._ufoGlyphSets[(source.path, source.layerName)]
                     if glyphName not in glyphSet:
                         masterPoints.append(None)
                         continue
