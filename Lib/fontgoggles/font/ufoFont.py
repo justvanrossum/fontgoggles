@@ -40,12 +40,12 @@ class UFOFont(BaseFont):
         self.reader.readInfo(self.info)
         self._cachedGlyphs = {}
         if self.ufoState is None:
+            includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
             self.ufoState = UFOState(self.reader, self.glyphSet,
-                                     getUnicodesAndAnchors=self._getUnicodesAndAnchors)
+                                     getUnicodesAndAnchors=self._getUnicodesAndAnchors,
+                                     includedFeatureFiles=includedFeatureFiles)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
-
-        self._includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
 
         f = io.BytesIO(fontData)
         self.ttFont = TTFont(f, lazy=True)
@@ -57,7 +57,7 @@ class UFOFont(BaseFont):
         self._setupReaderAndGlyphSet()
 
     def getExternalFiles(self):
-        return self._includedFeatureFiles
+        return self.ufoState.includedFeatureFiles
 
     def canReloadWithChange(self, externalFilePath):
         if self.reader.fileStructure != UFOFileStructure.PACKAGE:
@@ -296,7 +296,8 @@ class UFOState:
     #
 
     def __init__(self, reader, glyphSet, anchors=None, unicodes=None,
-                 getUnicodesAndAnchors=None, previousState=None):
+                 getUnicodesAndAnchors=None, includedFeatureFiles=(),
+                 previousState=None):
         self.reader = reader
         self.glyphSet = glyphSet
         assert (anchors is not None) == (getUnicodesAndAnchors is None)
@@ -306,6 +307,7 @@ class UFOState:
         self._getUnicodesAndAnchors = getUnicodesAndAnchors
         self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
         self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
+        self.includedFeatureFiles = includedFeatureFiles
         self._previousState = previousState
 
     def newState(self):
@@ -315,6 +317,7 @@ class UFOState:
         newState = UFOState(self.reader, self.glyphSet,
                             self._anchors, self._unicodes,
                             self._getUnicodesAndAnchors,
+                            self.includedFeatureFiles,
                             self)
         self._previousState = None
         return newState

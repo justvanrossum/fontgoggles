@@ -64,17 +64,17 @@ class DSFont(BaseFont):
                     reader = UFOReader(source.path, validate=False)
                     glyphSet = reader.getGlyphSet(layerName=source.layerName)
                     if source.layerName is None:
-                        includedFeaFiles = extractIncludedFeatureFiles(source.path, reader)
+                        includedFeatureFiles = extractIncludedFeatureFiles(source.path, reader)
                         getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
                     else:
-                        includedFeaFiles = []
+                        includedFeatureFiles = []
                         # We're not compiling features nor do we need cmaps for these sparse layers,
                         # so we don't need need proper anchor or unicode data
                         getUnicodesAndAnchors = lambda: ({}, {})
                     ufoState = UFOState(reader, glyphSet,
-                                        getUnicodesAndAnchors=getUnicodesAndAnchors)
-                    ufoState.includedFeaFiles = includedFeaFiles
-                for includedFeaFile in ufoState.includedFeaFiles:
+                                        getUnicodesAndAnchors=getUnicodesAndAnchors,
+                                        includedFeatureFiles=includedFeatureFiles)
+                for includedFeaFile in ufoState.includedFeatureFiles:
                     self._includedFeatureFiles[includedFeaFile].append(sourceKey)
                 self._ufos[sourceKey] = ufoState
 
@@ -95,6 +95,7 @@ class DSFont(BaseFont):
                     outputs.append(output)
                     coros.append(compileUFOToPath(source.path, ttPath, output.write))
 
+            # print(f"compiling {len(coros)} fonts")
             errors = await asyncio.gather(*coros, return_exceptions=True)
 
             for sourcePath, exc, output in zip(ufosToCompile, errors, outputs):
@@ -230,7 +231,7 @@ class DSFont(BaseFont):
 
     def _getUnicodesAndAnchors(self, sourcePath):
         f = io.BytesIO(self._sourceFontData[sourcePath])
-        ttFont = TTFont(f, lazy-True)
+        ttFont = TTFont(f, lazy=True)
         unicodes = defaultdict(list)
         for code, gn in ttFont.getBestCmap().items():
             unicodes[gn].append(code)
