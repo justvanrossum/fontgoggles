@@ -44,7 +44,7 @@ class DSFont(BaseFont):
             self.doc.findDefault()
 
         with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
-            ufoPathToTTPath = getTTPaths(self.doc, ttFolder)
+            sourcePathToTTPath = getTTPaths(self.doc, ttFolder)
             ufosToCompile = []
             ttPaths = []
             outputs = []
@@ -72,25 +72,24 @@ class DSFont(BaseFont):
                 if source.layerName is not None:
                     continue
 
-                ufoPath = source.path
-                if ufoPath in ufosToCompile:
+                if source.path in ufosToCompile:
                     continue
-                ttPath = ufoPathToTTPath[ufoPath]
-                if ufoPath in self._sourceFontData:
+                ttPath = sourcePathToTTPath[source.path]
+                if source.path in self._sourceFontData:
                     with open(ttPath, "wb") as f:
                         f.write(self._sourceFontData[source.path])
                 else:
-                    ufosToCompile.append(ufoPath)
+                    ufosToCompile.append(source.path)
                     ttPaths.append(ttPath)
                     output = io.StringIO()
                     outputs.append(output)
-                    coros.append(compileUFOToPath(ufoPath, ttPath, output.write))
+                    coros.append(compileUFOToPath(source.path, ttPath, output.write))
 
             errors = await asyncio.gather(*coros, return_exceptions=True)
-            for ufoPath, exc, output in zip(ufosToCompile, errors, outputs):
+            for sourcePath, exc, output in zip(ufosToCompile, errors, outputs):
                 output = output.getvalue()
                 if output or exc is not None:
-                    outputWriter(f"compile output for {ufoPath}:\n")
+                    outputWriter(f"compile output for {sourcePath}:\n")
                     if output:
                         outputWriter(output)
                     if exc is not None:
@@ -101,11 +100,11 @@ class DSFont(BaseFont):
                     f"Could not build '{os.path.basename(self.fontPath)}': "
                     "some sources did not successfully compile"
                 )
-            for ufoPath, ttPath in zip(ufosToCompile, ttPaths):
+            for sourcePath, ttPath in zip(ufosToCompile, ttPaths):
                 # Store compiled tt data so we can reuse it to rebuild ourselves
                 # without recompiling the source.
                 with open(ttPath, "rb") as f:
-                    self._sourceFontData[ufoPath] = f.read()
+                    self._sourceFontData[sourcePath] = f.read()
 
             vfFontData = await compileDSToBytes(self.fontPath, ttFolder, outputWriter)
 

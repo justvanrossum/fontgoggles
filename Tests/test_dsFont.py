@@ -44,13 +44,10 @@ async def test_DSFont():
     font = DSFont(ufoPath, 0)
     await font.load(None)
     expected = [
-        'MutatorSansLightCondensed.ufo',
         'MutatorSansBoldCondensed.ufo',
-        'MutatorSansLightWide.ufo',
         'MutatorSansBoldWide.ufo',
         'MutatorSansLightCondensed.ufo',
-        'MutatorSansLightCondensed.ufo',
-        'MutatorSansLightCondensed.ufo',
+        'MutatorSansLightWide.ufo',
     ]
     assert expected == [p.name for p in font.getExternalFiles()]
     run = font.getGlyphRun("ABC")
