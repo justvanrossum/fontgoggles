@@ -133,7 +133,6 @@ class DSFont(BaseFont):
         return sorted(self._sourceFiles) + sorted(self._includedFeatureFiles)
 
     def canReloadWithChange(self, externalFilePath):
-        print("DS external file changed:", externalFilePath)
         invalidateCaches = False
         if not externalFilePath:
             # Our .designspace file itself changed, let's reload
@@ -143,8 +142,6 @@ class DSFont(BaseFont):
         else:
             for sourcePath, sourceLayerName in self._includedFeatureFiles.get(externalFilePath, ()):
                 assert sourceLayerName is None
-                print("---", sourcePath, type(sourcePath))
-                print("XXX", sourcePath in self._sourceFontData)
                 self._sourceFontData.pop(sourcePath, None)  # implies self._needsVFRebuild
                 invalidateCaches = True
             for sourcePath, sourceLayerName in self._sourceFiles.get(externalFilePath, ()):
