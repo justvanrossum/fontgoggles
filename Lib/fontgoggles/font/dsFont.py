@@ -131,23 +131,38 @@ class DSFont(BaseFont):
         return sorted(self._sourceFiles) + sorted(self._includedFeatureFiles)
 
     def canReloadWithChange(self, externalFilePath):
+        invalidateCaches = False
         if not externalFilePath:
             # Our .designspace file itself changed, let's reload
             del self.doc
             del self.ttFont
+            invalidateCaches = True
         else:
             print("DS external file changed:", externalFilePath)
             for sourcePath, sourceLayerName in self._includedFeatureFiles.get(externalFilePath, ()):
                 # sourceKey = sourcePath, sourceLayerName
                 # del self._ufos[sourceKey]
                 del self._sourceFontData[sourcePath]
+                invalidateCaches = True
             for sourcePath, sourceLayerName in self._sourceFiles.get(externalFilePath, ()):
                 sourceKey = sourcePath, sourceLayerName
                 self._ufos[sourceKey] = self._ufos[sourceKey].newState()
                 (needsFeaturesUpdate, needsGlyphUpdate,
                  needsInfoUpdate, needsCmapUpdate) = self._ufos[sourceKey].getUpdateInfo()
-        self.resetCache()
-        self._varGlyphs = {}
+                if needsFeaturesUpdate:
+                    del self._sourceFontData[sourcePath]
+                    invalidateCaches = True
+                if needsGlyphUpdate or invalidateCaches:
+                    invalidateCaches = True
+                if needsCmapUpdate:
+                    # TODO: This could be done more efficiently like how UFOFont
+                    # does it, if the changed source is the default source.
+                    del self.doc
+                    del self.ttFont
+                    invalidateCaches = True
+        if invalidateCaches:
+            self.resetCache()
+            self._varGlyphs = {}
         return True
 
     @cachedProperty
