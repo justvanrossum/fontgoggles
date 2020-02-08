@@ -36,6 +36,7 @@ class DSFont(BaseFont):
         self._normalizedLocation = {}
         self._sourceFontData = {}
         self._ufos = {}
+        self._needsVFRebuild = True
 
     async def load(self, outputWriter):
         if not hasattr(self, "doc"):
@@ -61,10 +62,10 @@ class DSFont(BaseFont):
                 ufoState = previousUFOs.get(sourceKey)
                 if ufoState is None:
                     reader = UFOReader(source.path, validate=False)
-                    for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
-                        self._includedFeatureFiles[includedFeaFile].append(sourceKey)
                     glyphSet = reader.getGlyphSet(layerName=source.layerName)
                     if source.layerName is None:
+                        for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
+                            self._includedFeatureFiles[includedFeaFile].append(sourceKey)
                         getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
                     else:
                         # We're not compiling features nor do we need cmaps for these sparse layers,
@@ -113,8 +114,8 @@ class DSFont(BaseFont):
                 with open(ttPath, "rb") as f:
                     self._sourceFontData[sourcePath] = f.read()
 
-            if not ufosToCompile and hasattr(self, "ttFont"):
-                # self.ttFont and self.shaper should still be up-to-date
+            if not ufosToCompile and not self._needsVFRebuild:
+                # self.ttFont and self.shaper are still up-to-date
                 return
 
             vfFontData = await compileDSToBytes(self.fontPath, ttFolder, outputWriter)
@@ -126,6 +127,7 @@ class DSFont(BaseFont):
         assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
 
         self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
+        self._needsVFRebuild = False
 
     def getExternalFiles(self):
         return sorted(self._sourceFiles) + sorted(self._includedFeatureFiles)
@@ -135,22 +137,24 @@ class DSFont(BaseFont):
         if not externalFilePath:
             # Our .designspace file itself changed, let's reload
             del self.doc
-            del self.ttFont
+            self._needsVFRebuild = True
             invalidateCaches = True
         else:
             print("DS external file changed:", externalFilePath)
             for sourcePath, sourceLayerName in self._includedFeatureFiles.get(externalFilePath, ()):
-                # sourceKey = sourcePath, sourceLayerName
-                # del self._ufos[sourceKey]
-                del self._sourceFontData[sourcePath]
+                assert sourceLayerName is None
+                self._sourceFontData.pop(sourcePath, None)  # implies self._needsVFRebuild
                 invalidateCaches = True
             for sourcePath, sourceLayerName in self._sourceFiles.get(externalFilePath, ()):
                 sourceKey = sourcePath, sourceLayerName
                 self._ufos[sourceKey] = self._ufos[sourceKey].newState()
                 (needsFeaturesUpdate, needsGlyphUpdate,
                  needsInfoUpdate, needsCmapUpdate) = self._ufos[sourceKey].getUpdateInfo()
+                if sourceLayerName is not None:
+                    # We don't compile features for layer masters
+                    needsFeaturesUpdate = False
                 if needsFeaturesUpdate:
-                    del self._sourceFontData[sourcePath]
+                    self._sourceFontData.pop(sourcePath, None)  # implies self._needsVFRebuild
                     invalidateCaches = True
                 if needsGlyphUpdate or needsInfoUpdate:
                     invalidateCaches = True
@@ -158,7 +162,7 @@ class DSFont(BaseFont):
                     # TODO: This could be done more efficiently like how UFOFont
                     # does it, if the changed source is the default source.
                     del self.doc
-                    del self.ttFont
+                    self._needsVFRebuild = True
                     invalidateCaches = True
         if invalidateCaches:
             self.resetCache()
