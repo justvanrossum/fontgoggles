@@ -132,13 +132,15 @@ class DSFont(BaseFont):
             self.doc = None
         else:
             print("DS external file changed:", externalFilePath)
-            for sourcePath, sourceLayerName in self._sourceFiles.get(externalFilePath, ()):
-                ...
             for sourcePath, sourceLayerName in self._includedFeatureFiles.get(externalFilePath, ()):
-                ...
-            # TODO:
-            # - check for changes in .doc
-            # - check for changes in sources
+                # sourceKey = sourcePath, sourceLayerName
+                # del self._ufos[sourceKey]
+                del self._sourceFontData[sourcePath]
+            for sourcePath, sourceLayerName in self._sourceFiles.get(externalFilePath, ()):
+                sourceKey = sourcePath, sourceLayerName
+                self._ufos[sourceKey] = self._ufos[sourceKey].newState()
+                (needsFeaturesUpdate, needsGlyphUpdate,
+                 needsInfoUpdate, needsCmapUpdate) = self._ufos[sourceKey].getUpdateInfo()
         self.resetCache()
         self._varGlyphs = {}
         return True
