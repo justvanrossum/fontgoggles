@@ -97,7 +97,7 @@ class DSFont(BaseFont):
         for source in self.doc.sources:
             reader = UFOReader(source.path, validate=False)
             for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
-                self._includedFeatureFiles[includedFeaFile].append(source.path)
+                self._includedFeatureFiles[includedFeaFile].append((source.path, source.layerName))
             self._ufoReaders[(source.path, source.layerName)] = reader
             self._ufoGlyphSets[(source.path, source.layerName)] = reader.getGlyphSet(layerName=source.layerName)
 
