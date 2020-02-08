@@ -382,15 +382,14 @@ class PointCollector(BasePen):
 def normalizeLocation(doc, location):
     # Adapted from DesignSpaceDocument.normalizeLocation(), which takes axis
     # names, yet we need to work with tags here.
+    # Also, the original takes design space coordinates, whereas I have user
+    # space coordinates here.
     new = {}
     for axis in doc.axes:
         if axis.tag not in location:
             # skipping this dimension it seems
             continue
-        value = location[axis.tag]
-        # 'anisotropic' location, take first coord only
-        if isinstance(value, tuple):
-            value = value[0]
+        value = axis.map_forward(location[axis.tag])
         triple = [
             axis.map_forward(v) for v in (axis.minimum, axis.default, axis.maximum)
         ]
