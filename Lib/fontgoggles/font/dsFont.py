@@ -47,9 +47,11 @@ class DSFont(BaseFont):
             ttPaths = []
             outputs = []
             coros = []
+            self._sourceFiles = defaultdict(list)
             self._includedFeatureFiles = defaultdict(list)
 
             for source in self.doc.sources:
+                self._sourceFiles[pathlib.Path(source.path)].append((source.path, source.layerName))
                 reader = UFOReader(source.path, validate=False)
                 for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
                     self._includedFeatureFiles[includedFeaFile].append((source.path, source.layerName))
@@ -112,11 +114,12 @@ class DSFont(BaseFont):
         self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
 
     def getExternalFiles(self):
-        sourcePaths = [pathlib.Path(source.path) for source in self.doc.sources]
-        return sourcePaths + sorted(self._includedFeatureFiles)
+        return sorted(self._sourceFiles) + sorted(self._includedFeatureFiles)
 
     def canReloadWithChange(self, externalFilePath):
         print("DS external file changed:", externalFilePath)
+        print("src:", self._sourceFiles.get(externalFilePath))
+        print("fea:", self._includedFeatureFiles.get(externalFilePath))
         # TODO:
         # - check for changes in .doc
         # - check for changes in sources
