@@ -53,6 +53,8 @@ class DSFont(BaseFont):
             self._includedFeatureFiles = defaultdict(list)
             previousUFOs = self._ufos
             self._ufos = {}
+            previousSourceData = self._sourceFontData
+            self._sourceFontData = {}
 
             for source in self.doc.sources:
                 sourceKey = (source.path, source.layerName)
@@ -79,9 +81,10 @@ class DSFont(BaseFont):
                 if source.path in ufosToCompile:
                     continue
                 ttPath = sourcePathToTTPath[source.path]
-                if source.path in self._sourceFontData:
+                if source.path in previousSourceData:
                     with open(ttPath, "wb") as f:
-                        f.write(self._sourceFontData[source.path])
+                        f.write(previousSourceData[source.path])
+                    self._sourceFontData[source.path] = previousSourceData[source.path]
                 else:
                     ufosToCompile.append(source.path)
                     ttPaths.append(ttPath)
