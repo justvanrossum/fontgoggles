@@ -108,13 +108,10 @@ openFontsTestData = [
                   'maxValue': 1000.0,
                   'minValue': 0.0,
                   'name': 'Weight'}},
-        ['MutatorSansLightCondensed.ufo',
-         'MutatorSansBoldCondensed.ufo',
-         'MutatorSansLightWide.ufo',
+        ['MutatorSansBoldCondensed.ufo',
          'MutatorSansBoldWide.ufo',
          'MutatorSansLightCondensed.ufo',
-         'MutatorSansLightCondensed.ufo',
-         'MutatorSansLightCondensed.ufo'],
+         'MutatorSansLightWide.ufo'],
         "A", ["A"]),
 ]
 

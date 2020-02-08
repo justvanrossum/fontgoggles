@@ -32,14 +32,16 @@ class DSFont(BaseFont):
 
     def __init__(self, fontPath, fontNumber, dataProvider=None):
         super().__init__(fontPath, fontNumber)
+        self.doc = None
         self._varGlyphs = {}
         self._normalizedLocation = {}
         self._sourceFontData = {}
         self._ufos = {}
 
     async def load(self, outputWriter):
-        self.doc = DesignSpaceDocument.fromfile(self.fontPath)
-        self.doc.findDefault()
+        if self.doc is None:
+            self.doc = DesignSpaceDocument.fromfile(self.fontPath)
+            self.doc.findDefault()
 
         with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
             ufoPathToTTPath = getTTPaths(self.doc, ttFolder)
@@ -51,19 +53,21 @@ class DSFont(BaseFont):
             self._includedFeatureFiles = defaultdict(list)
 
             for source in self.doc.sources:
-                self._sourceFiles[pathlib.Path(source.path)].append((source.path, source.layerName))
+                sourceKey = (source.path, source.layerName)
+                self._sourceFiles[pathlib.Path(source.path)].append(sourceKey)
                 reader = UFOReader(source.path, validate=False)
                 for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
-                    self._includedFeatureFiles[includedFeaFile].append((source.path, source.layerName))
+                    self._includedFeatureFiles[includedFeaFile].append(sourceKey)
                 glyphSet = reader.getGlyphSet(layerName=source.layerName)
-                if source.layerName is None:
-                    getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
-                else:
-                    # We're not compiling features nor do we need cmaps for these sparse layers,
-                    # so we don't need need proper anchor or unicode data
-                    getUnicodesAndAnchors = lambda: ({}, {})
-                self._ufos[(source.path, source.layerName)] = UFOState(reader, glyphSet,
-                                                                       getUnicodesAndAnchors=getUnicodesAndAnchors)
+                if sourceKey not in self._ufos:
+                    if source.layerName is None:
+                        getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
+                    else:
+                        # We're not compiling features nor do we need cmaps for these sparse layers,
+                        # so we don't need need proper anchor or unicode data
+                        getUnicodesAndAnchors = lambda: ({}, {})
+                    self._ufos[sourceKey] = UFOState(reader, glyphSet,
+                                                     getUnicodesAndAnchors=getUnicodesAndAnchors)
 
                 if source.layerName is not None:
                     continue
@@ -117,12 +121,17 @@ class DSFont(BaseFont):
         return sorted(self._sourceFiles) + sorted(self._includedFeatureFiles)
 
     def canReloadWithChange(self, externalFilePath):
-        print("DS external file changed:", externalFilePath)
-        print("src:", self._sourceFiles.get(externalFilePath))
-        print("fea:", self._includedFeatureFiles.get(externalFilePath))
-        # TODO:
-        # - check for changes in .doc
-        # - check for changes in sources
+        if not externalFilePath:
+            print("DS doc changed")
+        else:
+            print("DS external file changed:", externalFilePath)
+            for sourcePath, sourceLayerName in self._sourceFiles.get(externalFilePath, ()):
+                ...
+            for sourcePath, sourceLayerName in self._includedFeatureFiles.get(externalFilePath, ()):
+                ...
+            # TODO:
+            # - check for changes in .doc
+            # - check for changes in sources
         self.resetCache()
         self._varGlyphs = {}
         return True
