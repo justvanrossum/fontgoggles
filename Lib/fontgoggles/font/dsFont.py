@@ -47,9 +47,18 @@ class DSFont(BaseFont):
             ttPaths = []
             outputs = []
             coros = []
+            self._includedFeatureFiles = defaultdict(list)
+
             for source in self.doc.sources:
+                reader = UFOReader(source.path, validate=False)
+                for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
+                    self._includedFeatureFiles[includedFeaFile].append((source.path, source.layerName))
+                self._ufoReaders[(source.path, source.layerName)] = reader
+                self._ufoGlyphSets[(source.path, source.layerName)] = reader.getGlyphSet(layerName=source.layerName)
+
                 if source.layerName is not None:
                     continue
+
                 ufoPath = source.path
                 if ufoPath in ufosToCompile:
                     continue
@@ -92,14 +101,6 @@ class DSFont(BaseFont):
         # Nice cookie for us from the worker
         self.masterModel = pickle.loads(self.ttFont["MPcl"].data)
         assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
-
-        self._includedFeatureFiles = defaultdict(list)
-        for source in self.doc.sources:
-            reader = UFOReader(source.path, validate=False)
-            for includedFeaFile in extractIncludedFeatureFiles(source.path, reader):
-                self._includedFeatureFiles[includedFeaFile].append((source.path, source.layerName))
-            self._ufoReaders[(source.path, source.layerName)] = reader
-            self._ufoGlyphSets[(source.path, source.layerName)] = reader.getGlyphSet(layerName=source.layerName)
 
         self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
 
