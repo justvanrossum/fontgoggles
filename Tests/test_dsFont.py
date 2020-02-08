@@ -1,5 +1,6 @@
+import pytest
 from fontTools.ufoLib import UFOReader
-from fontgoggles.font.dsFont import PointCollector
+from fontgoggles.font.dsFont import DSFont, PointCollector
 from testSupport import getFontPath
 
 
@@ -35,3 +36,23 @@ def test_pointCollectorQuad():
     assert len(pen.tags) == 4
     assert pen.contours == [3]
     assert pen.tags == [0, 0, 0, 0]
+
+
+@pytest.mark.asyncio
+async def test_DSFont():
+    ufoPath = getFontPath("MutatorSans.designspace")
+    font = DSFont(ufoPath, 0)
+    await font.load(None)
+    expected = [
+        'MutatorSansLightCondensed.ufo',
+        'MutatorSansBoldCondensed.ufo',
+        'MutatorSansLightWide.ufo',
+        'MutatorSansBoldWide.ufo',
+        'MutatorSansLightCondensed.ufo',
+        'MutatorSansLightCondensed.ufo',
+        'MutatorSansLightCondensed.ufo',
+    ]
+    assert expected == [p.name for p in font.getExternalFiles()]
+    run = font.getGlyphRun("ABC")
+    ax = [gi.ax for gi in run]
+    assert [396, 443, 499] == ax
