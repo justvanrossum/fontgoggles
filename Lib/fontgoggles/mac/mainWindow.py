@@ -12,6 +12,7 @@ import AppKit
 import objc
 from vanilla import (ActionButton, CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs,
                      TextBox, TextEditor, VanillaBaseControl, Window)
+from vanilla.dialogs import getFile
 from fontTools.misc.arrayTools import offsetRect
 from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.font.baseFont import GlyphsRun
@@ -181,9 +182,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
-        textRightMargin = 70
         self.textEntry = TextEntryGroup((0, 0, 0, 45), callback=self.textEntryChangedCallback)
-
         self.fontList = FontList(self.project, self.projectFontsProxy, 300, self.defaultFontItemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
@@ -1007,18 +1006,19 @@ class Stepper(VanillaBaseControl):
 
 class TextEntryGroup(Group):
 
-    def __init__(self, posSize, callback=None):
+    def __init__(self, posSize, textFilePath=None, callback=None):
         super().__init__(posSize)
         textRightMargin = 70
         self.textEntry = EditText((10, 8, -textRightMargin, 25), "", callback=callback)
-        self.textFileStepper = Stepper((-textRightMargin + 5, 8, 12, 25), 0, 0, 0)
+        self.textFileStepper = Stepper((-textRightMargin + 5, 8, 12, 25), 0, 0, 1, callback=self.stepperCallback)
         items = [
-            dict(title="Load text file..."),
-            dict(title="Save"),
-            dict(title="Save as..."),
-            dict(title="Revert"),
+            dict(title="Load text file...", callback=self.loadTextFileCallback),
+            # dict(title="Save"),
+            # dict(title="Save as..."),
+            # dict(title="Revert"),
         ]
         self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
+        self.setTextFile(textFilePath)
 
     def get(self):
         return self.textEntry.get()
@@ -1029,6 +1029,34 @@ class TextEntryGroup(Group):
     @property
     def nsTextView(self):
         return self.textEntry._nsObject
+
+    def loadTextFileCallback(self, sender):
+        window = self._nsObject.window()
+        getFile("Please select a text file",
+                fileTypes=["txt"], parentWindow=window,
+                resultCallback=self.getFileCompiletionHandler)
+
+    def getFileCompiletionHandler(self, result):
+        self.setTextFile(result[0])
+
+    def setTextFile(self, path):
+        if path is None:
+            self.lines = [""]
+        else:
+            with open(path, "r", encoding="utf-8", errors="replace") as f:
+                self.lines = f.read().splitlines()
+        self.textFileStepper.maxValue = len(self.lines) - 1 if self.lines else 0
+        self.setTextFileIndex(0)
+
+    def setTextFileIndex(self, index):
+        line = ""
+        if index < len(self.lines):
+            line = self.lines[index]
+        self.textEntry.set(line)
+        self.textEntry._target.callback(self.textEntry)
+
+    def stepperCallback(self, sender):
+        self.setTextFileIndex(len(self.lines) - 1 - sender.get())
 
 
 _minimalSpaceBox = 12
