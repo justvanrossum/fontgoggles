@@ -1023,10 +1023,8 @@ class TextEntryGroup(Group):
         self.textEntry = EditText((10, 8, -textRightMargin, 25), "", callback=callback)
         self.textFileStepper = Stepper((-textRightMargin + 5, 8, 12, 25), 0, 0, 1, callback=self.stepperCallback)
         items = [
-            dict(title="Load text file...", callback=self.loadTextFileCallback),
-            # dict(title="Save"),
-            # dict(title="Save as..."),
-            # dict(title="Revert"),
+            dict(title="Load Text File...", callback=self.loadTextFileCallback),
+            dict(title="Forget Text File", callback=self.forgetTextFileCallback),
         ]
         self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
         self.textFilePath = None
@@ -1058,6 +1056,9 @@ class TextEntryGroup(Group):
     def getFileCompiletionHandler(self, result):
         self.setTextFile(result[0])
 
+    def forgetTextFileCallback(self, sender):
+        self.setTextFile(None)
+
     def textFileChanged(self, oldPath, newPath, wasModified):
         if newPath is not None:
             self.textFilePath = newPath
@@ -1066,18 +1067,20 @@ class TextEntryGroup(Group):
 
     def setTextFile(self, path, resetIndex=True):
         if path != self.textFilePath:
-            path = os.path.normpath(path)
-            obs = getFileObserver()
+            if path is not None:
+                path = os.path.normpath(path)
             if self.textFilePath is not None:
+                obs = getFileObserver()
                 obs.removeObserver(self.textFilePath, self.textFileChanged)
         if path is None:
             self.textFilePath = None
-            self.lines = [""]
+            self.lines = [self.textEntry.get()]
         else:
             with open(path, "r", encoding="utf-8", errors="replace") as f:
                 self.lines = f.read().splitlines()
             if path != self.textFilePath:
                 self.textFilePath = path
+                obs = getFileObserver()
                 obs.addObserver(self.textFilePath, self.textFileChanged)
         self.textFileStepper.maxValue = len(self.lines) - 1 if self.lines else 0
         if resetIndex:
