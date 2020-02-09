@@ -235,12 +235,17 @@ class FGFontListView(AppKit.NSView):
             fontList = self.vanillaWrapper()
             return bool(fontList.selection)
         else:
-            return super().validateMenuItem_(sender)
+            return True
 
     @suppressAndLogException
     def delete_(self, sender):
         fontList = self.vanillaWrapper()
         fontList.removeSelectedFontItems()
+
+    @suppressAndLogException
+    def selectAll_(self, sender):
+        fontList = self.vanillaWrapper()
+        fontList.selectAll()
 
 
 def _makeUndoTitle(mainTitle, info):
@@ -540,6 +545,9 @@ class FontList(Group):
             fontItem.selected = not fontItem.selected
         if self._selectionChangedCallback is not None:
             self._selectionChangedCallback(self)
+
+    def selectAll(self):
+        self.selection = set(range(len(self.project.fonts)))
 
     def resetSelection(self):
         self._selection = set()
