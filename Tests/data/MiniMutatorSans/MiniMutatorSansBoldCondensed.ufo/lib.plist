@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>com.typemytype.robofont.fontIdentifier</key>
+    <string>3iLPjN5WylIzTbwWryhVk4klVWfpGPCRfOEkSY8wb-c</string>
+    <key>com.typemytype.robofont.segmentType</key>
+    <string>curve</string>
+    <key>public.glyphOrder</key>
+    <array>
+      <string>A</string>
+      <string>B</string>
+      <string>C</string>
+      <string>I</string>
+      <string>IJ</string>
+      <string>J</string>
+      <string>T</string>
+      <string>space</string>
+    </array>
+  </dict>
+</plist>
