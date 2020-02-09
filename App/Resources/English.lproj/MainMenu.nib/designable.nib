@@ -279,6 +279,17 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="388"/>
+                            <menuItem title="Previous Line" keyEquivalent="" id="E8K-6H-zTJ">
+                                <connections>
+                                    <action selector="previousTextLine:" target="-1" id="gS3-Zy-m37"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Next Line" keyEquivalent="" id="hrd-CH-lCy">
+                                <connections>
+                                    <action selector="nextTextLine:" target="-1" id="D15-1Q-88d"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="mrw-Sw-MCo"/>
                             <menuItem title="Customize toolbar..." id="382">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>

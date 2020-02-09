@@ -883,6 +883,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isVisible = not self.fontListSplitView.isPaneVisible("compileOutput")
         elif action == "showFormattingOptions:":
             isVisible = not self.w.mainSplitView.isPaneVisible("formattingOptions")
+        elif action in ("previousTextLine:", "nextTextLine:"):
+            return bool(self.textEntry.textFilePath)
         if isVisible is not None:
             if isVisible:
                 findReplace.reverse()
@@ -897,6 +899,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def zoomOut_(self, sender):
         itemSize = max(fontItemMinimumSize, round(self.fontList.itemSize / (2 ** (1 / 3))))
         self.fontList.resizeFontItems(itemSize)
+
+    def previousTextLine_(self, sender):
+        self.textEntry.previousTextLine()
+
+    def nextTextLine_(self, sender):
+        self.textEntry.nextTextLine()
 
 
 class LabeledView(Group):
@@ -1019,6 +1027,8 @@ class TextEntryGroup(Group):
         ]
         self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
         self.setTextFile(textFilePath)
+        self.textFilePath = None
+        self.textFileIndex = 0
 
     def get(self):
         return self.textEntry.get()
@@ -1041,22 +1051,40 @@ class TextEntryGroup(Group):
 
     def setTextFile(self, path):
         if path is None:
+            self.textFilePath = None
             self.lines = [""]
         else:
+            self.textFilePath = pathlib.Path(path)
             with open(path, "r", encoding="utf-8", errors="replace") as f:
                 self.lines = f.read().splitlines()
         self.textFileStepper.maxValue = len(self.lines) - 1 if self.lines else 0
+        self.textFileStepper.set(self.textFileStepper.maxValue)
         self.setTextFileIndex(0)
 
+    def previousTextLine(self):
+        self.setTextFileIndex(self.textFileIndex - 1)
+        self.updateStepper()
+
+    def nextTextLine(self):
+        self.setTextFileIndex(self.textFileIndex + 1)
+        self.updateStepper()
+
     def setTextFileIndex(self, index):
-        line = ""
-        if index < len(self.lines):
+        if self.lines:
+            index = index % len(self.lines)
             line = self.lines[index]
+            self.textFileIndex = index
+        else:
+            line = ""
+            self.textFileIndex = 0
         self.textEntry.set(line)
         self.textEntry._target.callback(self.textEntry)
 
     def stepperCallback(self, sender):
         self.setTextFileIndex(len(self.lines) - 1 - sender.get())
+
+    def updateStepper(self):
+        self.stepper.set(len(self.lines) - 1 - self.textFileIndex)
 
 
 _minimalSpaceBox = 12
