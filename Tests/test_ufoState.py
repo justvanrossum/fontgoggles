@@ -1,7 +1,9 @@
 import pathlib
 import shutil
+from fontTools.pens.recordingPen import RecordingPointPen
 from fontTools.ufoLib import UFOReader
-from fontgoggles.font.ufoFont import Glyph, UFOState
+from fontTools.ufoLib.glifLib import Glyph
+from fontgoggles.font.ufoFont import UFOState
 from fontgoggles.compile.ufoCompiler import fetchCharacterMappingAndAnchors
 from testSupport import getFontPath
 
@@ -36,9 +38,10 @@ def test_getUpdateInfo(tmpdir):
     assert not needsCmapUpdate
 
     glyph = Glyph("A", None)
-    glyphSet.readGlyph("A", glyph, glyph.getPointPen())
+    ppen = RecordingPointPen()
+    glyphSet.readGlyph("A", glyph, ppen)
     glyph.anchors[0]["x"] = 123
-    glyphSet.writeGlyph("A", glyph, glyph.drawPoints)
+    glyphSet.writeGlyph("A", glyph, ppen.replay)
 
     state = state.newState()
     needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
@@ -48,9 +51,10 @@ def test_getUpdateInfo(tmpdir):
     assert not needsCmapUpdate
 
     glyph = Glyph("A", None)
-    glyphSet.readGlyph("A", glyph, glyph.getPointPen())
+    ppen = RecordingPointPen()
+    glyphSet.readGlyph("A", glyph, ppen)
     glyph.unicodes = [123]
-    glyphSet.writeGlyph("A", glyph, glyph.drawPoints)
+    glyphSet.writeGlyph("A", glyph, ppen.replay)
 
     state = state.newState()
     needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()

@@ -11,7 +11,6 @@ from fontTools.feaLib.ast import IncludeStatement
 from fontTools.feaLib.error import FeatureLibError
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.cocoaPen import CocoaPen  # TODO: factor out mac-specific code
-from fontTools.pens.recordingPen import RecordingPointPen
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader, UFOFileStructure
 from fontTools.ufoLib import FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURES_FILENAME
@@ -217,19 +216,8 @@ class NotDefGlyph:
 
 
 class Glyph(GLIFGlyph):
-
     width = 0
     height = None
-    _recording = None
-
-    def getPointPen(self):
-        if self._recording is None:
-            self._recording = RecordingPointPen()
-        return self._recording
-
-    def drawPoints(self, pointPen):
-        if self._recording is not None:
-            self._recording.replay(pointPen)
 
 
 def extractIncludedFeatureFiles(ufoPath, reader=None):
