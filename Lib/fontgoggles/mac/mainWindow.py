@@ -1025,6 +1025,7 @@ class TextEntryGroup(Group):
         items = [
             dict(title="Load Text File...", callback=self.loadTextFileCallback),
             dict(title="Forget Text File", callback=self.forgetTextFileCallback),
+            # TODO: Reveal in Finder
         ]
         self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
         # TODO: keep a list of (10?) recent items
