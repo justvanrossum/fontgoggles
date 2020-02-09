@@ -25,7 +25,8 @@ openFontsTestData = [
         {'DFLT': set(), 'arab': {'ARA ', 'KSH ', 'MLY ', 'SND ', 'URD '}, 'latn': {'TRK '}},
         {},
         [],
-        "فعل", ['uni0644.fina', 'uni0639.medi', 'uni0641.init']),
+        {},
+        "فعل", ['uni0644.fina', 'uni0639.medi', 'uni0641.init'], None),
     ("IBMPlexSans-Regular.ttf",
         {'familyName': 'IBM Plex Sans',
          'italicAngle': 0.0,
@@ -40,7 +41,8 @@ openFontsTestData = [
         {'DFLT': set(), 'cyrl': set(), 'grek': set(), 'latn': set()},
         {},
         [],
-        "Kofi", ["K", "o", "fi"]),
+        {},
+        "Kofi", ["K", "o", "fi"], None),
     ("IBMPlexSans-Regular.ttx",
         {},
         {'aalt', 'ccmp', 'dnom', 'frac', 'liga', 'numr', 'ordn',
@@ -50,7 +52,8 @@ openFontsTestData = [
         {'DFLT': set(), 'cyrl': set(), 'grek': set(), 'latn': set()},
         {},
         [],
-        "Kofi", ["K", "o", "fi"]),
+        {},
+        "Kofi", ["K", "o", "fi"], None),
     ("MutatorSans.ttf",
         {'familyName': 'MutatorMathTest',
          'italicAngle': 0.0,
@@ -70,7 +73,8 @@ openFontsTestData = [
                   'minValue': 0.0,
                   'name': 'Weight'}},
         [],
-        "HI", ["H", "I.narrow"]),
+        {},
+        "HI", ["H", "I.narrow"], None),
     ("NotoNastaliqUrdu-Regular.ttf",
         {'familyName': 'Noto Nastaliq Urdu',
          'italicAngle': 0.0,
@@ -83,7 +87,8 @@ openFontsTestData = [
         {'DFLT': set(), 'arab': {'ARA ', 'FAR ', 'KSH ', 'SND ', 'URD '}, 'latn': set()},
         {},
         [],
-        "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3']),
+        {},
+        "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3'], None),
     ("MutatorSansBoldWideMutated.ufo",
         {'familyName': 'MutatorMathTest',
          'italicAngle': 0,
@@ -94,7 +99,8 @@ openFontsTestData = [
         {'DFLT': set()},
         {},
         ['features_test.fea', 'features_test_nested.fea'],
-        "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"]),
+        {},
+        "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"], None),
     ('MutatorSans.designspace',
         {},
         {'rvrn'},
@@ -112,10 +118,24 @@ openFontsTestData = [
          'MutatorSansBoldWide.ufo',
          'MutatorSansLightCondensed.ufo',
          'MutatorSansLightWide.ufo'],
-        "A", ["A"]),
+        {},
+        "A", ["A"], None),
+    ('MiniMutatorSans.designspace',
+        {},
+        set(),
+        {'kern'},
+        {'DFLT': set()},
+        {'wdth': {'defaultValue': 100.0,
+                  'maxValue': 700.0,
+                  'minValue': 100.0,
+                  'name': 'Width'}},
+        ['MiniMutatorSansBoldCondensed.ufo',
+         'MiniMutatorSansBoldWide.ufo'],
+        {'wdth': 400},
+        "TABC", ["T", "A", "B", "C"], [692, 850, 822, 932]),
 ]
 
-@pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,ext,text,glyphNames",
+@pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,ext,location,text,glyphNames,ax",
                          openFontsTestData)
 @pytest.mark.asyncio
 async def test_openFonts(fileName,
@@ -125,8 +145,10 @@ async def test_openFonts(fileName,
                          scripts,
                          axes,
                          ext,
+                         location,
                          text,
-                         glyphNames):
+                         glyphNames,
+                         ax):
     fontPath = getFontPath(fileName)
     numFonts, opener, getSortInfo = getOpener(fontPath)
     assert numFonts(fontPath) == 1
@@ -138,9 +160,11 @@ async def test_openFonts(fileName,
     assert font.featuresGPOS == featuresGPOS
     assert font.scripts == scripts
     assert font.axes == axes
-    run = font.getGlyphRun(text)
+    run = font.getGlyphRun(text, varLocation=location)
     assert [gi.name for gi in run] == glyphNames
     assert ext == [p.name for p in font.getExternalFiles()]
+    if ax is not None:
+        assert [gi.ax for gi in run] == ax
 
 
 def test_iterFontPathsAndNumbers():
