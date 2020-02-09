@@ -980,9 +980,9 @@ class FGGlyphLineView(AppKit.NSView):
         else:  # align == "left" or align == "top"
             pos = margin
         if not self.vertical:
-            return pos, self.relativeHBaseline * itemSize  # TODO: something with hhea/OS/2 ascender/descender
+            return pos, self.relativeHBaseline * itemSize
         else:
-            return self.relativeVBaseline * itemSize, itemExtent - pos  # TODO: something with vhea ascender/descender
+            return self.relativeVBaseline * itemSize, itemExtent - pos
 
     def getColors(self):
         appearanceName = AppKit.NSAppearance.currentAppearance().name()
