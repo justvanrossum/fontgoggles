@@ -10,7 +10,8 @@ import traceback
 import unicodedata
 import AppKit
 import objc
-from vanilla import CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs, TextBox, TextEditor, Window
+from vanilla import (ActionButton, CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs,
+                     TextBox, TextEditor, VanillaBaseControl, Window)
 from fontTools.misc.arrayTools import offsetRect
 from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
 from fontgoggles.font.baseFont import GlyphsRun
@@ -180,7 +181,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
-        self._textEntry = EditText((10, 8, -10, 25), "", callback=self.textEntryChangedCallback)
+        textRightMargin = 70
+        self._textEntry = EditText((10, 8, -textRightMargin, 25), "", callback=self.textEntryChangedCallback)
+        self.textFileStepper = Stepper((-textRightMargin + 5, 8, 12, 25), 0, 0, 0)
+        items = [
+            dict(title="Load text file..."),
+            dict(title="Save"),
+            dict(title="Save as..."),
+            dict(title="Revert"),
+        ]
+        self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
+
         self.fontList = FontList(self.project, self.projectFontsProxy, 300, self.defaultFontItemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
@@ -202,6 +213,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # self.fontListSplitView.togglePane("compileOutput")
 
         group.textEntry = self._textEntry
+        group.textFileStepper = self.textFileStepper
+        group.textFileMenuButton = self.textFileMenuButton
         group.fontListSplitView = self.fontListSplitView
         self.fontList._nsObject.subscribeToMagnification_(self._fontListScrollView._nsObject)
         return group
@@ -957,6 +970,49 @@ class OutputText(TextEditor):
     def scrollToEnd(self):
         st = self._textView.textStorage()
         self._textView.scrollRangeToVisible_((st.length(), 0))
+
+
+class Stepper(VanillaBaseControl):
+
+    nsStepperClass = AppKit.NSStepper
+
+    def __init__(self, posSize, minValue=0, maxValue=10, increment=1, callback=None):
+        self._setupView(self.nsStepperClass, posSize, callback=callback)
+        self.minValue = minValue
+        self.maxValue = maxValue
+        self.increment = increment
+
+    def get(self):
+        return self._nsObject.intValue()
+
+    def set(self, value):
+        return self._nsObject.setIntValue_(value)
+
+    @property
+    def increment(self):
+        return self._nsObject.increment()
+
+    @increment.setter
+    def increment(self, value):
+        self._nsObject.setIncrement_(value)
+
+    @property
+    def minValue(self):
+        return self._nsObject.minValue()
+
+    @minValue.setter
+    def minValue(self, value):
+        self._nsObject.setMinValue_(value)
+        self.enable(self.minValue != self.maxValue)
+
+    @property
+    def maxValue(self):
+        return self._nsObject.maxValue()
+
+    @maxValue.setter
+    def maxValue(self, value):
+        self._nsObject.setMaxValue_(value)
+        self.enable(self.minValue != self.maxValue)
 
 
 _minimalSpaceBox = 12
