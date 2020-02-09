@@ -900,6 +900,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         itemSize = max(fontItemMinimumSize, round(self.fontList.itemSize / (2 ** (1 / 3))))
         self.fontList.resizeFontItems(itemSize)
 
+    def loadTextFile_(self, sender):
+        self.textEntry.loadTextFileCallback(sender)
+
     def previousTextLine_(self, sender):
         self.textEntry.previousTextLine()
 
@@ -1026,9 +1029,15 @@ class TextEntryGroup(Group):
             # dict(title="Revert"),
         ]
         self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
-        self.setTextFile(textFilePath)
         self.textFilePath = None
+        self.setTextFile(textFilePath)
         self.textFileIndex = 0
+
+    def _breakCycles(self):
+        super()._breakCycles()
+        if self.textFilePath is not None:
+            obs = getFileObserver()
+            obs.removeObserver(self.textFilePath, self.textFileChanged)
 
     def get(self):
         return self.textEntry.get()
@@ -1049,17 +1058,33 @@ class TextEntryGroup(Group):
     def getFileCompiletionHandler(self, result):
         self.setTextFile(result[0])
 
-    def setTextFile(self, path):
+    def textFileChanged(self, oldPath, newPath, wasModified):
+        if newPath is not None:
+            self.textFilePath = newPath
+        if wasModified:
+            self.setTextFile(self.textFilePath, resetIndex=False)
+
+    def setTextFile(self, path, resetIndex=True):
+        if path != self.textFilePath:
+            path = os.path.normpath(path)
+            obs = getFileObserver()
+            if self.textFilePath is not None:
+                obs.removeObserver(self.textFilePath, self.textFileChanged)
         if path is None:
             self.textFilePath = None
             self.lines = [""]
         else:
-            self.textFilePath = pathlib.Path(path)
             with open(path, "r", encoding="utf-8", errors="replace") as f:
                 self.lines = f.read().splitlines()
+            if path != self.textFilePath:
+                self.textFilePath = path
+                obs.addObserver(self.textFilePath, self.textFileChanged)
         self.textFileStepper.maxValue = len(self.lines) - 1 if self.lines else 0
-        self.textFileStepper.set(self.textFileStepper.maxValue)
-        self.setTextFileIndex(0)
+        if resetIndex:
+            self.textFileStepper.set(self.textFileStepper.maxValue)
+            self.setTextFileIndex(0)
+        else:
+            self.setTextFileIndex(self.textFileIndex, wrapAround=False)
 
     def previousTextLine(self):
         self.setTextFileIndex(self.textFileIndex - 1)
@@ -1069,9 +1094,12 @@ class TextEntryGroup(Group):
         self.setTextFileIndex(self.textFileIndex + 1)
         self.updateStepper()
 
-    def setTextFileIndex(self, index):
+    def setTextFileIndex(self, index, wrapAround=True):
         if self.lines:
-            index = index % len(self.lines)
+            if wrapAround:
+                index = index % len(self.lines)
+            else:
+                index = min(index, len(self.lines) - 1)
             line = self.lines[index]
             self.textFileIndex = index
         else:

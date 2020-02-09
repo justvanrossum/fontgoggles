@@ -279,9 +279,14 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="388"/>
-                            <menuItem title="Previous Line" keyEquivalent="" id="E8K-6H-zTJ">
+                            <menuItem title="Load Text File…" keyEquivalent="l" id="E8K-6H-zTJ">
                                 <connections>
-                                    <action selector="previousTextLine:" target="-1" id="gS3-Zy-m37"/>
+                                    <action selector="loadTextFile:" target="-1" id="eNM-YV-Fqh"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Previous Line" keyEquivalent="" id="PWA-9F-kae">
+                                <connections>
+                                    <action selector="previousTextLine:" target="-1" id="YSU-P4-FDK"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Next Line" keyEquivalent="" id="hrd-CH-lCy">
