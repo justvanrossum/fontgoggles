@@ -114,8 +114,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.setWindow_(self.w._window)
 
         initialText = "ABC abc 0123 :;?"
-        self._textEntry.set(initialText)
-        self.textEntryChangedCallback(self._textEntry)
+        self.textEntry.set(initialText)
+        self.textEntryChangedCallback(self.textEntry)
         self.w.bind("close", self._windowCloseCallback)
         self.updateFileObservers()
         self.loadFonts()
@@ -182,7 +182,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         textRightMargin = 70
-        self._textEntry = EditText((10, 8, -textRightMargin, 25), "", callback=self.textEntryChangedCallback)
+        self.textEntry = EditText((10, 8, -textRightMargin, 25), "", callback=self.textEntryChangedCallback)
         self.textFileStepper = Stepper((-textRightMargin + 5, 8, 12, 25), 0, 0, 0)
         items = [
             dict(title="Load text file..."),
@@ -212,7 +212,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                            isVertical=False)
         # self.fontListSplitView.togglePane("compileOutput")
 
-        group.textEntry = self._textEntry
+        group.textEntry = self.textEntry
         group.textFileStepper = self.textFileStepper
         group.textFileMenuButton = self.textFileMenuButton
         group.fontListSplitView = self.fontListSplitView
@@ -753,7 +753,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
         self.fontList.vertical = vertical
         self.alignmentChangedCallback(self.alignmentPopup)
-        self.textEntryChangedCallback(self._textEntry)
+        self.textEntryChangedCallback(self.textEntry)
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
@@ -798,21 +798,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             newSelectedIndex = 0
         self.languagesPopup.setItems(languages)
         self.languagesPopup.set(newSelectedIndex)
-        self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
+        self.textEntryChangedCallback(self.textEntry, updateUnicodeList=False)
 
     @objc.python_method
     def languagesPopupCallback(self, sender):
-        self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
+        self.textEntryChangedCallback(self.textEntry, updateUnicodeList=False)
 
     @objc.python_method
     def featuresChanged(self, sender):
         self.featureState = self.featuresGroup.get()
-        self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
+        self.textEntryChangedCallback(self.textEntry, updateUnicodeList=False)
 
     @objc.python_method
     def varLocationChanged(self, sender):
         self.varLocation = {k: v for k, v in sender.get().items() if v is not None}
-        self.textEntryChangedCallback(self._textEntry, updateUnicodeList=False)
+        self.textEntryChangedCallback(self.textEntry, updateUnicodeList=False)
 
     @objc.python_method
     def relativeSizeChangedCallback(self, sender):
@@ -852,21 +852,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             nsAlign = AppKit.NSTextAlignmentLeft
 
-        if self._textEntry._nsObject.alignment() == nsAlign:
+        if self.textEntry._nsObject.alignment() == nsAlign:
             return
 
-        fieldEditor = self.w._window.fieldEditor_forObject_(False, self._textEntry._nsObject)
-        hasFocus = fieldEditor.delegate() is self._textEntry._nsObject
+        fieldEditor = self.w._window.fieldEditor_forObject_(False, self.textEntry._nsObject)
+        hasFocus = fieldEditor.delegate() is self.textEntry._nsObject
         if hasFocus:
             sel = fieldEditor.selectedRange()
             fieldEditor.setAlignment_(nsAlign)
-            self._textEntry._nsObject.setAlignment_(nsAlign)
+            self.textEntry._nsObject.setAlignment_(nsAlign)
             # Now we've lost focus, let's get it again
-            self.w._window.makeFirstResponder_(self._textEntry._nsObject)
+            self.w._window.makeFirstResponder_(self.textEntry._nsObject)
             # Now we've lost the selection, let's restore it
             fieldEditor.setSelectedRange_(sel)
         else:
-            self._textEntry._nsObject.setAlignment_(nsAlign)
+            self.textEntry._nsObject.setAlignment_(nsAlign)
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
