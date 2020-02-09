@@ -90,15 +90,8 @@ class HBShape:
                 return cmap.get(codePoint)
             getGlyphNameFromCodePoint = functools.partial(_getGlyphNameFromCodePoint, self._ttFont.getBestCmap())
 
-        if getHorizontalAdvance is None and getGlyphNameFromCodePoint is not None:
-            # TODO: this is wrong for var fonts, we should not set a width func at all
-            # TODO: the problem seems to be we need to set all funcs, or the ones we
-            # don't set will misbehave. We currently go through hoops to support glyph
-            # name input, but if that is not needed we can skip the advance with func,
-            # too.
-            def _getHorizontalAdvance(hmtx, glyphName):
-                return hmtx[glyphName][0]
-            getHorizontalAdvance = functools.partial(_getHorizontalAdvance, self._ttFont["hmtx"])
+        if getGlyphNameFromCodePoint is not None:
+            assert getHorizontalAdvance is not None
 
         self.getGlyphNameFromCodePoint = getGlyphNameFromCodePoint
         self.getHorizontalAdvance = getHorizontalAdvance
