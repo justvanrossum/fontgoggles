@@ -109,12 +109,10 @@ class HBShape:
             self._funcs = hb.FontFuncs.create()
             self._funcs.set_nominal_glyph_func(_getGlyphIDFunc, self)
             self._funcs.set_glyph_h_advance_func(_getHorizontalAdvanceFunc, self)
-            if hasattr(self._funcs, "set_glyph_v_advance_func"):
-                # See https://github.com/harfbuzz/uharfbuzz/pull/26
-                if getVerticalAdvance is not None:
-                    self._funcs.set_glyph_v_advance_func(_getVerticalAdvanceFunc, self)
-                if getVerticalOrigin is not None:
-                    self._funcs.set_glyph_v_origin_func(_getVerticalOriginFunc, self)
+            if getVerticalAdvance is not None:
+                self._funcs.set_glyph_v_advance_func(_getVerticalAdvanceFunc, self)
+            if getVerticalOrigin is not None:
+                self._funcs.set_glyph_v_origin_func(_getVerticalOriginFunc, self)
         else:
             self._funcs = None
 
