@@ -110,7 +110,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.w.mainSplitView = mainSplitView
         self.w.open()
         self.w._window.setWindowController_(self)
-        self.w._window.makeFirstResponder_(fontListGroup.textEntry._nsObject)
+        self.w._window.makeFirstResponder_(fontListGroup.textEntry.nsTextView)
         self.setWindow_(self.w._window)
 
         initialText = "ABC abc 0123 :;?"
@@ -182,15 +182,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         textRightMargin = 70
-        self.textEntry = EditText((10, 8, -textRightMargin, 25), "", callback=self.textEntryChangedCallback)
-        self.textFileStepper = Stepper((-textRightMargin + 5, 8, 12, 25), 0, 0, 0)
-        items = [
-            dict(title="Load text file..."),
-            dict(title="Save"),
-            dict(title="Save as..."),
-            dict(title="Revert"),
-        ]
-        self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
+        self.textEntry = TextEntryGroup((0, 0, 0, 45), callback=self.textEntryChangedCallback)
 
         self.fontList = FontList(self.project, self.projectFontsProxy, 300, self.defaultFontItemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
@@ -213,8 +205,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # self.fontListSplitView.togglePane("compileOutput")
 
         group.textEntry = self.textEntry
-        group.textFileStepper = self.textFileStepper
-        group.textFileMenuButton = self.textFileMenuButton
         group.fontListSplitView = self.fontListSplitView
         self.fontList._nsObject.subscribeToMagnification_(self._fontListScrollView._nsObject)
         return group
@@ -852,21 +842,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             nsAlign = AppKit.NSTextAlignmentLeft
 
-        if self.textEntry._nsObject.alignment() == nsAlign:
+        if self.textEntry.nsTextView.alignment() == nsAlign:
             return
 
-        fieldEditor = self.w._window.fieldEditor_forObject_(False, self.textEntry._nsObject)
-        hasFocus = fieldEditor.delegate() is self.textEntry._nsObject
+        fieldEditor = self.w._window.fieldEditor_forObject_(False, self.textEntry.nsTextView)
+        hasFocus = fieldEditor.delegate() is self.textEntry.nsTextView
         if hasFocus:
             sel = fieldEditor.selectedRange()
             fieldEditor.setAlignment_(nsAlign)
-            self.textEntry._nsObject.setAlignment_(nsAlign)
+            self.textEntry.nsTextView.setAlignment_(nsAlign)
             # Now we've lost focus, let's get it again
-            self.w._window.makeFirstResponder_(self.textEntry._nsObject)
+            self.w._window.makeFirstResponder_(self.textEntry.nsTextView)
             # Now we've lost the selection, let's restore it
             fieldEditor.setSelectedRange_(sel)
         else:
-            self.textEntry._nsObject.setAlignment_(nsAlign)
+            self.textEntry.nsTextView.setAlignment_(nsAlign)
 
     def showCharacterList_(self, sender):
         self.w.mainSplitView.togglePane("characterList")
@@ -1013,6 +1003,32 @@ class Stepper(VanillaBaseControl):
     def maxValue(self, value):
         self._nsObject.setMaxValue_(value)
         self.enable(self.minValue != self.maxValue)
+
+
+class TextEntryGroup(Group):
+
+    def __init__(self, posSize, callback=None):
+        super().__init__(posSize)
+        textRightMargin = 70
+        self.textEntry = EditText((10, 8, -textRightMargin, 25), "", callback=callback)
+        self.textFileStepper = Stepper((-textRightMargin + 5, 8, 12, 25), 0, 0, 0)
+        items = [
+            dict(title="Load text file..."),
+            dict(title="Save"),
+            dict(title="Save as..."),
+            dict(title="Revert"),
+        ]
+        self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
+
+    def get(self):
+        return self.textEntry.get()
+
+    def set(self, value):
+        self.textEntry.set(value)
+
+    @property
+    def nsTextView(self):
+        return self.textEntry._nsObject
 
 
 _minimalSpaceBox = 12
