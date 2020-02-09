@@ -1027,6 +1027,7 @@ class TextEntryGroup(Group):
             dict(title="Forget Text File", callback=self.forgetTextFileCallback),
         ]
         self.textFileMenuButton = ActionButton((-textRightMargin + 25, 8, -10, 25), items)
+        # TODO: keep a list of (10?) recent items
         self.textFilePath = None
         self.setTextFile(textFilePath)
         self.textFileIndex = 0
