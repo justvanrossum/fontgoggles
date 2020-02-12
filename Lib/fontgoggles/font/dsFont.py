@@ -32,6 +32,7 @@ class DSFont(BaseFont):
 
     def __init__(self, fontPath, fontNumber, dataProvider=None):
         super().__init__(fontPath, fontNumber)
+        self.doc = None
         self._varGlyphs = {}
         self._normalizedLocation = {}
         self._sourceFontData = {}
@@ -39,7 +40,7 @@ class DSFont(BaseFont):
         self._needsVFRebuild = True
 
     async def load(self, outputWriter):
-        if not hasattr(self, "doc"):
+        if self.doc is None:
             self.doc = DesignSpaceDocument.fromfile(self.fontPath)
             self.doc.findDefault()
 
@@ -140,7 +141,7 @@ class DSFont(BaseFont):
         invalidateCaches = False
         if not externalFilePath:
             # Our .designspace file itself changed, let's reload
-            del self.doc
+            self.doc = None
             self._needsVFRebuild = True
             invalidateCaches = True
         else:
@@ -164,7 +165,7 @@ class DSFont(BaseFont):
                 if needsCmapUpdate:
                     # TODO: This could be done more efficiently like how UFOFont
                     # does it, if the changed source is the default source.
-                    del self.doc
+                    self.doc = None
                     self._needsVFRebuild = True
                     invalidateCaches = True
         if invalidateCaches:
