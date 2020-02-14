@@ -1,7 +1,6 @@
 from setuptools import setup
 import os
 import datetime
-import glob
 import fontgoggles.mac
 
 
