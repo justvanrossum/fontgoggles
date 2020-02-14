@@ -1,6 +1,6 @@
 setuptools>=42.0.2
 wheel>=0.33.6
-py2app
+py2app==0.19
 pyobjc
 corefoundationasyncio
 git+https://github.com/robotools/vanilla
