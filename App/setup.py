@@ -43,7 +43,7 @@ infoplist = dict(
         ),
     ],
     CFBundleName="FontGoggles",
-    CFBundleIdentifier="com.github.googlefonts.FontGoggles",
+    CFBundleIdentifier="com.github.justvanrossum.FontGoggles",
     LSMinimumSystemVersion="10.10",
     CFBundleShortVersionString="0.9",
     CFBundleVersion="0.9",
