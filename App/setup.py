@@ -55,16 +55,11 @@ infoplist = dict(
     # ATSApplicationFontsPath="Fonts/",
 )
 
-dataFiles = [
-        os.path.join(os.path.dirname(fontgoggles.mac.__file__), "libmakePathFromOutline.dylib"),
-        'Resources/English.lproj',
-        # 'Resources/Fonts',
-] + glob.glob("Resources/*.pdf")
 
 appName = "FontGoggles"
 
 setup(
-    data_files=dataFiles,
+    data_files=['Resources/English.lproj'],
     app=[f"{appName}.py"],
     options=dict(py2app=dict(
         iconfile="Resources/fontgoggles.icns",
@@ -81,5 +76,8 @@ setup(
             "wx",
             "test",
             ],
+        frameworks=[
+            os.path.join(os.path.dirname(fontgoggles.mac.__file__), "libmakePathFromOutline.dylib"),
+        ]
     )),
 )
