@@ -9,4 +9,4 @@ mkdir -p build
 
 gcc -g -fPIC -c -mmacosx-version-min=10.9 -o build/makePathFromOutline.o makePathFromOutline.m
 
-ld -dylib -macosx_version_min 10.9 -o libmakePathFromOutline.dylib -framework AppKit -arch x86_64 -lsystem.b build/makePathFromOutline.o
+ld -dylib -macosx_version_min 10.9 -o ../Lib/fontgoggles/mac/libmakePathFromOutline.dylib -framework AppKit -arch x86_64 -lsystem.b build/makePathFromOutline.o

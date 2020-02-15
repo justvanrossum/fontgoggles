@@ -17,9 +17,9 @@ _libName = "libmakePathFromOutline.dylib"
 _mainBundle = Foundation.NSBundle.mainBundle()
 _libPath = pathlib.Path(_mainBundle.privateFrameworksPath()) / _libName
 if not _libPath.exists():
-    # This is for when we're running in an py2app -A bundle or outside of an app budle,
+    # This is for when we're running in an py2app -A bundle or outside of an app bundle,
     # such as with pytest
-    _libPath = pathlib.Path(__file__).resolve().parent.parent.parent.parent / "Turbo" / _libName
+    _libPath = pathlib.Path(__file__).resolve().parent / _libName
     assert _libPath.exists(), f"can't find {_libName}"
 
 _lib = ctypes.cdll.LoadLibrary(_libPath)
