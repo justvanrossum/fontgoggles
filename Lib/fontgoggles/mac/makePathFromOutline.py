@@ -15,32 +15,26 @@ c_short_p = ctypes.POINTER(ctypes.c_short)
 
 _libName = "libmakePathFromOutline.dylib"
 _mainBundle = Foundation.NSBundle.mainBundle()
-_searchFolders = [
-    pathlib.Path(_mainBundle.resourcePath()),
-    pathlib.Path(_mainBundle.privateFrameworksPath()),
-    pathlib.Path(__file__).resolve().parent,
-]
+_libPath = pathlib.Path(_mainBundle.privateFrameworksPath()) / _libName
+if not _libPath.exists():
+    # This is for when we're running in an py2app -A bundle or outside of an app budle,
+    # such as with pytest
+    _libPath = pathlib.Path(__file__).resolve().parent.parent.parent.parent / "Turbo" / _libName
+    assert _libPath.exists(), f"can't find {_libName}"
 
-for _folder in _searchFolders:
-    _libPath = _folder / _libName
-    if _libPath.exists():
-        _lib = ctypes.cdll.LoadLibrary(_libPath)
+_lib = ctypes.cdll.LoadLibrary(_libPath)
 
-        _makePathFromOutline = _lib.makePathFromOutline
-        _makePathFromOutline.argtypes = [FT_Outline_p]
-        _makePathFromOutline.restype = ctypes.c_void_p
+_makePathFromOutline = _lib.makePathFromOutline
+_makePathFromOutline.argtypes = [FT_Outline_p]
+_makePathFromOutline.restype = ctypes.c_void_p
 
-        _makePathFromArrays = _lib.makePathFromArrays
-        _makePathFromArrays.argtypes = [ctypes.c_short,
-                                        ctypes.c_short,
-                                        FT_Vector_p,
-                                        c_char_p,
-                                        c_short_p]
-        _makePathFromArrays.restype = ctypes.c_void_p
-
-        break
-else:
-    _makePathFromOutline = None
+_makePathFromArrays = _lib.makePathFromArrays
+_makePathFromArrays.argtypes = [ctypes.c_short,
+                                ctypes.c_short,
+                                FT_Vector_p,
+                                c_char_p,
+                                c_short_p]
+_makePathFromArrays.restype = ctypes.c_void_p
 
 
 def makePathFromOutline(outline):

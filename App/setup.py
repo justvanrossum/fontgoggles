@@ -4,7 +4,8 @@ import datetime
 import fontgoggles.mac
 
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))  # make our parent dir the current dir
+appFolder = os.path.dirname(os.path.abspath(__file__))
+os.chdir(appFolder)  # make our parent dir the current dir
 
 
 infoplist = dict(
@@ -65,6 +66,7 @@ setup(
         plist=infoplist,
         packages=[
             "fontgoggles",
+            "freetype",
             "pkg_resources",
         ],
         excludes=[
@@ -75,8 +77,6 @@ setup(
             "wx",
             "test",
             ],
-        frameworks=[
-            os.path.join(os.path.dirname(fontgoggles.mac.__file__), "libmakePathFromOutline.dylib"),
-        ]
+        frameworks=[os.path.join(os.path.dirname(appFolder), "Turbo", "libmakePathFromOutline.dylib")],
     )),
 )
