@@ -58,25 +58,37 @@ infoplist = dict(
 
 appName = "FontGoggles"
 
-setup(
-    data_files=['Resources/English.lproj'],
-    app=[f"{appName}.py"],
-    options=dict(py2app=dict(
-        iconfile="Resources/fontgoggles.icns",
-        plist=infoplist,
-        packages=[
-            "fontgoggles",
-            "freetype",
-            "pkg_resources",
-        ],
-        excludes=[
-            "scipy",
-            "matplotlib",
-            "PIL",
-            "pygame",
-            "wx",
-            "test",
+turboLibOriginalPath = os.path.join(os.path.dirname(fontgoggles.mac.__file__),
+                                    "libmakePathFromOutline.dylib")
+turboLibPath = os.path.join(appFolder, "libmakePathFromOutline.dylib")
+
+try:
+    # We don't want our dylib to be included in the library zip file, instead
+    # it should go into the app Frameworks location. We temporarily move the
+    # dylib to the App folder to accomplish this.
+    os.rename(turboLibOriginalPath, turboLibPath)
+    setup(
+        data_files=['Resources/English.lproj'],
+        app=[f"{appName}.py"],
+        options=dict(py2app=dict(
+            iconfile="Resources/fontgoggles.icns",
+            plist=infoplist,
+            packages=[
+                "fontgoggles",
+                "freetype",
+                "pkg_resources",
             ],
-        frameworks=[os.path.join(os.path.dirname(appFolder), "Turbo", "libmakePathFromOutline.dylib")],
-    )),
-)
+            excludes=[
+                "scipy",
+                "matplotlib",
+                "PIL",
+                "pygame",
+                "wx",
+                "test",
+                ],
+            frameworks=[turboLibPath],
+        )),
+    )
+finally:
+    # Move the dylib back to its original location
+    os.rename(turboLibPath, turboLibOriginalPath)
