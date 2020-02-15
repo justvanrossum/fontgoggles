@@ -106,7 +106,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         ]
         mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
 
-        self.w = Window((800, 500), "FontGoggles", minSize=(900, 500), autosaveName="FontGogglesWindow",
+        self.w = Window((1400, 700), "FontGoggles", minSize=(900, 500), autosaveName="FontGogglesWindow",
                         fullScreenMode="primary")
         self.w.mainSplitView = mainSplitView
         self.w.open()
