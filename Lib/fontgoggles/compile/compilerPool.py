@@ -115,7 +115,7 @@ class CompilerPool:
 class CompilerWorker:
 
     async def start(self):
-        env = dict(PYTHONPATH=":".join(sys.path))
+        env = dict(PYTHONPATH=":".join(sys.path), PYTHONHOME=sys.prefix)
         args = ["-u", "-m", "fontgoggles.compile.workServer"]
         self.process = await asyncio.create_subprocess_exec(
             sys.executable, *args,
