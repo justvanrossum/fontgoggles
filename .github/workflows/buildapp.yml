@@ -78,7 +78,7 @@ jobs:
         name: FontGoggles.dmg
         path: App/dist/FontGoggles.dmg
     - name: Release
-      uses: docker://antonyurchenko/git-release:latest
+      uses: anton-yurchenko/git-release@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         DRAFT_RELEASE: "false"
