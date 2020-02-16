@@ -77,15 +77,25 @@ jobs:
       with:
         name: FontGoggles.dmg
         path: App/dist/FontGoggles.dmg
-    - name: Release
-      uses: anton-yurchenko/git-release@master
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DRAFT_RELEASE: "false"
-        PRE_RELEASE: "false"
-        CHANGELOG_FILE: "CHANGELOG.md"
-        ALLOW_EMPTY_CHANGELOG: "true"
-        ALLOW_TAG_PREFIX: "true"
       with:
-        args: |
-            App/dist/FontGoggles.dmg
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          --release info--
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: App/dist/FontGoggles.dmg
+        asset_name: FontGoggles.dmg
+        asset_content_type: application/octet-stream
