@@ -14,9 +14,13 @@ jobs:
     steps:
     - name: Install Certificates
       run: |
+        echo "step 1"
         echo ${{ secrets.CERTIFICATE_P12 }} | base64 --decode > certificate.p12
+        echo "step 2"
         security import certificate.p12 -P ${{ secrets.CERTIFICATE_PASSWORD }}
+        echo "step 3"
         security create-keychain -p fgKeychain fg.keychain
+        echo "step 4"
         security default-keychain -s fg.keychain
         security set-keychain-settings -l -u -t 8000
         security unlock-keychain -p fgKeychain fg.keychain
