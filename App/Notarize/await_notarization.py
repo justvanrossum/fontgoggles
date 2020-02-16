@@ -18,6 +18,7 @@ def getNotarizeInfo(requestUUID, user, passw):
     result = subprocess.run(infoCommand, check=True, capture_output=True)
     return plistlib.loads(result.stdout)
 
+
 notarizeResult = plistlib.loads(sys.stdin.read().encode("ascii"))
 
 notarisationRequestUUID = None
