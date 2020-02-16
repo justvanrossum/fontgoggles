@@ -51,7 +51,7 @@ else:
     sys.exit(1)
 
 logURL = info["LogFileURL"]
-os.system(f"curl {logURL} > notarize_log.txt")
+os.system(f"curl -s {logURL} > notarize_log.txt")
 
 if status == "invalid":
     print("notarization failed")
