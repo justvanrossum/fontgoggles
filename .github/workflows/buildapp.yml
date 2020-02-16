@@ -29,16 +29,34 @@ jobs:
       run: |
         curl https://www.python.org/ftp/python/3.7.6/python-3.7.6-macosx10.9.pkg --output pythonInstaller.pkg
         sudo installer -pkg pythonInstaller.pkg -target /
-    - name: Check python
+    - name: Check Python
       run: |
         python3 --version
         python3 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
-    - name: Setup venv
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Setup venv and install dependencies
       run: |
         python3 -m venv venv
         source venv/bin/activate
         python -c "import sys; print('\n'.join(sys.path))"
-    - name: Install dependencies
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    - name: Run Tests
       run: |
-        python -c "import sys; print('\n'.join(sys.path))"
-        echo "lalala"
+        source venv/bin/activate
+        pytest
+    - name: Build Application
+      run: |
+        source venv/bin/activate
+        python App/setup.py py2app
+    - name: Codesign and Notarize
+      run: |
+        ./App/Notarize/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" App/dist/FontGoggles.app App/Notarize/entitlements.xml
+        /usr/bin/ditto -c -k --keepParent "App/dist/FontGoggles.app" "App/dist/FontGoggles.zip"
+        xcrun altool --notarize-app --primary-bundle-id "com.github.justvanrossum.FontGoggles" --username "${{ secrets.NOTARIZE_DEVELOPER }}" --password "${{ secrets.NOTARIZE_PASSWORD }}" --file App/dist/FontGoggles.zip
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: FontGoggles.zip
+        path: App/dist/FontGoggles.zip
