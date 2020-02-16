@@ -60,7 +60,6 @@ jobs:
         source venv/bin/activate
         ./App/Notarize/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" App/dist/FontGoggles.app App/Notarize/entitlements.xml
         /usr/bin/ditto -c -k --keepParent "App/dist/FontGoggles.app" "App/dist/FontGoggles.zip"
-        codesign --sign "${{ secrets.CODESIGN_NAME }}" --deep "App/dist/FontGoggles.dmg"
         xcrun altool --notarize-app --primary-bundle-id "com.github.justvanrossum.FontGoggles" \
                      --username "${{ secrets.NOTARIZE_DEVELOPER }}" \
                      --password "${{ secrets.NOTARIZE_PASSWORD }}" \
