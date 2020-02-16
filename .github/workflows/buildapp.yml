@@ -59,15 +59,14 @@ jobs:
       run: |
         source venv/bin/activate
         ./App/Notarize/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" App/dist/FontGoggles.app App/Notarize/entitlements.xml
-        /usr/bin/ditto -c -k --keepParent "App/dist/FontGoggles.app" "App/dist/FontGoggles.zip"
+        python App/Notarize/build_dmg.py "App/dist/FontGoggles.app" "App/dist/FontGoggles.dmg"
         xcrun altool --notarize-app --primary-bundle-id "com.github.justvanrossum.FontGoggles" \
                      --username "${{ secrets.NOTARIZE_DEVELOPER }}" \
                      --password "${{ secrets.NOTARIZE_PASSWORD }}" \
-                     --file App/dist/FontGoggles.zip \
+                     --file App/dist/FontGoggles.dmg \
                      --output-format xml \
                      | python App/Notarize/await_notarization.py "${{ secrets.NOTARIZE_DEVELOPER }}" "${{ secrets.NOTARIZE_PASSWORD }}"
-        xcrun stapler staple App/dist/FontGoggles.app
-        python App/Notarize/build_dmg.py "App/dist/FontGoggles.app" "App/dist/FontGoggles.dmg"
+        xcrun stapler staple App/dist/FontGoggles.dmg
     - name: Upload Notarization Log
       uses: actions/upload-artifact@v1
       if: always()
