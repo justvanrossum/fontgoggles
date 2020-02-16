@@ -45,8 +45,8 @@ jobs:
         pip install -r requirements-dev.txt
         pip install .
         # Install custom wheels to woraround various problems, see App/CustomWheels/README.md
-        pip inststall --upgrade App/CustomWheels/lxml-4.5.0-cp37-cp37m-macosx_10_9_x86_64.whl
-        pip inststall --upgrade App/CustomWheels/uharfbuzz-0.5.1.dev13+g5f9b224-cp37-cp37m-macosx_10_9_x86_64.whl
+        pip install --upgrade App/CustomWheels/lxml-4.5.0-cp37-cp37m-macosx_10_9_x86_64.whl
+        pip install --upgrade App/CustomWheels/uharfbuzz-0.5.1.dev13+g5f9b224-cp37-cp37m-macosx_10_9_x86_64.whl
     - name: Run Tests
       run: |
         source venv/bin/activate
