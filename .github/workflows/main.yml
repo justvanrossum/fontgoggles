@@ -1,0 +1,26 @@
+name: Build FontGoggles Application
+
+on:
+  push:
+    tags:
+      - "v*"
+
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Install Certificates
+      run: |
+        echo ${{ secrets.CERTIFICATE_P12 }} | base64 --decode > certificate.p12
+        security import certificate.p12 -P ${{ secrets.CERTIFICATE_PASSWORD }}
+        security create-keychain -p fgKeychain fg.keychain
+        security default-keychain -s fg.keychain
+        security set-keychain-settings -l -u -t 8000
+        security unlock-keychain -p fgKeychain fg.keychain
+        security import certificate.p12 -k fg.keychain -P ${{ secrets.CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k fgKeychain fg.keychain
+        rm -fr *.p12
+        security find-identity -v -p codesigning
