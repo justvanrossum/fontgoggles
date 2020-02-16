@@ -1,4 +1,4 @@
-name: FontGoggles application
+name: Run FontGoggles test suite
 
 on: [push]
 
