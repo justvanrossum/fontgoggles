@@ -1,11 +1,9 @@
 name: Build FontGoggles Application
 
-# on:
-#   push:
-#     tags:
-#       - "v*"
-
-on: [push]
+on:
+  push:
+    tags:
+      - "v*"
 
 jobs:
   build:
@@ -79,3 +77,15 @@ jobs:
       with:
         name: FontGoggles.dmg
         path: App/dist/FontGoggles.dmg
+    - name: Release
+      uses: docker://antonyurchenko/git-release:latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DRAFT_RELEASE: "false"
+        PRE_RELEASE: "false"
+        CHANGELOG_FILE: "CHANGELOG.md"
+        ALLOW_EMPTY_CHANGELOG: "true"
+        ALLOW_TAG_PREFIX: "true"
+      with:
+        args: |
+            App/dist/FontGoggles.dmg
