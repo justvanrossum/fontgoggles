@@ -1,0 +1,4 @@
+# humans who have contributed to this project
+# not listed in AUTHORS.txt
+
+Just van Rossum
