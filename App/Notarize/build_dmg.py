@@ -15,6 +15,8 @@ if os.path.exists(dmgPath):
 
 with tempfile.TemporaryDirectory() as imgPath:
     appOnImagePath = os.path.join(imgPath, appFileName)
+    # We temporarily _move_ the app, as shutil.copytree() apparently
+    # invalidates a couple of the app's code signatures :(
     os.rename(appPath, appOnImagePath)
     try:
         linkCommand = ["ln", "-s", "/Applications", imgPath]
