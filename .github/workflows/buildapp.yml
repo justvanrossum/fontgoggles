@@ -72,11 +72,6 @@ jobs:
       with:
         name: notarize_log.txt
         path: notarize_log.txt
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: FontGoggles.dmg
-        path: App/dist/FontGoggles.dmg
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
