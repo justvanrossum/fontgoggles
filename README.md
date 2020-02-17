@@ -2,7 +2,7 @@
 
 FontGoggles was funded by [Google Fonts](https://fonts.google.com/).
 
-FontGoggles is a font viewer app that supports these file formats:
+FontGoggles is a font viewer desktop app for macOS that supports these file formats:
 
 - `.otf`, `.ttf`, `.otc`, `.ttc`, `.woff`, `.woff2`
 - `.ufo`
