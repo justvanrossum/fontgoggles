@@ -1,10 +1,23 @@
-# fontgoggles
+# FontGoggles
 
-FontGoggles: Visual OTL Preview and QA
+FontGoggles is a font viewer app that supports these file formats:
+
+- `.otf`, `.ttf`, `.otc`, `.ttc`, `.woff`, `.woff2`
+- `.ufo`
+- `.designspace`
+- `.ttx`
+
+It uses HarfBuzz for line layout, so it supports complex scripts. The source formats are partially compiled on the fly, so their line layout and variation behaviour can be realistically previewed.
+
+When a font file changes on disk, FontGoggles will automatically reload it and show the updated version.
+
+For downloads see the [releases page](https://github.com/justvanrossum/fontgoggles/releases).
 
 ![FontGoggles Icon](icon.png)
 
 ## Build instructions
+
+If you want to build and run the app from the source, follow these instructions.
 
 - Make sure you have Python 3.7 installed, preferably from python.org, but homebrew may work, too. (3.8 may work, but I didn't check whether all our dependencies are available.)
 
