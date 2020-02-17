@@ -1,9 +1,7 @@
 name: Run FontGoggles test suite
 
-on:
-  push:
-    tags-ignore:
-      - "v*"
+on: [push]
+
 
 jobs:
   build:
