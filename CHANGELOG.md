@@ -1,5 +1,5 @@
 # Changelog for FontGoggles
 
-## [0.9.0-beta.1] - 2020-02-16
+## [0.9.0] - 2020-02-17
 
 First public release.
