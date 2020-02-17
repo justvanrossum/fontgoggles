@@ -19,8 +19,7 @@ with tempfile.TemporaryDirectory() as imgPath:
     # invalidates a couple of the app's code signatures :(
     os.rename(appPath, appOnImagePath)
     try:
-        linkCommand = ["ln", "-s", "/Applications", imgPath]
-        subprocess.run(linkCommand, check=True)
+        os.symlink("/Applications", os.path.join(imgPath, "Applications"))
 
         tmpImagePath = tempfile.mktemp(suffix=".dmg")
         try:
