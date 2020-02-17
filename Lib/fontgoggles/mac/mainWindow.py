@@ -230,7 +230,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         optionsTab = group.feaVarTabs[2]
         # TODO initial value from where?
         y = 10
-        optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Size", 25, 70, 125,
+        optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Relative Size", 25, 70, 125,
                                                    callback=self.relativeSizeChangedCallback)
         y += 50
         optionsTab.relativeBaselineSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Baseline", 0, 25, 100,
