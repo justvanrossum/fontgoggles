@@ -935,6 +935,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             keys = [col.identifier() for col in tableView.tableColumns()]
 
+        # Make tab-separated text from the selection
         text = "\n".join("\t".join(str(listView[i].get(k, "")) for k in keys)
                          for i in rowIndices)
         if text:
