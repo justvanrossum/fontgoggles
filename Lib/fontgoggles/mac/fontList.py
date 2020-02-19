@@ -56,7 +56,7 @@ class FGFontListView(AppKit.NSView):
 
     def init(self):
         self = super().init()
-        self.registerForDraggedTypes_([AppKit.NSFilenamesPboardType])
+        self.registerForDraggedTypes_([FGPasteboardTypeFileURL])
         return self
 
     def acceptsFirstResponder(self):
