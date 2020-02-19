@@ -145,6 +145,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                 columnDescriptions=columnDescriptions,
                                 allowsSorting=False, drawFocusRing=False, rowHeight=20,
                                 selectionCallback=self.unicodeListSelectionChangedCallback)
+        self.unicodeList._tableView.setAllowsColumnSelection_(True)
+        self.unicodeList._tableView.setDelegate_(self)
         self.unicodeShowBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
                                                 callback=self.unicodeShowBiDiCheckBoxCallback)
         self.unicodeShowBiDiCheckBox._nsObject.setToolTip_(
@@ -176,6 +178,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                               allowsSorting=False, drawFocusRing=False,
                               rowHeight=20,
                               selectionCallback=self.glyphListSelectionChangedCallback)
+        self.glyphList._tableView.setAllowsColumnSelection_(True)
+        self.glyphList._tableView.setDelegate_(self)
         group.glyphList = self.glyphList
         return group
 
@@ -908,6 +912,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def nextTextLine_(self, sender):
         self.textEntry.nextTextLine()
+
+    def tableView_didClickTableColumn_(self, tableView, column):
+        self.w._window.makeFirstResponder_(tableView)
 
 
 class LabeledView(Group):
