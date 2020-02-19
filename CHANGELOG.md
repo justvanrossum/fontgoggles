@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [0.9.2] - 2020-02-??
+
+- Fixed drag and drop bug on macOS 10.10
+
 ## [0.9.1] - 2020-02-19
 
 - Reordering of fonts in the font list is now possible through drag and drop. One can also drag fonts to other FontGoggles windows, and to other applications.
