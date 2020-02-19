@@ -18,6 +18,7 @@ from fontgoggles.misc.rectTree import RectTree
 
 FGPasteboardTypeFileURL = getattr(AppKit, "NSPasteboardTypeFileURL", None)
 if FGPasteboardTypeFileURL is None:
+    # Happens when building/running on macOS 10.10. The value just works, though.
     FGPasteboardTypeFileURL = "public.file-url"
 FGPasteboardTypeFontNumber = "com.github.justvanrossum.fontgoggles.fontnumber"
 FGPasteboardTypeFontItemIdentifier = "com.github.justvanrossum.fontgoggles.fontitemidentifier"
