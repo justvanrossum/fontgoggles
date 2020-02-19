@@ -141,7 +141,7 @@ class FGFontListView(AppKit.NSView):
 
     @suppressAndLogException
     def draggingEntered_(self, draggingInfo):
-        if any(sniffFontType(path) or path.is_dir()
+        if any(fontItemIdentifier or sniffFontType(path) or path.is_dir()
                for path, fontNumber, fontItemIdentifier in self._iterateItemsFromDraggingInfo(draggingInfo)):
             self._weHaveValidDrag = True
             if self._dragPosView is None:
