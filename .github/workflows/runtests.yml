@@ -31,8 +31,3 @@ jobs:
       run: |
         pip install -r requirements-dev.txt
         pytest
-    - name: Build application
-      run: |
-        python -c "import sys; print('\n'.join(sys.path))"
-        # python App/setup.py py2app
-        # doesn't work: https://github.com/justvanrossum/fontgoggles/issues/14
