@@ -9,6 +9,7 @@ changelog = changelogPath.read_text("utf-8")
 changelogVersionPattern = re.compile(r"## \[(.+)\]")
 
 gitTag = os.getenv("GITHUB_REF")
+print("----", gitTag)
 assert gitTag[0] == "v"
 version = gitTag[1:]
 
