@@ -1176,8 +1176,8 @@ class FGGlyphLineView(AppKit.NSView):
     def mouseDragged_(self, event):
         mx, my = self.mouseDownLocation
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
-        if math.hypot(x - mx, y - my) > 10:
-            # Only do a drag beyond a minimal dragged distance
+        if math.hypot(x - mx, y - my) > 15:
+            # Only do a drag beyond a minimum dragged distance
             self.mouseDownGlyphIndex = None
             super().mouseDragged_(event)
 
@@ -1193,10 +1193,10 @@ class FGGlyphLineView(AppKit.NSView):
                     newSelection = {index}
                 self.selection = newSelection
 
-            # tell our parent we've been clicked on
-            fontListIndex = self.superview().vanillaWrapper().fontListIndex
-            fontList = self.superview().superview().vanillaWrapper()
-            fontList._lastItemClicked = fontListIndex
+        # tell our parent we've been clicked on
+        fontListIndex = self.superview().vanillaWrapper().fontListIndex
+        fontList = self.superview().superview().vanillaWrapper()
+        fontList._lastItemClicked = fontListIndex
         super().mouseUp_(event)
 
     def findGlyph_(self, point):
