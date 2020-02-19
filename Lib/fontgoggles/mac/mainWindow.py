@@ -889,6 +889,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isVisible = not self.w.mainSplitView.isPaneVisible("formattingOptions")
         elif action in ("previousTextLine:", "nextTextLine:"):
             return bool(self.textEntry.textFilePath)
+        elif action == "copy:":
+            return self.w._window.firstResponder() in (self.glyphList._tableView,
+                                                       self.unicodeList._tableView)
         if isVisible is not None:
             if isVisible:
                 findReplace.reverse()
@@ -915,6 +918,30 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def tableView_didClickTableColumn_(self, tableView, column):
         self.w._window.makeFirstResponder_(tableView)
+        listView = tableView.vanillaWrapper()
+        listView._selectionCallback(listView)
+
+    @suppressAndLogException
+    def copy_(self, sender):
+        tableView = self.w._window.firstResponder()
+        if not isinstance(tableView, AppKit.NSTableView):
+            return
+        listView = tableView.vanillaWrapper()
+        colIndices = list(tableView.selectedColumnIndexes())
+        rowIndices = list(tableView.selectedRowIndexes())
+        if colIndices:
+            rowIndices = range(len(listView))
+            keys = [tableView.tableColumns()[i].identifier() for i in colIndices]
+        else:
+            keys = [col.identifier() for col in tableView.tableColumns()]
+
+        text = "\n".join("\t".join(str(listView[i].get(k, "")) for k in keys)
+                         for i in rowIndices)
+        if text:
+            pb = AppKit.NSPasteboard.generalPasteboard()
+            pb.clearContents()
+            pb.declareTypes_owner_([AppKit.NSPasteboardTypeString], None)
+            pb.setString_forType_(text, AppKit.NSPasteboardTypeString)
 
 
 class LabeledView(Group):
