@@ -11,6 +11,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
+
     - name: Install Certificates
       run: |
         echo ${{ secrets.CERTIFICATE_P12 }} | base64 --decode > certificate.p12
@@ -23,21 +24,26 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k fgKeychain fg.keychain
         rm -fr *.p12
         # security find-identity -v -p codesigning
+
     - name: Set up Python 3.7
       run: |
         curl https://www.python.org/ftp/python/3.7.6/python-3.7.6-macosx10.9.pkg --output pythonInstaller.pkg
         sudo installer -pkg pythonInstaller.pkg -target /
+
     - name: Check Python
       run: |
         python3 --version
         python3 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
+
     - name: Checkout
       uses: actions/checkout@v1
+
     - name: Setup Virtual Environment
       run: |
         python3 -m venv venv
         source venv/bin/activate
         python -c "import sys; print('\n'.join(sys.path))"
+
     - name: Install Dependencies
       run: |
         source venv/bin/activate
@@ -48,14 +54,17 @@ jobs:
         # Install custom wheels to workaround various problems, see App/CustomWheels/README.md
         pip install --upgrade App/CustomWheels/lxml-4.5.0-cp37-cp37m-macosx_10_9_x86_64.whl
         pip install --upgrade App/CustomWheels/uharfbuzz-0.5.1.dev13+g5f9b224-cp37-cp37m-macosx_10_9_x86_64.whl
+
     - name: Run Tests
       run: |
         source venv/bin/activate
         pytest
+
     - name: Build Application
       run: |
         source venv/bin/activate
         python App/setup.py py2app
+
     - name: Codesign and Notarize
       run: |
         source venv/bin/activate
@@ -69,12 +78,14 @@ jobs:
                      --output-format xml \
                      | python App/Distribute/await_notarization.py "${{ secrets.NOTARIZE_DEVELOPER }}" "${{ secrets.NOTARIZE_PASSWORD }}"
         xcrun stapler staple App/dist/FontGoggles.dmg
+
     - name: Upload Notarization Log
       uses: actions/upload-artifact@v1
       if: always()
       with:
         name: notarize_log.txt
         path: notarize_log.txt
+
     - name: Read CHANGELOG.md
       id: changelog
       env:
@@ -82,6 +93,7 @@ jobs:
       run: |
         source venv/bin/activate
         echo "::set-output name=body::$(python App/Distribute/extract_changes.py)"
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -93,6 +105,7 @@ jobs:
         body: ${{ steps.changelog.outputs.body }}
         draft: true
         prerelease: false
+
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
