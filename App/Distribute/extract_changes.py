@@ -7,11 +7,10 @@ changelogPath = pathlib.Path(__file__).resolve().parent.parent.parent / "CHANGEL
 changelog = changelogPath.read_text("utf-8")
 
 changelogVersionPattern = re.compile(r"## \[(.+)\]")
+githubRefPattern = re.compile(r"refs/tags/v(.*)")
 
-gitTag = os.getenv("GITHUB_REF")
-print("----", gitTag)
-assert gitTag[0] == "v"
-version = gitTag[1:]
+m = githubRefPattern.match(os.getenv("GITHUB_REF"))
+version = m.group(1)
 
 notes = []
 
