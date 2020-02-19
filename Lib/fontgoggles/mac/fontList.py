@@ -16,6 +16,9 @@ from fontgoggles.misc.properties import delegateProperty, hookedProperty
 from fontgoggles.misc.rectTree import RectTree
 
 
+FGPasteboardTypeFileURL = getattr(AppKit, "NSPasteboardTypeFileURL", None)
+if FGPasteboardTypeFileURL is None:
+    FGPasteboardTypeFileURL = "public.file-url"
 FGPasteboardTypeFontNumber = "com.github.justvanrossum.fontgoggles.fontnumber"
 FGPasteboardTypeFontItemIdentifier = "com.github.justvanrossum.fontgoggles.fontitemidentifier"
 
@@ -220,7 +223,7 @@ class FGFontListView(AppKit.NSView):
     @staticmethod
     def _iterateItemsFromDraggingInfo(draggingInfo):
         for pbItem in draggingInfo.draggingPasteboard().pasteboardItems():
-            urlString = pbItem.stringForType_(AppKit.NSPasteboardTypeFileURL)
+            urlString = pbItem.stringForType_(FGPasteboardTypeFileURL)
             url = AppKit.NSURL.alloc().initWithString_relativeToURL_(urlString, None)
             fontNumberString = pbItem.stringForType_(FGPasteboardTypeFontNumber)
             fontNumber = int(fontNumberString) if fontNumberString else None
@@ -676,7 +679,7 @@ class FontList(Group):
             pbItem = AppKit.NSPasteboardItem.alloc().init()
             fontPath, fontNumber = item.fontKey
             fileURL = AppKit.NSURL.fileURLWithPath_(str(fontPath))
-            pbItem.setString_forType_(fileURL.absoluteString(), AppKit.NSPasteboardTypeFileURL)
+            pbItem.setString_forType_(fileURL.absoluteString(), FGPasteboardTypeFileURL)
             pbItem.setString_forType_(str(fontNumber), FGPasteboardTypeFontNumber)
             pbItem.setString_forType_(item.identifier, FGPasteboardTypeFontItemIdentifier)
             dragItem = AppKit.NSDraggingItem.alloc().initWithPasteboardWriter_(pbItem)
