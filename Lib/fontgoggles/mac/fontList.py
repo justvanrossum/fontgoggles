@@ -220,13 +220,11 @@ class FGFontListView(AppKit.NSView):
     @staticmethod
     def _iterateItemsFromDraggingInfo(draggingInfo):
         for pbItem in draggingInfo.draggingPasteboard().pasteboardItems():
-            urlData = pbItem.dataForType_(AppKit.NSPasteboardTypeFileURL)
-            url = AppKit.NSURL.alloc().initWithDataRepresentation_relativeToURL_(urlData, None)
-            fontNumberData = pbItem.dataForType_(FGPasteboardTypeFontNumber)
-            fontNumber = int(fontNumberData) if fontNumberData else None
-            fontItemIdentifier = pbItem.dataForType_(FGPasteboardTypeFontItemIdentifier)
-            if fontItemIdentifier:
-                fontItemIdentifier = bytes(fontItemIdentifier).decode("ascii")
+            urlString = pbItem.stringForType_(AppKit.NSPasteboardTypeFileURL)
+            url = AppKit.NSURL.alloc().initWithString_relativeToURL_(urlString, None)
+            fontNumberString = pbItem.stringForType_(FGPasteboardTypeFontNumber)
+            fontNumber = int(fontNumberString) if fontNumberString else None
+            fontItemIdentifier = pbItem.stringForType_(FGPasteboardTypeFontItemIdentifier)
             yield pathlib.Path(url.path()), fontNumber, fontItemIdentifier
 
     # Undo/Redo
@@ -678,9 +676,9 @@ class FontList(Group):
             pbItem = AppKit.NSPasteboardItem.alloc().init()
             fontPath, fontNumber = item.fontKey
             fileURL = AppKit.NSURL.fileURLWithPath_(str(fontPath))
-            pbItem.setData_forType_(fileURL.dataRepresentation(), AppKit.NSPasteboardTypeFileURL)
-            pbItem.setData_forType_(str(fontNumber).encode("ascii"), FGPasteboardTypeFontNumber)
-            pbItem.setData_forType_(item.identifier.encode("ascii"), FGPasteboardTypeFontItemIdentifier)
+            pbItem.setString_forType_(fileURL.absoluteString(), AppKit.NSPasteboardTypeFileURL)
+            pbItem.setString_forType_(str(fontNumber), FGPasteboardTypeFontNumber)
+            pbItem.setString_forType_(item.identifier, FGPasteboardTypeFontItemIdentifier)
             dragItem = AppKit.NSDraggingItem.alloc().initWithPasteboardWriter_(pbItem)
             point = self._nsObject.convertPoint_fromView_(event.locationInWindow(), None)
             dragItem.setDraggingFrame_(((point.x + xOffset, point.y - yOffset), (10, 10)))
