@@ -665,6 +665,7 @@ class FontList(Group):
     def mouseDragged(self, event):
         items = [self.project.fonts[i] for i in sorted(self.selection)]
         dragItems = []
+        xOffset = yOffset = 0
         for item in items:
             pbItem = AppKit.NSPasteboardItem.alloc().init()
             fontPath, fontNumber = item.fontKey
@@ -673,7 +674,20 @@ class FontList(Group):
             pbItem.setData_forType_(str(fontNumber).encode("ascii"), FGPasteboardTypeFontNumber)
             pbItem.setData_forType_(item.identifier.encode("ascii"), FGPasteboardTypeFontItemIdentifier)
             dragItem = AppKit.NSDraggingItem.alloc().initWithPasteboardWriter_(pbItem)
-            dragItem.setDraggingFrame_(((0, 0), (10, 10)))
+            point = self._nsObject.convertPoint_fromView_(event.locationInWindow(), None)
+            dragItem.setDraggingFrame_(((point.x + xOffset, point.y - yOffset), (10, 10)))
+            if self.vertical:
+                xOffset += 50
+            else:
+                yOffset += 50
+            def imageComponentsProvider(identifier=item.identifier):
+                fontItem = self.getFontItem(identifier)
+                image = fontItem._nsObject.imageRepresentation()
+                imageComponent = AppKit.NSDraggingImageComponent.draggingImageComponentWithKey_(AppKit.NSDraggingImageComponentIconKey)
+                imageComponent.setContents_(image)
+                imageComponent.setFrame_(((0, -image.size().height), image.size()))
+                return [imageComponent]
+            dragItem.setImageComponentsProvider_(imageComponentsProvider)
             dragItems.append(dragItem)
 
         self._nsObject.beginDraggingSessionWithItems_event_source_(dragItems, event, self._nsObject)
@@ -774,6 +788,18 @@ class FGFontItemView(AppKit.NSView):
             AppKit.NSMenu.popUpContextMenu_withEvent_forView_(menu, event, self)
         else:
             super().mouseDown_(event)
+
+    @suppressAndLogException
+    def imageRepresentation(self):
+        wasSelected = self.selected
+        self.selected = False
+        bitmapRep = self.bitmapImageRepForCachingDisplayInRect_(self.bounds())
+        self.cacheDisplayInRect_toBitmapImageRep_(self.bounds(), bitmapRep)
+        image = AppKit.NSImage.alloc().init()
+        image.addRepresentation_(bitmapRep)
+        bitmapRep.setSize_(self.bounds().size)
+        self.selected = wasSelected
+        return image
 
 
 class FontItem(Group):
