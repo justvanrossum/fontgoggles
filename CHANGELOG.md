@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [0.9.2] - 2020-02-??
+## [0.9.2] - 2020-02-19
 
 - Fixed drag and drop bug on macOS 10.10
 
