@@ -506,12 +506,15 @@ class FontList(Group):
         movingItems = [fontItemIdentifier for fontPath, fontNumber, fontItemIdentifier in items]
         movingItemsSet = set(movingItems)
         movedItems = []
+        selection = set()
         for i, identifier in enumerate(allItems):
             if i == index:
+                selection.update(range(len(movedItems), len(movedItems) + len(movingItems)))
                 movedItems.extend(movingItems)
             if identifier not in movingItemsSet:
                 movedItems.append(identifier)
         if index >= len(allItems):
+            selection.update(range(len(movedItems), len(movedItems) + len(movingItems)))
             movedItems.extend(movingItems)
         assert len(movedItems) == len(allItems)
         if allItems == movedItems:
@@ -522,6 +525,7 @@ class FontList(Group):
             itemDict = {item.identifier: item for item in self.project.fonts}
             for i, itemIdentifier in enumerate(movedItems):
                 self.projectFontsProxy[i] = itemDict[itemIdentifier]
+        self.selection = selection
 
     def removeSelectedFontItems(self):
         indicesToDelete = sorted(self.selection, reverse=True)
