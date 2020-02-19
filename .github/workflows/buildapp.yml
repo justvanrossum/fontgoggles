@@ -72,6 +72,13 @@ jobs:
       with:
         name: notarize_log.txt
         path: notarize_log.txt
+    - name: Read CHANGELOG.md
+      id: changelog
+      env:
+        GITHUB_REF: ${{ github.ref }}
+      run: |
+        python App/Distribute/extract_changes.py
+        echo "::set-output name=body::$(python App/Distribute/extract_changes.py)"
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
