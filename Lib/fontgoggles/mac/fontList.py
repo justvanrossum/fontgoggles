@@ -667,6 +667,10 @@ class FontList(Group):
 
     @suppressAndLogException
     def mouseDragged(self, event):
+        clickedIndex = self._lastItemClicked
+        assert clickedIndex is not None
+        if clickedIndex not in self.selection:
+            self.selection = {clickedIndex}
         items = [self.project.fonts[i] for i in sorted(self.selection)]
         dragItems = []
         xOffset = yOffset = 0
@@ -1171,9 +1175,16 @@ class FGGlyphLineView(AppKit.NSView):
         self.mouseDownLocation = self.convertPoint_fromView_(event.locationInWindow(), None)
         self.mouseDownGlyphIndex = self.findGlyph_(self.mouseDownLocation)
 
+        # tell our parent we've been clicked on
+        fontListIndex = self.superview().vanillaWrapper().fontListIndex
+        fontList = self.superview().superview().vanillaWrapper()
+        fontList._lastItemClicked = fontListIndex
+
         super().mouseDown_(event)
 
     def mouseDragged_(self, event):
+        if event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
+            return
         mx, my = self.mouseDownLocation
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
         if math.hypot(x - mx, y - my) > 15:
@@ -1193,10 +1204,6 @@ class FGGlyphLineView(AppKit.NSView):
                     newSelection = {index}
                 self.selection = newSelection
 
-        # tell our parent we've been clicked on
-        fontListIndex = self.superview().vanillaWrapper().fontListIndex
-        fontList = self.superview().superview().vanillaWrapper()
-        fontList._lastItemClicked = fontListIndex
         super().mouseUp_(event)
 
     def findGlyph_(self, point):
