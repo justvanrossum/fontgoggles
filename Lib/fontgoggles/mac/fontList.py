@@ -1,4 +1,5 @@
 import io
+import math
 import os
 import pathlib
 from types import SimpleNamespace
@@ -14,6 +15,9 @@ from fontgoggles.misc.decorators import suppressAndLogException, asyncTaskAutoCa
 from fontgoggles.misc.properties import delegateProperty, hookedProperty
 from fontgoggles.misc.rectTree import RectTree
 
+
+FGPasteboardTypeFontNumber = "com.github.justvanrossum.fontgoggles.fontnumber"
+FGPasteboardTypeFontItemIdentifier = "com.github.justvanrossum.fontgoggles.fontitemidentifier"
 
 fontItemMinimumSize = 60
 fontItemMaximumSize = 1500
@@ -59,6 +63,12 @@ class FGFontListView(AppKit.NSView):
 
     def mouseDown_(self, event):
         self.vanillaWrapper().mouseDown(event)
+
+    def mouseDragged_(self, event):
+        self.vanillaWrapper().mouseDragged(event)
+
+    def mouseUp_(self, event):
+        self.vanillaWrapper().mouseUp(event)
 
     def keyDown_(self, event):
         if not self.vanillaWrapper().keyDown(event):
@@ -131,7 +141,8 @@ class FGFontListView(AppKit.NSView):
 
     @suppressAndLogException
     def draggingEntered_(self, draggingInfo):
-        if any(sniffFontType(path) or path.is_dir() for path in self._iterateFilesFromDraggingInfo(draggingInfo)):
+        if any(sniffFontType(path) or path.is_dir()
+               for path, fontNumber, fontItemIdentifier in self._iterateItemsFromDraggingInfo(draggingInfo)):
             self._weHaveValidDrag = True
             if self._dragPosView is None:
                 self._dragPosView = AppKit.NSView.alloc().init()
@@ -199,13 +210,24 @@ class FGFontListView(AppKit.NSView):
     @suppressAndLogException
     def performDragOperation_(self, draggingInfo):
         index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
-        self.vanillaWrapper().insertFonts(self._iterateFilesFromDraggingInfo(draggingInfo), index)
+        if draggingInfo.draggingSource() is self:
+            # Local drag, just reorder
+            self.vanillaWrapper().moveFonts(self._iterateItemsFromDraggingInfo(draggingInfo), index)
+        else:
+            self.vanillaWrapper().insertFonts(self._iterateItemsFromDraggingInfo(draggingInfo), index)
         return True
 
     @staticmethod
-    def _iterateFilesFromDraggingInfo(draggingInfo):
-        for path in draggingInfo.draggingPasteboard().propertyListForType_(AppKit.NSFilenamesPboardType):
-            yield pathlib.Path(path)
+    def _iterateItemsFromDraggingInfo(draggingInfo):
+        for pbItem in draggingInfo.draggingPasteboard().pasteboardItems():
+            urlData = pbItem.dataForType_(AppKit.NSPasteboardTypeFileURL)
+            url = AppKit.NSURL.alloc().initWithDataRepresentation_relativeToURL_(urlData, None)
+            fontNumberData = pbItem.dataForType_(FGPasteboardTypeFontNumber)
+            fontNumber = int(fontNumberData) if fontNumberData else None
+            fontItemIdentifier = pbItem.dataForType_(FGPasteboardTypeFontItemIdentifier)
+            if fontItemIdentifier:
+                fontItemIdentifier = bytes(fontItemIdentifier).decode("ascii")
+            yield pathlib.Path(url.path()), fontNumber, fontItemIdentifier
 
     # Undo/Redo
 
@@ -463,15 +485,43 @@ class FontList(Group):
         clipView.setBounds_(clipBounds)
 
     @suppressAndLogException
-    def insertFonts(self, paths, index):
+    def insertFonts(self, items, index):
         addedIndices = []
         with recordChanges(self.projectFontsProxy, title="Insert Fonts"):
-            for fontPath, fontNumber in sortedFontPathsAndNumbers(paths, defaultSortSpec):
-                fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
-                self.projectFontsProxy.insert(index, fontItemInfo)
-                addedIndices.append(index)
-                index += 1
+            for fontPath, fontNumber, fontItemIdentifier in items:
+                if fontNumber is None:
+                    subItems = sortedFontPathsAndNumbers([fontPath], defaultSortSpec)
+                else:
+                    subItems = [(fontPath, fontNumber)]
+                for fontPath, fontNumber in subItems:
+                    fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
+                    self.projectFontsProxy.insert(index, fontItemInfo)
+                    addedIndices.append(index)
+                    index += 1
         self.scrollSelectionToVisible(addedIndices)
+
+    @suppressAndLogException
+    def moveFonts(self, items, index):
+        allItems = [fontItemInfo.identifier for fontItemInfo in self.project.fonts]
+        movingItems = [fontItemIdentifier for fontPath, fontNumber, fontItemIdentifier in items]
+        movingItemsSet = set(movingItems)
+        movedItems = []
+        for i, identifier in enumerate(allItems):
+            if i == index:
+                movedItems.extend(movingItems)
+            if identifier not in movingItemsSet:
+                movedItems.append(identifier)
+        if index >= len(allItems):
+            movedItems.extend(movingItems)
+        assert len(movedItems) == len(allItems)
+        if allItems == movedItems:
+            # Nothing moved
+            return
+
+        with recordChanges(self.projectFontsProxy, title="Reorder Fonts"):
+            itemDict = {item.identifier: item for item in self.project.fonts}
+            for i, itemIdentifier in enumerate(movedItems):
+                self.projectFontsProxy[i] = itemDict[itemIdentifier]
 
     def removeSelectedFontItems(self):
         indicesToDelete = sorted(self.selection, reverse=True)
@@ -609,8 +659,29 @@ class FontList(Group):
 
     @suppressAndLogException
     def mouseDown(self, event):
+        pass
+
+    @suppressAndLogException
+    def mouseDragged(self, event):
+        items = [self.project.fonts[i] for i in sorted(self.selection)]
+        dragItems = []
+        for item in items:
+            pbItem = AppKit.NSPasteboardItem.alloc().init()
+            fontPath, fontNumber = item.fontKey
+            fileURL = AppKit.NSURL.fileURLWithPath_(str(fontPath))
+            pbItem.setData_forType_(fileURL.dataRepresentation(), AppKit.NSPasteboardTypeFileURL)
+            pbItem.setData_forType_(str(fontNumber).encode("ascii"), FGPasteboardTypeFontNumber)
+            pbItem.setData_forType_(item.identifier.encode("ascii"), FGPasteboardTypeFontItemIdentifier)
+            dragItem = AppKit.NSDraggingItem.alloc().initWithPasteboardWriter_(pbItem)
+            dragItem.setDraggingFrame_(((0, 0), (10, 10)))
+            dragItems.append(dragItem)
+
+        self._nsObject.beginDraggingSessionWithItems_event_source_(dragItems, event, self._nsObject)
+
+    @suppressAndLogException
+    def mouseUp(self, event):
         glyphSelectionChanged = False
-        index = self._lastItemClicked
+        index = self._lastItemClicked  # TODO: This needs to be permanent and get a better API
         self._lastItemClicked = None
         if index is not None:
             fontItem = self.getFontItemByIndex(index)
@@ -1067,23 +1138,36 @@ class FGGlyphLineView(AppKit.NSView):
             # The event will be handled by our superview
             super().mouseDown_(event)
             return
+        self.mouseDownLocation = self.convertPoint_fromView_(event.locationInWindow(), None)
+        self.mouseDownGlyphIndex = self.findGlyph_(self.mouseDownLocation)
 
-        index = self.findGlyph_(self.convertPoint_fromView_(event.locationInWindow(), None))
-
-        if not event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
-            if index is None:
-                newSelection = set()
-            elif index in self.selection:
-                newSelection = self.selection
-            else:
-                newSelection = {index}
-            self.selection = newSelection
-
-        # tell our parent we've been clicked on
-        fontListIndex = self.superview().vanillaWrapper().fontListIndex
-        fontList = self.superview().superview().vanillaWrapper()
-        fontList._lastItemClicked = fontListIndex
         super().mouseDown_(event)
+
+    def mouseDragged_(self, event):
+        mx, my = self.mouseDownLocation
+        x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
+        if math.hypot(x - mx, y - my) > 10:
+            # Only do a drag beyond a minimal dragged distance
+            self.mouseDownGlyphIndex = None
+            super().mouseDragged_(event)
+
+    def mouseUp_(self, event):
+        index = self.mouseDownGlyphIndex
+        if index is not None:
+            if not event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
+                if index is None:
+                    newSelection = set()
+                elif index in self.selection:
+                    newSelection = self.selection
+                else:
+                    newSelection = {index}
+                self.selection = newSelection
+
+            # tell our parent we've been clicked on
+            fontListIndex = self.superview().vanillaWrapper().fontListIndex
+            fontList = self.superview().superview().vanillaWrapper()
+            fontList._lastItemClicked = fontListIndex
+        super().mouseUp_(event)
 
     def findGlyph_(self, point):
         if self._rectTree is None:
