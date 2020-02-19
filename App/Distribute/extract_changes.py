@@ -3,11 +3,12 @@ import pathlib
 import re
 
 
-changelogPath = pathlib.Path(__file__).resolve().parent.parent.parent / "CHANGELOG.md"
-changelog = changelogPath.read_text("utf-8")
-
 changelogVersionPattern = re.compile(r"## \[(.+)\]")
 githubRefPattern = re.compile(r"refs/tags/v(.*)")
+
+
+changelogPath = pathlib.Path(__file__).resolve().parent.parent.parent / "CHANGELOG.md"
+changelog = changelogPath.read_text("utf-8")
 
 m = githubRefPattern.match(os.getenv("GITHUB_REF"))
 version = m.group(1)
@@ -16,7 +17,6 @@ notes = []
 
 collecting = False
 for line in changelog.splitlines():
-    # print(line)
     m = changelogVersionPattern.match(line)
     if m is not None:
         if collecting:
