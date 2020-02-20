@@ -11,6 +11,7 @@ class Project:
 
     def __init__(self):
         self.fonts = []
+        self.fontSelection = set()  # not persistent
         self._fontLoader = FontLoader()
         self._fontItemIdentifierGenerator = self._fontItemIdentifierGeneratorFunc()
 
