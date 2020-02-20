@@ -40,16 +40,17 @@ sidebarWidth = 300
 
 
 directionPopUpConfig = [
-    ("Automatic, with BiDi", None),
-    ("Automatic, without BiDi", None),
-    ("Left-to-Right", "LTR"),
-    ("Right-to-Left", "RTL"),
-    (None, None),  # separator
-    ("Top-to-Bottom", "TTB"),
-    ("Bottom-to-Top", "BTT"),
+    ("Automatic, with BiDi", None, "auto-with-bidi"),
+    ("Automatic, without BiDi", None, "auto-without-bidi"),
+    ("Left-to-Right", "LTR", "LTR"),
+    ("Right-to-Left", "RTL", "RTL"),
+    (None, None, None),  # separator
+    ("Top-to-Bottom", "TTB", "TTB"),
+    ("Bottom-to-Top", "BTT", "BTT"),
 ]
-directionOptions = [label for label, direction in directionPopUpConfig]
-directionSettings = [direction for label, direction in directionPopUpConfig]
+directionOptions = [label for label, direction, identifier in directionPopUpConfig]
+directionSettings = [direction for label, direction, identifier in directionPopUpConfig]
+directionIdentifiers = [identifier for label, direction, identifier in directionPopUpConfig]
 
 alignmentOptionsHorizontal = [
     "Automatic",
