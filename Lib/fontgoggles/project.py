@@ -11,6 +11,8 @@ class Project:
 
     def __init__(self):
         self.fonts = []
+        self.uiState = {}
+        self.textState = {}
         self.fontSelection = set()  # not persistent
         self._fontLoader = FontLoader()
         self._fontItemIdentifierGenerator = self._fontItemIdentifierGeneratorFunc()
@@ -25,6 +27,8 @@ class Project:
         for fontItemInfoDict in root["fonts"]:
             fontPath = pathlib.Path(os.path.normpath(os.path.join(rootPath, fontItemInfoDict["path"])))
             self.addFont(fontPath, fontItemInfoDict["fontNumber"])
+        self.uiState = root.get("uiState", {})
+        self.textState = root.get("textState", {})
         return self
 
     def asJSON(self, rootPath):
@@ -34,12 +38,13 @@ class Project:
     def asDict(self, rootPath):
         root = {}
         root["fonts"] = []
-        root["settings"] = {}
         for fontItemInfo in self.fonts:
             fontPath, fontNumber = fontItemInfo.fontKey
             relFontPath = os.path.relpath(fontPath, rootPath)
             fontItemInfoDict = dict(path=relFontPath, fontNumber=fontNumber)
             root["fonts"].append(fontItemInfoDict)
+        root["uiState"] = self.uiState
+        root["textState"] = self.textState
         return root
 
     def addFont(self, path: PathLike, fontNumber: int, index=None):

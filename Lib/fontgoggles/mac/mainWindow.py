@@ -108,6 +108,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.w = Window((1400, 700), "FontGoggles", minSize=(900, 500), autosaveName="FontGogglesWindow",
                         fullScreenMode="primary")
+        self.restoreWindowPosition(self.project.uiState.get("windowPosition"))
+
         self.w.mainSplitView = mainSplitView
         self.w.open()
         self.w._window.setWindowController_(self)
@@ -130,6 +132,23 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def windowTitleForDocumentDisplayName_(self, displayName):
         return f"FontGoggles — {displayName}"
+
+    def syncUIStateWithProject(self):
+        # Called by FGDocument just before save
+        (x, y), (w, h) = self.w._window.frame()
+        self.project.uiState["windowPosition"] = [x, y, w, h]
+
+    @objc.python_method
+    def restoreWindowPosition(self, windowPosition):
+        if not windowPosition:
+            return
+        window = self.w._window
+        x, y, w, h = windowPosition
+        window.setFrame_display_(((x, y), (w, h)), False)
+        sw, sh = window.screen().visibleFrame().size
+        w = min(w, sw)
+        h = min(h, sh)
+        window.setFrame_display_(((x, y), (w, h)), True)
 
     @objc.python_method
     def setupUnicodeListGroup(self):

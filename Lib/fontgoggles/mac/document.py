@@ -31,6 +31,8 @@ class FGDocument(AppKit.NSDocument):
 
     def dataOfType_error_(self, type, error):
         rootPath = pathlib.Path(self._savePath).parent
+        for controller in self.windowControllers():
+            controller.syncUIStateWithProject()
         return AppKit.NSData.dataWithData_(self.project.asJSON(rootPath)), error
 
     def readFromData_ofType_error_(self, data, type, error):
