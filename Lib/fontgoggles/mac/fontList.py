@@ -602,6 +602,15 @@ class FontList(Group):
         if self._selectionChangedCallback is not None:
             self._selectionChangedCallback(self)
 
+    @property
+    def selectionKeys(self):
+        return {self.project.fonts[index].identifier for index in self.selection}
+
+    @selectionKeys.setter
+    def selectionKeys(self, newSelection):
+        self.selection = {index for index, fii in enumerate(self.project.fonts)
+                          if fii.identifier in newSelection}
+
     def selectAll(self):
         self.selection = set(range(len(self.project.fonts)))
 
