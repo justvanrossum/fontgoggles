@@ -26,9 +26,11 @@ class Project:
         self = cls()
         for fontItemInfoDict in root["fonts"]:
             fontPath = pathlib.Path(os.path.normpath(os.path.join(rootPath, fontItemInfoDict["path"])))
-            self.addFont(fontPath, fontItemInfoDict["fontNumber"])
+            self.addFont(fontPath, fontItemInfoDict.get("fontNumber", 0))
         self.uiSettings = root.get("uiSettings", {})
-        self.textSettings = root.get("textSettings", {})
+        self.textSettings = dict(root.get("textSettings", {}))
+        if "textFilePath" in self.textSettings and self.textSettings["textFilePath"] is not None:
+            self.textSettings["textFilePath"] = os.path.normpath(os.path.join(rootPath, self.textSettings["textFilePath"]))
         return self
 
     def asJSON(self, rootPath):
@@ -41,9 +43,13 @@ class Project:
         for fontItemInfo in self.fonts:
             fontPath, fontNumber = fontItemInfo.fontKey
             relFontPath = os.path.relpath(fontPath, rootPath)
-            fontItemInfoDict = dict(path=relFontPath, fontNumber=fontNumber)
+            fontItemInfoDict = dict(path=relFontPath)
+            if fontNumber != 0:
+                fontItemInfoDict["fontNumber"] = fontNumber
             root["fonts"].append(fontItemInfoDict)
-        root["textSettings"] = self.textSettings
+        root["textSettings"] = dict(self.textSettings)
+        if "textFilePath" in root["textSettings"] and root["textSettings"]["textFilePath"] is not None:
+            root["textSettings"]["textFilePath"] = os.path.relpath(root["textSettings"]["textFilePath"], rootPath)
         root["uiSettings"] = self.uiSettings
         return root
 

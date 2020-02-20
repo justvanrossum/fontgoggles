@@ -125,8 +125,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.w._window.makeFirstResponder_(fontListGroup.textEntry.nsTextView)
         self.setWindow_(self.w._window)
 
-        initialText = "ABC abc 0123 :;?"
-        self.textEntry.set(initialText)
+        initialText = "ABC abc 0123 :;?"  # TODO: From user defaults?
+        self.textEntry.set(self.project.textSettings.get("text", initialText))
         self.textEntryChangedCallback(self.textEntry)
         self.w.bind("close", self._windowCloseCallback)
         self.updateFileObservers()
@@ -145,6 +145,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @suppressAndLogException
     def syncUISettingsWithProject(self):
         # Called by FGDocument just before save
+        textSettings = {}
+        textSettings["text"] = self.textEntry.get()
+        textSettings["textFilePath"] = self.textEntry.textFilePath
+        self.project.textSettings = textSettings
+
         uiSettings = {}
 
         (x, y), (w, h) = self.w._window.frame()
@@ -228,7 +233,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
-        self.textEntry = TextEntryGroup((0, 0, 0, 45), callback=self.textEntryChangedCallback)
+        textFilePath = self.project.textSettings.get("textFilePath")
+        if textFilePath and not os.path.exists(textFilePath):
+            print("text file not found:", textFilePath)
+            textFilePath = None
+        self.textEntry = TextEntryGroup((0, 0, 0, 45), textFilePath=textFilePath,
+                                        callback=self.textEntryChangedCallback)
         itemSize = self.project.uiSettings.get("fontListItemSize", self.defaultFontItemSize)
         self.fontList = FontList(self.project, self.projectProxy, 300, itemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
