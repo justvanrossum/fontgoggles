@@ -606,8 +606,7 @@ class FontList(Group):
             try:
                 fontItem = self.getFontItem(identifier)
             except AttributeError:
-                print("1 ------ deleted", identifier)
-                pass  # item no longer exists, it's fine
+                self._selection.discard(identifier)
             else:
                 fontItem.selected = not fontItem.selected
         if self._selectionChangedCallback is not None:
@@ -641,7 +640,6 @@ class FontList(Group):
             try:
                 return self.getFontItem(identifier)
             except AttributeError:
-                print("2 ------ deleted", identifier)
                 return None  # item got deleted, it's fine
         else:
             return None
