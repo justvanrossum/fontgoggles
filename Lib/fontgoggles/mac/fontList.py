@@ -489,6 +489,7 @@ class FontList(Group):
     @suppressAndLogException
     def insertFonts(self, items, index):
         addedItems = []
+        self.project.fontSelection = self.selection
         with recordChanges(self.projectProxy, title="Insert Fonts"):
             for fontPath, fontNumber, fontItemIdentifier in items:
                 if fontNumber is None:
@@ -522,6 +523,7 @@ class FontList(Group):
             # Nothing moved
             return
 
+        self.project.fontSelection = self.selection
         with recordChanges(self.projectProxy, title="Reorder Fonts"):
             self.projectProxy.fontSelection = self.selection
             itemDict = {item.identifier: item for item in self.project.fonts}
@@ -533,10 +535,8 @@ class FontList(Group):
 
     def removeSelectedFontItems(self):
         indicesToDelete = sorted(self.selectionIndices, reverse=True)
-        # One of the font list items is first responder, but it will
-        # get deleted, so it can't stay first responder. Make the font
-        # list itself the first responder and all is fine.
-        self._nsObject.window().makeFirstResponder_(self._nsObject)
+        self.ensureFirstResponder()
+        self.project.fontSelection = self.selection
         with recordChanges(self.projectProxy, title="Remove Fonts"):
             self.projectProxy.fontSelection = self.selection
             fontsProxy = self.projectProxy.fonts
@@ -544,6 +544,12 @@ class FontList(Group):
                 del fontsProxy[index]
             self.selection = set()
             self.projectProxy.fontSelection = self.selection
+
+    def ensureFirstResponder(self):
+        # If originally one of th font list items is first responder
+        # but gets deleted, the font list itself should becode first
+        # responder.
+        self._nsObject.window().makeFirstResponder_(self._nsObject)
 
     def refitFontItems(self):
         if hasattr(self, "dropFontsPlaceHolder"):
