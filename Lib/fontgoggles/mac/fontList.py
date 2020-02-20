@@ -488,7 +488,7 @@ class FontList(Group):
 
     @suppressAndLogException
     def insertFonts(self, items, index):
-        addedIndices = []
+        addedItems = []
         with recordChanges(self.projectProxy, title="Insert Fonts"):
             for fontPath, fontNumber, fontItemIdentifier in items:
                 if fontNumber is None:
@@ -499,9 +499,10 @@ class FontList(Group):
                 for fontPath, fontNumber in subItems:
                     fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
                     fontsProxy.insert(index, fontItemInfo)
-                    addedIndices.append(index)
+                    addedItems.append(fontItemInfo.identifier)
                     index += 1
-        self.scrollSelectionToVisible(addedIndices)
+            self.projectProxy.fontSelection = self.selection
+        self.scrollSelectionToVisible(addedItems)
 
     @suppressAndLogException
     def moveFonts(self, items, index):
@@ -527,7 +528,8 @@ class FontList(Group):
             fontsProxy = self.projectProxy.fonts
             for i, itemIdentifier in enumerate(movedItems):
                 fontsProxy[i] = itemDict[itemIdentifier]
-        self.selection = set(movingItems)
+            self.selection = set(movingItems)
+            self.projectProxy.fontSelection = self.selection
 
     def removeSelectedFontItems(self):
         indicesToDelete = sorted(self.selectionIndices, reverse=True)
@@ -536,9 +538,12 @@ class FontList(Group):
         # list itself the first responder and all is fine.
         self._nsObject.window().makeFirstResponder_(self._nsObject)
         with recordChanges(self.projectProxy, title="Remove Fonts"):
+            self.projectProxy.fontSelection = self.selection
             fontsProxy = self.projectProxy.fonts
             for index in indicesToDelete:
                 del fontsProxy[index]
+            self.selection = set()
+            self.projectProxy.fontSelection = self.selection
 
     def refitFontItems(self):
         if hasattr(self, "dropFontsPlaceHolder"):
@@ -601,6 +606,7 @@ class FontList(Group):
             try:
                 fontItem = self.getFontItem(identifier)
             except AttributeError:
+                print("1 ------ deleted", identifier)
                 pass  # item no longer exists, it's fine
             else:
                 fontItem.selected = not fontItem.selected
@@ -632,7 +638,11 @@ class FontList(Group):
             return self.getFontItemByIndex(0)
         elif len(self.selection) == 1:
             identifier = list(self.selection)[0]
-            return self.getFontItem(identifier)
+            try:
+                return self.getFontItem(identifier)
+            except AttributeError:
+                print("2 ------ deleted", identifier)
+                return None  # item got deleted, it's fine
         else:
             return None
 
