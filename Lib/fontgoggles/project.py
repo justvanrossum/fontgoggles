@@ -30,6 +30,7 @@ class Project:
         self.uiSettings = root.get("uiSettings", {})
         self.textSettings = dict(root.get("textSettings", {}))
         if "textFilePath" in self.textSettings and self.textSettings["textFilePath"] is not None:
+            # relative path -> absolute path
             self.textSettings["textFilePath"] = os.path.normpath(os.path.join(rootPath, self.textSettings["textFilePath"]))
         return self
 
@@ -48,8 +49,9 @@ class Project:
                 fontItemInfoDict["fontNumber"] = fontNumber
             root["fonts"].append(fontItemInfoDict)
         root["textSettings"] = dict(self.textSettings)
-        if "textFilePath" in root["textSettings"] and root["textSettings"]["textFilePath"] is not None:
-            root["textSettings"]["textFilePath"] = os.path.relpath(root["textSettings"]["textFilePath"], rootPath)
+        if self.textSettings.get("textFilePath") is not None:
+            # absolute path -> relative path
+            root["textSettings"]["textFilePath"] = os.path.relpath(self.textSettings["textFilePath"], rootPath)
         root["uiSettings"] = self.uiSettings
         return root
 
