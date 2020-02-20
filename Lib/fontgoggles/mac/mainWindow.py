@@ -93,7 +93,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(view=fontListGroup, identifier="fontList", canCollapse=False,
                  size=200),
         ]
-        subSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
+        subSplitView = MySplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
         if not self.project.uiSettings.get("glyphListVisible", True):
             subSplitView.togglePane("glyphList")
         self.subSplitView = subSplitView
@@ -107,7 +107,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth,
                  resizeFlexibility=False),
         ]
-        mainSplitView = SplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
+        mainSplitView = MySplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
         if not self.project.uiSettings.get("characterListVisible", True):
             mainSplitView.togglePane("characterList")
         if not self.project.uiSettings.get("formattingOptionsVisible", True):
@@ -140,17 +140,24 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def windowTitleForDocumentDisplayName_(self, displayName):
         return f"FontGoggles — {displayName}"
 
+    @suppressAndLogException
     def syncUISettingsWithProject(self):
         # Called by FGDocument just before save
+        uiSettings = {}
+
         (x, y), (w, h) = self.w._window.frame()
-        uiSettings = self.project.uiSettings
         uiSettings["windowPosition"] = [x, y, w, h]
         uiSettings["fontListItemSize"] = self.fontList.itemSize
 
-        uiSettings["characterListVisible"] = not self.w.mainSplitView.isPaneVisible("characterList")
-        uiSettings["glyphListVisible"] = not self.subSplitView.isPaneVisible("glyphList")
-        uiSettings["compileOutputVisible"] = not self.fontListSplitView.isPaneVisible("compileOutput")
-        uiSettings["formattingOptionsVisible"] = not self.w.mainSplitView.isPaneVisible("formattingOptions")
+        uiSettings["characterListVisible"] = self.w.mainSplitView.isPaneReallyVisible("characterList")
+        uiSettings["characterListSize"] = self.w.mainSplitView.paneSize("characterList")
+        uiSettings["glyphListVisible"] = self.subSplitView.isPaneReallyVisible("glyphList")
+        uiSettings["glyphListSize"] = self.subSplitView.paneSize("glyphList")
+        uiSettings["compileOutputVisible"] = self.fontListSplitView.isPaneReallyVisible("compileOutput")
+        uiSettings["compileOutput"] = self.fontListSplitView.paneSize("compileOutput")
+        uiSettings["formattingOptionsVisible"] = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
+
+        self.project.uiSettings = uiSettings
 
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
@@ -237,7 +244,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(view=self.compileOutput, identifier="compileOutput", canCollapse=True,
                  size=80, minSize=30, resizeFlexibility=False),
         ]
-        self.fontListSplitView = SplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
+        self.fontListSplitView = MySplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
                                            isVertical=False)
         if not self.project.uiSettings.get("compileOutputVisible", True):
             self.fontListSplitView.togglePane("compileOutput")
@@ -913,13 +920,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         isVisible = None
         findReplace = ["Hide", "Show"]
         if action == "showCharacterList:":
-            isVisible = not self.w.mainSplitView.isPaneVisible("characterList")
+            isVisible = self.w.mainSplitView.isPaneReallyVisible("characterList")
         elif action == "showGlyphList:":
-            isVisible = not self.subSplitView.isPaneVisible("glyphList")
+            isVisible = self.subSplitView.isPaneReallyVisible("glyphList")
         elif action == "showCompileOutput:":
-            isVisible = not self.fontListSplitView.isPaneVisible("compileOutput")
+            isVisible = self.fontListSplitView.isPaneReallyVisible("compileOutput")
         elif action == "showFormattingOptions:":
-            isVisible = not self.w.mainSplitView.isPaneVisible("formattingOptions")
+            isVisible = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
         elif action in ("previousTextLine:", "nextTextLine:"):
             return bool(self.textEntry.textFilePath)
         elif action == "copy:":
@@ -1186,6 +1193,20 @@ class TextEntryGroup(Group):
 
     def updateStepper(self):
         self.stepper.set(len(self.lines) - 1 - self.textFileIndex)
+
+
+class MySplitView(SplitView):
+
+    def isPaneReallyVisible(self, paneIdentifier):
+        return not self.isPaneVisible(paneIdentifier)
+
+    def paneSize(self, paneIdentifier):
+        view = self._identifierToPane[paneIdentifier]["view"]
+        w, h = view._nsObject.frame().size
+        if self._nsObject.isVertical():
+            return w
+        else:
+            return h
 
 
 _minimalSpaceBox = 12
