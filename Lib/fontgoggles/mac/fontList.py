@@ -538,8 +538,9 @@ class FontList(Group):
         # list itself the first responder and all is fine.
         self._nsObject.window().makeFirstResponder_(self._nsObject)
         with recordChanges(self.projectProxy, title="Remove Fonts"):
+            fontsProxy = self.projectProxy.fonts
             for index in indicesToDelete:
-                del self.projectProxy[index]
+                del fontsProxy[index]
 
     def refitFontItems(self):
         if hasattr(self, "dropFontsPlaceHolder"):
