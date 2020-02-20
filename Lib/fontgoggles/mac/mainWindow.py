@@ -137,6 +137,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # Called by FGDocument just before save
         (x, y), (w, h) = self.w._window.frame()
         self.project.uiState["windowPosition"] = [x, y, w, h]
+        self.project.uiState["fontListItemSize"] = self.fontList.itemSize
 
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
@@ -206,7 +207,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self.textEntry = TextEntryGroup((0, 0, 0, 45), callback=self.textEntryChangedCallback)
-        self.fontList = FontList(self.project, self.projectProxy, 300, self.defaultFontItemSize,
+        itemSize = self.project.uiState.get("fontListItemSize", self.defaultFontItemSize)
+        self.fontList = FontList(self.project, self.projectProxy, 300, itemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
