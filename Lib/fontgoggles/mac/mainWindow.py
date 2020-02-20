@@ -87,9 +87,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontListGroup = self.setupFontListGroup()
         sidebarGroup = self.setupSidebarGroup()
 
+        glyphListSize = self.project.uiSettings.get("glyphListSize", 230)
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="glyphList", canCollapse=True,
-                 size=230, minSize=80, resizeFlexibility=False),
+                 size=glyphListSize, minSize=80, resizeFlexibility=False),
             dict(view=fontListGroup, identifier="fontList", canCollapse=False,
                  size=200),
         ]
@@ -99,9 +100,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.subSplitView = subSplitView
 
 
+        characterListSize = self.project.uiSettings.get("characterListSize", 100)
         paneDescriptors = [
             dict(view=unicodeListGroup, identifier="characterList", canCollapse=True,
-                 size=100, minSize=100, resizeFlexibility=False),
+                 size=characterListSize, minSize=100, resizeFlexibility=False),
             dict(view=subSplitView, identifier="subSplit", canCollapse=False),
             dict(view=sidebarGroup, identifier="formattingOptions", canCollapse=True,
                  size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth,
@@ -154,7 +156,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings["glyphListVisible"] = self.subSplitView.isPaneReallyVisible("glyphList")
         uiSettings["glyphListSize"] = self.subSplitView.paneSize("glyphList")
         uiSettings["compileOutputVisible"] = self.fontListSplitView.isPaneReallyVisible("compileOutput")
-        uiSettings["compileOutput"] = self.fontListSplitView.paneSize("compileOutput")
+        uiSettings["compileOutputSize"] = self.fontListSplitView.paneSize("compileOutput")
         uiSettings["formattingOptionsVisible"] = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
 
         self.project.uiSettings = uiSettings
@@ -238,11 +240,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.compileOutput = OutputText((0, 0, 0, 0))
 
+        compileOutputSize = self.project.uiSettings.get("compileOutputSize", 80)
         paneDescriptors = [
             dict(view=self._fontListScrollView, identifier="fontList", canCollapse=False,
                  size=230, minSize=150),
             dict(view=self.compileOutput, identifier="compileOutput", canCollapse=True,
-                 size=80, minSize=30, resizeFlexibility=False),
+                 size=compileOutputSize, minSize=30, resizeFlexibility=False),
         ]
         self.fontListSplitView = MySplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
                                            isVertical=False)
