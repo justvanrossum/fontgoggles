@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from distutils.command.build import build as _build
+import re
 from setuptools import setup, find_packages
 import subprocess
 
@@ -11,9 +12,16 @@ class build(_build):
         _build.run(self)
 
 
+_versionRE = re.compile(r'__version__\s*=\s*\"([^\"]+)\"')
+with open('Lib/fontgoggles/__init__.py', "r") as fg_init:
+    match = _versionRE.search(fg_init.read())
+    assert match is not None, "fontgoggles.__version__ not found"
+    fg_version = match.group(1)
+
+
 setup(
     name="fontgoggles",
-    version="0.9.1",
+    version=fg_version,
     description="fontgoggles is the main library for the FontGoggles application.",
     author="Just van Rossum",
     author_email="justvanrossum@gmail.com",
