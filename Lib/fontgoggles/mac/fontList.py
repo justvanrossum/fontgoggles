@@ -236,23 +236,23 @@ class FGFontListView(AppKit.NSView):
     @suppressAndLogException
     def undo_(self, sender):
         fontList = self.vanillaWrapper()
-        undoChanges(fontList.projectFontsProxy)
+        undoChanges(fontList.projectProxy)
 
     @suppressAndLogException
     def redo_(self, sender):
         fontList = self.vanillaWrapper()
-        redoChanges(fontList.projectFontsProxy)
+        redoChanges(fontList.projectProxy)
 
     @suppressAndLogException
     def validateMenuItem_(self, sender):
         if sender.action() == "undo:":
             fontList = self.vanillaWrapper()
-            info = undoInfo(fontList.projectFontsProxy)
+            info = undoInfo(fontList.projectProxy)
             sender.setTitle_(_makeUndoTitle("Undo", info))
             return info is not None
         elif sender.action() == "redo:":
             fontList = self.vanillaWrapper()
-            info = redoInfo(fontList.projectFontsProxy)
+            info = redoInfo(fontList.projectProxy)
             sender.setTitle_(_makeUndoTitle("Redo", info))
             return info is not None
         elif sender.action() == "delete:":
@@ -293,7 +293,7 @@ class FontList(Group):
 
     nsViewClass = FGFontListView
 
-    def __init__(self, project, projectFontsProxy, width, itemSize, relativeFontSize=0.7, relativeHBaseline=0.25,
+    def __init__(self, project, projectProxy, width, itemSize, relativeFontSize=0.7, relativeHBaseline=0.25,
                  relativeVBaseline=0.5, relativeMargin=0.1, selectionChangedCallback=None,
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
@@ -311,7 +311,7 @@ class FontList(Group):
         self._arrowKeyCallback = arrowKeyCallback
         self._lastItemClicked = None
         self.project = project
-        self.projectFontsProxy = projectFontsProxy
+        self.projectProxy = projectProxy
         self.setupFontItems()
 
     def _glyphSelectionChanged(self):
@@ -489,15 +489,16 @@ class FontList(Group):
     @suppressAndLogException
     def insertFonts(self, items, index):
         addedIndices = []
-        with recordChanges(self.projectFontsProxy, title="Insert Fonts"):
+        with recordChanges(self.projectProxy, title="Insert Fonts"):
             for fontPath, fontNumber, fontItemIdentifier in items:
                 if fontNumber is None:
                     subItems = sortedFontPathsAndNumbers([fontPath], defaultSortSpec)
                 else:
                     subItems = [(fontPath, fontNumber)]
+                fontsProxy = self.projectProxy.fonts
                 for fontPath, fontNumber in subItems:
                     fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
-                    self.projectFontsProxy.insert(index, fontItemInfo)
+                    fontsProxy.insert(index, fontItemInfo)
                     addedIndices.append(index)
                     index += 1
         self.scrollSelectionToVisible(addedIndices)
@@ -523,10 +524,11 @@ class FontList(Group):
             # Nothing moved
             return
 
-        with recordChanges(self.projectFontsProxy, title="Reorder Fonts"):
+        with recordChanges(self.projectProxy, title="Reorder Fonts"):
             itemDict = {item.identifier: item for item in self.project.fonts}
+            fontsProxy = self.projectProxy.fonts
             for i, itemIdentifier in enumerate(movedItems):
-                self.projectFontsProxy[i] = itemDict[itemIdentifier]
+                fontsProxy[i] = itemDict[itemIdentifier]
         self.selection = selection
 
     def removeSelectedFontItems(self):
@@ -535,9 +537,9 @@ class FontList(Group):
         # get deleted, so it can't stay first responder. Make the font
         # list itself the first responder and all is fine.
         self._nsObject.window().makeFirstResponder_(self._nsObject)
-        with recordChanges(self.projectFontsProxy, title="Remove Fonts"):
+        with recordChanges(self.projectProxy, title="Remove Fonts"):
             for index in indicesToDelete:
-                del self.projectFontsProxy[index]
+                del self.projectProxy[index]
 
     def refitFontItems(self):
         if hasattr(self, "dropFontsPlaceHolder"):

@@ -73,7 +73,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def __init__(self, project):
         self.project = project
-        self.projectFontsProxy = makeUndoProxy(self.project.fonts, self._projectFontsChanged)
+        self.projectProxy = makeUndoProxy(self.project, self._projectFontsChanged)
         self.observedPaths = {}
         self.defaultFontItemSize = 150
         self.alignmentOverride = None
@@ -187,7 +187,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self.textEntry = TextEntryGroup((0, 0, 0, 45), callback=self.textEntryChangedCallback)
-        self.fontList = FontList(self.project, self.projectFontsProxy, 300, self.defaultFontItemSize,
+        self.fontList = FontList(self.project, self.projectProxy, 300, self.defaultFontItemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
