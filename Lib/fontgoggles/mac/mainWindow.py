@@ -108,7 +108,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.w = Window((1400, 700), "FontGoggles", minSize=(900, 500), autosaveName="FontGogglesWindow",
                         fullScreenMode="primary")
-        self.restoreWindowPosition(self.project.uiState.get("windowPosition"))
+        self.restoreWindowPosition(self.project.uiSettings.get("windowPosition"))
 
         self.w.mainSplitView = mainSplitView
         self.w.open()
@@ -133,11 +133,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def windowTitleForDocumentDisplayName_(self, displayName):
         return f"FontGoggles — {displayName}"
 
-    def syncUIStateWithProject(self):
+    def syncUISettingsWithProject(self):
         # Called by FGDocument just before save
         (x, y), (w, h) = self.w._window.frame()
-        self.project.uiState["windowPosition"] = [x, y, w, h]
-        self.project.uiState["fontListItemSize"] = self.fontList.itemSize
+        self.project.uiSettings["windowPosition"] = [x, y, w, h]
+        self.project.uiSettings["fontListItemSize"] = self.fontList.itemSize
 
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
@@ -207,7 +207,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         self.textEntry = TextEntryGroup((0, 0, 0, 45), callback=self.textEntryChangedCallback)
-        itemSize = self.project.uiState.get("fontListItemSize", self.defaultFontItemSize)
+        itemSize = self.project.uiSettings.get("fontListItemSize", self.defaultFontItemSize)
         self.fontList = FontList(self.project, self.projectProxy, 300, itemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
