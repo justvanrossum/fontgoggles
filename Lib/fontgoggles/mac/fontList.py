@@ -509,15 +509,12 @@ class FontList(Group):
         movingItems = [fontItemIdentifier for fontPath, fontNumber, fontItemIdentifier in items]
         movingItemsSet = set(movingItems)
         movedItems = []
-        selection = set()
         for i, identifier in enumerate(allItems):
             if i == index:
-                selection.update(range(len(movedItems), len(movedItems) + len(movingItems)))
                 movedItems.extend(movingItems)
             if identifier not in movingItemsSet:
                 movedItems.append(identifier)
         if index >= len(allItems):
-            selection.update(range(len(movedItems), len(movedItems) + len(movingItems)))
             movedItems.extend(movingItems)
         assert len(movedItems) == len(allItems)
         if allItems == movedItems:
@@ -525,11 +522,12 @@ class FontList(Group):
             return
 
         with recordChanges(self.projectProxy, title="Reorder Fonts"):
+            self.projectProxy.fontSelection = self.selection
             itemDict = {item.identifier: item for item in self.project.fonts}
             fontsProxy = self.projectProxy.fonts
             for i, itemIdentifier in enumerate(movedItems):
                 fontsProxy[i] = itemDict[itemIdentifier]
-        self.selection = selection
+        self.selection = set(movingItems)
 
     def removeSelectedFontItems(self):
         indicesToDelete = sorted(self.selection, reverse=True)
@@ -599,30 +597,22 @@ class FontList(Group):
     def selection(self, newSelection):
         diffSelection = self._selection ^ newSelection
         self._selection = newSelection
-        for index in diffSelection:
-            fontItem = self.getFontItem(self.project.fonts[index].identifier)
+        for identifier in diffSelection:
+            fontItem = self.getFontItem(identifier)
             fontItem.selected = not fontItem.selected
         if self._selectionChangedCallback is not None:
             self._selectionChangedCallback(self)
 
     @property
-    def selectionKeys(self):
-        return {self.project.fonts[index].identifier for index in self.selection}
+    def selectionIndices(self):
+        return {index for index, fii in enumerate(self.project.fonts) if fii.identifier in self._selection}
 
-    @selectionKeys.setter
-    def selectionKeys(self, newSelection):
-        self.selection = {index for index, fii in enumerate(self.project.fonts)
-                          if fii.identifier in newSelection}
+    @selectionIndices.setter
+    def selectionIndices(self, newSelection):
+        self.selection = {self.project.fonts[index].identifier for index in newSelection}
 
     def selectAll(self):
-        self.selection = set(range(len(self.project.fonts)))
-
-    def resetSelection(self):
-        self._selection = set()
-        for fontItem in self.iterFontItems():
-            fontItem.selected = False
-        if self._selectionChangedCallback is not None:
-            self._selectionChangedCallback(self)
+        self.selection = {fii.identifier for fii in self.project.fonts}
 
     def getFontItem(self, fontItemIdentifier):
         return getattr(self, fontItemIdentifier)
@@ -637,15 +627,15 @@ class FontList(Group):
         if len(self.project.fonts) == 1:
             return self.getFontItemByIndex(0)
         elif len(self.selection) == 1:
-            index = list(self.selection)[0]
-            return self.getFontItemByIndex(index)
+            identifier = list(self.selection)[0]
+            return self.getFontItem(identifier)
         else:
             return None
 
     def _getSelectionRect(self, selection):
         selRect = None
-        for index in selection:
-            fontItem = self.getFontItemByIndex(index)
+        for identifier in selection:
+            fontItem = self.getFontItem(identifier)
             if selRect is None:
                 selRect = fontItem._nsObject.frame()
             else:
@@ -659,7 +649,7 @@ class FontList(Group):
 
     def scrollGlyphSelectionToVisible(self):
         if self.selection:
-            fontItems = (self.getFontItemByIndex(index) for index in self.selection)
+            fontItems = (self.getFontItem(identifier) for identifier in self.selection)
         else:
             fontItems = (self.getFontItem(fiInfo.identifier) for fiInfo in self.project.fonts)
         rects = []
@@ -684,8 +674,10 @@ class FontList(Group):
         clickedIndex = self._lastItemClicked
         assert clickedIndex is not None
         if clickedIndex not in self.selection:
-            self.selection = {clickedIndex}
-        items = [self.project.fonts[i] for i in sorted(self.selection)]
+            self.selection = {self.project.fonts[clickedIndex].identifier}
+        selectedIndices = {i for i, fii in enumerate(self.project.fonts)
+                           if fii.identifier in self.selection}
+        items = [self.project.fonts[i] for i in sorted(selectedIndices)]
         dragItems = []
         xOffset = yOffset = 0
         for item in items:
@@ -722,7 +714,7 @@ class FontList(Group):
         if index is not None:
             fontItem = self.getFontItemByIndex(index)
             glyphSelectionChanged = bool(fontItem.popDiffSelection())
-            clickedSelection = {index}
+            clickedSelection = {self.project.fonts[index].identifier}
         else:
             for fontItem in self.iterFontItems():
                 fontItem.selection = set()
@@ -753,20 +745,20 @@ class FontList(Group):
                 return True
 
             numFontItems = len(self.project.fonts)
-            if not self._selection:
+            if not self.selectionIndices:
                 if direction == 1:
-                    self.selection = {0}
+                    self.selectionIndices = {0}
                 else:
-                    self.selection = {numFontItems - 1}
+                    self.selectionIndices = {numFontItems - 1}
             else:
                 if direction == 1:
-                    index = min(numFontItems - 1, max(self._selection) + 1)
+                    index = min(numFontItems - 1, max(self.selectionIndices) + 1)
                 else:
-                    index = max(0, min(self._selection) - 1)
+                    index = max(0, min(self.selectionIndices) - 1)
                 if event.modifierFlags() & AppKit.NSEventModifierFlagShift:
-                    self.selection = self.selection | {index}
+                    self.selectionIndices = self.selectionIndices | {index}
                 else:
-                    self.selection = {index}
+                    self.selectionIndices = {index}
             self.scrollSelectionToVisible()
             return True
         return False

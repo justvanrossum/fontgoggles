@@ -355,11 +355,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.fontList.purgeFontItems()
             self.project.purgeFonts()
         fontItemsNeedingTextUpdate = self.fontList.refitFontItems()
-        # TODO: Consider keeping selection, which can only work if we store
-        # the selection as a set of identifiers instead of indices, because
-        # once we get here the indices are no longer valid, hence the need
-        # to completely reset the selection.
-        self.fontList.resetSelection()
+        self.fontList.selection = self.project.fontSelection
+
         # TODO: rethink factorization of the next bit.
         # - refitFontItems() added new items
         # - the font for the new item may or may not be loaded
