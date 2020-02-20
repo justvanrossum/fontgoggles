@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [0.9.3] - 2020-02-??
+
+- When performing undo/redo in the font list, also take the selection into account.
+
 ## [0.9.2] - 2020-02-19
 
 - Fixed drag and drop bug on macOS 10.10
