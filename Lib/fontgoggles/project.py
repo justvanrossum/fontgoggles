@@ -43,8 +43,8 @@ class Project:
             relFontPath = os.path.relpath(fontPath, rootPath)
             fontItemInfoDict = dict(path=relFontPath, fontNumber=fontNumber)
             root["fonts"].append(fontItemInfoDict)
-        root["uiSettings"] = self.uiSettings
         root["textSettings"] = self.textSettings
+        root["uiSettings"] = self.uiSettings
         return root
 
     def addFont(self, path: PathLike, fontNumber: int, index=None):
