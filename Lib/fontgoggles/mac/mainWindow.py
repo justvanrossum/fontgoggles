@@ -82,7 +82,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._callbackRecursionLock = 0
         self._previouslySingleSelectedItem = None
 
-        unicodeListGroup = self.setupUnicodeListGroup()
+        characterListGroup = self.setupCharacterListGroup()
         glyphListGroup = self.setupGlyphListGroup()
         fontListGroup = self.setupFontListGroup()
         sidebarGroup = self.setupSidebarGroup()
@@ -102,7 +102,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         characterListSize = self.project.uiSettings.get("characterListSize", 100)
         paneDescriptors = [
-            dict(view=unicodeListGroup, identifier="characterList", canCollapse=True,
+            dict(view=characterListGroup, identifier="characterList", canCollapse=True,
                  size=characterListSize, minSize=100, resizeFlexibility=False),
             dict(view=subSplitView, identifier="subSplit", canCollapse=False),
             dict(view=sidebarGroup, identifier="formattingOptions", canCollapse=True,
@@ -174,7 +174,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         window.setFrame_display_(((x, y), (w, h)), True)
 
     @objc.python_method
-    def setupUnicodeListGroup(self):
+    def setupCharacterListGroup(self):
         group = Group((0, 0, 0, 0))
         columnDescriptions = [
             # dict(title="index", width=34, cell=makeTextCell("right")),
@@ -183,20 +183,20 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(title="unicode name", width=200, minWidth=200, maxWidth=400, key="unicodeName",
                  cell=makeTextCell("left", "truncmiddle")),
         ]
-        self.unicodeList = List((0, 40, 0, 0), [],
+        self.characterList = List((0, 40, 0, 0), [],
                                 columnDescriptions=columnDescriptions,
                                 allowsSorting=False, drawFocusRing=False, rowHeight=20,
-                                selectionCallback=self.unicodeListSelectionChangedCallback)
-        self.unicodeList._tableView.setAllowsColumnSelection_(True)
-        self.unicodeList._tableView.setDelegate_(self)
-        self.unicodeShowBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
-                                                callback=self.unicodeShowBiDiCheckBoxCallback)
-        self.unicodeShowBiDiCheckBox._nsObject.setToolTip_(
+                                selectionCallback=self.characterListSelectionChangedCallback)
+        self.characterList._tableView.setAllowsColumnSelection_(True)
+        self.characterList._tableView.setDelegate_(self)
+        self.showBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
+                                                callback=self.showBiDiCheckBoxCallback)
+        self.showBiDiCheckBox._nsObject.setToolTip_(
             "If this option is on, you see the result of Bi-Directional processing "
             "in the list below, instead of the original text. It does not affect "
             "the rendered text.")
-        group.unicodeShowBiDiCheckBox = self.unicodeShowBiDiCheckBox
-        group.unicodeList = self.unicodeList
+        group.showBiDiCheckBox = self.showBiDiCheckBox
+        group.characterList = self.characterList
         return group
 
     @objc.python_method
@@ -500,11 +500,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         return self.fontList.iterFontItemInfoAndItems()
 
     @objc.python_method
-    def unicodeShowBiDiCheckBoxCallback(self, sender):
-        self.updateUnicodeList()
+    def showBiDiCheckBoxCallback(self, sender):
+        self.updateCharacterList()
 
     @asyncTaskAutoCancel
-    async def textEntryChangedCallback(self, sender, updateUnicodeList=True):
+    async def textEntryChangedCallback(self, sender, updateCharacterList=True):
         if not hasattr(self, "directionPopUp"):
             # Our window already closed, and our poor async task is too
             # late. Nothing left to do.
@@ -524,13 +524,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             self.updateTextEntryAlignment(align)
 
-        if updateUnicodeList:
+        if updateCharacterList:
             # Immediately reset selection, so that delayed async clients
             # won't get a stale selection.
-            self.unicodeList.setSelection([])
-            self.updateUnicodeList(delay=0.05)
+            self.characterList.setSelection([])
+            self.updateCharacterList(delay=0.05)
         else:
-            charSelection = self.unicodeList.getSelection()
+            charSelection = self.characterList.getSelection()
         t = time.time()
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
             self.setFontItemText(fontItemInfo, fontItem)
@@ -541,9 +541,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 t = time.time()
         self.growOrShrinkFontList()
         self.fontListSelectionChangedCallback(self.fontList)
-        if not updateUnicodeList:
-            self.unicodeList.setSelection(charSelection)
-            self.unicodeListSelectionChangedCallback(self.unicodeList)
+        if not updateCharacterList:
+            self.characterList.setSelection(charSelection)
+            self.characterListSelectionChangedCallback(self.characterList)
 
     @objc.python_method
     def setFontItemText(self, fontItemInfo, fontItem):
@@ -560,7 +560,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         addBoundingBoxes(glyphs)
         fontItem.glyphs = glyphs
-        charSelection = self.unicodeList.getSelection()
+        charSelection = self.characterList.getSelection()
         if charSelection:
             with self.blockCallbackRecursion():
                 fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charSelection)
@@ -622,14 +622,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 self.glyphList.setSelection(fontItem.selection)
 
     @asyncTaskAutoCancel
-    async def updateUnicodeList(self, selection=None, delay=0):
-        if not hasattr(self, "unicodeShowBiDiCheckBox"):
+    async def updateCharacterList(self, selection=None, delay=0):
+        if not hasattr(self, "showBiDiCheckBox"):
             # Window closed before we got to run
             return
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
-        if self.unicodeShowBiDiCheckBox.get():
+        if self.showBiDiCheckBox.get():
             txt = self.textInfo.text
         else:
             txt = self.textInfo.originalText
@@ -639,9 +639,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 dict(index=index, char=char, unicode=f"U+{ord(char):04X}",
                      unicodeName=unicodedata.name(char, "?"))
             )
-        self.unicodeList.set(uniListData)
+        self.characterList.set(uniListData)
         if selection is not None:
-            self.unicodeList.setSelection(selection)
+            self.characterList.setSelection(selection)
 
     @objc.python_method
     def fontListSelectionChangedCallback(self, sender):
@@ -650,7 +650,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self._previouslySingleSelectedItem.setAuxillaryOutput(None)
         if fontItem is not None:
             glyphs = fontItem.glyphs
-            self.updateUnicodeListSelection(fontItem)
+            self.updateCharacterListSelection(fontItem)
             self.compileOutput.set(fontItem.getCompileOutput())
             fontItem.setAuxillaryOutput(self.compileOutput)
         else:
@@ -665,7 +665,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         selectedFontItem = sender.getSingleSelectedItem()
         if selectedFontItem is None:
-            self.unicodeList.setSelection([])
+            self.characterList.setSelection([])
             return
         if selectedFontItem.glyphs is not None:
             charIndices = selectedFontItem.glyphs.mapGlyphsToChars(selectedFontItem.selection)
@@ -676,7 +676,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             for fontItem in self.iterFontItems():
                 if fontItem is selectedFontItem:
                     self.glyphList.setSelection(fontItem.selection)
-                    self.updateUnicodeListSelection(fontItem)
+                    self.updateCharacterListSelection(fontItem)
                 elif fontItem.glyphs is not None:
                     fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
 
@@ -686,18 +686,18 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             event = transposeArrowKeyEvent(event)
         if len(self.glyphList) > 0:
             self.glyphList._nsObject.documentView().keyDown_(event)
-        elif len(self.unicodeList) > 0:
+        elif len(self.characterList) > 0:
             if self.textInfo.text == self.textInfo.originalText:
                 # Either automatic direction (by bidi algo + HB) or explicit
                 # reversal of direction
                 if (self.textInfo.directionForShaper is None and self.textInfo.baseDirection == "R") \
                         or self.textInfo.directionForShaper in ("RTL", "BTT"):
                     event = flipArrowKeyEvent(event)
-                self.unicodeList._nsObject.documentView().keyDown_(event)
-            elif self.unicodeShowBiDiCheckBox.get():
+                self.characterList._nsObject.documentView().keyDown_(event)
+            elif self.showBiDiCheckBox.get():
                 # We're showing post-BiDi characters, which should lign up
                 # with our glyphs
-                self.unicodeList._nsObject.documentView().keyDown_(event)
+                self.characterList._nsObject.documentView().keyDown_(event)
             else:
                 # BiDi processing is on, and we're looking at the original
                 # text sequence (before BiDi processing). We convert our
@@ -709,10 +709,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     direction = -1
                 else:
                     direction = 1
-                charSelection = self.unicodeList.getSelection()
+                charSelection = self.characterList.getSelection()
                 if not charSelection:
                     if direction == -1:
-                        newCharselection = [len(self.unicodeList) - 1]
+                        newCharselection = [len(self.characterList) - 1]
                     else:
                         newCharselection = [0]
                 else:
@@ -720,11 +720,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     if direction == -1:
                         newCharselection = [max(0, min(charSelection) - 1)]
                     else:
-                        newCharselection = [min(len(self.unicodeList) - 1, max(charSelection) + 1)]
+                        newCharselection = [min(len(self.characterList) - 1, max(charSelection) + 1)]
                 newCharselection = self.textInfo.mapFromBiDi(newCharselection)
                 if event.modifierFlags() & AppKit.NSEventModifierFlagShift:
-                    newCharselection = set(newCharselection + self.unicodeList.getSelection())
-                self.unicodeList.setSelection(newCharselection)
+                    newCharselection = set(newCharselection + self.characterList.getSelection())
+                self.characterList.setSelection(newCharselection)
         self.fontList.scrollGlyphSelectionToVisible()
 
     @objc.python_method
@@ -744,31 +744,31 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             for fontItem in self.iterFontItems():
                 if fontItem is selectedFontItem:
                     fontItem.selection = set(glyphIndices)
-                    self.updateUnicodeListSelection(fontItem)
+                    self.updateCharacterListSelection(fontItem)
                 elif fontItem.glyphs is not None:
                     fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
         self.fontList.scrollGlyphSelectionToVisible()
 
     @objc.python_method
-    def updateUnicodeListSelection(self, fontItem):
+    def updateCharacterListSelection(self, fontItem):
         if fontItem.glyphs is None:
             return
         charIndices = fontItem.glyphs.mapGlyphsToChars(fontItem.selection)
 
-        if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
+        if self.textInfo.shouldApplyBiDi and not self.showBiDiCheckBox.get():
             charIndices = self.textInfo.mapFromBiDi(charIndices)
 
         with self.blockCallbackRecursion():
-            self.unicodeList.setSelection(charIndices)
+            self.characterList.setSelection(charIndices)
 
     @objc.python_method
-    def unicodeListSelectionChangedCallback(self, sender):
+    def characterListSelectionChangedCallback(self, sender):
         if self._callbackRecursionLock:
             return
         selectedFontItem = self.fontList.getSingleSelectedItem()
 
         charIndices = set(sender.getSelection())
-        if self.textInfo.shouldApplyBiDi and not self.unicodeShowBiDiCheckBox.get():
+        if self.textInfo.shouldApplyBiDi and not self.showBiDiCheckBox.get():
             charIndices = self.textInfo.mapToBiDi(charIndices)
 
         with self.blockCallbackRecursion():
@@ -784,7 +784,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def directionPopUpCallback(self, sender):
         popupValue = sender.get()
-        self.unicodeShowBiDiCheckBox.enable(popupValue == 0)
+        self.showBiDiCheckBox.enable(popupValue == 0)
         vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
         self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
         self.fontList.vertical = vertical
@@ -834,21 +834,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             newSelectedIndex = 0
         self.languagesPopup.setItems(languages)
         self.languagesPopup.set(newSelectedIndex)
-        self.textEntryChangedCallback(self.textEntry, updateUnicodeList=False)
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
     def languagesPopupCallback(self, sender):
-        self.textEntryChangedCallback(self.textEntry, updateUnicodeList=False)
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
     def featuresChanged(self, sender):
         self.featureState = self.featuresGroup.get()
-        self.textEntryChangedCallback(self.textEntry, updateUnicodeList=False)
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
     def varLocationChanged(self, sender):
         self.varLocation = {k: v for k, v in sender.get().items() if v is not None}
-        self.textEntryChangedCallback(self.textEntry, updateUnicodeList=False)
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
     def relativeSizeChangedCallback(self, sender):
@@ -934,7 +934,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return bool(self.textEntry.textFilePath)
         elif action == "copy:":
             return self.w._window.firstResponder() in (self.glyphList._tableView,
-                                                       self.unicodeList._tableView)
+                                                       self.characterList._tableView)
         if isVisible is not None:
             if isVisible:
                 findReplace.reverse()
