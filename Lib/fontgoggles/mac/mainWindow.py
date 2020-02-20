@@ -92,7 +92,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(view=glyphListGroup, identifier="glyphList", canCollapse=True,
                  size=glyphListSize, minSize=80, resizeFlexibility=False),
             dict(view=fontListGroup, identifier="fontList", canCollapse=False,
-                 size=200),
+                 size=200, minSize=160),
         ]
         subSplitView = MySplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
         if not self.project.uiSettings.get("glyphListVisible", True):
