@@ -99,7 +99,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             subSplitView.togglePane("glyphList")
         self.subSplitView = subSplitView
 
-
         characterListSize = self.project.uiSettings.get("characterListSize", 100)
         paneDescriptors = [
             dict(view=characterListGroup, identifier="characterList", canCollapse=True,
@@ -184,13 +183,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  cell=makeTextCell("left", "truncmiddle")),
         ]
         self.characterList = List((0, 40, 0, 0), [],
-                                columnDescriptions=columnDescriptions,
-                                allowsSorting=False, drawFocusRing=False, rowHeight=20,
-                                selectionCallback=self.characterListSelectionChangedCallback)
+                                  columnDescriptions=columnDescriptions,
+                                  allowsSorting=False, drawFocusRing=False, rowHeight=20,
+                                  selectionCallback=self.characterListSelectionChangedCallback)
         self.characterList._tableView.setAllowsColumnSelection_(True)
         self.characterList._tableView.setDelegate_(self)
         self.showBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
-                                                callback=self.showBiDiCheckBoxCallback)
+                                         callback=self.showBiDiCheckBoxCallback)
         self.showBiDiCheckBox._nsObject.setToolTip_(
             "If this option is on, you see the result of Bi-Directional processing "
             "in the list below, instead of the original text. It does not affect "
@@ -248,7 +247,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  size=compileOutputSize, minSize=30, resizeFlexibility=False),
         ]
         self.fontListSplitView = MySplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
-                                           isVertical=False)
+                                             isVertical=False)
         if not self.project.uiSettings.get("compileOutputVisible", True):
             self.fontListSplitView.togglePane("compileOutput")
 
