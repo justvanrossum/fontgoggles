@@ -530,7 +530,7 @@ class FontList(Group):
         self.selection = set(movingItems)
 
     def removeSelectedFontItems(self):
-        indicesToDelete = sorted(self.selection, reverse=True)
+        indicesToDelete = sorted(self.selectionIndices, reverse=True)
         # One of the font list items is first responder, but it will
         # get deleted, so it can't stay first responder. Make the font
         # list itself the first responder and all is fine.
@@ -598,8 +598,12 @@ class FontList(Group):
         diffSelection = self._selection ^ newSelection
         self._selection = newSelection
         for identifier in diffSelection:
-            fontItem = self.getFontItem(identifier)
-            fontItem.selected = not fontItem.selected
+            try:
+                fontItem = self.getFontItem(identifier)
+            except AttributeError:
+                pass  # item no longer exists, it's fine
+            else:
+                fontItem.selected = not fontItem.selected
         if self._selectionChangedCallback is not None:
             self._selectionChangedCallback(self)
 
