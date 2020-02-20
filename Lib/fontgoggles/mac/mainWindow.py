@@ -356,6 +356,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.project.purgeFonts()
         fontItemsNeedingTextUpdate = self.fontList.refitFontItems()
         self.fontList.selection = self.project.fontSelection
+        self.fontList.ensureFirstResponder()
 
         # TODO: rethink factorization of the next bit.
         # - refitFontItems() added new items
