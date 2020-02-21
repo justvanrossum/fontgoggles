@@ -238,6 +238,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         itemSize = self.project.uiSettings.fontListItemSize
         vertical = self.project.textSettings.direction in {"TTB", "BTT"}
         self.fontList = FontList(self.project, self.projectProxy, 300, itemSize, vertical=vertical,
+                                 relativeFontSize=self.project.textSettings.relativeFontSize,
+                                 relativeHBaseline=self.project.textSettings.relativeHBaseline,
+                                 relativeVBaseline=self.project.textSettings.relativeVBaseline,
+                                 relativeMargin=self.project.textSettings.relativeMargin,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
@@ -284,15 +288,24 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                                 borderType=AppKit.NSNoBorder)
 
         optionsTab = group.feaVarTabs[2]
-        # TODO initial value from where?
+        vertical = self.project.textSettings.direction in {"TTB", "BTT"}
+        relativeFontSize = self.project.textSettings.relativeFontSize * 100
+        if vertical:
+            relativeBaseline = self.project.textSettings.relativeVBaseline * 100
+        else:
+            relativeBaseline = self.project.textSettings.relativeHBaseline * 100
+        relativeMargin = self.project.textSettings.relativeMargin * 100
         y = 10
-        optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Relative Size", 25, 70, 125,
+        optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Relative Size",
+                                                   25, relativeFontSize, 125,
                                                    callback=self.relativeSizeChangedCallback)
         y += 50
-        optionsTab.relativeBaselineSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Baseline", 0, 25, 100,
+        optionsTab.relativeBaselineSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Baseline",
+                                                       0, relativeBaseline, 100,
                                                        callback=self.relativeBaselineChangedCallback)
         y += 50
-        optionsTab.relativeMarginSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Margin", 0, 10, 100,
+        optionsTab.relativeMarginSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Margin",
+                                                     0, relativeMargin, 100,
                                                      callback=self.relativeMarginChangedCallback)
         y += 50
 
@@ -891,7 +904,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if not hasattr(self, "fontList"):
             # Happens when the window is closing and the text field of the slider has focus
             return
-        self.fontList.relativeFontSize = sender.get() / 100
+        self.fontList.relativeFontSize = self.project.textSettings.relativeFontSize = sender.get() / 100
         self.growOrShrinkFontList()
 
     @objc.python_method
@@ -901,8 +914,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         value = sender.get() / 100
         if self.fontList.vertical:
+            self.project.textSettings.relativeVBaseline = value
             self.fontList.relativeVBaseline = value
         else:
+            self.project.textSettings.relativeHBaseline = value
             self.fontList.relativeHBaseline = value
 
     @objc.python_method
@@ -910,7 +925,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if not hasattr(self, "fontList"):
             # Happens when the window is closing and the text field of the slider has focus
             return
-        self.fontList.relativeMargin = sender.get() / 100
+        self.fontList.relativeMargin = self.project.textSettings.relativeMargin = sender.get() / 100
         self.growOrShrinkFontList()
 
     @objc.python_method

@@ -195,6 +195,10 @@ class TextSettings:
     textFileIndex: int = 0
     features: dict = field(default_factory=dict)
     varLocation: dict = field(default_factory=dict)
+    relativeFontSize: float = 0.7
+    relativeHBaseline: float = 0.25
+    relativeVBaseline: float = 0.5
+    relativeMargin: float = 0.1
     shouldApplyBiDi: bool = True
     direction: typing.Union[None, str] = None
     script: typing.Union[None, str] = None
