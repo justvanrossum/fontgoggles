@@ -157,6 +157,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if self.varLocation:
             textSettings["varLocation"] = self.varLocation
 
+        textSettings["shouldApplyBiDi"] = self.textInfo.shouldApplyBiDi
+        textSettings["direction"] = self.textInfo.directionOverride
+        textSettings["script"] = self.textInfo.scriptOverride
+        textSettings["language"] = self.textInfo.languageOverride
+        textSettings["alignment"] = self.alignmentOverride
+
         (x, y), (w, h) = self.w._window.frame()
         uiSettings["windowPosition"] = [x, y, w, h]
         uiSettings["fontListItemSize"] = self.fontList.itemSize
