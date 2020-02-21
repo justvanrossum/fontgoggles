@@ -146,13 +146,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def syncUISettingsWithProject(self):
         # Called by FGDocument just before save
         textSettings = {}
+        uiSettings = {}
+
         textSettings["text"] = self.textEntry.get()
         if self.textEntry.textFilePath is not None:
             textSettings["textFilePath"] = self.textEntry.textFilePath
             textSettings["textFileIndex"] = self.textEntry.textFileIndex
-        self.project.textSettings = textSettings
-
-        uiSettings = {}
 
         (x, y), (w, h) = self.w._window.frame()
         uiSettings["windowPosition"] = [x, y, w, h]
@@ -166,6 +165,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings["compileOutputSize"] = self.fontListSplitView.paneSize("compileOutput")
         uiSettings["formattingOptionsVisible"] = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
 
+        self.project.textSettings = textSettings
         self.project.uiSettings = uiSettings
 
     @objc.python_method
