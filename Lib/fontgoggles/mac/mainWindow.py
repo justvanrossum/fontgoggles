@@ -152,8 +152,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if self.textEntry.textFilePath is not None:
             textSettings["textFilePath"] = self.textEntry.textFilePath
             textSettings["textFileIndex"] = self.textEntry.textFileIndex
-        textSettings["features"] = self.featureState
-        textSettings["varLocation"] = self.varLocation
+        if self.featureState:
+            textSettings["features"] = self.featureState
+        if self.varLocation:
+            textSettings["varLocation"] = self.varLocation
 
         (x, y), (w, h) = self.w._window.frame()
         uiSettings["windowPosition"] = [x, y, w, h]
