@@ -148,6 +148,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         textSettings = {}
         textSettings["text"] = self.textEntry.get()
         textSettings["textFilePath"] = self.textEntry.textFilePath
+        textSettings["textFileIndex"] = self.textEntry.textFileIndex
         self.project.textSettings = textSettings
 
         uiSettings = {}
@@ -234,11 +235,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
         textFilePath = self.project.textSettings.get("textFilePath")
+        textFileIndex = self.project.textSettings.get("textFileIndex", 0)
         if textFilePath and not os.path.exists(textFilePath):
             print("text file not found:", textFilePath)
             textFilePath = None
         self.textEntry = TextEntryGroup((0, 0, 0, 45), textFilePath=textFilePath,
                                         callback=self.textEntryChangedCallback)
+        if textFilePath and textFileIndex:
+            self.textEntry.setTextFileIndex(textFileIndex, wrapAround=False)
         itemSize = self.project.uiSettings.get("fontListItemSize", self.defaultFontItemSize)
         self.fontList = FontList(self.project, self.projectProxy, 300, itemSize,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
