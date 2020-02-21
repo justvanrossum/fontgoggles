@@ -722,13 +722,16 @@ class FontList(Group):
                 xOffset += 50
             else:
                 yOffset += 50
+
             def imageComponentsProvider(identifier=item.identifier):
                 fontItem = self.getFontItem(identifier)
                 image = fontItem._nsObject.imageRepresentation()
-                imageComponent = AppKit.NSDraggingImageComponent.draggingImageComponentWithKey_(AppKit.NSDraggingImageComponentIconKey)
+                imageComponent = AppKit.NSDraggingImageComponent.draggingImageComponentWithKey_(
+                        AppKit.NSDraggingImageComponentIconKey)
                 imageComponent.setContents_(image)
                 imageComponent.setFrame_(((0, -image.size().height), image.size()))
                 return [imageComponent]
+
             dragItem.setImageComponentsProvider_(imageComponentsProvider)
             dragItems.append(dragItem)
 
