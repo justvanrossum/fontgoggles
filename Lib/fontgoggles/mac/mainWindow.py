@@ -130,7 +130,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.textEntryChangedCallback(self.textEntry)
         self.w.bind("close", self._windowCloseCallback)
         self.updateFileObservers()
-        self.loadFonts()
+        self.loadFonts(shouldRestoreSettings=True)
 
     @suppressAndLogException
     def _windowCloseCallback(self, sender):
@@ -152,8 +152,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if self.textEntry.textFilePath is not None:
             textSettings["textFilePath"] = self.textEntry.textFilePath
             textSettings["textFileIndex"] = self.textEntry.textFileIndex
-        textSettings["features"] = self.featuresGroup.get()
-        textSettings["varLocation"] = self.variationsGroup.get()
+        textSettings["features"] = self.featureState
+        textSettings["varLocation"] = self.varLocation
 
         (x, y), (w, h) = self.w._window.frame()
         uiSettings["windowPosition"] = [x, y, w, h]
@@ -433,16 +433,20 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.loadFonts()
 
     @asyncTaskAutoCancel
-    async def loadFonts(self):
+    async def loadFonts(self, shouldRestoreSettings=False):
         """This loads fonts that aren't yet loaded, and updates all information
         regarding features, scripts/languages and variations.
         """
+        if shouldRestoreSettings:
+            self._updateSidebarSettingsPre()
         coros = []
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
             if fontItemInfo.font is None or fontItemInfo.wantsReload:
                 coros.append(self._loadFont(fontItemInfo, fontItem))
         await asyncio.gather(*coros)
         self._updateSidebarItems(*self._gatherSidebarInfo(self.project.fonts))
+        if shouldRestoreSettings:
+            self._updateSidebarSettingsPost()
         self.fontListSelectionChangedCallback(self.fontList)
 
     @objc.python_method
@@ -511,6 +515,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.scriptsPopup.setItems(scriptMenuTitles)
         self.scriptsPopup.set(newSelectedIndex)
         self.allScriptsAndLanguages = allScriptsAndLanguages
+
+    def _updateSidebarSettingsPre(self):
+        featureState = self.project.textSettings.get("features", {})
+        self.featureState = featureState
+        varLocation = self.project.textSettings.get("varLocation", {})
+        self.varLocation = varLocation
+
+    def _updateSidebarSettingsPost(self):
+        self.featuresGroup.set(self.featureState)
+        self.variationsGroup.set(self.varLocation)
 
     def iterFontItems(self):
         return self.fontList.iterFontItems()
