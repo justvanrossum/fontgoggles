@@ -40,17 +40,16 @@ sidebarWidth = 300
 
 
 directionPopUpConfig = [
-    ("Automatic, with BiDi", None, "auto-with-bidi"),
-    ("Automatic, without BiDi", None, "auto-without-bidi"),
-    ("Left-to-Right", "LTR", "LTR"),
-    ("Right-to-Left", "RTL", "RTL"),
-    (None, None, None),  # separator
-    ("Top-to-Bottom", "TTB", "TTB"),
-    ("Bottom-to-Top", "BTT", "BTT"),
+    ("Automatic, with BiDi", None),
+    ("Automatic, without BiDi", None),
+    ("Left-to-Right", "LTR"),
+    ("Right-to-Left", "RTL"),
+    (None, None),  # separator
+    ("Top-to-Bottom", "TTB"),
+    ("Bottom-to-Top", "BTT"),
 ]
-directionOptions = [label for label, direction, identifier in directionPopUpConfig]
-directionSettings = [direction for label, direction, identifier in directionPopUpConfig]
-directionIdentifiers = [identifier for label, direction, identifier in directionPopUpConfig]
+directionOptions = [label for label, direction in directionPopUpConfig]
+directionSettings = [direction for label, direction in directionPopUpConfig]
 
 alignmentOptionsHorizontal = [
     "Automatic",
@@ -321,6 +320,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         y = 10
 
+        textSettings = self.project.textSettings
+        storedDirection = textSettings.get("direction")
+
         directions = [label if label is not None else AppKit.NSMenuItem.separatorItem() for label in directionOptions]
 
         self.directionPopUp = LabeledView(
@@ -328,6 +330,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             PopUpButton, directions,
             callback=self.directionPopUpCallback,
         )
+        if storedDirection:
+            self.directionPopUp.set(directionSettings.index(storedDirection))
+        else:
+            ...  # bidi
         group.directionPopUp = self.directionPopUp
         y += 50
 
