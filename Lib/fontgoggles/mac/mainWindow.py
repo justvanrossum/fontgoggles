@@ -81,6 +81,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.varLocation = {}
         self._callbackRecursionLock = 0
         self._previouslySingleSelectedItem = None
+        self.textInfo = TextInfo("")
 
         characterListGroup = self.setupCharacterListGroup()
         glyphListGroup = self.setupGlyphListGroup()
@@ -556,7 +557,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # Our window already closed, and our poor async task is too
             # late. Nothing left to do.
             return
-        self.textInfo = TextInfo(sender.get())
+        self.textInfo.text = sender.get()
         self.textInfo.shouldApplyBiDi = self.directionPopUp.get() == 0
         self.textInfo.directionOverride = directionSettings[self.directionPopUp.get()]
         self.textInfo.scriptOverride = self.scriptOverride
