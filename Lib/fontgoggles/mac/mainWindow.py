@@ -336,9 +336,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.directionPopUp = self.directionPopUp
         y += 50
 
+        if self.project.textSettings.direction in {"TTB", "BTT"}:
+            alignmentOptions = alignmentOptionsVertical
+        else:
+            alignmentOptions = alignmentOptionsHorizontal
         self.alignmentPopup = LabeledView(
             (10, y, -10, 40), "Visual alignment:",
-            PopUpButton, alignmentOptionsHorizontal,
+            PopUpButton, alignmentOptions,
             callback=self.alignmentChangedCallback,
         )
         group.alignmentPopup = self.alignmentPopup
