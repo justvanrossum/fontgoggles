@@ -449,7 +449,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         await asyncio.gather(*coros)
         self._updateSidebarItems(*self._gatherSidebarInfo(self.project.fonts))
         if shouldRestoreSettings:
-            self._updateSidebarSettingsPost()
+            self._updateSidebarSettings()
         self.fontListSelectionChangedCallback(self.fontList)
 
     @objc.python_method
@@ -519,7 +519,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.scriptsPopup.set(newSelectedIndex)
         self.allScriptsAndLanguages = allScriptsAndLanguages
 
-    def _updateSidebarSettingsPost(self):
+    def _updateSidebarSettings(self):
         self.featuresGroup.set(self.project.textSettings.features)
         self.variationsGroup.set(self.project.textSettings.varLocation)
 
