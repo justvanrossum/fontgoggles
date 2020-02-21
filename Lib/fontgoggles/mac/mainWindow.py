@@ -179,6 +179,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.characterList._tableView.setAllowsColumnSelection_(True)
         self.characterList._tableView.setDelegate_(self)
         self.showBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
+                                         value=self.project.uiSettings.showBiDi,
                                          callback=self.showBiDiCheckBoxCallback)
         self.showBiDiCheckBox._nsObject.setToolTip_(
             "If this option is on, you see the result of Bi-Directional processing "
@@ -552,6 +553,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def showBiDiCheckBoxCallback(self, sender):
+        self.project.uiSettings.showBiDi = bool(sender.get())
         self.updateCharacterList()
 
     @asyncTaskAutoCancel
@@ -681,7 +683,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
-        if self.showBiDiCheckBox.get():
+        if self.project.uiSettings.showBiDi:
             txt = self.textInfo.text
         else:
             txt = self.textInfo.originalText
@@ -746,7 +748,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                         or self.textInfo.directionForShaper in ("RTL", "BTT"):
                     event = flipArrowKeyEvent(event)
                 self.characterList._nsObject.documentView().keyDown_(event)
-            elif self.showBiDiCheckBox.get():
+            elif self.project.uiSettings.showBiDi:
                 # We're showing post-BiDi characters, which should lign up
                 # with our glyphs
                 self.characterList._nsObject.documentView().keyDown_(event)
@@ -807,7 +809,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         charIndices = fontItem.glyphs.mapGlyphsToChars(fontItem.selection)
 
-        if self.textInfo.shouldApplyBiDi and not self.showBiDiCheckBox.get():
+        if self.textInfo.shouldApplyBiDi and not self.project.uiSettings.showBiDi:
             charIndices = self.textInfo.mapFromBiDi(charIndices)
 
         with self.blockCallbackRecursion():
@@ -820,7 +822,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         selectedFontItem = self.fontList.getSingleSelectedItem()
 
         charIndices = set(sender.getSelection())
-        if self.textInfo.shouldApplyBiDi and not self.showBiDiCheckBox.get():
+        if self.textInfo.shouldApplyBiDi and not self.project.uiSettings.showBiDi:
             charIndices = self.textInfo.mapToBiDi(charIndices)
 
         with self.blockCallbackRecursion():

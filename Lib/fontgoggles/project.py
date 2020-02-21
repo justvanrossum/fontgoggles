@@ -210,6 +210,7 @@ class TextSettings:
 class UISettings:
     windowPosition: typing.Union[None, list] = None
     fontListItemSize: float = 150
+    showBiDi: bool = False
     characterListVisible: bool = True
     characterListSize: float = 100
     glyphListVisible: bool = True
