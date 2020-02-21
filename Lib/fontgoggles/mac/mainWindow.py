@@ -352,7 +352,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         obs = getFileObserver()
         newObservedPaths = defaultdict(list)
         for fontItemInfo in self.project.fonts:
-            newObservedPaths[fontItemInfo.fontKey[0]].append(fontItemInfo)
+            fontPath = fontItemInfo.fontKey[0]
+            if not fontPath.exists():
+                # We can't observe a non-existing path. This can happen
+                # if the project file contains a wrong source path.
+                # We don't want to stop loading other fonts that do have a
+                # correct path so we won't complain here.
+                continue
+            newObservedPaths[fontPath].append(fontItemInfo)
             if fontItemInfo.font is not None:
                 for path in fontItemInfo.font.getExternalFiles():
                     assert isinstance(path, os.PathLike)
