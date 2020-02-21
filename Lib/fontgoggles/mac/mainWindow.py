@@ -78,7 +78,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.alignmentOverride = None
         self._callbackRecursionLock = 0
         self._previouslySingleSelectedItem = None
-        self.textInfo = TextInfo("")
 
         characterListGroup = self.setupCharacterListGroup()
         glyphListGroup = self.setupGlyphListGroup()
@@ -147,12 +146,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         textSettings.text = self.textEntry.get()
         textSettings.textFilePath = self.textEntry.textFilePath
         textSettings.textFileIndex = self.textEntry.textFileIndex
-
-        textSettings.shouldApplyBiDi = self.textInfo.shouldApplyBiDi
-        textSettings.direction = self.textInfo.directionOverride
-        textSettings.script = self.textInfo.scriptOverride
-        textSettings.language = self.textInfo.languageOverride
-        textSettings.alignment = self.alignmentOverride
 
         (x, y), (w, h) = self.w._window.frame()
         uiSettings.windowPosition = [x, y, w, h]
@@ -539,13 +532,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # Our window already closed, and our poor async task is too
             # late. Nothing left to do.
             return
-        self.textInfo.text = sender.get()
-        self.textInfo.shouldApplyBiDi = self.directionPopUp.get() == 0
-        self.textInfo.directionOverride = directionSettings[self.directionPopUp.get()]
-        self.textInfo.scriptOverride = self.scriptOverride
-        self.textInfo.languageOverride = self.languageOverride
-        if self.alignmentOverride is not None:
-            align = self.alignmentOverride
+        self.textInfo = TextInfo(sender.get())
+        self.textInfo.shouldApplyBiDi = self.project.textSettings.shouldApplyBiDi
+        self.textInfo.directionOverride = self.project.textSettings.direction
+        self.textInfo.scriptOverride = self.project.textSettings.script
+        self.textInfo.languageOverride = self.project.textSettings.language
+        if self.project.textSettings.alignment is not None:
+            align = self.project.textSettings.alignment
         else:
             align = self.textInfo.suggestedAlignment
 
@@ -815,6 +808,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def directionPopUpCallback(self, sender):
         popupValue = sender.get()
+
+        self.project.textSettings.shouldApplyBiDi = popupValue == 0
+        self.project.textSettings.direction = directionSettings[popupValue]
+
         self.showBiDiCheckBox.enable(popupValue == 0)
         vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
         self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
@@ -839,22 +836,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self._fontListScrollView.vAlign = align
         self.updateTextEntryAlignment(align)
 
-    @property
-    def scriptOverride(self):
-        tag = _tagFromMenuItem(self.scriptsPopup.getItem())
-        return None if tag == "Automatic" else tag
-
-    @property
-    def languageOverride(self):
-        tag = _tagFromMenuItem(self.languagesPopup.getItem())
-        return None if tag == "dflt" else tag
-
     @objc.python_method
     def scriptsPopupCallback(self, sender):
         tag = _tagFromMenuItem(sender.getItem())
         if tag == "Automatic":
+            self.project.textSettings.script = None
             languages = []
         else:
+            self.project.textSettings.script = tag
             languages = [f"{tag} – {opentypeTags.languages.get(tag, ['?'])[0]}"
                          for tag in sorted(self.allScriptsAndLanguages[tag])]
         languages = ['dflt – Default'] + languages
@@ -869,6 +858,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def languagesPopupCallback(self, sender):
+        tag = _tagFromMenuItem(self.languagesPopup.getItem())
+        self.project.textSettings.language = None if tag == "dflt" else tag
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
