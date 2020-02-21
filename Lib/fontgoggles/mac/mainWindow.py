@@ -288,12 +288,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                                 borderType=AppKit.NSNoBorder)
 
         optionsTab = group.feaVarTabs[2]
-        vertical = self.project.textSettings.direction in {"TTB", "BTT"}
         relativeFontSize = self.project.textSettings.relativeFontSize * 100
-        if vertical:
-            relativeBaseline = self.project.textSettings.relativeVBaseline * 100
-        else:
-            relativeBaseline = self.project.textSettings.relativeHBaseline * 100
+        relativeBaseline = self.getRelativeBaselineValueForSlider()
         relativeMargin = self.project.textSettings.relativeMargin * 100
         y = 10
         optionsTab.relativeSizeSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Relative Size",
@@ -307,9 +303,16 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         optionsTab.relativeMarginSlider = SliderPlus((10, y, sidebarWidth - 26, 40), "Margin",
                                                      0, relativeMargin, 100,
                                                      callback=self.relativeMarginChangedCallback)
+        self.relativeBaselineSlider = optionsTab.relativeBaselineSlider
         y += 50
 
         return group
+
+    def getRelativeBaselineValueForSlider(self):
+        if self.project.textSettings.direction in {"TTB", "BTT"}:
+            return self.project.textSettings.relativeVBaseline * 100
+        else:
+            return self.project.textSettings.relativeHBaseline * 100
 
     def setupGeneralSettingsGroup(self):
         group = Group((0, 0, 0, 0))
@@ -843,6 +846,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.fontList.vertical = vertical
         self.alignmentChangedCallback(self.alignmentPopup)
         self.textEntryChangedCallback(self.textEntry)
+        self.relativeBaselineSlider.set(self.getRelativeBaselineValueForSlider())
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
