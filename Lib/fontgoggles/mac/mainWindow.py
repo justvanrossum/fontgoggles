@@ -76,7 +76,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.projectProxy = makeUndoProxy(self.project, self._projectFontsChanged)
         self.observedPaths = {}
         self.alignmentOverride = None
-        self.varLocation = {}
         self._callbackRecursionLock = 0
         self._previouslySingleSelectedItem = None
         self.textInfo = TextInfo("")
@@ -148,7 +147,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         textSettings.text = self.textEntry.get()
         textSettings.textFilePath = self.textEntry.textFilePath
         textSettings.textFileIndex = self.textEntry.textFileIndex
-        textSettings.varLocation = self.varLocation
 
         textSettings.shouldApplyBiDi = self.textInfo.shouldApplyBiDi
         textSettings.direction = self.textInfo.directionOverride
@@ -444,8 +442,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         """This loads fonts that aren't yet loaded, and updates all information
         regarding features, scripts/languages and variations.
         """
-        if shouldRestoreSettings:
-            self._updateSidebarSettingsPre()
         coros = []
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
             if fontItemInfo.font is None or fontItemInfo.wantsReload:
@@ -523,12 +519,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.scriptsPopup.set(newSelectedIndex)
         self.allScriptsAndLanguages = allScriptsAndLanguages
 
-    def _updateSidebarSettingsPre(self):
-        self.varLocation = self.project.textSettings.varLocation
-
     def _updateSidebarSettingsPost(self):
         self.featuresGroup.set(self.project.textSettings.features)
-        self.variationsGroup.set(self.varLocation)
+        self.variationsGroup.set(self.project.textSettings.varLocation)
 
     def iterFontItems(self):
         return self.fontList.iterFontItems()
@@ -591,7 +584,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         with contextlib.redirect_stderr(stderr):
             glyphs = font.getGlyphRunFromTextInfo(self.textInfo,
                                                   features=self.project.textSettings.features,
-                                                  varLocation=self.varLocation)
+                                                  varLocation=self.project.textSettings.varLocation)
         stderr = stderr.getvalue()
         if stderr:
             fontItem.writeCompileOutput(stderr)
@@ -885,7 +878,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def varLocationChanged(self, sender):
-        self.varLocation = {k: v for k, v in sender.get().items() if v is not None}
+        self.project.textSettings.varLocation = {k: v for k, v in sender.get().items() if v is not None}
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
