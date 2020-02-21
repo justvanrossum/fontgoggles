@@ -7,12 +7,23 @@ alignments = dict(LTR="left", RTL="right", TTB="top", BTT="bottom")
 class TextInfo:
 
     def __init__(self, text):
-        self.originalText = text
-        self.biDiText, self._runLengths, self.baseDirection, self.toBiDi, self.fromBiDi = applyBiDi(self.originalText)
+        self.text = text
         self.shouldApplyBiDi = True
         self.directionOverride = None
         self.scriptOverride = None
         self.languageOverride = None
+
+    @property
+    def text(self):
+        if self.shouldApplyBiDi:
+            return self.biDiText
+        else:
+            return self.originalText
+
+    @text.setter
+    def text(self, text):
+        self.originalText = text
+        self.biDiText, self._runLengths, self.baseDirection, self.toBiDi, self.fromBiDi = applyBiDi(self.originalText)
 
     def mapToBiDi(self, charIndices):
         toBiDi = self.toBiDi
@@ -33,13 +44,6 @@ class TextInfo:
             return self._runLengths
         else:
             return [len(self.originalText)]
-
-    @property
-    def text(self):
-        if self.shouldApplyBiDi:
-            return self.biDiText
-        else:
-            return self.originalText
 
     @property
     def directionForShaper(self):
