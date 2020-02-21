@@ -218,3 +218,4 @@ class UISettings:
     compileOutputVisible: bool = True
     compileOutputSize: float = 80
     formattingOptionsVisible: bool = True
+    feaVarTabSelection: str = "features"

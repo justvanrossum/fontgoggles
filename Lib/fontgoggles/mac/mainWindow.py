@@ -57,6 +57,9 @@ alignmentValuesHorizontal = [None, "left", "right", "center"]
 alignmentOptionsVertical = ["Automatic", "Top", "Bottom", "Center"]
 alignmentValuesVertical = [None, "top", "bottom", "center"]
 
+feaVarTabLabels = ["Features", "Variations", "Options"]
+feaVarTabValues = [v.lower() for v in feaVarTabLabels]
+
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
 
@@ -149,6 +152,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings.compileOutputVisible = self.fontListSplitView.isPaneReallyVisible("compileOutput")
         uiSettings.compileOutputSize = self.fontListSplitView.paneSize("compileOutput")
         uiSettings.formattingOptionsVisible = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
+        uiSettings.feaVarTabSelection = feaVarTabValues[self.feaVarTabs.get()]
 
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
@@ -265,7 +269,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         group.generalSettings = self.setupGeneralSettingsGroup()
         x, y, w, h = group.generalSettings.getPosSize()
-        group.feaVarTabs = Tabs((0, h + 6, 0, 0), ["Features", "Variations", "Options"])
+        self.feaVarTabs = Tabs((0, h + 6, 0, 0), feaVarTabLabels)
+        group.feaVarTabs = self.feaVarTabs
+        group.feaVarTabs.set(feaVarTabValues.index(self.project.uiSettings.feaVarTabSelection))
 
         featuresTab = group.feaVarTabs[0]
         self.featuresGroup = FeatureTagGroup(sidebarWidth - 6, {}, callback=self.featuresChanged)
