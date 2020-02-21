@@ -333,7 +333,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if storedDirection:
             self.directionPopUp.set(directionSettings.index(storedDirection))
         else:
-            ...  # bidi
+            if not textSettings.get("shouldApplyBiDi", True):
+                self.directionPopUp.set(1)
         group.directionPopUp = self.directionPopUp
         y += 50
 
