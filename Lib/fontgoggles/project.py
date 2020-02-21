@@ -1,9 +1,11 @@
 import asyncio
+from dataclasses import dataclass, field
 import json
 from os import PathLike
 import os
 import pathlib
 import sys
+import typing
 from .font import getOpener
 
 
@@ -11,8 +13,8 @@ class Project:
 
     def __init__(self):
         self.fonts = []
-        self.uiSettings = {}
-        self.textSettings = {}
+        self.textSettings = TextSettings()
+        self.uiSettings = UISettings()
         self.fontSelection = set()  # not persistent
         self._fontLoader = FontLoader()
         self._fontItemIdentifierGenerator = self._fontItemIdentifierGeneratorFunc()
@@ -27,11 +29,11 @@ class Project:
         for fontItemInfoDict in root["fonts"]:
             fontPath = pathlib.Path(os.path.normpath(os.path.join(rootPath, fontItemInfoDict["path"])))
             self.addFont(fontPath, fontItemInfoDict.get("fontNumber", 0))
-        self.uiSettings = root.get("uiSettings", {})
-        self.textSettings = dict(root.get("textSettings", {}))
-        if "textFilePath" in self.textSettings and self.textSettings["textFilePath"] is not None:
+        self.textSettings.__dict__.update(root.get("textSettings", {}))
+        if self.textSettings.textFilePath is not None:
             # relative path -> absolute path
-            self.textSettings["textFilePath"] = os.path.normpath(os.path.join(rootPath, self.textSettings["textFilePath"]))
+            self.textSettings.textFilePath = os.path.normpath(os.path.join(rootPath, self.textSettings.textFilePath))
+        self.uiSettings.__dict__.update(root.get("uiSettings", {}))
         return self
 
     def asJSON(self, rootPath):
@@ -48,11 +50,11 @@ class Project:
             if fontNumber != 0:
                 fontItemInfoDict["fontNumber"] = fontNumber
             root["fonts"].append(fontItemInfoDict)
-        root["textSettings"] = dict(self.textSettings)
-        if self.textSettings.get("textFilePath") is not None:
+        root["textSettings"] = dict(self.textSettings.__dict__)
+        if self.textSettings.textFilePath is not None:
             # absolute path -> relative path
-            root["textSettings"]["textFilePath"] = os.path.relpath(self.textSettings["textFilePath"], rootPath)
-        root["uiSettings"] = self.uiSettings
+            root["textSettings"]["textFilePath"] = os.path.relpath(self.textSettings.textFilePath, rootPath)
+        root["uiSettings"] = self.uiSettings.__dict__
         return root
 
     def addFont(self, path: PathLike, fontNumber: int, index=None):
@@ -184,3 +186,30 @@ class FontLoader:
             # Font was not loaded, nothing to rename
             return
         self.fonts[newFontKey] = self.fonts.pop(oldFontKey)
+
+
+@dataclass
+class TextSettings:
+    text: str = "ABC abc 0123 :;?"  # TODO: From user defaults?
+    textFilePath: PathLike = None
+    textFileIndex: int = 0
+    features: dict = field(default_factory=dict)
+    varLocation: dict = field(default_factory=dict)
+    shouldApplyBiDi: bool = True
+    direction: typing.Union[None, str] = None
+    script: typing.Union[None, str] = None
+    language: typing.Union[None, str] = None
+    alignment: typing.Union[None, str] = None
+
+
+@dataclass
+class UISettings:
+    windowPosition: typing.Union[None, list] = None
+    fontListItemSize: float = 150
+    characterListVisible: bool = True
+    characterListSize: float = 100
+    glyphListVisible: bool = True
+    glyphListSize: float = 230
+    compileOutputVisible: bool = True
+    compileOutputSize: float = 80
+    formattingOptionsVisible: bool = True

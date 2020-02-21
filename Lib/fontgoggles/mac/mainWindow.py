@@ -75,7 +75,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.project = project
         self.projectProxy = makeUndoProxy(self.project, self._projectFontsChanged)
         self.observedPaths = {}
-        self.defaultFontItemSize = 150
         self.alignmentOverride = None
         self.featureState = {}
         self.varLocation = {}
@@ -88,7 +87,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         fontListGroup = self.setupFontListGroup()
         sidebarGroup = self.setupSidebarGroup()
 
-        glyphListSize = self.project.uiSettings.get("glyphListSize", 230)
+        glyphListSize = self.project.uiSettings.glyphListSize
         paneDescriptors = [
             dict(view=glyphListGroup, identifier="glyphList", canCollapse=True,
                  size=glyphListSize, minSize=80, resizeFlexibility=False),
@@ -96,11 +95,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  size=200, minSize=160),
         ]
         subSplitView = MySplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
-        if not self.project.uiSettings.get("glyphListVisible", True):
+        if not self.project.uiSettings.glyphListVisible:
             subSplitView.togglePane("glyphList")
         self.subSplitView = subSplitView
 
-        characterListSize = self.project.uiSettings.get("characterListSize", 100)
+        characterListSize = self.project.uiSettings.characterListSize
         paneDescriptors = [
             dict(view=characterListGroup, identifier="characterList", canCollapse=True,
                  size=characterListSize, minSize=100, resizeFlexibility=False),
@@ -110,14 +109,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  resizeFlexibility=False),
         ]
         mainSplitView = MySplitView((0, 0, 0, 0), paneDescriptors, dividerStyle="thin")
-        if not self.project.uiSettings.get("characterListVisible", True):
+        if not self.project.uiSettings.characterListVisible:
             mainSplitView.togglePane("characterList")
-        if not self.project.uiSettings.get("formattingOptionsVisible", True):
+        if not self.project.uiSettings.formattingOptionsVisible:
             mainSplitView.togglePane("formattingOptions")
 
         self.w = Window((1400, 700), "FontGoggles", minSize=(900, 500), autosaveName="FontGogglesWindow",
                         fullScreenMode="primary")
-        self.restoreWindowPosition(self.project.uiSettings.get("windowPosition"))
+        self.restoreWindowPosition(self.project.uiSettings.windowPosition)
 
         self.w.mainSplitView = mainSplitView
         self.w.open()
@@ -125,8 +124,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.w._window.makeFirstResponder_(fontListGroup.textEntry.nsTextView)
         self.setWindow_(self.w._window)
 
-        initialText = "ABC abc 0123 :;?"  # TODO: From user defaults?
-        self.textEntry.set(self.project.textSettings.get("text", initialText))
+        self.textEntry.set(self.project.textSettings.text)
         self.textEntryChangedCallback(self.textEntry)
         self.w.bind("close", self._windowCloseCallback)
         self.updateFileObservers()
@@ -145,38 +143,32 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @suppressAndLogException
     def syncUISettingsWithProject(self):
         # Called by FGDocument just before save
-        textSettings = {}
-        uiSettings = {}
+        textSettings = self.project.textSettings
+        uiSettings = self.project.uiSettings
 
-        textSettings["text"] = self.textEntry.get()
-        if self.textEntry.textFilePath is not None:
-            textSettings["textFilePath"] = self.textEntry.textFilePath
-            textSettings["textFileIndex"] = self.textEntry.textFileIndex
-        if self.featureState:
-            textSettings["features"] = self.featureState
-        if self.varLocation:
-            textSettings["varLocation"] = self.varLocation
+        textSettings.text = self.textEntry.get()
+        textSettings.textFilePath = self.textEntry.textFilePath
+        textSettings.textFileIndex = self.textEntry.textFileIndex
+        textSettings.features = self.featureState
+        textSettings.varLocation = self.varLocation
 
-        textSettings["shouldApplyBiDi"] = self.textInfo.shouldApplyBiDi
-        textSettings["direction"] = self.textInfo.directionOverride
-        textSettings["script"] = self.textInfo.scriptOverride
-        textSettings["language"] = self.textInfo.languageOverride
-        textSettings["alignment"] = self.alignmentOverride
+        textSettings.shouldApplyBiDi = self.textInfo.shouldApplyBiDi
+        textSettings.direction = self.textInfo.directionOverride
+        textSettings.script = self.textInfo.scriptOverride
+        textSettings.language = self.textInfo.languageOverride
+        textSettings.alignment = self.alignmentOverride
 
         (x, y), (w, h) = self.w._window.frame()
-        uiSettings["windowPosition"] = [x, y, w, h]
-        uiSettings["fontListItemSize"] = self.fontList.itemSize
+        uiSettings.windowPosition = [x, y, w, h]
+        uiSettings.fontListItemSize = self.fontList.itemSize
 
-        uiSettings["characterListVisible"] = self.w.mainSplitView.isPaneReallyVisible("characterList")
-        uiSettings["characterListSize"] = self.w.mainSplitView.paneSize("characterList")
-        uiSettings["glyphListVisible"] = self.subSplitView.isPaneReallyVisible("glyphList")
-        uiSettings["glyphListSize"] = self.subSplitView.paneSize("glyphList")
-        uiSettings["compileOutputVisible"] = self.fontListSplitView.isPaneReallyVisible("compileOutput")
-        uiSettings["compileOutputSize"] = self.fontListSplitView.paneSize("compileOutput")
-        uiSettings["formattingOptionsVisible"] = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
-
-        self.project.textSettings = textSettings
-        self.project.uiSettings = uiSettings
+        uiSettings.characterListVisible = self.w.mainSplitView.isPaneReallyVisible("characterList")
+        uiSettings.characterListSize = self.w.mainSplitView.paneSize("characterList")
+        uiSettings.glyphListVisible = self.subSplitView.isPaneReallyVisible("glyphList")
+        uiSettings.glyphListSize = self.subSplitView.paneSize("glyphList")
+        uiSettings.compileOutputVisible = self.fontListSplitView.isPaneReallyVisible("compileOutput")
+        uiSettings.compileOutputSize = self.fontListSplitView.paneSize("compileOutput")
+        uiSettings.formattingOptionsVisible = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
 
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
@@ -245,8 +237,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def setupFontListGroup(self):
         group = Group((0, 0, 0, 0))
-        textFilePath = self.project.textSettings.get("textFilePath")
-        textFileIndex = self.project.textSettings.get("textFileIndex", 0)
+        textFilePath = self.project.textSettings.textFilePath
+        textFileIndex = self.project.textSettings.textFileIndex
         if textFilePath and not os.path.exists(textFilePath):
             print("text file not found:", textFilePath)
             textFilePath = None
@@ -254,8 +246,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                         callback=self.textEntryChangedCallback)
         if textFilePath and textFileIndex:
             self.textEntry.setTextFileIndex(textFileIndex, wrapAround=False)
-        itemSize = self.project.uiSettings.get("fontListItemSize", self.defaultFontItemSize)
-        vertical = self.project.textSettings.get("direction", False) in {"TTB", "BTT"}
+        itemSize = self.project.uiSettings.fontListItemSize
+        vertical = self.project.textSettings.direction in {"TTB", "BTT"}
         self.fontList = FontList(self.project, self.projectProxy, 300, itemSize, vertical=vertical,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
@@ -266,7 +258,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.compileOutput = OutputText((0, 0, 0, 0))
 
-        compileOutputSize = self.project.uiSettings.get("compileOutputSize", 80)
+        compileOutputSize = self.project.uiSettings.compileOutputSize
         paneDescriptors = [
             dict(view=self._fontListScrollView, identifier="fontList", canCollapse=False,
                  size=230, minSize=150),
@@ -275,7 +267,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         ]
         self.fontListSplitView = MySplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
                                              isVertical=False)
-        if not self.project.uiSettings.get("compileOutputVisible", True):
+        if not self.project.uiSettings.compileOutputVisible:
             self.fontListSplitView.togglePane("compileOutput")
 
         group.textEntry = self.textEntry
@@ -322,7 +314,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y = 10
 
         textSettings = self.project.textSettings
-        storedDirection = textSettings.get("direction")
+        storedDirection = textSettings.direction
 
         directions = [label if label is not None else AppKit.NSMenuItem.separatorItem() for label in directionOptions]
 
@@ -334,7 +326,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if storedDirection:
             self.directionPopUp.set(directionSettings.index(storedDirection))
         else:
-            if not textSettings.get("shouldApplyBiDi", True):
+            if not textSettings.shouldApplyBiDi:
                 self.directionPopUp.set(1)
         group.directionPopUp = self.directionPopUp
         y += 50
@@ -534,8 +526,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allScriptsAndLanguages = allScriptsAndLanguages
 
     def _updateSidebarSettingsPre(self):
-        self.featureState = self.project.textSettings.get("features", {})
-        self.varLocation = self.project.textSettings.get("varLocation", {})
+        self.featureState = self.project.textSettings.features
+        self.varLocation = self.project.textSettings.varLocation
 
     def _updateSidebarSettingsPost(self):
         self.featuresGroup.set(self.featureState)
