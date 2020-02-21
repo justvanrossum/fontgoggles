@@ -51,19 +51,11 @@ directionPopUpConfig = [
 directionOptions = [label for label, direction in directionPopUpConfig]
 directionSettings = [direction for label, direction in directionPopUpConfig]
 
-alignmentOptionsHorizontal = [
-    "Automatic",
-    "Left",
-    "Right",
-    "Center",
-]
+alignmentOptionsHorizontal = ["Automatic", "Left", "Right", "Center"]
+alignmentValuesHorizontal = [None, "left", "right", "center"]
 
-alignmentOptionsVertical = [
-    "Automatic",
-    "Top",
-    "Bottom",
-    "Center",
-]
+alignmentOptionsVertical = ["Automatic", "Top", "Bottom", "Center"]
+alignmentValuesVertical = [None, "top", "bottom", "center"]
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
@@ -75,7 +67,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.project = project
         self.projectProxy = makeUndoProxy(self.project, self._projectFontsChanged)
         self.observedPaths = {}
-        self.alignmentOverride = None
         self._callbackRecursionLock = 0
         self._previouslySingleSelectedItem = None
 
@@ -336,15 +327,20 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.directionPopUp = self.directionPopUp
         y += 50
 
-        if self.project.textSettings.direction in {"TTB", "BTT"}:
+        vertical = self.project.textSettings.direction in {"TTB", "BTT"}
+        if vertical:
             alignmentOptions = alignmentOptionsVertical
+            alignmentValues = alignmentValuesVertical
         else:
             alignmentOptions = alignmentOptionsHorizontal
+            alignmentValues = alignmentValuesHorizontal
         self.alignmentPopup = LabeledView(
             (10, y, -10, 40), "Visual alignment:",
             PopUpButton, alignmentOptions,
             callback=self.alignmentChangedCallback,
         )
+        self.alignmentPopup.set(alignmentValues.index(self.project.textSettings.alignment))
+
         group.alignmentPopup = self.alignmentPopup
         y += 50
 
@@ -854,10 +850,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
-        values = [[None, "left", "right", "center"],
-                  [None, "top", "bottom", "center"]][self.fontList.vertical]
+        values = [alignmentValuesHorizontal,
+                  alignmentValuesVertical][self.fontList.vertical]
         align = values[sender.get()]
-        self.alignmentOverride = align
+        self.project.textSettings.alignment = align
         if align is None:
             align = self.textInfo.suggestedAlignment
         self.fontList.align = align
