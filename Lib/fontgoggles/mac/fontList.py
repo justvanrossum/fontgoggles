@@ -293,7 +293,8 @@ class FontList(Group):
 
     nsViewClass = FGFontListView
 
-    def __init__(self, project, projectProxy, width, itemSize, relativeFontSize=0.7, relativeHBaseline=0.25,
+    def __init__(self, project, projectProxy, width, itemSize, vertical=False,
+                 relativeFontSize=0.7, relativeHBaseline=0.25,
                  relativeVBaseline=0.5, relativeMargin=0.1, selectionChangedCallback=None,
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
@@ -303,7 +304,7 @@ class FontList(Group):
         self.relativeVBaseline = relativeVBaseline
         self.relativeMargin = relativeMargin
         self._selection = set()  # a set of indices
-        self.vertical = 0  # 0, 1: it is also an index into (x, y) tuples
+        self.vertical = int(vertical)  # 0, 1: it is also an index into (x, y) tuples
         self.itemSize = itemSize
         self.align = "left"
         self._selectionChangedCallback = selectionChangedCallback
@@ -327,7 +328,16 @@ class FontList(Group):
         if self.project.fonts:
             y = 0
             for index, fontItemInfo in enumerate(self.project.fonts):
-                fontItem = FontItem((0, y, 0, itemSize), fontItemInfo.fontKey, index, self.vertical,
+                x = y = 0
+                if self.vertical:
+                    x = index * itemSize
+                    w = itemSize
+                    h = 0
+                else:
+                    y = index * itemSize
+                    w = 0
+                    h = itemSize
+                fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index, self.vertical,
                                     self.align, self.relativeFontSize, self.relativeHBaseline,
                                     self.relativeVBaseline, self.relativeMargin)
                 setattr(self, fontItemInfo.identifier, fontItem)
@@ -934,7 +944,7 @@ class FontItem(Group):
     def align(self, value):
         if self.vertical:
             mapping = dict(top="left", center="center", bottom="right")
-            value = mapping[value]
+            value = mapping.get(value, value)
         self.fileNameLabel.align = value
         self.glyphLineView._nsObject.align = value
 

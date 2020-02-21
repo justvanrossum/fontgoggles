@@ -255,7 +255,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if textFilePath and textFileIndex:
             self.textEntry.setTextFileIndex(textFileIndex, wrapAround=False)
         itemSize = self.project.uiSettings.get("fontListItemSize", self.defaultFontItemSize)
-        self.fontList = FontList(self.project, self.projectProxy, 300, itemSize,
+        vertical = self.project.textSettings.get("direction", False) in {"TTB", "BTT"}
+        self.fontList = FontList(self.project, self.projectProxy, 300, itemSize, vertical=vertical,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
