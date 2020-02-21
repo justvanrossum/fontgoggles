@@ -147,8 +147,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         # Called by FGDocument just before save
         textSettings = {}
         textSettings["text"] = self.textEntry.get()
-        textSettings["textFilePath"] = self.textEntry.textFilePath
-        textSettings["textFileIndex"] = self.textEntry.textFileIndex
+        if self.textEntry.textFilePath is not None:
+            textSettings["textFilePath"] = self.textEntry.textFilePath
+            textSettings["textFileIndex"] = self.textEntry.textFileIndex
         self.project.textSettings = textSettings
 
         uiSettings = {}
