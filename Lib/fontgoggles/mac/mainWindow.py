@@ -378,6 +378,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @suppressAndLogException
     def _fileChanged(self, oldPath, newPath, wasModified):
+        # This gets called by the file observer, when a file changed on disk.
         oldPath = pathlib.Path(oldPath)
         if newPath is not None:
             newPath = pathlib.Path(newPath)
@@ -413,6 +414,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @suppressAndLogException
     def _projectFontsChanged(self, changeSet):
+        # This gets called by the undo manager, upon performing undo or redo.
         if any(change.op == "remove" for change in changeSet):
             self.fontList.purgeFontItems()
             self.project.purgeFonts()
