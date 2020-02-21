@@ -345,7 +345,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y += 50
 
         group.setPosSize((0, 0, 0, y))
-        self.scriptsPopupCallback(self.scriptsPopup)
+        self.setLanguagesFromScript()
         return group
 
     def updateFileObservers(self):
@@ -520,6 +520,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allScriptsAndLanguages = allScriptsAndLanguages
 
     def _updateSidebarSettings(self):
+        scriptTags = [_tagFromMenuItem(item, "Automatic") for item in self.scriptsPopup.getItems()]
+        self.scriptsPopup.set(scriptTags.index(self.project.textSettings.script))
+        self.setLanguagesFromScript()
+        languageTags = [_tagFromMenuItem(item, "dflt") for item in self.languagesPopup.getItems()]
+        self.languagesPopup.set(languageTags.index(self.project.textSettings.language))
         self.featuresGroup.set(self.project.textSettings.features)
         self.variationsGroup.set(self.project.textSettings.varLocation)
 
@@ -845,12 +850,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def scriptsPopupCallback(self, sender):
-        tag = _tagFromMenuItem(sender.getItem())
-        if tag == "Automatic":
-            self.project.textSettings.script = None
+        self.project.textSettings.script = self.setLanguagesFromScript()
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
+
+    def setLanguagesFromScript(self):
+        tag = _tagFromMenuItem(self.scriptsPopup.getItem(), "Automatic")
+        if tag is None:
             languages = []
         else:
-            self.project.textSettings.script = tag
             languages = [f"{tag} – {opentypeTags.languages.get(tag, ['?'])[0]}"
                          for tag in sorted(self.allScriptsAndLanguages[tag])]
         languages = ['dflt – Default'] + languages
@@ -861,12 +868,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             newSelectedIndex = 0
         self.languagesPopup.setItems(languages)
         self.languagesPopup.set(newSelectedIndex)
-        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
+        return tag
 
     @objc.python_method
     def languagesPopupCallback(self, sender):
-        tag = _tagFromMenuItem(self.languagesPopup.getItem())
-        self.project.textSettings.language = None if tag == "dflt" else tag
+        tag = _tagFromMenuItem(self.languagesPopup.getItem(), "dflt")
+        self.project.textSettings.language = tag
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
@@ -1273,12 +1280,14 @@ def addBoundingBoxes(glyphs):
             gi.bounds = (xMin, yMin, xMax, yMax)
 
 
-def _tagFromMenuItem(title):
+def _tagFromMenuItem(title, defaultTitle=None):
     if not title:
         return None
     tag = title.split()[0]
     if len(tag) < 4:
         tag += " " * (4 - len(tag))
+    if tag == defaultTitle:
+        tag = None
     return tag
 
 
