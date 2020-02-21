@@ -2,6 +2,7 @@
 
 ## [0.9.3] - 2020-02-??
 
+- Save all text settings and many UI settings to the project file.
 - When performing undo/redo in the font list, also take the selection into account.
 
 ## [0.9.2] - 2020-02-19
