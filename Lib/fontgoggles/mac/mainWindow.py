@@ -517,10 +517,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allScriptsAndLanguages = allScriptsAndLanguages
 
     def _updateSidebarSettingsPre(self):
-        featureState = self.project.textSettings.get("features", {})
-        self.featureState = featureState
-        varLocation = self.project.textSettings.get("varLocation", {})
-        self.varLocation = varLocation
+        self.featureState = self.project.textSettings.get("features", {})
+        self.varLocation = self.project.textSettings.get("varLocation", {})
 
     def _updateSidebarSettingsPost(self):
         self.featuresGroup.set(self.featureState)
