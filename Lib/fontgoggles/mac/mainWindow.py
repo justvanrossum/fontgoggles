@@ -76,7 +76,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.projectProxy = makeUndoProxy(self.project, self._projectFontsChanged)
         self.observedPaths = {}
         self.alignmentOverride = None
-        self.featureState = {}
         self.varLocation = {}
         self._callbackRecursionLock = 0
         self._previouslySingleSelectedItem = None
@@ -149,7 +148,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         textSettings.text = self.textEntry.get()
         textSettings.textFilePath = self.textEntry.textFilePath
         textSettings.textFileIndex = self.textEntry.textFileIndex
-        textSettings.features = self.featureState
         textSettings.varLocation = self.varLocation
 
         textSettings.shouldApplyBiDi = self.textInfo.shouldApplyBiDi
@@ -526,11 +524,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.allScriptsAndLanguages = allScriptsAndLanguages
 
     def _updateSidebarSettingsPre(self):
-        self.featureState = self.project.textSettings.features
         self.varLocation = self.project.textSettings.varLocation
 
     def _updateSidebarSettingsPost(self):
-        self.featuresGroup.set(self.featureState)
+        self.featuresGroup.set(self.project.textSettings.features)
         self.variationsGroup.set(self.varLocation)
 
     def iterFontItems(self):
@@ -592,7 +589,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         stderr = io.StringIO()
         with contextlib.redirect_stderr(stderr):
-            glyphs = font.getGlyphRunFromTextInfo(self.textInfo, features=self.featureState,
+            glyphs = font.getGlyphRunFromTextInfo(self.textInfo,
+                                                  features=self.project.textSettings.features,
                                                   varLocation=self.varLocation)
         stderr = stderr.getvalue()
         if stderr:
@@ -882,7 +880,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def featuresChanged(self, sender):
-        self.featureState = self.featuresGroup.get()
+        self.project.textSettings.features = self.featuresGroup.get()
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
