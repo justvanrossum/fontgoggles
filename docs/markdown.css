@@ -1,0 +1,313 @@
+@font-face {
+  font-family: recursive-sans-casual-extra-black-italic;
+  src: url(fonts/RecursiveSansCslSt-XBlkItalic.woff2);
+}
+
+@font-face {
+  font-family: recursive-sans-linear-regular;
+  src: url(fonts/RecursiveSansLnrSt-Regular.woff2);
+}
+
+@font-face {
+  font-family: recursive-sans-casual-italic;
+  src: url(fonts/RecursiveSansCslSt-Italic.woff2);
+}
+
+@font-face {
+  font-family: recursive-sans-casual-bold;
+  src: url(fonts/RecursiveSansCslSt-Bold.woff2);
+}
+
+@font-face {
+  font-family: recursive-mono-linear-regular;
+  src: url(fonts/RecursiveMonoLnrSt-Regular.woff2);
+}
+
+html {
+  max-width: 800px;
+  background-color: #123;
+}
+
+body {
+  max-width: 100%;
+  margin-left: 1em;
+  margin-right: 1em;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  line-height: 1.5;
+  color: #fff;
+  font-family: recursive-sans-linear-regular, sans-serif;
+  font-size: 1.1em;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+body a {
+  color: #4488DD;  /* link color */
+}
+
+body a:hover,
+body a:active {
+  color: #ff6655;  /* hovered link color */
+}
+
+body em {
+  font-style: normal;
+  font-family: recursive-sans-casual-italic;
+}
+
+body strong {
+  font-family: recursive-sans-casual-bold;
+  font-weight: bolder;
+}
+
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6 {
+  font-family: recursive-sans-casual-bold;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  line-height: 1.25;
+}
+
+body h1 {
+  font-family: recursive-sans-casual-extra-black-italic;
+  font-size: 4em;
+  padding-bottom: 0.3em;
+}
+
+body h2 {
+  padding-bottom: 0.3em;
+}
+
+body h3 {
+  font-size: 1.2em;
+}
+
+body h4 {
+  font-size: 1.1em;
+}
+
+body h5 {
+  font-size: 0.875em;
+}
+
+body h6 {
+  font-size: 0.85em;
+  color: #777;
+}
+
+body img {
+  max-width: 100%;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  border-style: none;
+}
+
+body svg:not(:root) {
+  overflow: hidden;
+}
+
+body code,
+body pre {
+  font-family: recursive-mono-linear-regular, monospace;
+  color: #fff;
+}
+
+body hr {
+  height: 1px;
+  padding: 0;
+  margin: 12px 0;
+  background-color: #567;
+  border: 0;
+}
+
+body table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+body td,
+body th {
+  padding: 0;
+}
+
+body p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+body blockquote {
+  margin: 0;
+}
+
+body ul,
+body ol {
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+body ol ol,
+body ul ol {
+  list-style-type: lower-roman;
+}
+
+body ul ul ol,
+body ul ol ol,
+body ol ul ol,
+body ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+body dd {
+  margin-left: 0;
+}
+
+body pre {
+  margin-top: 0;
+  margin-bottom: 0;
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+body p,
+body blockquote,
+body ul,
+body ol,
+body dl,
+body table,
+body pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+body blockquote {
+  padding: 0 1em;
+  color: #777;
+  border-left: 0.25em solid #ddd;
+}
+
+body blockquote>:first-child {
+  margin-top: 0;
+}
+
+body blockquote>:last-child {
+  margin-bottom: 0;
+}
+
+body ul,
+body ol {
+  padding-left: 2em;
+}
+
+body ul ul,
+body ul ol,
+body ol ol,
+body ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+body li>p {
+  margin-top: 16px;
+}
+
+body li+li {
+  margin-top: 0.25em;
+}
+
+body dl {
+  padding: 0;
+}
+
+body dl dt {
+  padding: 0;
+  margin-top: 16px;
+//  font-size: 1em;
+  font-style: italic;
+  font-weight: bold;
+}
+
+body dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+body table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+}
+
+body table th {
+  font-weight: bold;
+}
+
+body table th,
+body table td {
+  padding: 6px 13px;
+  border: 1px solid #ddd;
+}
+
+body table tr {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+
+body code {
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  margin: 0;
+  background-color: #234;
+  border-radius: 3px;
+}
+
+body code::before,
+body code::after {
+  letter-spacing: -0.25em;
+  content: "\00a0";
+}
+
+body pre {
+  word-wrap: normal;
+}
+
+body pre>code {
+  padding: 0;
+  margin: 0;
+//  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+body pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 100%;
+  line-height: 1.45;
+  background-color: #234;
+  border-radius: 3px;
+}
+
+body pre code {
+  display: inline;
+  max-width: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+body pre code::before,
+body pre code::after {
+  content: normal;
+}
