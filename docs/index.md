@@ -58,7 +58,7 @@ Core features:
 
 ## Found a bug or have a question?
 
-Please open an issue on the [GitHub repository](https://github.com/justvanrossum/fontgoggles/issues).
+Please open an issue on the FontGoggles [GitHub repository](https://github.com/justvanrossum/fontgoggles/issues).
 
 -------------------
 
