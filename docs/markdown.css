@@ -34,11 +34,10 @@ body {
   margin-right: 1em;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-  line-height: 1.5;
+  line-height: 1.4;
   color: #fff;
   font-family: recursive-sans-linear-regular, sans-serif;
   font-size: 20px;
-  line-height: 1.5;
   word-wrap: break-word;
 }
 
@@ -107,10 +106,6 @@ body img {
   border-style: none;
 }
 
-body svg:not(:root) {
-  overflow: hidden;
-}
-
 body code,
 body pre {
   font-family: recursive-mono-linear-regular, monospace;
@@ -165,12 +160,6 @@ body ol ol ol {
 
 body dd {
   margin-left: 0;
-}
-
-body pre {
-  margin-top: 0;
-  margin-bottom: 0;
-  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
 body p,
