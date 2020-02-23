@@ -143,3 +143,5 @@ fonts.”_
 
 *FontGoggles was written by [Just van Rossum](mailto:justvanrossum@gmail.com)
 and funded by [GoogleFonts](https://fonts.google.com/).*
+
+-------------------
