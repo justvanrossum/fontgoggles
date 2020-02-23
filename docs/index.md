@@ -61,6 +61,8 @@ After opening some fonts it will look like this:
 - Script
 - Language
 
+![FontGoggles screenshot](images/screenshot_5.png)
+
 ## Formatting settings
 
 - Features panel
