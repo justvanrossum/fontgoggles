@@ -92,7 +92,7 @@ The _Script_ button overrides the automatic detection of the script by
 HarfBuzz.
 
 The _Language_ button allows you to specify for which language any
-language-specific features will be activated.
+language-specific lookups will be activated.
 
 ![FontGoggles screenshot](images/screenshot_6.png)
 
