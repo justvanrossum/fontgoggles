@@ -51,7 +51,16 @@ After opening some fonts it will look like this:
 
 ## Text settings
 
+- Direction/orientation
+- Visual alignment
+- Script
+- Language
+
 ## Formatting settings
+
+- Features panel
+- Variation panel
+- Options panel
 
 ## Customize the window
 
