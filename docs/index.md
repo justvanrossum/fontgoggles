@@ -13,7 +13,7 @@ The main focus is text behavior, specifically text shaping and variation behavio
 
 You can download [the latest release here](https://github.com/justvanrossum/fontgoggles/releases/latest).
 
-The following formats are supported:
+The following font formats are supported:
 
 - .ttf/.otf (including variable fonts)
 - .ttc/.otc
