@@ -23,7 +23,7 @@ Supported formats:
 Core features:
 
 - View multiple fonts simultaneously
-- Supports complex scripts: if does proper text shaping with HarfBuzz
+- Supports complex scripts: it does proper text shaping with HarfBuzz
 - Enable/disable OpenType features
 - Explore design spaces
 - Preview .ufo and .designspace files _as if_ they are compiled fonts
