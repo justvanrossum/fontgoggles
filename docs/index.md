@@ -123,6 +123,12 @@ output panel below the font list. (todo: screenshot)
 
 Please open an issue on [the FontGoggles repository](https://github.com/justvanrossum/fontgoggles/issues).
 
+## Testimonials
+
+Stephen Nixon: _“Super nice! I really love how this lets me compare the same variable axes across multiple fonts. It's super interesting to visually compare how different fonts handle wght, opsz, etc. I also love that I can put this in my mac dock and drag font files directly onto it, rather than booting up a browser to test things. And the light/dark modes are right on point.”_
+
+Thomas Thiemich: _“The most impressive feature of this tool so far is its speed — it’s quite impressive how fast it handles multiple fonts or variable fonts.”_
+
 -------------------
 
 *FontGoggles was written by [Just van Rossum](mailto:justvanrossum@gmail.com)
