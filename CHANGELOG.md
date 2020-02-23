@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [0.9.4] - 2020-02-??
+
+- Fixed issue with dragging multiple fonts: the selection was reset to a single item, making it impossible to drag multiple fonts.
+
 ## [0.9.3] - 2020-02-21
 
 - Save all text settings and many UI settings to the project file.
