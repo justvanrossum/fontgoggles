@@ -95,6 +95,10 @@ the project file become invalid._
 
 ## Compile warnings and errors
 
+- If an warning is issued or an error occurs during the loading of a font,
+  (... visual feedback todo ...), click on the font and have a look at the
+  output panel below the font list
+
 ## Found a bug or have a question?
 
 Please open an issue on [the FontGoggles repository](https://github.com/justvanrossum/fontgoggles/issues).
