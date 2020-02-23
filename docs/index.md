@@ -7,7 +7,7 @@ _Rich Font Previewing and Comparing_
 ## Overview
 
 FontGoggles is a font viewer for various font formats. It is a desktop
-application for macOS. It is free and open [source](https://github.com/justvanrossum/fontgoggles).
+application for macOS. It is free and [open source](https://github.com/justvanrossum/fontgoggles).
 
 You can download [the latest release here](https://github.com/justvanrossum/fontgoggles/releases/latest).
 
