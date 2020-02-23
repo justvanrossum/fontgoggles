@@ -41,12 +41,13 @@ An empty window looks like this:
 After opening some fonts it will look like this:
 ![FontGoggles screenshot](images/screenshot_3.png)
 
-
 - Zoom in/out by using pinch gestures on your trackpad, or use command-plus and command-minus, or option-scroll.
 - Type text in the text field to change the displayed text
 - Drag and drop can be used to rearrange the fonts
 - Click on a font to see the glyph positioning information
 - Select glyphs by clicking on them, highlighting glyph positioning info and character info
+
+![FontGoggles screenshot](images/screenshot_4.png)
 
 ## Text settings
 
