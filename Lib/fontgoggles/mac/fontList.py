@@ -699,10 +699,9 @@ class FontList(Group):
 
     @suppressAndLogException
     def mouseDragged(self, event):
-        clickedIndex = self._lastItemClicked
-        assert clickedIndex is not None
-        if clickedIndex not in self.selection:
-            self.selection = {self.project.fonts[clickedIndex].identifier}
+        clickedIdentifier = self.project.fonts[self._lastItemClicked].identifier
+        if clickedIdentifier not in self.selection:
+            self.selection = {clickedIdentifier}
         selectedIndices = {i for i, fii in enumerate(self.project.fonts)
                            if fii.identifier in self.selection}
         items = [self.project.fonts[i] for i in sorted(selectedIndices)]
