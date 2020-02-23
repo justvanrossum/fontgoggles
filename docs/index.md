@@ -56,10 +56,22 @@ After opening some fonts it will look like this:
 
 ## Text settings
 
+At the top right of the FontGoggles window you find four buttons with
+popup menus:
+
 - Direction/orientation
 - Visual alignment
 - Script
 - Language
+
+The _Direction/orientation_ menu has six options:
+
+- _Automatic, with BiDi_: apply the Unicode bidirectional algorithm, let HarfBuzz do the rest
+- _Automatic, without BiDi_: let HarfBuzz figure out the direction of the text, without first applying the Unicode bidirectional algorithm
+- _Left-to-Right_: force the direction of the text to be Left-to-Right
+- _Right-to-Left_: force the direction of the text to be Right-to-Left
+- _Top-to-Bottom_: use vertical layout, Top-to-Bottom
+- _Bottom-to-Top_: use vertical layout, Bottom-to-Top
 
 ![FontGoggles screenshot](images/screenshot_5.png)
 
