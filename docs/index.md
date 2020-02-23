@@ -70,7 +70,8 @@ After opening some fonts it will look like this:
 ## Customize the window
 
 Most panels in the window are resizable, and some are collapsable.
-There are also “View” menu items to show and hide a few panels:
+There are also “View” menu items to show and hide the collapsable
+panels:
 
 - Show/hide Character list — ⌘-1
 - Show/hide Glyph list — ⌘-2
@@ -93,8 +94,8 @@ FontGoggles: it will reload the text file and show the changes.
 
 ## Save a project file
 
-You can save a window as a `.gggls` project file. It will store all text,
-formatting and window settings.
+You can save a window as a `.gggls` project file. Apart from the viewed
+fonts, it will store all text, formatting and window settings.
 
 _Note: The file stores relative paths to the font files, so its location
 is related on the location of the font files. They can move together,
