@@ -75,10 +75,27 @@ After opening some fonts it will look like this:
 </ul>
 <p><img alt="FontGoggles screenshot" src="images/screenshot_5.png" /></p>
 <h2>Formatting settings</h2>
+<p>The <em>Features</em> panel shows the superset of GSUB and GPOS features of
+all opened fonts. You can click feature tags to enable them (green),
+disable them (red) or use their default setting (gray).</p>
+<p>The <em>Variations</em> panel shows sliders for all axes defined in the opened
+fonts. The minimum and maximum values for an axis are the lowest and
+highest values found in all opened fonts that have that axis.</p>
+<p>When multiple variable fonts (and/or .designspace files) are opened,
+all axes in all open fonts are set to their respective default values.
+However, since this value can be different per font, the slider will
+in that case show an arbitrary position, and the numeric field will
+be empty as a sign there is not a single possible value.</p>
+<p>The <em>Options</em> panel has three sliders that affect the display of the
+text.</p>
 <ul>
-<li>Features panel</li>
-<li>Variation panel</li>
-<li>Options panel</li>
+<li>The <em>Relative Size</em> slider controls the relative size of the text in
+  comparison to the box in which is is displayed. A value of 100 scales
+  the Units Per Em value to the display box size.</li>
+<li>The <em>Baseline</em> slider controls the baseline position, as a percentage
+  of the display box size.</li>
+<li>The <em>Margin</em> slider controls the left and right margins, as a percentage
+  of the display box size. Or top and bottom in vertical layout mode.</li>
 </ul>
 <h2>Customize the window</h2>
 <p>Most panels in the window are resizable, and some are collapsable.

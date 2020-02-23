@@ -65,9 +65,30 @@ After opening some fonts it will look like this:
 
 ## Formatting settings
 
-- Features panel
-- Variation panel
-- Options panel
+The _Features_ panel shows the superset of GSUB and GPOS features of
+all opened fonts. You can click feature tags to enable them (green),
+disable them (red) or use their default setting (gray).
+
+The _Variations_ panel shows sliders for all axes defined in the opened
+fonts. The minimum and maximum values for an axis are the lowest and
+highest values found in all opened fonts that have that axis.
+
+When multiple variable fonts (and/or .designspace files) are opened,
+all axes in all open fonts are set to their respective default values.
+However, since this value can be different per font, the slider will
+in that case show an arbitrary position, and the numeric field will
+be empty as a sign there is not a single possible value.
+
+The _Options_ panel has three sliders that affect the display of the
+text.
+
+- The _Relative Size_ slider controls the relative size of the text in
+  comparison to the box in which is is displayed. A value of 100 scales
+  the Units Per Em value to the display box size.
+- The _Baseline_ slider controls the baseline position, as a percentage
+  of the display box size.
+- The _Margin_ slider controls the left and right margins, as a percentage
+  of the display box size. Or top and bottom in vertical layout mode.
 
 ## Customize the window
 
