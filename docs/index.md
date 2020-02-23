@@ -34,18 +34,21 @@ Core features:
 
 ## How to use
 
-Drop some fonts (or folders with fonts) onto the application, or launch the application, and drop some fonts onto the window.
+Drop some fonts (or folders with fonts) onto the application, or launch
+the application, and drop some fonts onto the window.
 
 An empty window looks like this:
 ![FontGoggles screenshot](images/screenshot_2.png)
 After opening some fonts it will look like this:
 ![FontGoggles screenshot](images/screenshot_3.png)
 
-- Zoom in/out by using pinch gestures on your trackpad, or use ⌘-plus and ⌘-minus, or option-scroll.
+- Zoom in/out by using pinch gestures on your trackpad, or use ⌘-plus
+  and ⌘-minus, or option-scroll.
 - Type text in the text field to change the displayed text
 - Drag and drop can be used to rearrange the fonts
 - Click on a font to see the glyph positioning information
-- Select glyphs by clicking on them, highlighting glyph positioning info and character info
+- Select glyphs by clicking on them, highlighting glyph positioning
+  info and character info
 
 ![FontGoggles screenshot](images/screenshot_4.png)
 
