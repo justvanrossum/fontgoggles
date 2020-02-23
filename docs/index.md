@@ -88,6 +88,14 @@ In vertical mode, the options are _Automatic_, _Top_, _Bottom_ and _Center_.
 
 ![FontGoggles screenshot](images/screenshot_5.png)
 
+The _Script_ button overrides the automatic detection of the script by
+HarfBuzz.
+
+The _Language_ button allows you to specify for which language any
+language-specific features will be activated.
+
+![FontGoggles screenshot](images/screenshot_6.png)
+
 ## Formatting settings
 
 The _Features_ panel shows the superset of GSUB and GPOS features of
