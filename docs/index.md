@@ -78,6 +78,14 @@ Instead of typing the text into the text field, you may load an external
 text file, using the “Load Text File...” menu under “View”, or with the
 “gear” popup menu next to the text field.
 
+Once loaded, you can navigate through the lines of the text file with
+the “stepper” control next to the text field. The “View” menu has shortcuts
+for this: ⌘-arrow-key-up and ⌘-arrow-key-down to go to the previous or next
+line respectively.
+
+You can keep editing the text file in a text editor while it is loaded in
+FontGoggles: it will reload the text file and show the changes.
+
 ## Save a project file
 
 You can save a window as a `.gggls` project file. It will store all text,
@@ -90,14 +98,26 @@ the project file become invalid._
 
 ## Edit font with another application
 
-- Edit .ufo with RoboFont
-- Edit .ttx with text editor
+If a font gets changed on-disk by another application, FontGoggles will
+reload it and show the updated version. For example, this happens, when
+you:
+
+- Re-generate a .ttf or .otf from a font editor.
+- Edit a .ufo with a font editor
+- Edit a .ufo with a text editor
+- Edit a .designspace file
+- Edit a .fea file associated with a .ufo or .designspace file
+- Edit a .ttx file
+
+_Note: FontGoggles does its very best to reload as quickly as possible,
+but for .ufo and .designspace it may have to re-compile OpenType
+features, and the time needed depends on the complexity of the font._
 
 ## Compile warnings and errors
 
-- If an warning is issued or an error occurs during the loading of a font,
-  (... visual feedback todo ...), click on the font and have a look at the
-  output panel below the font list
+If a warning is issued or an error occurs during the loading of a font,
+(... visual feedback todo ...), click on the font and have a look at the
+output panel below the font list.
 
 ## Found a bug or have a question?
 

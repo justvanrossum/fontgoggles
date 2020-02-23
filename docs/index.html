@@ -88,6 +88,12 @@ There are also “View” menu items to show and hide a few panels:</p>
 <p>Instead of typing the text into the text field, you may load an external
 text file, using the “Load Text File...” menu under “View”, or with the
 “gear” popup menu next to the text field.</p>
+<p>Once loaded, you can navigate through the lines of the text file with
+the “stepper” control next to the text field. The “View” menu has shortcuts
+for this: ⌘-arrow-key-up and ⌘-arrow-key-down to go to the previous or next
+line respectively.</p>
+<p>You can keep editing the text file in a text editor while it is loaded in
+FontGoggles: it will reload the text file and show the changes.</p>
 <h2>Save a project file</h2>
 <p>You can save a window as a <code>.gggls</code> project file. It will store all text,
 formatting and window settings.</p>
@@ -96,16 +102,24 @@ is related on the location of the font files. They can move together,
 but if sources move or the project file moves, the source references in
 the project file become invalid.</em></p>
 <h2>Edit font with another application</h2>
+<p>If a font gets changed on-disk by another application, FontGoggles will
+reload it and show the updated version. For example, this happens, when
+you:</p>
 <ul>
-<li>Edit .ufo with RoboFont</li>
-<li>Edit .ttx with text editor</li>
+<li>Re-generate a .ttf or .otf from a font editor.</li>
+<li>Edit a .ufo with a font editor</li>
+<li>Edit a .ufo with a text editor</li>
+<li>Edit a .designspace file</li>
+<li>Edit a .fea file associated with a .ufo or .designspace file</li>
+<li>Edit a .ttx file</li>
 </ul>
+<p><em>Note: FontGoggles does its very best to reload as quickly as possible,
+but for .ufo and .designspace it may have to re-compile OpenType
+features, and the time needed depends on the complexity of the font.</em></p>
 <h2>Compile warnings and errors</h2>
-<ul>
-<li>If an warning is issued or an error occurs during the loading of a font,
-  (... visual feedback todo ...), click on the font and have a look at the
-  output panel below the font list</li>
-</ul>
+<p>If a warning is issued or an error occurs during the loading of a font,
+(... visual feedback todo ...), click on the font and have a look at the
+output panel below the font list.</p>
 <h2>Found a bug or have a question?</h2>
 <p>Please open an issue on <a href="https://github.com/justvanrossum/fontgoggles/issues">the FontGoggles repository</a>.</p>
 <hr />
