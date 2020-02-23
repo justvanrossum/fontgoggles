@@ -41,7 +41,7 @@ An empty window looks like this:
 After opening some fonts it will look like this:
 ![FontGoggles screenshot](images/screenshot_3.png)
 
-- Zoom in/out by using pinch gestures on your trackpad, or use command-plus and command-minus, or option-scroll.
+- Zoom in/out by using pinch gestures on your trackpad, or use ⌘-plus and ⌘-minus, or option-scroll.
 - Type text in the text field to change the displayed text
 - Drag and drop can be used to rearrange the fonts
 - Click on a font to see the glyph positioning information
@@ -53,9 +53,31 @@ After opening some fonts it will look like this:
 
 ## Formatting settings
 
-## Save a project file
+## Customize the window
+
+Most panels in the window are resizable, and some are collapsable.
+There are also “View” menu items to show and hide a few panels:
+
+- Show/hide Character list — ⌘-1
+- Show/hide Glyph list — ⌘-2
+- Show/hide Compile output — ⌘-3
+- Show/hide Formatting options — ⌘-4
 
 ## Load and navigate a text file
+
+Instead of typing the text into the text field, you may load an external
+text file, using the “Load Text File...” menu under “View”, or with the
+“gear” popup menu next to the text field.
+
+## Save a project file
+
+You can save a window as a `.gggls` project file. It will store all text,
+formatting and window settings.
+
+_Note: The file stores relative paths to the font files, so its location
+is related on the location of the font files. They can move together,
+but if sources move or the project file moves, the source references in
+the project file become invalid._
 
 ## Edit font with another application
 
