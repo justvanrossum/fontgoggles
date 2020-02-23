@@ -80,7 +80,7 @@ in that case show an arbitrary position, and the numeric field will
 be empty as a sign there is not a single possible value.
 
 The _Options_ panel has three sliders that affect the display of the
-text.
+text:
 
 - The _Relative Size_ slider controls the relative size of the text in
   comparison to the box in which is is displayed. A value of 100 scales
