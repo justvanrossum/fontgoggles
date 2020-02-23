@@ -1,6 +1,8 @@
 name: Run FontGoggles test suite
 
-on: [push]
+on:
+  push:
+    paths-ignore: docs/*
 
 
 jobs:
