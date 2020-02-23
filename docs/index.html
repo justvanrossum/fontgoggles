@@ -77,13 +77,25 @@ popup menus:</p>
 </ul>
 <p>The <em>Direction/orientation</em> menu has six options:</p>
 <ul>
-<li><em>Automatic, with BiDi</em>: apply the Unicode bidirectional algorithm, let HarfBuzz do the rest</li>
-<li><em>Automatic, without BiDi</em>: let HarfBuzz figure out the direction of the text, without first applying the Unicode bidirectional algorithm</li>
+<li><em>Automatic, with BiDi</em>: apply the Unicode bidirectional algorithm,
+  which will determine the dominant writing direction</li>
+<li><em>Automatic, without BiDi</em>: let HarfBuzz figure out the writing
+  direction of the text, and do not applying the Unicode bidirectional
+  algorithm</li>
 <li><em>Left-to-Right</em>: force the direction of the text to be Left-to-Right</li>
 <li><em>Right-to-Left</em>: force the direction of the text to be Right-to-Left</li>
 <li><em>Top-to-Bottom</em>: use vertical layout, Top-to-Bottom</li>
 <li><em>Bottom-to-Top</em>: use vertical layout, Bottom-to-Top</li>
 </ul>
+<p>The <em>Visual alignment</em> button controls how the rendered text is visually
+aligned within the window. Its menu has four options:</p>
+<ul>
+<li><em>Automatic</em>: Use the alignment that is most natural with the detected writing direction</li>
+<li><em>Left</em>: align left</li>
+<li><em>Right</em>: align right</li>
+<li><em>Center</em>: align center</li>
+</ul>
+<p>In vertical mode, the options are <em>Automatic</em>, <em>Top</em>, <em>Bottom</em> and <em>Center</em>.</p>
 <p><img alt="FontGoggles screenshot" src="images/screenshot_5.png" /></p>
 <h2>Formatting settings</h2>
 <p>The <em>Features</em> panel shows the superset of GSUB and GPOS features of

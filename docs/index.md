@@ -66,12 +66,25 @@ popup menus:
 
 The _Direction/orientation_ menu has six options:
 
-- _Automatic, with BiDi_: apply the Unicode bidirectional algorithm, let HarfBuzz do the rest
-- _Automatic, without BiDi_: let HarfBuzz figure out the direction of the text, without first applying the Unicode bidirectional algorithm
+- _Automatic, with BiDi_: apply the Unicode bidirectional algorithm,
+  which will determine the dominant writing direction
+- _Automatic, without BiDi_: let HarfBuzz figure out the writing
+  direction of the text, and do not applying the Unicode bidirectional
+  algorithm
 - _Left-to-Right_: force the direction of the text to be Left-to-Right
 - _Right-to-Left_: force the direction of the text to be Right-to-Left
 - _Top-to-Bottom_: use vertical layout, Top-to-Bottom
 - _Bottom-to-Top_: use vertical layout, Bottom-to-Top
+
+The _Visual alignment_ button controls how the rendered text is visually
+aligned within the window. Its menu has four options:
+
+- _Automatic_: Use the alignment that is most natural with the detected writing direction
+- _Left_: align left
+- _Right_: align right
+- _Center_: align center
+
+In vertical mode, the options are _Automatic_, _Top_, _Bottom_ and _Center_.
 
 ![FontGoggles screenshot](images/screenshot_5.png)
 
