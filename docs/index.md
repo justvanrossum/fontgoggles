@@ -115,9 +115,9 @@ features, and the time needed depends on the complexity of the font._
 
 ## Compile warnings and errors
 
-If a warning is issued or an error occurs during the loading of a font,
+If, during the (re)loading of a font, a warning is issued or an error occurs,
 (... visual feedback todo ...), click on the font and have a look at the
-output panel below the font list.
+output panel below the font list. (todo: screenshot)
 
 ## Found a bug or have a question?
 
