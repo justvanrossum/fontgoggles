@@ -9,9 +9,11 @@ _Rich Font Previewing and Comparing_
 FontGoggles is a font viewer for various font formats. It is a desktop
 application for macOS. It is free and [open source](https://github.com/justvanrossum/fontgoggles).
 
+The main focus is text behavior, specifically text shaping and variation behavior.
+
 You can download [the latest release here](https://github.com/justvanrossum/fontgoggles/releases/latest).
 
-Supported formats:
+The following formats are supported:
 
 - .ttf/.otf (including variable fonts)
 - .ttc/.otc
