@@ -17,7 +17,7 @@ htmlTemplate = """\
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FontGoggles — Interactive Font Previewing and Comparing</title>
+<title>FontGoggles — Interactive Previewing and Comparing</title>
 <link rel="stylesheet" href="markdown.css">
 </style>
 </head>

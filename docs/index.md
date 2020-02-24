@@ -2,7 +2,7 @@
 
 # FontGoggles
 
-_Interactive Font Previewing and Comparing_
+_Interactive Previewing and Comparing_
 
 ## Overview
 
