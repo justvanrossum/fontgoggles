@@ -11,6 +11,7 @@
   a single item, making it impossible to drag multiple fonts.
 - Fixed issue where you couldn't delect glyphs by clicking outside the
   glyphs.
+- Make app icon work better at small sizes.
 
 ## [0.9.3] - 2020-02-21
 
