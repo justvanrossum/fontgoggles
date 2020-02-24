@@ -52,7 +52,7 @@ fonts.”_
 Drop some fonts (or folders with fonts) onto the application, or launch
 the application, and drop some fonts onto the window.
 
-An new, empty window looks like this:
+A new, empty window looks like this:
 
 ![FontGoggles screenshot](images/screenshot_2_empty.png)
 
