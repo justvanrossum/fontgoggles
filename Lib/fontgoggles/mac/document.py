@@ -39,3 +39,13 @@ class FGDocument(AppKit.NSDocument):
         rootPath = pathlib.Path(self.fileURL().path()).parent
         self.project = Project.fromJSON(bytes(data), rootPath)
         return True, None
+
+    def revertToContentsOfURL_ofType_error_(self, url, type, error):
+        for controller in list(self.windowControllers()):
+            self.removeWindowController_(controller)
+            controller.w.close()
+            controller.close()
+        success, error = self.readFromURL_ofType_error_(url, type, None)
+        if success:
+            self.makeWindowControllers()
+        return True, error

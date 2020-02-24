@@ -2,6 +2,7 @@
 
 ## [0.9.4] - 2020-02-??
 
+- Implement File -> Revert
 - Hide the compile output panel by default, but show visual feedback
   in the font list when a compile warning or error was issued, and show
   the compile output pane automatically when a font item is selected
