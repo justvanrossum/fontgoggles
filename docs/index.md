@@ -161,7 +161,7 @@ is related on the location of the font files. They can move together,
 but if sources move or the project file moves, the source references in
 the project file become invalid._
 
-## Edit font with another application
+## Edit a font with another application
 
 If a font gets changed on-disk by another application, FontGoggles will
 reload it and show the updated version. For example, this happens, when
