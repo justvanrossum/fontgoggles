@@ -717,6 +717,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
             isVisible = self.fontListSplitView.isPaneReallyVisible("compileOutput")
             if output and not self.fontListSplitView.isPaneReallyVisible("compileOutput"):
+                # This may be annoying if warnings are common and need to be ignored
+                # more. For now, let's make sure the user sees all warnings/errors.
                 self.fontListSplitView.togglePane("compileOutput")
         else:
             glyphs = []
