@@ -78,8 +78,14 @@ body h6 {
 
 body h1 {
   font-family: recursive-sans-casual-extra-black-italic;
-  font-size: 3.5em;
+  font-size: 14.5vw;
   padding-bottom: 0.1em;
+}
+
+@media (min-width: 690px) {
+  body h1 {
+    font-size: 100px;
+  }
 }
 
 body h2 {
