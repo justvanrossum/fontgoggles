@@ -15,7 +15,7 @@ When a font file changes on disk, FontGoggles will automatically reload it and s
 
 For downloads see the [releases page](https://github.com/justvanrossum/fontgoggles/releases).
 
-![FontGoggles Icon](icon.png)
+![FontGoggles Icon](docs/images/icon.png)
 
 ## Build instructions
 
