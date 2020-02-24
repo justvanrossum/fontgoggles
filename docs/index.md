@@ -34,16 +34,29 @@ Core features:
 
 ![FontGoggles screenshot](images/screenshot_1_goggle.png)
 
+## Testimonials
+
+Stephen Nixon: _“Super nice! I really love how this lets me compare the same
+variable axes across multiple fonts. It’s super interesting to visually
+compare how different fonts handle wght, opsz, etc. I also love that I can
+put this in my mac dock and drag font files directly onto it, rather than
+booting up a browser to test things. And the light/dark modes are right on
+point.”_
+
+Thomas Thiemich: _“The most impressive feature of this tool so far is its
+speed — it’s quite impressive how fast it handles multiple fonts or variable
+fonts.”_
+
 ## How to use
 
 Drop some fonts (or folders with fonts) onto the application, or launch
 the application, and drop some fonts onto the window.
 
-An empty window looks like this:
+An new, empty window looks like this:
 
 ![FontGoggles screenshot](images/screenshot_2_empty.png)
 
-After opening some fonts it will look like this:
+After dropping some fonts it will look like this:
 
 ![FontGoggles screenshot](images/screenshot_3_filled.png)
 
@@ -52,8 +65,8 @@ After opening some fonts it will look like this:
 - Type text in the text field to change the displayed text
 - Drag and drop can be used to rearrange the fonts
 - Click on a font to see the glyph positioning information
-- Select glyphs by clicking on them, highlighting glyph positioning
-  info and character info
+- Select glyphs by clicking on them, which will highlight glyph
+  positioning info and character info
 
 ![FontGoggles screenshot](images/screenshot_4_arabic.png)
 
@@ -190,19 +203,6 @@ the compile output panel at the bottom of the font list will appear.
 ## Found a bug or have a question?
 
 Please open an issue on [the FontGoggles repository](https://github.com/justvanrossum/fontgoggles/issues).
-
-## Testimonials
-
-Stephen Nixon: _“Super nice! I really love how this lets me compare the same
-variable axes across multiple fonts. It’s super interesting to visually
-compare how different fonts handle wght, opsz, etc. I also love that I can
-put this in my mac dock and drag font files directly onto it, rather than
-booting up a browser to test things. And the light/dark modes are right on
-point.”_
-
-Thomas Thiemich: _“The most impressive feature of this tool so far is its
-speed — it’s quite impressive how fast it handles multiple fonts or variable
-fonts.”_
 
 -------------------
 
