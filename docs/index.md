@@ -193,7 +193,7 @@ features, and the time needed depends on the complexity of the font._
 
 ## Compile warnings and errors
 
-When during the loading of a font a warning or error is issued, the
+When an error or warning occurs during the loading of a font, the
 font list will show that by highlighting the font with a diagonally
 striped background. To view the error details, click on the font, and
 the compile output panel at the bottom of the font list will appear.
