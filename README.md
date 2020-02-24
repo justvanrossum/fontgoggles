@@ -1,6 +1,16 @@
+![FontGoggles Icon](docs/images/icon.png)
+
 # FontGoggles
 
+_Interactive Previewing and Comparing_
+
+For end-user documentation see [fontgoggles.org](https://fontgoggles.org/).
+
+The lastest release can be downloaded [here](https://github.com/justvanrossum/fontgoggles/releases/latest).
+
 FontGoggles was funded by [Google Fonts](https://fonts.google.com/).
+
+## Brief description
 
 FontGoggles is a font viewer desktop app for macOS that supports these file formats:
 
@@ -12,10 +22,6 @@ FontGoggles is a font viewer desktop app for macOS that supports these file form
 It uses HarfBuzz for line layout, so it supports complex scripts. The source formats are partially compiled on the fly, so their line layout and variation behaviour can be realistically previewed.
 
 When a font file changes on disk, FontGoggles will automatically reload it and show the updated version.
-
-For downloads see the [releases page](https://github.com/justvanrossum/fontgoggles/releases).
-
-![FontGoggles Icon](docs/images/icon.png)
 
 ## Build instructions
 
