@@ -180,9 +180,12 @@ features, and the time needed depends on the complexity of the font._
 
 ## Compile warnings and errors
 
-If, during the (re)loading of a font, a warning is issued or an error occurs,
-(... visual feedback todo ...), click on the font and have a look at the
-output panel below the font list. (todo: screenshot)
+If, during the (re)loading of a font, a warning or error is issued, the
+font list will show that by highlighting the font with a diagonally
+striped background. To view the error details, click on the font, and
+the compile output panel at the bottom of the font list will appear.
+
+![FontGoggles screenshot](images/screenshot_7.png)
 
 ## Found a bug or have a question?
 
