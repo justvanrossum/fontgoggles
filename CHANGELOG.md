@@ -12,7 +12,7 @@
   that has a warning or error.
 - Fixed issue with dragging multiple fonts: the selection was reset to
   a single item, making it impossible to drag multiple fonts.
-- Fixed issue where you couldn't delect glyphs by clicking outside the
+- Fixed issue where you couldn't select glyphs by clicking outside the
   glyphs.
 - Make app icon work better at small sizes.
 
