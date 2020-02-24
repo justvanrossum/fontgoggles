@@ -4,7 +4,7 @@
 
 - Implement File -> Revert
 - Discovered a bug in the BiDi algorithm we use, which tripped an assert.
-  Disabled the assert to we at least get to see the result of the bug.
+  Disabled the assert so we can at least see the result of the bug.
   Workaround: disable BiDi processing. See [#35](https://github.com/justvanrossum/fontgoggles/issues/35).
 - Hide the compile output panel by default, but show visual feedback
   in the font list when a compile warning or error was issued, and show
