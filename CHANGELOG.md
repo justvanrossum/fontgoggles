@@ -2,7 +2,14 @@
 
 ## [0.9.4] - 2020-02-??
 
-- Fixed issue with dragging multiple fonts: the selection was reset to a single item, making it impossible to drag multiple fonts.
+- Hide the compile output panel by default, but show visual feedback
+  in the font list when a compile warning or error was issued, and show
+  the compile output pane automatically when a font item is selected
+  that has a warning or error.
+- Fixed issue with dragging multiple fonts: the selection was reset to
+  a single item, making it impossible to drag multiple fonts.
+- Fixed issue where you couldn't delect glyphs by clicking outside the
+  glyphs.
 
 ## [0.9.3] - 2020-02-21
 
