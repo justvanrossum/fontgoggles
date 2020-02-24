@@ -215,7 +215,7 @@ class UISettings:
     characterListSize: float = 100
     glyphListVisible: bool = True
     glyphListSize: float = 230
-    compileOutputVisible: bool = True  # TODO: change to False once we have a visual indicator and can automatically uncollapse
+    compileOutputVisible: bool = False
     compileOutputSize: float = 80
     formattingOptionsVisible: bool = True
     feaVarTabSelection: str = "features"
