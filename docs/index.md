@@ -32,7 +32,7 @@ Core features:
 - Automatically reload fonts if they are changed on disk
 - Supports vertical text layout
 
-![FontGoggles screenshot](images/screenshot_1.png)
+![FontGoggles screenshot](images/screenshot_1_goggle.png)
 
 ## How to use
 
@@ -41,11 +41,11 @@ the application, and drop some fonts onto the window.
 
 An empty window looks like this:
 
-![FontGoggles screenshot](images/screenshot_2.png)
+![FontGoggles screenshot](images/screenshot_2_empty.png)
 
 After opening some fonts it will look like this:
 
-![FontGoggles screenshot](images/screenshot_3.png)
+![FontGoggles screenshot](images/screenshot_3_filled.png)
 
 - Zoom in/out by using pinch gestures on your trackpad, or use ⌘-plus
   and ⌘-minus, or option-scroll.
@@ -55,7 +55,7 @@ After opening some fonts it will look like this:
 - Select glyphs by clicking on them, highlighting glyph positioning
   info and character info
 
-![FontGoggles screenshot](images/screenshot_4.png)
+![FontGoggles screenshot](images/screenshot_4_arabic.png)
 
 ## Text settings
 
@@ -89,7 +89,7 @@ aligned within the window. Its menu has four options:
 
 In vertical mode, the options are _Automatic_, _Top_, _Bottom_ and _Center_.
 
-![FontGoggles screenshot](images/screenshot_5.png)
+![FontGoggles screenshot](images/screenshot_5_cjk.png)
 
 The _Script_ button overrides the automatic detection of the script by
 HarfBuzz.
@@ -97,7 +97,7 @@ HarfBuzz.
 The _Language_ button allows you to specify for which language any
 language-specific lookups will be activated.
 
-![FontGoggles screenshot](images/screenshot_6.png)
+![FontGoggles screenshot](images/screenshot_6_turkish.png)
 
 ## Formatting settings
 
@@ -185,7 +185,7 @@ font list will show that by highlighting the font with a diagonally
 striped background. To view the error details, click on the font, and
 the compile output panel at the bottom of the font list will appear.
 
-![FontGoggles screenshot](images/screenshot_7.png)
+![FontGoggles screenshot](images/screenshot_7_error.png)
 
 ## Found a bug or have a question?
 
