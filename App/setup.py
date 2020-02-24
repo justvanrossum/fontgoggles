@@ -68,7 +68,7 @@ try:
     # dylib to the App folder to accomplish this.
     os.rename(turboLibOriginalPath, turboLibPath)
     setup(
-        data_files=['Resources/English.lproj'],
+        data_files=['Resources/English.lproj', 'Resources/errorPatternImage.png'],
         app=[f"{appName}.py"],
         options=dict(py2app=dict(
             iconfile="Resources/fontgoggles.icns",

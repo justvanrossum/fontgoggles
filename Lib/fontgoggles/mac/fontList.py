@@ -12,7 +12,7 @@ from fontgoggles.font import defaultSortSpec, sniffFontType, sortedFontPathsAndN
 from fontgoggles.mac.drawing import nsRectFromRect, rectFromNSRect, scale, translate
 from fontgoggles.mac.misc import textAlignments
 from fontgoggles.misc.decorators import suppressAndLogException, asyncTaskAutoCancel
-from fontgoggles.misc.properties import delegateProperty, hookedProperty
+from fontgoggles.misc.properties import delegateProperty, hookedProperty, cachedProperty
 from fontgoggles.misc.rectTree import RectTree
 
 
@@ -801,11 +801,18 @@ def _scheduleRedraw(self):
 class FGFontItemView(AppKit.NSView):
 
     selected = hookedProperty(_scheduleRedraw, default=False)
+    hasWarningOrError = hookedProperty(_scheduleRedraw, default=False)
 
     def init(self):
         self = super().init()
         self.selected = False
         return self
+
+    @cachedProperty
+    def errorOverlayColor(self):
+        im = AppKit.NSImage.imageNamed_("errorPatternImage")
+        assert im is not None
+        return AppKit.NSColor.colorWithPatternImage_(im)
 
     def drawRect_(self, rect):
         if not self.selected:
@@ -815,6 +822,9 @@ class FGFontItemView(AppKit.NSView):
                 0.5, AppKit.NSColor.selectedTextBackgroundColor())
         backgroundColor.set()
         AppKit.NSRectFill(rect)
+        if self.hasWarningOrError:
+            self.errorOverlayColor.set()
+            AppKit.NSRectFillUsingOperation(rect, AppKit.NSCompositeSourceOver)
 
     @suppressAndLogException
     def revealInFinder_(self, sender):
@@ -850,6 +860,7 @@ class FontItem(Group):
 
     nsViewClass = FGFontItemView
     selected = delegateProperty("_nsObject")
+    hasWarningOrError = delegateProperty("_nsObject")
     vertical = delegateProperty("glyphLineView")
     relativeSize = delegateProperty("glyphLineView")
     relativeHBaseline = delegateProperty("glyphLineView")
@@ -905,6 +916,7 @@ class FontItem(Group):
         self.compileOutput.write(text)
         if self._auxillaryOutput[0] is not None:
             self._auxillaryOutput[0].write(text)
+        self.hasWarningOrError = True
 
     def getCompileOutput(self):
         return self.compileOutput.getvalue()
@@ -914,6 +926,7 @@ class FontItem(Group):
         self.compileOutput.truncate()
         if self._auxillaryOutput[0] is not None:
             self._auxillaryOutput[0].clear()
+        self.hasWarningOrError = False
 
     @property
     def glyphs(self):
