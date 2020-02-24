@@ -59,7 +59,7 @@ body em {
 
 body strong {
   font-family: recursive-sans-casual-bold;
-  font-weight: bolder;
+  font-weight: normal;
 }
 
 body h1,
@@ -70,6 +70,7 @@ body h5,
 body h6 {
   font-family: recursive-sans-casual-bold;
   font-style: normal;
+  font-weight: normal;
   margin-top: 20px;
   margin-bottom: 5px;
   line-height: 1.25;
