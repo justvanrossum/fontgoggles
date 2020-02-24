@@ -711,8 +711,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if fontItem is not None:
             glyphs = fontItem.glyphs
             self.updateCharacterListSelection(fontItem)
-            self.compileOutput.set(fontItem.getCompileOutput())
+            output = fontItem.getCompileOutput()
+            self.compileOutput.set(output)
             fontItem.setAuxillaryOutput(self.compileOutput)
+
+            isVisible = self.fontListSplitView.isPaneReallyVisible("compileOutput")
+            if output and not self.fontListSplitView.isPaneReallyVisible("compileOutput"):
+                self.fontListSplitView.togglePane("compileOutput")
         else:
             glyphs = []
             self.compileOutput.set("")
