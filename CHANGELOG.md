@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [0.9.4] - 2020-02-??
+## [0.9.4] - 2020-02-24
 
 - Implement File -> Revert
 - Discovered a bug in the BiDi algorithm we use, which tiggered an assert.
