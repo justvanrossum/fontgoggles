@@ -40,8 +40,11 @@ Drop some fonts (or folders with fonts) onto the application, or launch
 the application, and drop some fonts onto the window.
 
 An empty window looks like this:
+
 ![FontGoggles screenshot](images/screenshot_2.png)
+
 After opening some fonts it will look like this:
+
 ![FontGoggles screenshot](images/screenshot_3.png)
 
 - Zoom in/out by using pinch gestures on your trackpad, or use ⌘-plus
