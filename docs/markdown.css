@@ -26,6 +26,8 @@
 html {
   max-width: 800px;
   background-color: #123;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 body {
@@ -37,7 +39,7 @@ body {
   line-height: 1.4;
   color: #fff;
   font-family: recursive-sans-linear-regular, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   word-wrap: break-word;
 }
 
@@ -74,7 +76,7 @@ body h6 {
 
 body h1 {
   font-family: recursive-sans-casual-extra-black-italic;
-  font-size: 3em;
+  font-size: 3.5em;
   padding-bottom: 0.1em;
 }
 
