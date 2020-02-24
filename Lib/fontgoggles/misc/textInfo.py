@@ -24,6 +24,7 @@ class TextInfo:
     def text(self, text):
         self.originalText = text
         self.biDiText, self._runLengths, self.baseDirection, self.toBiDi, self.fromBiDi = applyBiDi(self.originalText)
+        # assert len(self.biDiText) == len(self.originalText), (len(self.biDiText), len(self.originalText))
 
     def mapToBiDi(self, charIndices):
         toBiDi = self.toBiDi

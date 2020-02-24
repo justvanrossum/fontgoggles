@@ -105,7 +105,7 @@ class BaseFont:
                 gi.cluster += index
             glyphs.extend(run)
             index += rl
-        assert index == len(text)
+        # assert index == len(text)
         x = y = 0
         for gi in glyphs:
             gi.pos = x + gi.dx, y + gi.dy
