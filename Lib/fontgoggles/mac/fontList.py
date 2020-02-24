@@ -1252,6 +1252,8 @@ class FGGlyphLineView(AppKit.NSView):
                 else:
                     newSelection = {index}
                 self.selection = newSelection
+        else:
+            self.selection = set()
 
         super().mouseUp_(event)
 
