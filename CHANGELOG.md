@@ -3,7 +3,7 @@
 ## [0.9.4] - 2020-02-??
 
 - Implement File -> Revert
-- Discovered a bug in the BiDi algorithm we use, which tripped an assert.
+- Discovered a bug in the BiDi algorithm we use, which tiggered an assert.
   Disabled the assert so we can at least see the result of the bug.
   Workaround: disable BiDi processing. See [#35](https://github.com/justvanrossum/fontgoggles/issues/35).
 - Hide the compile output panel by default, but show visual feedback
