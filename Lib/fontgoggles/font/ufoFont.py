@@ -45,6 +45,7 @@ class UFOFont(BaseFont):
         self._setupReaderAndGlyphSet()
         self.info = SimpleNamespace()
         self.reader.readInfo(self.info)
+        self.lib = self.reader.readLib()
         self._cachedGlyphs = {}
         if self.ufoState is None:
             includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
@@ -98,8 +99,12 @@ class UFOFont(BaseFont):
             self.ttFont.save(f, reorderTables=False)
             self.shaper = self._getShaper(f.getvalue())
 
-        if needsGlyphUpdate or needsInfoUpdate or needsCmapUpdate:
-            self.resetCache()
+        if needsLibUpdate:
+            self.lib = self.reader.readLib()
+
+        # We don't explicitly track changes in layers, but they may be involved
+        # in building layered color glyphs, so let's just always reset the cache.
+        self.resetCache()
 
         return True
 
