@@ -27,6 +27,11 @@ class UFOFont(BaseFont):
 
     ufoState = None
 
+    def resetCache(self):
+        super().resetCache()
+        del self.defaultVerticalAdvance
+        del self.defaultVerticalOriginY
+
     def _setupReaderAndGlyphSet(self):
         self.reader = UFOReader(self.fontPath, validate=False)
         self.glyphSet = self.reader.getGlyphSet()
