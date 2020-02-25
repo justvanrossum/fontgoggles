@@ -988,6 +988,8 @@ class FGGlyphLineView(AppKit.NSView):
         self._hoveredGlyphIndex = None
         self._lastDiffSelection = None
         self._lastAppearanceName = None
+        self._glyphsColorPalette = None
+        self._cachedColorPalettes = {}
 
         trackingArea = AppKit.NSTrackingArea.alloc().initWithRect_options_owner_userInfo_(
             self.bounds(),
@@ -1155,13 +1157,23 @@ class FGGlyphLineView(AppKit.NSView):
             self._colors = colors
         return self._colors
 
-
-    @cachedProperty
-    def colorPalette(self):
-        palette = {}
-        for colorID, (r, g, b, a) in enumerate(self._glyphs.colorPalette):
-            palette[colorID] = AppKit.NSColor.colorWithRed_green_blue_alpha_(r, g, b, a)
-        return palette
+    @objc.python_method
+    def getColorPalette(self, blendColor):
+        if self._glyphsColorPalette != self._glyphs.colorPalette:
+            self._glyphsColorPalette = self._glyphs.colorPalette
+            self._cachedColorPalettes = {}
+        mainPalette = self._cachedColorPalettes.get(None)
+        if mainPalette is None:
+            mainPalette = {}
+            for colorID, (r, g, b, a) in enumerate(self._glyphs.colorPalette):
+                mainPalette[colorID] = AppKit.NSColor.colorWithRed_green_blue_alpha_(r, g, b, a)
+            self._cachedColorPalettes[None] = mainPalette
+        blendedPalette = self._cachedColorPalettes.get(blendColor)
+        if blendedPalette is None:
+            blendedPalette = {colorID: color.blendedColorWithFraction_ofColor_(0.5, blendColor)
+                              for colorID, color in mainPalette.items()}
+            self._cachedColorPalettes[blendColor] = blendedPalette
+        return blendedPalette
 
 
     @suppressAndLogException
@@ -1194,7 +1206,6 @@ class FGGlyphLineView(AppKit.NSView):
         translate(dx, dy)
         scale(self.scaleFactor)
 
-        colors.foregroundColor.set()
         lastPosX = lastPosY = 0
         for index in self._rectTree.iterIntersections(rect):
             gi = self._glyphs[index]
@@ -1212,7 +1223,8 @@ class FGGlyphLineView(AppKit.NSView):
                 AppKit.NSRectFillUsingOperation(nsRectFromRect(offsetRect(gi.bounds, -posX, -posY)),
                                                 AppKit.NSCompositeSourceOver)
             else:
-                gi.glyphDrawing.draw(self.colorPalette, color)
+                blendColor = None if color == colors.foregroundColor else color
+                gi.glyphDrawing.draw(self.getColorPalette(blendColor), color)
 
     def mouseMoved_(self, event):
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
