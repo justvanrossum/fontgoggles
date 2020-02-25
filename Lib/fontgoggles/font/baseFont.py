@@ -54,7 +54,7 @@ class BaseFont:
 
     @cachedProperty
     def colorPalettes(self):
-        return [[(0, 0, 0, 1)]]  # default palette [[(r, g, b, a)]]
+        return [{}]
 
     @cachedProperty
     def featuresGSUB(self):
@@ -85,14 +85,15 @@ class BaseFont:
             axes[axis.axisTag] = axisDict
         return axes
 
-    def getGlyphRunFromTextInfo(self, textInfo, **kwargs):
+    def getGlyphRunFromTextInfo(self, textInfo, colorPalettesIndex=0, **kwargs):
         text = textInfo.text
         runLengths = textInfo.runLengths
         direction = textInfo.directionForShaper
         script = textInfo.scriptOverride
         language = textInfo.languageOverride
 
-        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"))
+        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"),
+                           self.colorPalettes[colorPalettesIndex])
         index = 0
         for rl in runLengths:
             seg = text[index:index + rl]
@@ -156,13 +157,14 @@ class BaseFont:
 
 class GlyphsRun(list):
 
-    def __init__(self, numChars, unitsPerEm, vertical):
+    def __init__(self, numChars, unitsPerEm, vertical, colorPalette=None):
         self.numChars = numChars
         self.unitsPerEm = unitsPerEm
         self.vertical = vertical
         self._glyphToChars = None
         self._charToGlyphs = None
         self.endPos = (0, 0)
+        self.colorPalette = [] if colorPalette is None else colorPalette
 
     def mapGlyphsToChars(self, glyphIndices):
         if self._glyphToChars is None:

@@ -1155,6 +1155,15 @@ class FGGlyphLineView(AppKit.NSView):
             self._colors = colors
         return self._colors
 
+
+    @cachedProperty
+    def colorPalette(self):
+        palette = {}
+        for colorID, (r, g, b, a) in enumerate(self._glyphs.colorPalette):
+            palette[colorID] = AppKit.NSColor.colorWithRed_green_blue_alpha_(r, g, b, a)
+        return palette
+
+
     @suppressAndLogException
     def drawRect_(self, rect):
         if not self._glyphs:
@@ -1203,7 +1212,7 @@ class FGGlyphLineView(AppKit.NSView):
                 AppKit.NSRectFillUsingOperation(nsRectFromRect(offsetRect(gi.bounds, -posX, -posY)),
                                                 AppKit.NSCompositeSourceOver)
             else:
-                gi.glyphDrawing.draw({}, color)
+                gi.glyphDrawing.draw(self.colorPalette, color)
 
     def mouseMoved_(self, event):
         point = self.convertPoint_fromView_(event.locationInWindow(), None)

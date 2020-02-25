@@ -613,7 +613,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         with contextlib.redirect_stderr(stderr):
             glyphs = font.getGlyphRunFromTextInfo(self.textInfo,
                                                   features=self.project.textSettings.features,
-                                                  varLocation=self.project.textSettings.varLocation)
+                                                  varLocation=self.project.textSettings.varLocation,
+                                                  colorLayers=True)
         stderr = stderr.getvalue()
         if stderr:
             fontItem.writeCompileOutput(stderr)
