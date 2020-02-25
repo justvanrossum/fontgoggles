@@ -3,6 +3,9 @@
 ## [0.9.5] - 2020-02-??
 
 - Added support for COLR/CPAL color fonts
+- Added support for UFO color layer fonts, as experimentally supported
+  by fontmake. See this [new feature](https://github.com/googlefonts/ufo2ft/pull/359)
+  in ufo2ft.
 
 ## [0.9.4] - 2020-02-24
 
