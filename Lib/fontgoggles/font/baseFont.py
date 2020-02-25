@@ -54,7 +54,7 @@ class BaseFont:
 
     @cachedProperty
     def colorPalettes(self):
-        return [{}]
+        return [[]]  # Return a list containing one empty palette
 
     @cachedProperty
     def featuresGSUB(self):
