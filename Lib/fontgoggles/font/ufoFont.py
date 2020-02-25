@@ -16,6 +16,7 @@ from fontTools.ufoLib import UFOReader, UFOFileStructure
 from fontTools.ufoLib import FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURES_FILENAME
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph, CONTENTS_FILENAME
 from .baseFont import BaseFont
+from .glyphDrawing import GlyphDrawing
 from ..compile.compilerPool import compileUFOToBytes
 from ..compile.ufoCompiler import fetchCharacterMappingAndAnchors
 from ..misc.hbShape import HBShape
@@ -175,7 +176,7 @@ class UFOFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         glyph = self._getGlyph(glyphName)
-        return glyph.outline
+        return GlyphDrawing([(glyph.outline, None)])
 
 
 class NotDefGlyph:

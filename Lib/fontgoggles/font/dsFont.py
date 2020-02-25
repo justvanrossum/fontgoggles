@@ -16,6 +16,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
+from .glyphDrawing import GlyphDrawing
 from .ufoFont import NotDefGlyph, UFOState, extractIncludedFeatureFiles
 from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
 from ..compile.dsCompiler import getTTPaths
@@ -228,7 +229,7 @@ class DSFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         varGlyph = self._getVarGlyph(glyphName)
-        return varGlyph.getOutline()
+        return GlyphDrawing([(varGlyph.getOutline(), None)])
 
     def _getUnicodesAndAnchors(self, sourcePath):
         f = io.BytesIO(self._sourceFontData[sourcePath])
