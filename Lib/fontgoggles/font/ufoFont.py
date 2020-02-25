@@ -16,6 +16,7 @@ from fontTools.ufoLib import UFOReader, UFOFileStructure
 from fontTools.ufoLib import (FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME,
                               FEATURES_FILENAME, LIB_FILENAME)
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph, CONTENTS_FILENAME
+from ufo2ft.constants import COLOR_LAYER_MAPPING_KEY, COLOR_PALETTES_KEY
 from .baseFont import BaseFont
 from .glyphDrawing import GlyphDrawing
 from ..compile.compilerPool import compileUFOToBytes
@@ -32,11 +33,13 @@ class UFOFont(BaseFont):
         super().resetCache()
         del self.defaultVerticalAdvance
         del self.defaultVerticalOriginY
+        del self.globalColorLayerMapping
 
     def _setupReaderAndGlyphSet(self):
         self.reader = UFOReader(self.fontPath, validate=False)
         self.glyphSet = self.reader.getGlyphSet()
         self.glyphSet.glyphClass = Glyph
+        self.layerGlyphSets = {}
 
     async def load(self, outputWriter):
         if hasattr(self, "reader"):
@@ -126,8 +129,8 @@ class UFOFont(BaseFont):
     def unitsPerEm(self):
         return self.info.unitsPerEm
 
-    def _getGlyph(self, glyphName):
-        glyph = self._cachedGlyphs.get(glyphName)
+    def _getGlyph(self, glyphName, layerName=None):
+        glyph = self._cachedGlyphs.get((layerName, glyphName))
         if glyph is None:
             if glyphName == ".notdef" and glyphName not in self.glyphSet:
                 # We need a .notdef glyph, so let's make one.
@@ -135,13 +138,16 @@ class UFOFont(BaseFont):
                 self._addOutlinePathToGlyph(glyph)
             else:
                 try:
-                    glyph = self.glyphSet[glyphName]
+                    if layerName is None:
+                        glyph = self.glyphSet[glyphName]
+                    else:
+                        glyph = self.getLayerGlyphSet(layerName)[glyphName]
                     self._addOutlinePathToGlyph(glyph)
                 except Exception as e:
                     # TODO: logging would be better but then capturing in mainWindow.py is harder
                     print(f"Glyph '{glyphName}' could not be read: {e!r}", file=sys.stderr)
                     glyph = self._getGlyph(".notdef")
-            self._cachedGlyphs[glyphName] = glyph
+            self._cachedGlyphs[(layerName, glyphName)] = glyph
         return glyph
 
     def _addOutlinePathToGlyph(self, glyph):
@@ -188,7 +194,34 @@ class UFOFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         glyph = self._getGlyph(glyphName)
+        if colorLayers:
+            colorLayerMapping = glyph.lib.get(COLOR_LAYER_MAPPING_KEY)
+            if colorLayerMapping is None:
+                colorLayerMapping = self.globalColorLayerMapping
+            if colorLayerMapping is not None:
+                layers = []
+                for layerName, colorID in colorLayerMapping:
+                    glyph = self._getGlyph(glyphName, layerName)
+                    if not isinstance(glyph, NotDefGlyph):
+                        layers.append((glyph.outline, colorID))
+                if layers:
+                    return GlyphDrawing(layers)
         return GlyphDrawing([(glyph.outline, None)])
+
+    @cachedProperty
+    def colorPalettes(self):
+        return self.lib.get(COLOR_PALETTES_KEY, [[]])
+
+    @cachedProperty
+    def globalColorLayerMapping(self):
+        return self.lib.get(COLOR_LAYER_MAPPING_KEY)
+
+    def getLayerGlyphSet(self, layerName):
+        layerGlyphSet = self.layerGlyphSets.get(layerName)
+        if layerGlyphSet is None:
+            layerGlyphSet = self.reader.getGlyphSet(layerName)
+            self.layerGlyphSets[layerName] = layerGlyphSet
+        return layerGlyphSet
 
 
 class NotDefGlyph:
@@ -197,6 +230,7 @@ class NotDefGlyph:
         self.unitsPerEm = unitsPerEm
         self.width = unitsPerEm // 2
         self.height = unitsPerEm
+        self.lib = {}
 
     def draw(self, pen):
         inset = 0.05 * self.unitsPerEm
@@ -231,6 +265,7 @@ class NotDefGlyph:
 class Glyph(GLIFGlyph):
     width = 0
     height = None
+    lib = {}  # readonly default!
 
 
 def extractIncludedFeatureFiles(ufoPath, reader=None):
