@@ -204,6 +204,7 @@ class TextSettings:
     script: typing.Union[None, str] = None
     language: typing.Union[None, str] = None
     alignment: typing.Union[None, str] = None
+    enableColor: bool = True
 
 
 @dataclass

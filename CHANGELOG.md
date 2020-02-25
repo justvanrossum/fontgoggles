@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [0.9.5] - 2020-02-??
+
+- Added support for COLR/CPAL color fonts
+
 ## [0.9.4] - 2020-02-24
 
 - Implement File -> Revert

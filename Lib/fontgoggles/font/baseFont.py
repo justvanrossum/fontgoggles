@@ -11,7 +11,7 @@ class BaseFont:
         self.resetCache()
 
     def resetCache(self):
-        self._outlinePaths = [{}, {}]  # cache for (outline, colorLayers) objects
+        self._glyphDrawings = [{}, {}]  # cache for (outline, colorLayers) objects
         self._currentVarLocation = None  # used to determine whether to purge the outline cache
         # Invalidate cached properties
         del self.unitsPerEm
@@ -54,7 +54,7 @@ class BaseFont:
 
     @cachedProperty
     def colorPalettes(self):
-        return [[(0, 0, 0, 1)]]  # default palette [[(r, g, b, a)]]
+        return [[]]  # Return a list containing one empty palette
 
     @cachedProperty
     def featuresGSUB(self):
@@ -85,14 +85,15 @@ class BaseFont:
             axes[axis.axisTag] = axisDict
         return axes
 
-    def getGlyphRunFromTextInfo(self, textInfo, **kwargs):
+    def getGlyphRunFromTextInfo(self, textInfo, colorPalettesIndex=0, **kwargs):
         text = textInfo.text
         runLengths = textInfo.runLengths
         direction = textInfo.directionForShaper
         script = textInfo.scriptOverride
         language = textInfo.languageOverride
 
-        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"))
+        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"),
+                           self.colorPalettes[colorPalettesIndex])
         index = 0
         for rl in runLengths:
             seg = text[index:index + rl]
@@ -121,8 +122,8 @@ class BaseFont:
         glyphInfo = self.shaper.shape(text, features=features, varLocation=varLocation,
                                       direction=direction, language=language, script=script)
         glyphNames = (gi.name for gi in glyphInfo)
-        for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, colorLayers)):
-            glyph.path = path
+        for glyph, glyphDrawing in zip(glyphInfo, self.getGlyphDrawings(glyphNames, colorLayers)):
+            glyph.glyphDrawing = glyphDrawing
         return glyphInfo
 
     def setVarLocation(self, varLocation):
@@ -135,18 +136,18 @@ class BaseFont:
             self._currentVarLocation = varLocation
             self.varLocationChanged(varLocation)
 
-    def getOutlinePaths(self, glyphNames, colorLayers=False):
+    def getGlyphDrawings(self, glyphNames, colorLayers=False):
         for glyphName in glyphNames:
-            outline = self._outlinePaths[colorLayers].get(glyphName)
-            if outline is None:
-                outline = self._getOutlinePath(glyphName, colorLayers)
-                self._outlinePaths[colorLayers][glyphName] = outline
-            yield outline
+            glyphDrawing = self._glyphDrawings[colorLayers].get(glyphName)
+            if glyphDrawing is None:
+                glyphDrawing = self._getGlyphDrawing(glyphName, colorLayers)
+                self._glyphDrawings[colorLayers][glyphName] = glyphDrawing
+            yield glyphDrawing
 
     def _purgeCaches(self):
-        self._outlinePaths = [{}, {}]
+        self._glyphDrawings = [{}, {}]
 
-    def _getOutlinePath(self, glyphName, colorLayers):
+    def _getGlyphDrawing(self, glyphName, colorLayers):
         raise NotImplementedError()
 
     def varLocationChanged(self, varLocation):
@@ -156,13 +157,14 @@ class BaseFont:
 
 class GlyphsRun(list):
 
-    def __init__(self, numChars, unitsPerEm, vertical):
+    def __init__(self, numChars, unitsPerEm, vertical, colorPalette=None):
         self.numChars = numChars
         self.unitsPerEm = unitsPerEm
         self.vertical = vertical
         self._glyphToChars = None
         self._charToGlyphs = None
         self.endPos = (0, 0)
+        self.colorPalette = [] if colorPalette is None else colorPalette
 
     def mapGlyphsToChars(self, glyphIndices):
         if self._glyphToChars is None:

@@ -1,22 +1,40 @@
 import io
 from fontTools.ttLib import TTFont
+from .baseFont import BaseFont
+from .glyphDrawing import GlyphDrawing
+from ..compile.compilerPool import compileTTXToBytes
 from ..misc.ftFont import FTFont
 from ..misc.hbShape import HBShape
-from .baseFont import BaseFont
-from ..compile.compilerPool import compileTTXToBytes
+from ..misc.properties import cachedProperty
 
 
 class _OTFBaseFont(BaseFont):
 
-    def _getOutlinePath(self, glyphName, colorLayers):
+    def _getGlyphDrawing(self, glyphName, colorLayers):
+        if colorLayers and "COLR" in self.ttFont:
+            colorLayers = self.ttFont["COLR"].ColorLayers
+            layers = colorLayers.get(glyphName)
+            if layers is not None:
+                drawingLayers = [(self.ftFont.getOutlinePath(layer.name), layer.colorID)
+                                 for layer in layers]
+                return GlyphDrawing(drawingLayers)
         outline = self.ftFont.getOutlinePath(glyphName)
-        if colorLayers:
-            return [(outline, 0)]
-        else:
-            return outline
+        return GlyphDrawing([(outline, None)])
 
     def varLocationChanged(self, varLocation):
         self.ftFont.setVarLocation(varLocation if varLocation else {})
+
+    @cachedProperty
+    def colorPalettes(self):
+        if "CPAL" in self.ttFont:
+            palettes = []
+            for paletteRaw in self.ttFont["CPAL"].palettes:
+                palette = [(color.red/255, color.green/255, color.blue/255, color.alpha/255)
+                           for color in paletteRaw]
+                palettes.append(palette)
+            return palettes
+        else:
+            return [[]]
 
 
 class OTFFont(_OTFBaseFont):
