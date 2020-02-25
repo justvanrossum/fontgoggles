@@ -1287,8 +1287,9 @@ _minimalSpaceBox = 12
 
 def addBoundingBoxes(glyphs):
     for gi in glyphs:
-        if gi.path.elementCount():
-            gi.bounds = offsetRect(rectFromNSRect(gi.path.controlPointBounds()), *gi.pos)
+        bounds = gi.glyphDrawing.bounds
+        if bounds is not None:
+            gi.bounds = offsetRect(bounds, *gi.pos)
         else:
             # Empty shape, let's make a bounding box so we can visualize it anyway
             x, y = gi.pos

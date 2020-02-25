@@ -4,16 +4,14 @@ from ..misc.ftFont import FTFont
 from ..misc.hbShape import HBShape
 from .baseFont import BaseFont
 from ..compile.compilerPool import compileTTXToBytes
+from .glyphDrawing import GlyphDrawing
 
 
 class _OTFBaseFont(BaseFont):
 
-    def _getOutlinePath(self, glyphName, colorLayers):
+    def _getGlyphDrawing(self, glyphName, colorLayers):
         outline = self.ftFont.getOutlinePath(glyphName)
-        if colorLayers:
-            return [(outline, 0)]
-        else:
-            return outline
+        return GlyphDrawing([(outline, None)])
 
     def varLocationChanged(self, varLocation):
         self.ftFont.setVarLocation(varLocation if varLocation else {})

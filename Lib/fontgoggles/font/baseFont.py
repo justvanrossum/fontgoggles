@@ -11,7 +11,7 @@ class BaseFont:
         self.resetCache()
 
     def resetCache(self):
-        self._outlinePaths = [{}, {}]  # cache for (outline, colorLayers) objects
+        self._glyphDrawings = [{}, {}]  # cache for (outline, colorLayers) objects
         self._currentVarLocation = None  # used to determine whether to purge the outline cache
         # Invalidate cached properties
         del self.unitsPerEm
@@ -121,8 +121,8 @@ class BaseFont:
         glyphInfo = self.shaper.shape(text, features=features, varLocation=varLocation,
                                       direction=direction, language=language, script=script)
         glyphNames = (gi.name for gi in glyphInfo)
-        for glyph, path in zip(glyphInfo, self.getOutlinePaths(glyphNames, colorLayers)):
-            glyph.path = path
+        for glyph, glyphDrawing in zip(glyphInfo, self.getGlyphDrawings(glyphNames, colorLayers)):
+            glyph.glyphDrawing = glyphDrawing
         return glyphInfo
 
     def setVarLocation(self, varLocation):
@@ -135,18 +135,18 @@ class BaseFont:
             self._currentVarLocation = varLocation
             self.varLocationChanged(varLocation)
 
-    def getOutlinePaths(self, glyphNames, colorLayers=False):
+    def getGlyphDrawings(self, glyphNames, colorLayers=False):
         for glyphName in glyphNames:
-            outline = self._outlinePaths[colorLayers].get(glyphName)
-            if outline is None:
-                outline = self._getOutlinePath(glyphName, colorLayers)
-                self._outlinePaths[colorLayers][glyphName] = outline
-            yield outline
+            glyphDrawing = self._glyphDrawings[colorLayers].get(glyphName)
+            if glyphDrawing is None:
+                glyphDrawing = self._getGlyphDrawing(glyphName, colorLayers)
+                self._glyphDrawings[colorLayers][glyphName] = glyphDrawing
+            yield glyphDrawing
 
     def _purgeCaches(self):
-        self._outlinePaths = [{}, {}]
+        self._glyphDrawings = [{}, {}]
 
-    def _getOutlinePath(self, glyphName, colorLayers):
+    def _getGlyphDrawing(self, glyphName, colorLayers):
         raise NotImplementedError()
 
     def varLocationChanged(self, varLocation):

@@ -173,7 +173,7 @@ class UFOFont(BaseFont):
             vOrgY = self.defaultVerticalOriginY
         return True, vOrgX, vOrgY
 
-    def _getOutlinePath(self, glyphName, colorLayers):
+    def _getGlyphDrawing(self, glyphName, colorLayers):
         glyph = self._getGlyph(glyphName)
         return glyph.outline
 

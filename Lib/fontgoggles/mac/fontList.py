@@ -1191,19 +1191,19 @@ class FGGlyphLineView(AppKit.NSView):
             gi = self._glyphs[index]
             selected = index in selection
             hovered = index == hoveredGlyphIndex
-            empty = not gi.path.elementCount()
+            empty = gi.glyphDrawing.bounds is None
             posX, posY = gi.pos
             translate(posX - lastPosX, posY - lastPosY)
             lastPosX, lastPosY = posX, posY
             color = colorTable[empty, selected, hovered]
             if color is None:
                 continue
-            color.set()
             if empty:
+                color.set()
                 AppKit.NSRectFillUsingOperation(nsRectFromRect(offsetRect(gi.bounds, -posX, -posY)),
                                                 AppKit.NSCompositeSourceOver)
             else:
-                gi.path.fill()
+                gi.glyphDrawing.draw({}, color)
 
     def mouseMoved_(self, event):
         point = self.convertPoint_fromView_(event.locationInWindow(), None)

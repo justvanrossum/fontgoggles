@@ -226,7 +226,7 @@ class DSFont(BaseFont):
 
     # TODO: vertical advance, vertical origin
 
-    def _getOutlinePath(self, glyphName, colorLayers):
+    def _getGlyphDrawing(self, glyphName, colorLayers):
         varGlyph = self._getVarGlyph(glyphName)
         return varGlyph.getOutline()
 
