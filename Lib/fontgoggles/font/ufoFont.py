@@ -13,7 +13,8 @@ from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.cocoaPen import CocoaPen  # TODO: factor out mac-specific code
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader, UFOFileStructure
-from fontTools.ufoLib import FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURES_FILENAME
+from fontTools.ufoLib import (FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME,
+                              FEATURES_FILENAME, LIB_FILENAME)
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph, CONTENTS_FILENAME
 from .baseFont import BaseFont
 from .glyphDrawing import GlyphDrawing
@@ -77,7 +78,8 @@ class UFOFont(BaseFont):
         self.glyphSet.rebuildContents()
 
         self.ufoState = self.ufoState.newState()
-        needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = self.ufoState.getUpdateInfo()
+        (needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate,
+         needsCmapUpdate, needsLibUpdate) = self.ufoState.getUpdateInfo()
 
         if needsFeaturesUpdate:
             return False
@@ -277,7 +279,8 @@ def _parseFeaSource(featureSource):
                 yield st.filename
 
 
-ufoFilesToTrack = [FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURES_FILENAME]
+ufoFilesToTrack = [FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME, FEATURES_FILENAME,
+                   LIB_FILENAME]
 
 
 class UFOState:
@@ -338,6 +341,7 @@ class UFOState:
         changedFiles = {fileName for fileName, modTime in prev.fileModTimes ^ self.fileModTimes}
 
         needsInfoUpdate = FONTINFO_FILENAME in changedFiles
+        needsLibUpdate = LIB_FILENAME in changedFiles
 
         needsFeaturesUpdate = (FEATURES_FILENAME in changedFiles or
                                GROUPS_FILENAME in changedFiles or
@@ -375,7 +379,7 @@ class UFOState:
             needsCmapUpdate = prev.unicodes != self.unicodes
             needsGlyphUpdate = bool(changedGlyphNames)
 
-        return needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate
+        return needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate, needsLibUpdate
 
     @property
     def anchors(self):

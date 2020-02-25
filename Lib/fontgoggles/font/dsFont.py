@@ -154,7 +154,7 @@ class DSFont(BaseFont):
                 sourceKey = sourcePath, sourceLayerName
                 self._ufos[sourceKey] = self._ufos[sourceKey].newState()
                 (needsFeaturesUpdate, needsGlyphUpdate,
-                 needsInfoUpdate, needsCmapUpdate) = self._ufos[sourceKey].getUpdateInfo()
+                 needsInfoUpdate, needsCmapUpdate, needsLibUpdate) = self._ufos[sourceKey].getUpdateInfo()
                 if sourceLayerName is not None:
                     # We don't compile features for layer masters
                     needsFeaturesUpdate = False

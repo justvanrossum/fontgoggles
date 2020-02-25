@@ -21,7 +21,8 @@ def test_getUpdateInfo(tmpdir):
     feaPath.touch()
 
     state = state.newState()
-    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
+    (needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate,
+     needsLibUpdate) = state.getUpdateInfo()
     assert needsFeaturesUpdate
     assert not needsGlyphUpdate
     assert not needsInfoUpdate
@@ -31,7 +32,8 @@ def test_getUpdateInfo(tmpdir):
     infoPath.touch()
 
     state = state.newState()
-    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
+    (needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate,
+     needsLibUpdate) = state.getUpdateInfo()
     assert not needsFeaturesUpdate
     assert not needsGlyphUpdate
     assert needsInfoUpdate
@@ -44,7 +46,8 @@ def test_getUpdateInfo(tmpdir):
     glyphSet.writeGlyph("A", glyph, ppen.replay)
 
     state = state.newState()
-    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
+    (needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate,
+     needsLibUpdate) = state.getUpdateInfo()
     assert needsFeaturesUpdate
     assert needsGlyphUpdate
     assert not needsInfoUpdate
@@ -57,7 +60,8 @@ def test_getUpdateInfo(tmpdir):
     glyphSet.writeGlyph("A", glyph, ppen.replay)
 
     state = state.newState()
-    needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate = state.getUpdateInfo()
+    (needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate,
+     needsLibUpdate) = state.getUpdateInfo()
     assert not needsFeaturesUpdate
     assert needsGlyphUpdate
     assert not needsInfoUpdate
