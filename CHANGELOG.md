@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [0.9.5] - 2020-02-??
+## [0.9.5] - 2020-02-25
 
 - Added support for COLR/CPAL color fonts
 - Added support for UFO color layer fonts, as experimentally supported
