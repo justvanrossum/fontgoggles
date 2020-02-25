@@ -1,10 +1,10 @@
 import io
 from fontTools.ttLib import TTFont
+from .baseFont import BaseFont
+from .glyphDrawing import GlyphDrawing
+from ..compile.compilerPool import compileTTXToBytes
 from ..misc.ftFont import FTFont
 from ..misc.hbShape import HBShape
-from .baseFont import BaseFont
-from ..compile.compilerPool import compileTTXToBytes
-from .glyphDrawing import GlyphDrawing
 
 
 class _OTFBaseFont(BaseFont):
