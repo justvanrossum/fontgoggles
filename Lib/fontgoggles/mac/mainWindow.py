@@ -303,6 +303,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                                      callback=self.relativeMarginChangedCallback)
         self.relativeBaselineSlider = optionsTab.relativeBaselineSlider
         y += 50
+        optionsTab.enableColor = CheckBox((10, y, sidebarWidth - 26, 25), "Enable Color (COLR/CPAL)",
+                                          value=self.project.textSettings.enableColor,
+                                          callback=self.enableColorChangedCallback)
+        y += 35
 
         return group
 
@@ -614,7 +618,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             glyphs = font.getGlyphRunFromTextInfo(self.textInfo,
                                                   features=self.project.textSettings.features,
                                                   varLocation=self.project.textSettings.varLocation,
-                                                  colorLayers=True)
+                                                  colorLayers=self.project.textSettings.enableColor)
         stderr = stderr.getvalue()
         if stderr:
             fontItem.writeCompileOutput(stderr)
@@ -947,6 +951,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         self.fontList.relativeMargin = self.project.textSettings.relativeMargin = sender.get() / 100
         self.growOrShrinkFontList()
+
+    @objc.python_method
+    def enableColorChangedCallback(self, sender):
+        self.project.textSettings.enableColor = bool(sender.get())
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     @objc.python_method
     def updateTextEntryAlignment(self, align):
