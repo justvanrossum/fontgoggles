@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [0.9.6] - 2020-02-??
+
+- Fixed issue with glyph selection/hover, when adjacent glyphs overlap
+
 ## [0.9.5] - 2020-02-25
 
 - Added support for COLR/CPAL color fonts
