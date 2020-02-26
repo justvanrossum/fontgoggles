@@ -108,6 +108,7 @@ class FGFontListView(AppKit.NSView):
         if self._nestedZoom == 0:
             self._savedClipBounds = self.superview().bounds()
             scrollView = notification.object()
+            scrollView.contentView().didLiveZoom = False
             fontList = self.vanillaWrapper()
             minMag = (fontItemMinimumSize / fontList.itemSize)
             maxMag = (fontItemMaximumSize / fontList.itemSize)
@@ -136,6 +137,8 @@ class FGFontListView(AppKit.NSView):
             fontList.resizeFontItems(newItemSize)
             newBounds = ((round(actualMag * scrollX), round(actualMag * scrollY)), self._savedClipBounds.size)
             scrollView.setMagnification_(1.0)
+
+            scrollView.contentView().didLiveZoom = True  # Something gets messed during a live zoom
             newBounds = clipView.constrainBoundsRect_(newBounds)
             clipView.setBounds_(newBounds)
             scrollView.setMagnification_(1.0)
