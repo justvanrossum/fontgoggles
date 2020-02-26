@@ -29,3 +29,6 @@ class GlyphDrawing:
             color = colorPalette.get(colorID, defaultColor)
             color.set()
             path.fill()
+
+    def pointInside(self, pt):
+        return any(path.containsPoint_(pt) for path, colorID in self.layers)

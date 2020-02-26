@@ -1301,7 +1301,7 @@ class FGGlyphLineView(AppKit.NSView):
             for index in reversed(indices):
                 gi = self._glyphs[index]
                 posX, posY = gi.pos
-                if gi.path.containsPoint_((x - posX, y - posY)):
+                if gi.glyphDrawing.pointInside((x - posX, y - posY)):
                     break
             else:
                 index = indices[-1]
