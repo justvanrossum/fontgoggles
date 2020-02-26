@@ -870,8 +870,8 @@ class FontItem(Group):
     def __init__(self, posSize, fontKey, fontListIndex, vertical, align,
                  relativeSize, relativeHBaseline, relativeVBaseline, relativeMargin):
         super().__init__(posSize)
-        self._nsObject.setWantsLayer_(True)
-        self._nsObject.setCanDrawSubviewsIntoLayer_(True)
+        # self._nsObject.setWantsLayer_(True)
+        # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
         self.fontListIndex = fontListIndex
         self.fileNameLabel = UnclickableTextBox(getFileNameLabelPosSize(vertical), "", sizeStyle="small",
                                                 textColor=AppKit.NSColor.systemGrayColor())
