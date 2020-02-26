@@ -1162,6 +1162,8 @@ class FGGlyphLineView(AppKit.NSView):
         if self._glyphsColorPalette != self._glyphs.colorPalette:
             self._glyphsColorPalette = self._glyphs.colorPalette
             self._cachedColorPalettes = {}
+        if not self._glyphsColorPalette:
+            return {}
         mainPalette = self._cachedColorPalettes.get(None)
         if mainPalette is None:
             mainPalette = {}
