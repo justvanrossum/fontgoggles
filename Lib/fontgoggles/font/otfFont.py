@@ -34,7 +34,7 @@ class _OTFBaseFont(BaseFont):
                 palettes.append(palette)
             return palettes
         else:
-            return [[]]
+            return None
 
 
 class OTFFont(_OTFBaseFont):

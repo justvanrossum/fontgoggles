@@ -54,7 +54,7 @@ class BaseFont:
 
     @cachedProperty
     def colorPalettes(self):
-        return [[]]  # Return a list containing one empty palette
+        return None
 
     @cachedProperty
     def featuresGSUB(self):
@@ -92,8 +92,12 @@ class BaseFont:
         script = textInfo.scriptOverride
         language = textInfo.languageOverride
 
-        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"),
-                           self.colorPalettes[colorPalettesIndex])
+        if not self.colorPalettes:
+            colorPalette = []
+        else:
+            colorPalette = self.colorPalettes[colorPalettesIndex]
+
+        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"), colorPalette)
         index = 0
         for rl in runLengths:
             seg = text[index:index + rl]

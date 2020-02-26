@@ -210,7 +210,7 @@ class UFOFont(BaseFont):
 
     @cachedProperty
     def colorPalettes(self):
-        return self.lib.get(COLOR_PALETTES_KEY, [[]])
+        return self.lib.get(COLOR_PALETTES_KEY)
 
     @cachedProperty
     def globalColorLayerMapping(self):
