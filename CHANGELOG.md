@@ -4,6 +4,8 @@
 
 - Fixed issue with glyph selection/hover, when adjacent glyphs overlap
 - Fixed pinch zoom issue which messed up window resize + scroll behavior
+- Fixed issue with clicking in font list but beyond of items
+- Made Copy menu (⌘-C) work in UnicodePicker
 
 ## [0.9.5] - 2020-02-25
 
