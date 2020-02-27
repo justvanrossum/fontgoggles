@@ -1,4 +1,5 @@
 import pytest
+import sys
 from fontTools.ufoLib import UFOReader
 from fontgoggles.font.dsFont import DSFont, PointCollector
 from testSupport import getFontPath
@@ -42,7 +43,7 @@ def test_pointCollectorQuad():
 async def test_DSFont():
     ufoPath = getFontPath("MutatorSans.designspace")
     font = DSFont(ufoPath, 0)
-    await font.load(None)
+    await font.load(sys.stderr.write)
     expected = [
         'MutatorSansBoldCondensed.ufo',
         'MutatorSansBoldWide.ufo',
