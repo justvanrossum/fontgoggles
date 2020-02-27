@@ -63,14 +63,15 @@ for src in sorted(docsSourceImages.glob("*.png")):
         # resetting the dpi value.
         data = im.tobytes()
         im = Image.frombytes(im.mode, im.size, data)
-        dstIm = Image.open(dst)
-        if data != dstIm.tobytes():
-            im.save(dst)
-        else:
-            # Don't save when the image data is the same, some
-            # meta data may still have changed, making us do
-            # unwanted commits.
-            print("-- same image, skipping", dst)
+        if dst.exists():
+            dstIm = Image.open(dst)
+            if data == dstIm.tobytes():
+                # Don't save when the image data is the same, some
+                # meta data may still have changed, making us do
+                # unwanted commits.
+                print("-- same image, skipping", dst)
+                continue
+        im.save(dst)
 
 
 print("Subsetting fonts...")
