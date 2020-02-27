@@ -80,15 +80,15 @@ class FGFontListView(AppKit.NSView):
 
     def scrollWheel_(self, event):
         if event.modifierFlags() & AppKit.NSEventModifierFlagOption:
-            if event.phase() == AppKit.NSEventPhaseBegan:
+            if event.phase() in {AppKit.NSEventPhaseBegan, AppKit.NSEventPhaseMayBegin}:
                 self._originalItemSize = self.vanillaWrapper().itemSize
                 self._magnification = 1.0
-            # centerPoint = self.convertPoint_fromView_(event.locationInWindow(), None)
+            centerPoint = self.convertPoint_fromView_(event.locationInWindow(), None)
             by = event.scrollingDeltaY() * 0.001  #
             self._magnification += by
             newItemSize = round(max(fontItemMinimumSize,
                                     min(fontItemMaximumSize, self._originalItemSize * self._magnification)))
-            self.vanillaWrapper().resizeFontItems(newItemSize)
+            self.vanillaWrapper().resizeFontItems(newItemSize, centerPoint=centerPoint)
         else:
             super().scrollWheel_(event)
 
@@ -411,7 +411,7 @@ class FontList(Group):
             fontItem.relativeMargin = self.relativeMargin
 
     @suppressAndLogException
-    def resizeFontItems(self, itemSize):
+    def resizeFontItems(self, itemSize, centerPoint=None):
         if not self.project.fonts:
             return
         scaleFactor = itemSize / self.itemSize
@@ -423,13 +423,21 @@ class FontList(Group):
             fontItem.setPosSize((*pos, *wh))
             pos[1 - self.vertical] += itemSize
 
-        # calculate the center of our clip view in relative doc coords
-        # so we can set the scroll position and zoom in/out "from the middle"
-        x, y, w, h = self.getPosSize()
         clipView = self._nsObject.superview()
+        x, y, w, h = self.getPosSize()
         (cx, cy), (cw, ch) = clipView.bounds()
-        cx += cw / 2
-        cy -= ch / 2
+        if centerPoint is not None:
+            # centerPoint is in doc view coordinates (self), convert to clipView
+            centerX, centerY = clipView.convertPoint_fromView_(centerPoint, self._nsObject)
+            # rcx and rcy are relative to the clip views origin
+            rcx = centerX - cx
+            rcy = ch - (centerY - cy)
+        else:
+            # rcx and rcy are relative to the clip views origin
+            rcx = cw / 2
+            rcy = ch / 2
+        cx += rcx
+        cy -= rcy
         cx /= w
         cy /= h
 
@@ -441,8 +449,8 @@ class FontList(Group):
             self.setPosSize((x, y, pos[0], h * scaleFactor))
             cx *= pos[0]
             cy *= h * scaleFactor
-        cx -= cw / 2
-        cy += ch / 2
+        cx -= rcx
+        cy += rcy
         clipBounds = clipView.bounds()
         clipBounds.origin = (cx, cy)
         clipView.setBounds_(clipBounds)
