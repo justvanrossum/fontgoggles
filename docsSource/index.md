@@ -206,7 +206,7 @@ the compile output panel at the bottom of the font list will appear.
 
 FontGoggles provides its own Unicode Picker, under the “Edit” menu:
 “Unicode Picker”, shortcut ⌘-U. It allows you to find a Unicode
-character by name very quickly.
+character by name.
 
 You can use multiple search terms: each additional term will narrow
 down the result. It searches by prefix, so you can for example type
