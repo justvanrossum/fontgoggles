@@ -16,7 +16,7 @@ class AligningScrollView(vanilla.ScrollView):
     def __init__(self, posSize, documentView, hAlign="left", vAlign="top",
                  drawBackground=True, minMagnification=None, maxMagnification=None,
                  borderType=AppKit.NSBezelBorder, clipview=None, forwardDragAndDrop=False,
-                 **kwargs):
+                 debug=False, **kwargs):
         self._docRef = [documentView]
         if hasattr(documentView, "_nsObject"):
             x, y, w, h = documentView._posSize
@@ -25,7 +25,7 @@ class AligningScrollView(vanilla.ScrollView):
             documentView = documentView._nsObject
             documentView.setFrame_(((0, 0), (w, h)))
         if clipview is None:
-            clipView = _AligningScrollView_ClipView(hAlign, vAlign)
+            clipView = _AligningScrollView_ClipView(hAlign, vAlign, debug)
         super().__init__(posSize, documentView, clipView=clipView, **kwargs)
         clipView.setDrawsBackground_(drawBackground)  # Must be called _after_ super()
         scrollView = self._nsObject
@@ -60,13 +60,14 @@ class AligningScrollView(vanilla.ScrollView):
 
 class _AligningScrollView_ClipView(AppKit.NSClipView):
 
-    def __new__(cls, hAlign, vAlign):
+    def __new__(cls, hAlign, vAlign, debug):
         return cls.alloc().init()
 
-    def __init__(self, hAlign, vAlign):
+    def __init__(self, hAlign, vAlign, debug):
+        self._prevClipBounds = self.bounds()
+        self.debug = debug
         self.hAlign = hAlign
         self.vAlign = vAlign
-        self._prevClipBounds = self.bounds()
         self._prevDocBounds = None
 
     def mouseDown_(self, event):
@@ -118,6 +119,16 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
 
         self._prevDocBounds = docBounds
         super().viewFrameChanged_(notification)
+
+    def setBounds_(self, rect):
+        super().setBounds_(rect)
+        if self._prevClipBounds is None:
+            self._prevClipBounds = self.bounds()
+
+    def setFrame_(self, rect):
+        super().setFrame_(rect)
+        if self._prevClipBounds is None:
+            self._prevClipBounds = self.bounds()  # setFrame_ gets called after live zoom, setBounds_ doesn't...
 
     def constrainBoundsRect_(self, proposedClipBounds):
         # Our purpose for this method is two-fold:
@@ -183,7 +194,7 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
             # TODO implement alignment for vertical
             pass
 
-        self._prevClipBounds = proposedClipBounds
+        self._prevClipBounds = None
         return proposedClipBounds
 
     def draggingEntered_(self, draggingInfo):
@@ -204,3 +215,9 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
 
     def performDragOperation_(self, draggingInfo):
         return self.documentView().performDragOperation_(draggingInfo)
+
+
+# For debugging
+def flattenRect(r):
+    (x, y), (w, h) = r
+    return tuple(round(v) for v in (x, y, w, h))
