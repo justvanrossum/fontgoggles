@@ -9,7 +9,10 @@ from .misc import makeTextCell
 _unicodePat = re.compile(r"(([u]\+)|(0x))?([0-9a-f]+)$", re.IGNORECASE)
 
 
-class UnicodePicker:
+class UnicodePicker(AppKit.NSWindowController):
+
+    def __new__(cls):
+        return cls.alloc().init()
 
     def __init__(self):
         self.searchResults = []
@@ -20,7 +23,7 @@ class UnicodePicker:
         y = 15
         self.w.searchField = EditText((20, y, -20, 25),
                                       placeholder="Search Unicode name or value",
-                                      callback=self.searchTextChanged)
+                                      callback=self.searchTextChanged_)
 
         y += 40
         columnDescriptions = [
@@ -31,17 +34,19 @@ class UnicodePicker:
         ]
         self.w.unicodeList = List((0, y, 0, -100), [], columnDescriptions=columnDescriptions,
                                   rowHeight=18,
-                                  selectionCallback=self.listSelectionChanged,
-                                  doubleClickCallback=self.listDoubleClickCallback)
+                                  selectionCallback=self.listSelectionChanged_,
+                                  doubleClickCallback=self.listDoubleClickCallback_)
+
         y = -95
         self.w.unicodeText = TextBox((20, y, -10, 55), "")
         self.w.unicodeText._nsObject.cell().setFont_(AppKit.NSFont.systemFontOfSize_(36))
         self.w.unicodeText._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)
         y += 55
-        self.w.copyButton = Button((20, y, 120, 25), "Copy", callback=self.copyButtonCallback)
+        self.w.copyButton = Button((20, y, 120, 25), "Copy", callback=self.copy_)
         self.w.copyButton.enable(False)
 
         self.w.open()
+        self.w._window.setWindowController_(self)
         self.w._window.setBecomesKeyOnlyIfNeeded_(False)
         self.w._window.makeKeyWindow()
 
@@ -52,7 +57,7 @@ class UnicodePicker:
         else:
             self.w.show()
 
-    def searchTextChanged(self, sender):
+    def searchTextChanged_(self, sender):
         results = []
         terms = sender.get().upper().split()
         if len(terms) == 1:
@@ -76,13 +81,13 @@ class UnicodePicker:
             unicodeItems = unicodeItems[:500] + [dict(name="...more...")]
         self.w.unicodeList.set(unicodeItems)
 
-    def listSelectionChanged(self, sender):
+    def listSelectionChanged_(self, sender):
         chars = "".join(chr(self.searchResults[i]) for i in sender.getSelection())
         self.w.copyButton.enable(bool(chars))
         self.selectedChars = chars
         self.w.unicodeText.set(chars)
 
-    def listDoubleClickCallback(self, sender):
+    def listDoubleClickCallback_(self, sender):
         app = AppKit.NSApp()
         w = app.mainWindow()
         fr = w.firstResponder()
@@ -90,7 +95,7 @@ class UnicodePicker:
             return
         fr.insertText_replacementRange_(self.selectedChars, fr.selectedRange())
 
-    def copyButtonCallback(self, sender):
+    def copy_(self, sender):
         p = AppKit.NSPasteboard.generalPasteboard()
         p.clearContents()
         p.declareTypes_owner_([AppKit.NSPasteboardTypeString], None)
