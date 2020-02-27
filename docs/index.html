@@ -65,7 +65,7 @@ the application, and drop some fonts onto the window.</p>
 </ul>
 <h2>The Character and Glyph lists</h2>
 <p>On the left hand side of the FontGoggles window there are two lists.</p>
-<p>The left-most one is the Character list, which shows the entered
+<p>The left-most one is the <em>Character list</em>, which shows the entered
 characters and their Unicode values.</p>
 <p>By default, characters are listed in logical order (first-to-last, in the
 natural writing direction of the script). However, when the “BiDi”
@@ -73,30 +73,39 @@ checkbox is checked, it shows the entered characters <em>after</em> BiDirectiona
 processing, which reorders them left-to-right. The “BiDi” checkbox
 does not affect the text display and is only available if BiDi processing
 is enabled (see the next section about “Text settings”).</p>
-<p>The second list is the Glyph list, which can show information about
+<p>The second list is the <em>Glyph list</em>, which can show information about
 the rendered glyphs, such as their names, advance values and positioning.
 Since this information is font-specific, it only shows information when
 exactly one font is selected (or when only one font has been opened).</p>
-<p>The glyphs in the Glyph list are ordered from left to right in <em>visual</em>
+<p>The glyphs in the <em>Glyph list</em> are ordered from left to right in <em>visual</em>
 order, or from top to bottom in vertical mode.</p>
 <p><img alt="FontGoggles screenshot" src="images/screenshot_4_arabic.png" /></p>
-<p>Selecting items in the Character list will reflect the selection in the
-Glyphs list and vice versa. A single glyph can belong to multiple
+<p>Selecting items in the <em>Character list</em> will reflect the selection in the
+<em>Glyphs list</em> and vice versa. A single glyph can belong to multiple
 characters (for example in the case of ligatures), or vice versa.</p>
 <p>Characters and glyphs are “clustered” by the shaping engine (HarfBuzz),
-and the Glyph list contains a column named “cluster” that shows the
+and the <em>Glyph list</em> contains a column named “cluster” that shows the
 cluster number for each glyph. For more in-depth information see the
 <a href="https://harfbuzz.github.io/clusters.html">HarfBuzz documentation</a>.
 Selecting a character or glyph in one list will select the entire cluster
 in the other list.</p>
 <p>Both lists can be scrolled horizontally or resized to reveal more information.</p>
-<p>You can copy information from both Character and Glyph lists by selecting
+<p>You can copy information from both <em>Character</em> and <em>Glyph lists</em> by selecting
 rows or columns and hit ⌘-C. Select multiple rows or columns by holding
 the Command key while clicking further items. For example, click on the
-“glyph” header in the Glyph list to select the glyph name column, the hit
+“glyph” header in the <em>Glyph list</em> to select the glyph name column, the hit
 ⌘-C to copy the sequence of glyph names to the clipboard. If multiple columns
 are involved in the selection, the clipboard data will be tab-separated, ready
 to be pasted into a spreadsheet.</p>
+<h2>The Font list</h2>
+<p>The <em>Font list</em> is the central section of the FontGoggles window. Font files can be
+dropped here, fonts can be selected, rearranged by dragging them around,
+or removed from the list with the delete key.</p>
+<p>You can control-click on a font to get a contextual menu. The menu item
+there is to reveal the font in the Finder.</p>
+<p>Fonts can also be dragged to other applications, which is equivalent to
+dragging them from the finder. You can also drag and drop fonts between
+FontGoggles windows.</p>
 <h2>Text settings</h2>
 <p>At the top right of the FontGoggles window you find four buttons with
 popup menus:</p>
