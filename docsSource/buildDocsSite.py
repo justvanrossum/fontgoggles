@@ -59,12 +59,17 @@ for src in sorted(docsSourceImages.glob("*.png")):
         newW = round(w * (72 / dpi[0]))
         newH = round(h * (72 / dpi[0]))
         im = im.resize((newW, newH), Image.BICUBIC)
+        # We round-trip through a buffer to workaround PIL not
+        # resetting the dpi value.
         data = im.tobytes()
         im = Image.frombytes(im.mode, im.size, data)
         dstIm = Image.open(dst)
         if data != dstIm.tobytes():
             im.save(dst)
         else:
+            # Don't save when the image data is the same, some
+            # meta data may still have changed, making us do
+            # unwanted commits.
             print("-- same image, skipping", dst)
 
 
