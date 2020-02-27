@@ -78,6 +78,14 @@ class _AligningScrollView_ClipView(AppKit.NSClipView):
             self.window().makeFirstResponder_(docView)
             docView.mouseDown_(event)
 
+    def mouseUp_(self, event):
+        # A click occured in the clipview, but outside the document view. Happens when it is
+        # smaller than the clipview. Make the document view first responder.
+        docView = self.documentView()
+        if docView.acceptsFirstResponder():
+            self.window().makeFirstResponder_(docView)
+            docView.mouseUp_(event)
+
     @hookedProperty
     def hAlign(self):
         self.setBounds_(self.constrainBoundsRect_(self.bounds()))
