@@ -60,6 +60,9 @@ def _getVerticalOriginFunc(font, glyphID, shaper):
     return shaper.getVerticalOrigin(glyphName)
 
 
+_stylisticSets = {f"ss{i:02}" for i in range(1, 21)}
+
+
 class HBShape:
 
     @classmethod
@@ -111,6 +114,24 @@ class HBShape:
 
     def getFeatures(self, tag):
         return hb.ot_layout_language_get_feature_tags(self.face, tag)
+
+    def getStylisticSetNames(self):
+        gsubTable = self._ttFont.get("GSUB")
+        nameTable = self._ttFont.get("name")
+        if gsubTable is None or nameTable is None:
+            return {}
+        gsubTable = gsubTable.table
+        tags = _stylisticSets & set(self.getFeatures("GSUB"))
+        names = {}
+        for feature in gsubTable.FeatureList.FeatureRecord:
+            tag = feature.FeatureTag
+            if tag in tags and tag not in names:
+                feaParams = feature.Feature.FeatureParams
+                if feaParams is not None:
+                    nameRecord = nameTable.getName(feaParams.UINameID, 3, 1)
+                    if nameRecord is not None:
+                        names[tag] = nameRecord.toUnicode()
+        return names
 
     def getScriptsAndLanguages(self, otTableTag):
         scriptsAndLanguages = {}
