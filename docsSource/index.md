@@ -68,7 +68,39 @@ After dropping some fonts it will look like this:
 - Select glyphs by clicking on them, which will highlight glyph
   positioning info and character info
 
+## The Character list and the Glyph list
+
+On the left hand side of the FontGoggles window there are two lists.
+
+The left-most one is the Character list, which shows the entered
+characters.
+
+By default, characters are listed in logical order (first-to-last, in the
+natural writing direction of the script). However, when the “BiDi”
+checkbox is checked, it shows the entered characters _after_ BiDirectional
+processing, which reorders them left-to-right. The “BiDi” checkbox
+does not affect the text display and is only available if BiDi processing
+is enabled (see the next section about “Text settings”).
+
+The second list is the Glyph list, which can show information about
+the rendered glyphs, such as their names, advance values and positioning.
+Since this information is font-specific, it only shows information when
+exactly one font is selected (or when only one font has been opened).
+
+The glyphs in the Glyph list are ordered from left to right in _visual_
+order, or from top to bottom in vertical mode.
+
 ![FontGoggles screenshot](images/screenshot_4_arabic.png)
+
+Selecting items in the Character list will reflect the selection in the
+Glyphs list and vice versa. A single glyph can belong to multiple
+characters (for example in the case of ligatures)
+
+You can copy information from both Character and Glyph lists by selecting
+rows or columns and hit ⌘-C. Select multiple rows or columns by holding
+the Command key while clicking further items.
+
+Both lists can be scrolled horizontally or resized to reveal more information.
 
 ## Text settings
 
