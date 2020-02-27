@@ -20,7 +20,8 @@ def compileDSToFont(dsPath, ttFolder):
             source.font = TTFont(ttPath, lazy=False)
 
     assert doc.default.font is not None
-    doc.default.font["name"] = newTable("name")  # This is the template for the VF, and needs a name table
+    if "name" not in doc.default.font:
+        doc.default.font["name"] = newTable("name")  # This is the template for the VF, and needs a name table
 
     if any(s.layerName is not None for s in doc.sources):
         fb = FontBuilder(unitsPerEm=doc.default.font["head"].unitsPerEm)
