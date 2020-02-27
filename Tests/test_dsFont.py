@@ -53,3 +53,15 @@ async def test_DSFont():
     run = font.getGlyphRun("ABC")
     ax = [gi.ax for gi in run]
     assert [396, 443, 499] == ax
+    # Glyph 'A' has custom vertical glyph metrics in the default master
+    run = font.getGlyphRun("A", direction="TTB")
+    assert run[0].ax == 0
+    assert run[0].ay == -986
+    assert run[0].dx == -198
+    assert run[0].dy == -777
+    # But not at the other masters, so expect defaults there
+    run = font.getGlyphRun("A", varLocation=dict(wght=1000), direction="TTB")
+    assert run[0].ax == 0
+    assert run[0].ay == -900
+    assert run[0].dx == -370
+    assert run[0].dy == -700
