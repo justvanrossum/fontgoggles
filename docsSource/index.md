@@ -15,7 +15,7 @@ You can download [the latest release here](https://github.com/justvanrossum/font
 
 The following font formats are supported:
 
-- .ttf/.otf (including variable fonts)
+- .ttf/.otf (including variable fonts and COLR/CPAL-based color fonts)
 - .ttc/.otc
 - .woff/.woff2
 - .ufo/.ufoz
