@@ -2,7 +2,14 @@ name: Run FontGoggles test suite
 
 on:
   push:
-    paths-ignore: docs/*
+    paths-ignore:
+    - docs/*
+    - docsSource/*
+    - Scripts/*
+    - *.md
+    - AUTHORS.txt
+    - CONTRIBUTORS.txt
+    - LICENSE.txt
 
 
 jobs:
