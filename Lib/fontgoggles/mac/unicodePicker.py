@@ -6,7 +6,7 @@ from ..misc.unicodeNameList import findPrefix
 from .misc import makeTextCell
 
 
-_unicodePat = re.compile(r"(([u]\+)|(0x))?([0-9a-f]+)$", re.IGNORECASE)
+_unicodePat = re.compile(r"(([u]\+?)|(0x)|uni)?([0-9a-f]+)$", re.IGNORECASE)
 
 
 class UnicodePicker(AppKit.NSWindowController):
