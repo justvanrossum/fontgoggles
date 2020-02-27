@@ -138,7 +138,11 @@ class DSFont(BaseFont):
         self.masterModel = pickle.loads(self.ttFont["MPcl"].data)
         assert len(self.masterModel.deltaWeights) == len(self.doc.sources)
 
-        self.shaper = HBShape(vfFontData, getHorizontalAdvance=self._getHorizontalAdvance, ttFont=self.ttFont)
+        self.shaper = HBShape(vfFontData,
+                              getHorizontalAdvance=self._getHorizontalAdvance,
+                              getVerticalAdvance=self._getVerticalAdvance,
+                              getVerticalOrigin=self._getVerticalOrigin,
+                              ttFont=self.ttFont)
         self._needsVFRebuild = False
 
     def getExternalFiles(self):
@@ -234,7 +238,16 @@ class DSFont(BaseFont):
                               file=sys.stderr)
                         masterPoints.append(None)
                     else:
-                        masterPoints.append(coll.points + [(glyph.width, 0)])
+                        hAdvance = glyph.width
+                        vAdvance = glyph.height
+                        if vAdvance is None or vAdvance == 0:  # XXX default vAdv == 0 -> bad UFO spec
+                            vAdvance = self.defaultVerticalAdvance
+                        vOrgX = hAdvance / 2
+                        vOrgY = getattr(glyph, "lib", {}).get("public.verticalOrigin")
+                        if vOrgY is None:
+                            vOrgY = self.defaultVerticalOriginY
+                        phantomPoints = [(hAdvance, 0), (vOrgX, vOrgY), (vOrgX, vOrgY - vAdvance)]
+                        masterPoints.append(coll.points + phantomPoints)
                         if source is self.doc.default:
                             tags = coll.tags
                             contours = coll.contours
@@ -252,7 +265,14 @@ class DSFont(BaseFont):
         varGlyph = self._getVarGlyph(glyphName)
         return varGlyph.width
 
-    # TODO: vertical advance, vertical origin
+    def _getVerticalAdvance(self, glyphName):
+        varGlyph = self._getVarGlyph(glyphName)
+        return -abs(varGlyph.height)
+
+    def _getVerticalOrigin(self, glyphName):
+        varGlyph = self._getVarGlyph(glyphName)
+        vOrgX, vOrgY = varGlyph.verticalOrigin
+        return True, vOrgX, vOrgY
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         varGlyph = self._getVarGlyph(glyphName)
@@ -336,7 +356,16 @@ class VarGlyph:
 
     @property
     def width(self):
-        return self.getPoints()[-1][0]
+        return self.getPoints()[-3][0]
+
+    @property
+    def height(self):
+        points = self.getPoints()
+        return points[-1][1] - points[-2][1]
+
+    @property
+    def verticalOrigin(self):
+        return self.getPoints()[-2]
 
     def getOutline(self):
         return makePathFromArrays(self.getPoints(), self.tags, self.contours)
