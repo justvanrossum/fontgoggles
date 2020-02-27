@@ -73,7 +73,7 @@ After dropping some fonts it will look like this:
 On the left hand side of the FontGoggles window there are two lists.
 
 The left-most one is the Character list, which shows the entered
-characters.
+characters and their Unicode values.
 
 By default, characters are listed in logical order (first-to-last, in the
 natural writing direction of the script). However, when the “BiDi”
