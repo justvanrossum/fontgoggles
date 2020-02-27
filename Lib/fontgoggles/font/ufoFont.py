@@ -230,6 +230,7 @@ class NotDefGlyph:
         self.unitsPerEm = unitsPerEm
         self.width = unitsPerEm // 2
         self.height = unitsPerEm
+        self.verticalOrigin = (self.width / 2, 0.75 * unitsPerEm)
         self.lib = {}
 
     def draw(self, pen):
