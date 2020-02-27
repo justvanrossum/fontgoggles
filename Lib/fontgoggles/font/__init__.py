@@ -171,3 +171,14 @@ def mergeAxes(*axesList):
             else:
                 merged[tag] = axis
     return merged
+
+
+def mergeStylisticSetNames(*stylisticSetNamesList):
+    merged = {}
+    for stylisticSetNames in stylisticSetNamesList:
+        for tag, name in stylisticSetNames.items():
+            if tag in merged:
+                merged[tag].add(name)
+            else:
+                merged[tag] = {name}
+    return merged

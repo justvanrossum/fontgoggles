@@ -18,6 +18,7 @@ class BaseFont:
         del self.colorPalettes
         del self.featuresGSUB
         del self.featuresGPOS
+        del self.stylisticSetNames
         del self.scripts
         del self.axes
 
@@ -63,6 +64,10 @@ class BaseFont:
     @cachedProperty
     def featuresGPOS(self):
         return set(self.shaper.getFeatures("GPOS"))
+
+    @cachedProperty
+    def stylisticSetNames(self):
+        return self.shaper.getStylisticSetNames()
 
     @cachedProperty
     def scripts(self):

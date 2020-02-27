@@ -14,7 +14,7 @@ from vanilla import (ActionButton, CheckBox, EditText, Group, List, PopUpButton,
                      TextBox, TextEditor, VanillaBaseControl, Window)
 from vanilla.dialogs import getFile
 from fontTools.misc.arrayTools import offsetRect
-from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages
+from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages, mergeStylisticSetNames
 from fontgoggles.font.baseFont import GlyphsRun
 from fontgoggles.mac.aligningScrollView import AligningScrollView
 from fontgoggles.mac.drawing import rectFromNSRect
@@ -508,6 +508,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         allFeatureTagsGPOS = set()
         allAxes = []
         allScriptsAndLanguages = []
+        allStylisticSetNames = []
         for fontItemInfo in fonts:
             font = fontItemInfo.font
             if font is None:
@@ -516,14 +517,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             allFeatureTagsGPOS.update(font.featuresGPOS)
             allAxes.append(font.axes)
             allScriptsAndLanguages.append(font.scripts)
+            allStylisticSetNames.append(font.stylisticSetNames)
         allAxes = mergeAxes(*allAxes)
         allScriptsAndLanguages = mergeScriptsAndLanguages(*allScriptsAndLanguages)
-        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages
+        allStylisticSetNames = mergeStylisticSetNames(*allStylisticSetNames)
+        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages, allStylisticSetNames
 
     @objc.python_method
     def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes,
-                            allScriptsAndLanguages):
-        self.featuresGroup.setTags({"GSUB": allFeatureTagsGSUB, "GPOS": allFeatureTagsGPOS})
+                            allScriptsAndLanguages, allStylisticSetNames):
+        self.featuresGroup.setTags({"GSUB": allFeatureTagsGSUB, "GPOS": allFeatureTagsGPOS},
+                                    allStylisticSetNames)
         sliderInfo = {}
         for tag, axis in allAxes.items():
             defaultValue = axis["defaultValue"]

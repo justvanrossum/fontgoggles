@@ -15,13 +15,13 @@ class FeatureTagGroup(Group):
         super().__init__(posSize)
         self._callback = callback
         self._state = {}
-        self.setTags(tagGroups)
+        self.setTags(tagGroups, {})
 
     def _breakCycles(self):
         del self._callback
         super()._breakCycles()
 
-    def setTags(self, tagGroups):
+    def setTags(self, tagGroups, stylisticSetNames):
         # clear all subviews
         for attr, value in list(self.__dict__.items()):
             if isinstance(value, VanillaBaseObject):
@@ -38,7 +38,15 @@ class FeatureTagGroup(Group):
             y += 24
             for tag in sorted(tags):
                 tagView = TagView((margin, y, tagWidth, 20), tag, None, callback=self._tagStateChanged)
-                friendlyName = TextBox((margin + tagWidth + 6, y + 1, -margin, 20), features.get(tag, ["<unknown>"])[0])
+                names = stylisticSetNames.get(tag)
+                if names:
+                    if len(names) == 1:
+                        description = next(iter(names))
+                    else:
+                        description = "<multiple names>"
+                else:
+                    description = features.get(tag, ["<unknown>"])[0]
+                friendlyName = TextBox((margin + tagWidth + 6, y + 1, -margin, 20), description)
                 friendlyName._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingTail)
                 tagIdentifier = f"tag_{title}_{tag}"
                 self._tagIdentifiers[tag].append(tagIdentifier)
