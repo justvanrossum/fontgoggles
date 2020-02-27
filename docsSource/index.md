@@ -95,7 +95,8 @@ The _Direction/orientation_ menu has six options:
 The _Visual alignment_ button controls how the rendered text is visually
 aligned within the window. Its menu has four options:
 
-- _Automatic_: Use the alignment that is most natural with the detected writing direction
+- _Automatic_: Use the alignment that is most natural with the detected
+  writing direction
 - _Left_: align left
 - _Right_: align right
 - _Center_: align center
