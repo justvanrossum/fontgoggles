@@ -92,58 +92,6 @@ class FGFontListView(AppKit.NSView):
         else:
             super().scrollWheel_(event)
 
-    def subscribeToMagnification_(self, scrollView):
-        nc = AppKit.NSNotificationCenter.defaultCenter()
-        nc.addObserver_selector_name_object_(
-            self, "_liveMagnifyWillStart:", AppKit.NSScrollViewWillStartLiveMagnifyNotification,
-            scrollView)
-        nc.addObserver_selector_name_object_(
-            self, "_liveMagnifyDidEnd:", AppKit.NSScrollViewDidEndLiveMagnifyNotification,
-            scrollView)
-
-    _nestedZoom = 0
-
-    @suppressAndLogException
-    def _liveMagnifyWillStart_(self, notification):
-        if self._nestedZoom == 0:
-            self._savedClipBounds = self.superview().bounds()
-            scrollView = notification.object()
-            scrollView.contentView().didLiveZoom = False
-            fontList = self.vanillaWrapper()
-            minMag = (fontItemMinimumSize / fontList.itemSize)
-            maxMag = (fontItemMaximumSize / fontList.itemSize)
-            scrollView.setMinMagnification_(minMag)
-            scrollView.setMaxMagnification_(maxMag)
-        self._nestedZoom += 1
-
-    @suppressAndLogException
-    def _liveMagnifyDidEnd_(self, notification):
-        self._nestedZoom -= 1
-        if self._nestedZoom == 0:
-            scrollView = notification.object()
-            clipView = self.superview()
-
-            finalBounds = clipView.bounds()
-            x, y = finalBounds.origin
-            dy = clipView.frame().size.height - clipView.bounds().size.height
-            scrollX, scrollY = x, y - dy
-            magnification = scrollView.magnification()
-            scrollView.setMagnification_(1.0)
-
-            fontList = self.vanillaWrapper()
-            newItemSize = round(max(fontItemMinimumSize,
-                                    min(fontItemMaximumSize, fontList.itemSize * magnification)))
-            actualMag = newItemSize / fontList.itemSize
-            fontList.resizeFontItems(newItemSize)
-            newBounds = ((round(actualMag * scrollX), round(actualMag * scrollY)), self._savedClipBounds.size)
-            scrollView.setMagnification_(1.0)
-
-            scrollView.contentView().didLiveZoom = True  # Something gets messed during a live zoom
-            newBounds = clipView.constrainBoundsRect_(newBounds)
-            clipView.setBounds_(newBounds)
-            scrollView.setMagnification_(1.0)
-            self._savedClipBounds = None
-
     _dragPosView = None
 
     @suppressAndLogException
