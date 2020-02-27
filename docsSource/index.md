@@ -101,8 +101,8 @@ Characters and glyphs are “clustered” by the shaping engine (HarfBuzz),
 and the Glyph list contains a column named “cluster” that shows the
 cluster number for each glyph. For more in-depth information see the
 [HarfBuzz documentation](https://harfbuzz.github.io/clusters.html).
-Selecting a character or glyph will select the entire cluster in the
-opposite list.
+Selecting a character or glyph in one list will select the entire cluster
+in the other list.
 
 Both lists can be scrolled horizontally or resized to reveal more information.
 
