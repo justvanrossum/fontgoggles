@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [0.9.6] - 2020-02-??
+## [0.9.6] - 2020-02-27
 
 - Fixed issue with glyph selection/hover, when adjacent glyphs overlap
 - Fixed pinch zoom issue which messed up window resize + scroll behavior

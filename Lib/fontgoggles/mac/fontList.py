@@ -387,6 +387,7 @@ class FontList(Group):
             fontItem.vertical = vertical
             fontItem.fileNameLabel.setPosSize(getFileNameLabelPosSize(vertical))
             fontItem.fileNameLabel.rotate([-90, 90][vertical])
+            fontItem.progressSpinner.setPosSize(getProgressSpinnerPosSize(vertical))
             x, y, w, h = fontItem.getPosSize()
             w, h = h, w
             fontItem.setPosSize((*pos, w, h))
@@ -854,7 +855,7 @@ class FontItem(Group):
         self.selected = False
         if vertical:
             self.fileNameLabel.rotate(90)
-        self.progressSpinner = ProgressSpinner((10, 20, 25, 25))
+        self.progressSpinner = ProgressSpinner(getProgressSpinnerPosSize(vertical))
         self.setFontKey(fontKey)
         self.compileOutput = io.StringIO()
         self._auxillaryOutput = [None]  # Avoid vanilla setattr magic
@@ -938,6 +939,13 @@ def getFileNameLabelPosSize(vertical):
         return (2, 10, 17, -10)
     else:
         return (10, 0, -10, 17)
+
+
+def getProgressSpinnerPosSize(vertical):
+    if vertical:
+        return (20, 10, 25, 25)
+    else:
+        return (10, 20, 25, 25)
 
 
 class FGGlyphLineView(AppKit.NSView):
