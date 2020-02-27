@@ -203,20 +203,21 @@ the compile output panel at the bottom of the font list will appear.
 ## Unicode Picker
 
 FontGoggles provides its own Unicode Picker, under the “Edit” menu:
-“Unicode Picker”, shortcut ⌘-U.
+“Unicode Picker”, shortcut ⌘-U. It allows you to find a Unicode
+character by name very quickly.
 
-You can search by Unicode name using multiple search terms. Each
-additional term will narrow down the result.
+You can use multiple search terms: each additional term will narrow
+down the result. It searches by prefix, so you can for example type
+“ara let” to find Arabic letters.
 
 Double click a character from the results to insert it in the front-most
-FontGoggles window, or copy the character as a string using the “Copy”
-button, or by using the “Copy” menu (⌘-C).
+FontGoggles window. Alternatively you can copy selected character from
+the results list with the “Copy” button, or by typing ⌘-C.
 
 ![FontGoggles screenshot](images/screenshot_8_color_unicode.png)
 
-Instead of searching by Unicode name, you can also enter a Unicode hex
+Instead of searching by Unicode name, you can enter a Unicode hex
 value, such as `1F63B` or with a `U+`, `0x`, `u` or `uni` prefix.
-
 These are examples of valid Unicode literal search terms:
 
 - `U+1F63B`
