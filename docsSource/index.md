@@ -200,6 +200,29 @@ the compile output panel at the bottom of the font list will appear.
 
 ![FontGoggles screenshot](images/screenshot_7_error.png)
 
+## Unicode Picker
+
+FontGoggles provides its own Unicode Picker, under the “Edit” menu:
+“Unicode Picker”, shortcut ⌘-U.
+
+You can search by Unicode name using multiple search terms. Each
+additional term will narrow down the result.
+
+Double click a character from the results to insert it in the front-most
+FontGoggles window, or copy the character as a string using the “Copy”
+button, or by using the “Copy” menu (⌘-C).
+
+![FontGoggles screenshot](images/screenshot_8_color_unicode.png)
+
+Instead of searching by Unicode name, you can also enter a Unicode hex
+value, such as `1F63B` or with a `U+`, `0x`, `u` or `uni` prefix. Valid
+Unicode literal search terms are:
+
+- `U+1F63B`
+- `0x1F63B`
+- `u1F63B`
+- `uni1234`
+
 ## Found a bug or have a question?
 
 Please open an issue on [the FontGoggles repository](https://github.com/justvanrossum/fontgoggles/issues).
