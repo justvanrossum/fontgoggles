@@ -40,6 +40,12 @@ class DSFont(BaseFont):
         self._ufos = {}
         self._needsVFRebuild = True
 
+    def resetCache(self):
+        super().resetCache()
+        del self.defaultInfo
+        del self.defaultVerticalAdvance
+        del self.defaultVerticalOriginY
+
     async def load(self, outputWriter):
         if self.doc is None:
             self.doc = DesignSpaceDocument.fromfile(self.fontPath)
@@ -175,11 +181,32 @@ class DSFont(BaseFont):
         return True
 
     @cachedProperty
-    def unitsPerEm(self):
+    def defaultInfo(self):
         info = SimpleNamespace()
         reader = self._ufos[(self.doc.default.path, self.doc.default.layerName)].reader
         reader.readInfo(info)
-        return info.unitsPerEm
+        return info
+
+    @cachedProperty
+    def unitsPerEm(self):
+        return self.defaultInfo.unitsPerEm
+
+    @cachedProperty
+    def defaultVerticalAdvance(self):
+        ascender = getattr(self.defaultInfo, "ascender", None)
+        descender = getattr(self.defaultInfo, "descender", None)
+        if ascender is None or descender is None:
+            return self.defaultInfo.unitsPerEm
+        else:
+            return ascender + abs(descender)
+
+    @cachedProperty
+    def defaultVerticalOriginY(self):
+        ascender = getattr(self.defaultInfo, "ascender", None)
+        if ascender is None:
+            return self.defaultInfo.unitsPerEm  # ???
+        else:
+            return ascender
 
     def varLocationChanged(self, varLocation):
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})
