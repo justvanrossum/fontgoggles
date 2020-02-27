@@ -215,8 +215,9 @@ button, or by using the “Copy” menu (⌘-C).
 ![FontGoggles screenshot](images/screenshot_8_color_unicode.png)
 
 Instead of searching by Unicode name, you can also enter a Unicode hex
-value, such as `1F63B` or with a `U+`, `0x`, `u` or `uni` prefix. Valid
-Unicode literal search terms are:
+value, such as `1F63B` or with a `U+`, `0x`, `u` or `uni` prefix.
+
+These are examples of valid Unicode literal search terms:
 
 - `U+1F63B`
 - `0x1F63B`
