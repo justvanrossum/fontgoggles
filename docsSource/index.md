@@ -67,8 +67,9 @@ After dropping some fonts it will look like this:
 - Click on a font to see the glyph positioning information
 - Select glyphs by clicking on them, which will highlight glyph
   positioning info and character info
+- In the font list, use arrow keys to navigate glyphs and fonts
 
-## The Character list and the Glyph list
+## The Character and Glyph lists
 
 On the left hand side of the FontGoggles window there are two lists.
 
@@ -94,13 +95,24 @@ order, or from top to bottom in vertical mode.
 
 Selecting items in the Character list will reflect the selection in the
 Glyphs list and vice versa. A single glyph can belong to multiple
-characters (for example in the case of ligatures)
+characters (for example in the case of ligatures), or vice versa.
+
+Characters and glyphs are “clustered” by the shaping engine (HarfBuzz),
+and the Glyph list contains a column named “cluster” that shows the
+cluster number for each glyph. For more in-depth information see the
+[HarfBuzz documentation](https://harfbuzz.github.io/clusters.html).
+Selecting a character or glyph will select the entire cluster in the
+opposite list.
+
+Both lists can be scrolled horizontally or resized to reveal more information.
 
 You can copy information from both Character and Glyph lists by selecting
 rows or columns and hit ⌘-C. Select multiple rows or columns by holding
-the Command key while clicking further items.
-
-Both lists can be scrolled horizontally or resized to reveal more information.
+the Command key while clicking further items. For example, click on the
+“glyph” header in the Glyph list to select the glyph name column, the hit
+⌘-C to copy the sequence of glyph names to the clipboard. If multiple columns
+are involved in the selection, the clipboard data will be tab-separated, ready
+to be pasted into a spreadsheet.
 
 ## Text settings
 

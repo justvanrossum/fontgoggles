@@ -61,8 +61,9 @@ the application, and drop some fonts onto the window.</p>
 <li>Click on a font to see the glyph positioning information</li>
 <li>Select glyphs by clicking on them, which will highlight glyph
   positioning info and character info</li>
+<li>In the font list, use arrow keys to navigate glyphs and fonts</li>
 </ul>
-<h2>The Character list and the Glyph list</h2>
+<h2>The Character and Glyph lists</h2>
 <p>On the left hand side of the FontGoggles window there are two lists.</p>
 <p>The left-most one is the Character list, which shows the entered
 characters and their Unicode values.</p>
@@ -81,11 +82,21 @@ order, or from top to bottom in vertical mode.</p>
 <p><img alt="FontGoggles screenshot" src="images/screenshot_4_arabic.png" /></p>
 <p>Selecting items in the Character list will reflect the selection in the
 Glyphs list and vice versa. A single glyph can belong to multiple
-characters (for example in the case of ligatures)</p>
+characters (for example in the case of ligatures), or vice versa.</p>
+<p>Characters and glyphs are “clustered” by the shaping engine (HarfBuzz),
+and the Glyph list contains a column named “cluster” that shows the
+cluster number for each glyph. For more in-depth information see the
+<a href="https://harfbuzz.github.io/clusters.html">HarfBuzz documentation</a>.
+Selecting a character or glyph will select the entire cluster in the
+opposite list.</p>
+<p>Both lists can be scrolled horizontally or resized to reveal more information.</p>
 <p>You can copy information from both Character and Glyph lists by selecting
 rows or columns and hit ⌘-C. Select multiple rows or columns by holding
-the Command key while clicking further items.</p>
-<p>Both lists can be scrolled horizontally or resized to reveal more information.</p>
+the Command key while clicking further items. For example, click on the
+“glyph” header in the Glyph list to select the glyph name column, the hit
+⌘-C to copy the sequence of glyph names to the clipboard. If multiple columns
+are involved in the selection, the clipboard data will be tab-separated, ready
+to be pasted into a spreadsheet.</p>
 <h2>Text settings</h2>
 <p>At the top right of the FontGoggles window you find four buttons with
 popup menus:</p>
