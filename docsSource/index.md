@@ -128,8 +128,8 @@ However, since this value can be different per font, the slider will
 in that case show an arbitrary position, and the numeric field will
 be empty as a sign there is not a single possible value.
 
-The _Options_ panel has three sliders that affect the display of the
-text:
+The _Options_ panel has three sliders and a checkbox that affect the
+display of the text:
 
 - The _Relative Size_ slider controls the relative size of the text in
   comparison to the box in which is is displayed. A value of 100 scales
@@ -138,6 +138,8 @@ text:
   of the display box size.
 - The _Margin_ slider controls the left and right margins, as a percentage
   of the display box size. Or top and bottom in vertical layout mode.
+- The _Enable Color (COLR/CPAL)_ checkbox allows you to choose whether
+  color glyphs are displayed if available.
 
 ## Customize the window
 
