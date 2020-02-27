@@ -6,9 +6,8 @@ import time
 from fontTools.ufoLib import plistlib
 import markdown
 
-
-rootDir = pathlib.Path(__file__).resolve().parent.parent
-docsDir = rootDir / "docs"
+docsSourceDir = pathlib.Path(__file__).resolve().parent
+docsDir = docsSourceDir.parent / "docs"
 
 
 htmlTemplate = """\
@@ -27,7 +26,7 @@ htmlTemplate = """\
 </html>
 """
 
-indexMD = docsDir / "index.md"
+indexMD = docsSourceDir / "index.md"
 markdownSource = indexMD.read_text(encoding="utf-8")
 
 mdConverter = markdown.Markdown()
