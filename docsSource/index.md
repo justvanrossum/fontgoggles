@@ -222,6 +222,7 @@ Instead of searching by Unicode name, you can enter a Unicode hex
 value, such as `1F63B` or with a `U+`, `0x`, `u` or `uni` prefix.
 These are examples of valid Unicode literal search terms:
 
+- `1F63B`
 - `U+1F63B`
 - `0x1F63B`
 - `u1F63B`
