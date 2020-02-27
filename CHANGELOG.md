@@ -2,8 +2,8 @@
 
 ## [0.9.7] - 2020-02-??
 
-- Show stylistic set names if possible (if multiple fonts are loaded and
-  don't have matching names, a generic "\<multiple names\>" is shown.
+- Show stylistic set names when possible. If multiple fonts are loaded and
+  they don't have matching names, a generic "\<multiple names\>" is shown.
 
 ## [0.9.6] - 2020-02-27
 
