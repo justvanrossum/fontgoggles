@@ -78,6 +78,9 @@ class FGFontListView(AppKit.NSView):
         if not self.vanillaWrapper().keyDown(event):
             super().keyDown_(event)
 
+    def magnifyWithEvent_(self, event):
+        print("maggg", event.phase(), event.magnification())
+
     def scrollWheel_(self, event):
         if event.modifierFlags() & AppKit.NSEventModifierFlagOption:
             if event.phase() in {AppKit.NSEventPhaseBegan, AppKit.NSEventPhaseMayBegin}:
