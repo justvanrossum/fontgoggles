@@ -239,6 +239,18 @@ These are examples of valid Unicode literal search terms:</p>
 <li><code>u1F63B</code></li>
 <li><code>uni1234</code></li>
 </ul>
+<h2>Implementation notes</h2>
+<ul>
+<li>HarfBuzz is used for text shaping, not CoreText</li>
+<li>Hints are not taken into account: glyph rasterisation is done by the
+  OS from unhinted outlines</li>
+<li>Source formats are partially compiled, using parts of the <code>fontmake</code>
+  toolchain. Source previews match binary fonts as built with <code>fontmake</code></li>
+</ul>
+<h2>System requirements</h2>
+<ul>
+<li>macOS 10.10 and higher</li>
+</ul>
 <h2>Found a bug or have a question?</h2>
 <p>Please open an issue on <a href="https://github.com/justvanrossum/fontgoggles/issues">the FontGoggles repository</a>.</p>
 <hr />
