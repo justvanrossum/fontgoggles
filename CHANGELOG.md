@@ -2,6 +2,8 @@
 
 ## [0.9.7] - 2020-02-??
 
+- Be smarter about multi-font glyph selection if fonts behave the same and
+  use the same glyph names, as is usual within a family
 - Show stylistic set names when possible. If multiple fonts are loaded and
   they don't have matching names for a stylistic set, a generic "\<multiple
   names\>" is shown.
