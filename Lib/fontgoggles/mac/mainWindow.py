@@ -741,8 +741,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         if selectedFontItem.glyphs is not None:
             charIndices = selectedFontItem.glyphs.mapGlyphsToChars(selectedFontItem.selection)
+            glyphNames = selectedFontItem.glyphs.glyphNames
+            glyphIndices = set(selectedFontItem.selection)
         else:
             charIndices = []
+            glyphNames = []
+            glyphIndices = set()
 
         with self.blockCallbackRecursion():
             for fontItem in self.iterFontItems():
@@ -750,7 +754,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     self.glyphList.setSelection(fontItem.selection)
                     self.updateCharacterListSelection(fontItem)
                 elif fontItem.glyphs is not None:
-                    fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
+                    if fontItem.glyphs.glyphNames == glyphNames:
+                        fontItem.selection = glyphIndices
+                    else:
+                        fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
 
     @objc.python_method
     def fontListArrowKeyCallback(self, sender, event):
