@@ -17,7 +17,6 @@ from fontTools.misc.arrayTools import offsetRect
 from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages, mergeStylisticSetNames
 from fontgoggles.font.baseFont import GlyphsRun
 from fontgoggles.mac.aligningScrollView import AligningScrollView
-from fontgoggles.mac.drawing import rectFromNSRect
 from fontgoggles.mac.featureTagGroup import FeatureTagGroup
 from fontgoggles.mac.fileObserver import getFileObserver
 from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize, makeUndoProxy
@@ -527,7 +526,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes,
                             allScriptsAndLanguages, allStylisticSetNames):
         self.featuresGroup.setTags({"GSUB": allFeatureTagsGSUB, "GPOS": allFeatureTagsGPOS},
-                                    allStylisticSetNames)
+                                   allStylisticSetNames)
         sliderInfo = {}
         for tag, axis in allAxes.items():
             defaultValue = axis["defaultValue"]
@@ -722,7 +721,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.compileOutput.set(output)
             fontItem.setAuxillaryOutput(self.compileOutput)
 
-            isVisible = self.fontListSplitView.isPaneReallyVisible("compileOutput")
             if output and not self.fontListSplitView.isPaneReallyVisible("compileOutput"):
                 # This may be annoying if warnings are common and need to be ignored
                 # more. For now, let's make sure the user sees all warnings/errors.
