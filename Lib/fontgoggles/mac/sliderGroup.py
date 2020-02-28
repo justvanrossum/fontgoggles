@@ -114,7 +114,7 @@ class SliderPlus(Group):
     def _editFieldCallback(self, sender):
         value = sender.get()
         if not value:
-            self._setSliderFromValue(None)
+            # self._setSliderFromValue(None)
             callCallback(self._callback, self)
             return
         value = value.replace(",", ".")
