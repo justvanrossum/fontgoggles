@@ -104,7 +104,8 @@ cluster number for each glyph. For more in-depth information see the
 Selecting a character or glyph in one list will select the entire cluster
 in the other list.
 
-Both lists can be scrolled horizontally or resized to reveal more information.
+Both lists can be scrolled horizontally or resized to reveal more information,
+and columns can be rearranged by dragging them around.
 
 You can copy information from both _Character_ and _Glyph lists_ by selecting
 rows or columns and hit ⌘-C. Select multiple rows or columns by holding
