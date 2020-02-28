@@ -25,7 +25,7 @@ def sniffFontType(fontPath: PathLike):
 defaultSortSpec = ("familyName", "weight", "width", "italicAngle", "styleName", "suffix")
 
 
-def sortedFontPathsAndNumbers(paths: list, sortSpec: tuple=()):
+def sortedFontPathsAndNumbers(paths: list, sortSpec: tuple = ()):
     expandedPaths = list(iterFontPathsAndNumbers(paths))
 
     def sorter(item):

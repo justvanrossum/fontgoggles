@@ -1154,7 +1154,6 @@ class FGGlyphLineView(AppKit.NSView):
             self._cachedColorPalettes[blendColor] = blendedPalette
         return blendedPalette
 
-
     @suppressAndLogException
     def drawRect_(self, rect):
         if not self._glyphs:

@@ -9,12 +9,12 @@ os.chdir(appFolder)  # make our parent dir the current dir
 
 
 infoplist = dict(
-    CFBundleDocumentTypes = [
+    CFBundleDocumentTypes=[
         dict(
-            CFBundleTypeExtensions = ["gggls"],
-            CFBundleTypeName = "FontGoggles Project File",
-            CFBundleTypeRole = "Editor",
-            NSDocumentClass = "FGDocument",
+            CFBundleTypeExtensions=["gggls"],
+            CFBundleTypeName="FontGoggles Project File",
+            CFBundleTypeRole="Editor",
+            NSDocumentClass="FGDocument",
         ),
         dict(
             CFBundleTypeExtensions=["ufo", "ufoz"],
