@@ -116,12 +116,14 @@ class HBShape:
         return hb.ot_layout_language_get_feature_tags(self.face, tag)
 
     def getStylisticSetNames(self):
+        tags = _stylisticSets & set(self.getFeatures("GSUB"))
+        if not tags:
+            return {}
         gsubTable = self._ttFont.get("GSUB")
         nameTable = self._ttFont.get("name")
         if gsubTable is None or nameTable is None:
             return {}
         gsubTable = gsubTable.table
-        tags = _stylisticSets & set(self.getFeatures("GSUB"))
         names = {}
         for feature in gsubTable.FeatureList.FeatureRecord:
             tag = feature.FeatureTag
