@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [0.9.7] - 2020-02-??
+## [0.9.7] - 2020-02-28
 
 - Be smarter about multi-font glyph selection if fonts behave the same and
   use the same glyph names, as is usual within a family
