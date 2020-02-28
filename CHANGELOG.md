@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [0.9.8] - 2020-02-??
+## [0.9.8] - 2020-02-28
 
 - Added “Reset all axes” button to Variations panel.
 - Deal better with different default axis values when multiple fonts are
