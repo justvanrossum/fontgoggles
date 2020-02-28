@@ -5,6 +5,7 @@
 - Added “Reset all axes” button to Variations panel.
 - Deal better with different default axis values when multiple fonts are
   being viewed.
+- Improved shift-click behavior in the font list
 
 ## [0.9.7] - 2020-02-28
 
