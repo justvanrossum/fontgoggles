@@ -1,5 +1,5 @@
 import AppKit
-from vanilla import EditText, Group, Slider, TextBox, VanillaBaseObject
+from vanilla import Button, EditText, Group, Slider, TextBox, VanillaBaseObject
 from fontgoggles.misc.properties import weakrefCallbackProperty
 
 
@@ -27,18 +27,34 @@ class SliderGroup(Group):
         margin = 10
         y = margin
         self._tags = []
+        self._defaultValues = {}
         for tag, (label, minValue, defaultValue, maxValue) in sliderInfo.items():
             self._tags.append(tag)
+            self._defaultValues[tag] = defaultValue
             attrName = f"slider_{tag}"
             slider = SliderPlus((margin, y, -margin, 40), label, minValue, defaultValue, maxValue,
                                 continuous=self._continuous, callback=self._sliderChanged)
             setattr(self, attrName, slider)
             y += 50
+
+        self.resetAllButton = Button((10, y, 120, 25), "Reset all axes", self._resetAllButtonCallback)
+        self.resetAllButton.enable(False)
+        y += 35
+
         posSize = (0, 0, self.getPosSize()[2], y)
         self.setPosSize(posSize)
         self._updateState(savedState)
 
     def _sliderChanged(self, sender):
+        self.resetAllButton.enable(True)
+        callCallback(self._callback, self)
+
+    def _resetAllButtonCallback(self, sender):
+        self.resetAllButton.enable(False)
+        for tag in self._tags:
+            attrName = f"slider_{tag}"
+            slider = getattr(self, attrName)
+            slider.set(self._defaultValues[tag])
         callCallback(self._callback, self)
 
     def get(self):
@@ -46,7 +62,10 @@ class SliderGroup(Group):
         for tag in self._tags:
             attrName = f"slider_{tag}"
             slider = getattr(self, attrName)
-            state[tag] = slider.get()
+            value = slider.get()
+            if value is not None:
+                if len(self._defaultValues[tag]) != 1 or value not in self._defaultValues[tag]:
+                    state[tag] = value
         return state
 
     def _updateState(self, state):
@@ -57,12 +76,15 @@ class SliderGroup(Group):
                 slider.set(value)
 
     def set(self, state):
+        if state:
+            self.resetAllButton.enable(True)
         for tag in self._tags:
             attrName = f"slider_{tag}"
             slider = getattr(self, attrName)
             value = state.get(tag)
-            if value is not None:
-                slider.set(value)
+            if value is None:
+                value = self._defaultValues[tag]
+            slider.set(value)
 
 
 class SliderPlus(Group):
@@ -108,19 +130,27 @@ class SliderPlus(Group):
             callCallback(self._callback, self)
 
     def _setSliderFromValue(self, value):
-        if value is None:
+        if isinstance(value, set):
+            value = sum(value) / len(value)
+        elif value is None:
             minValue = self.slider._nsObject.minValue()
             maxValue = self.slider._nsObject.maxValue()
             value = (minValue + maxValue) / 2
         self.slider.set(value)
 
     def _setEditFieldFromValue(self, value):
+        if isinstance(value, set):
+            if len(value) == 1:
+                value = next(iter(value))
+            else:
+                value = None
         if value is None:
             s = ""
-        elif int(value) == value:
-            s = str(int(value))
         else:
-            s = f"{value:.1f}"
+            if int(value) == value:
+                s = str(int(value))
+            else:
+                s = f"{value:.1f}"
         self.editField.set(s)
 
     def get(self):
