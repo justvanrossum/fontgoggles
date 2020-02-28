@@ -295,7 +295,8 @@ These are examples of valid Unicode literal search terms:
 - Hints are not taken into account: glyph rasterisation is done by the
   OS from unhinted outlines
 - Source formats are partially compiled, using parts of the `fontmake`
-  toolchain. Source previews match binary fonts as built with `fontmake`
+  toolchain, therefore source previews match binary fonts as built with
+  `fontmake`
 
 ## System requirements
 
