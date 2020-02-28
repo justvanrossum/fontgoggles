@@ -723,6 +723,21 @@ class FontList(Group):
 
         if clickedSelection and event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
             newSelection = self._selection ^ clickedSelection
+        elif clickedSelection and event.modifierFlags() & AppKit.NSEventModifierFlagShift:
+            if not self._selection:
+                newSelection = clickedSelection
+            else:
+                selIndices = [index for index, fontItemInfo in enumerate(self.project.fonts)
+                              if fontItemInfo.identifier in self._selection]
+                minSel = min(selIndices)
+                maxSel = max(selIndices)
+                if index < minSel:
+                    selIndices = range(index, maxSel + 1)
+                elif index > maxSel:
+                    selIndices = range(minSel, index + 1)
+                else:
+                    selIndices = range(minSel, maxSel + 1)
+                newSelection = {self.project.fonts[i].identifier for i in selIndices}
         elif index in self._selection:
             newSelection = None
         else:
@@ -1231,7 +1246,8 @@ class FGGlyphLineView(AppKit.NSView):
         super().mouseDown_(event)
 
     def mouseDragged_(self, event):
-        if event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
+        if (event.modifierFlags() & AppKit.NSEventModifierFlagCommand or
+                event.modifierFlags() & AppKit.NSEventModifierFlagShift):
             return
         mx, my = self.mouseDownLocation
         x, y = self.convertPoint_fromView_(event.locationInWindow(), None)
@@ -1243,7 +1259,8 @@ class FGGlyphLineView(AppKit.NSView):
     def mouseUp_(self, event):
         index = self.mouseDownGlyphIndex
         if index is not None:
-            if not event.modifierFlags() & AppKit.NSEventModifierFlagCommand:
+            if not (event.modifierFlags() & AppKit.NSEventModifierFlagCommand or
+                    event.modifierFlags() & AppKit.NSEventModifierFlagShift):
                 if index is None:
                     newSelection = set()
                 elif index in self.selection:
