@@ -200,7 +200,7 @@ display of the text:
 - The _Enable Color (COLR/CPAL)_ checkbox allows you to choose whether
   color glyphs are displayed if available.
 
-## Customize the window
+## Customize the window layout
 
 Most panels in the window are resizable, and some are collapsable.
 There are also “View” menu items to show and hide the collapsable
@@ -210,6 +210,8 @@ panels:
 - Show/hide Glyph list — ⌘-2
 - Show/hide Compile output — ⌘-3
 - Show/hide Formatting options — ⌘-4
+
+![FontGoggles screenshot](images/screenshot_7_hindi.png)
 
 ## Load and navigate a text file
 
