@@ -809,16 +809,22 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         glyphIndices = self.glyphList.getSelection()
         if selectedFontItem.glyphs is not None:
             charIndices = selectedFontItem.glyphs.mapGlyphsToChars(glyphIndices)
+            glyphNames = selectedFontItem.glyphs.glyphNames
         else:
             charIndices = []
+            glyphNames = []
 
+        glyphIndices = set(glyphIndices)
         with self.blockCallbackRecursion():
             for fontItem in self.iterFontItems():
                 if fontItem is selectedFontItem:
-                    fontItem.selection = set(glyphIndices)
+                    fontItem.selection = glyphIndices
                     self.updateCharacterListSelection(fontItem)
                 elif fontItem.glyphs is not None:
-                    fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
+                    if fontItem.glyphs.glyphNames == glyphNames:
+                        fontItem.selection = glyphIndices
+                    else:
+                        fontItem.selection = fontItem.glyphs.mapCharsToGlyphs(charIndices)
         self.fontList.scrollGlyphSelectionToVisible()
 
     @objc.python_method

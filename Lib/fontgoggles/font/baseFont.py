@@ -190,3 +190,7 @@ class GlyphsRun(list):
     def _calcMappings(self):
         clusters = [glyphInfo.cluster for glyphInfo in self]
         self._glyphToChars, self._charToGlyphs = characterGlyphMapping(clusters, self.numChars)
+
+    @cachedProperty
+    def glyphNames(self):
+        return [glyphInfo.name for glyphInfo in self]
