@@ -532,10 +532,23 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                    allStylisticSetNames)
         sliderInfo = {}
         for tag, axis in allAxes.items():
-            sliderInfo[tag] = (f"{axis['name']} ({tag})",
+            name = sorted(axis['name'])[0]
+            label = f"{name} ({tag})"
+            if len(axis['name']) > 1:
+                label += " <multiple names>"
+            sliderInfo[tag] = (label,
                                axis["minValue"],
                                axis["defaultValue"],
                                axis["maxValue"])
+
+        # The axis order easily becomes a mess when multiple fonts are loaded.
+        # Sort by (not isAxisRegistered, label.lower()), but keep it a dict.
+        # Downside: we no longer see the axes in the order defined by the font.
+        def sorter(keyValue):
+            tag, (label, minValue, defaultValue, maxValue) = keyValue
+            isAxisRegistered = tag == tag.lower()  # all lowercase tags are registered axes
+            return not isAxisRegistered, label.lower()
+        sliderInfo = {k: v for k, v in sorted(sliderInfo.items(), key=sorter)}
         self.variationsGroup.setSliderInfo(sliderInfo)
         scriptTags = sorted(allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]

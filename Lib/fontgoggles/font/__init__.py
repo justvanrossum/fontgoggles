@@ -154,18 +154,17 @@ def mergeScriptsAndLanguages(*dicts):
     return merged
 
 
-def _defaultValueToSet(axis):
-    return {k: v if k != "defaultValue" or isinstance(v, set) else {v} for k, v in axis.items()}
-
-
 def mergeAxes(*axesList):
     merged = {}
     for axes in axesList:
         for tag, axis in axes.items():
-            axis = _defaultValueToSet(axis)
+            axis = dict(axis)
+            axis["defaultValue"] = {axis["defaultValue"]}
+            axis["name"] = {axis["name"]}
             if tag in merged:
                 mergedAxis = merged[tag]
-                mergedAxis["defaultValue"] |= axis["defaultValue"]
+                mergedAxis["name"].update(axis["name"])
+                mergedAxis["defaultValue"].update(axis["defaultValue"])
                 mergedAxis["minValue"] = min(mergedAxis["minValue"], axis["minValue"])
                 mergedAxis["maxValue"] = max(mergedAxis["maxValue"], axis["maxValue"])
             else:

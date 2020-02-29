@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [0.9.9] - 2020-0?-??
+
+- Sort axis sliders more logically: sort registered axes first, then
+  by name.
+
 ## [0.9.8] - 2020-02-28
 
 - Added “Reset all axes” button to Variations panel.
