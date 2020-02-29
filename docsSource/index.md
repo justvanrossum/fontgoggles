@@ -47,6 +47,14 @@ Thomas Thiemich: _“The most impressive feature of this tool so far is its
 speed — it’s quite impressive how fast it handles multiple fonts or variable
 fonts.”_
 
+Petr van Blokland: _“FontGoggles works really well. Truly live feature
+source code debugging for many masters simultaneously. Awesome.”_
+
+Stephen Nixon, two days later: _WOW. Font Goggles is just so good. It allows
+me to open a preview of the full Recursive designspace in maybe 4 or 5
+seconds. Way quicker than any other way of checking whether a given
+interpolation will work as desired._
+
 ## How to use
 
 Drop some fonts (or folders with fonts) onto the application, or launch
