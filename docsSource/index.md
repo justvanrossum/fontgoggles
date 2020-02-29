@@ -36,6 +36,8 @@ Core features:
 
 ## Testimonials
 
+Agyei Archer: _“🤩🤩🤩”_
+
 Stephen Nixon: _“Super nice! I really love how this lets me compare the same
 variable axes across multiple fonts. It’s super interesting to visually
 compare how different fonts handle wght, opsz, etc. I also love that I can
@@ -50,10 +52,15 @@ fonts.”_
 Petr van Blokland: _“FontGoggles works really well. Truly live feature
 source code debugging for many masters simultaneously. Awesome.”_
 
-Stephen Nixon, two days later: _WOW. Font Goggles is just so good. It allows
+Arthur Reinders Folmer (Typearture): _“These goggles need no prescription!
+FontGoggles shows and compares complex color and variable fonts fast and
+fluid, making refinements and adjustments a piece of cake. An amazing
+variable color font proofing app for all file formats.”_
+
+Stephen Nixon, two days later: _“WOW. Font Goggles is just so good. It allows
 me to open a preview of the full Recursive designspace in maybe 4 or 5
 seconds. Way quicker than any other way of checking whether a given
-interpolation will work as desired._
+interpolation will work as desired.”_
 
 ## How to use
 
