@@ -74,6 +74,7 @@ class UnicodePicker(AppKit.NSWindowController):
             results += sorted(foundSet)
 
         self.searchResults = results
+        self.w.unicodeList.set([])
         self.appendResults_(500)
 
     def appendResults_(self, maxResults):
