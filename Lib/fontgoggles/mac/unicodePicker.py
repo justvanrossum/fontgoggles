@@ -74,15 +74,25 @@ class UnicodePicker(AppKit.NSWindowController):
             results += sorted(foundSet)
 
         self.searchResults = results
+        self.appendResults_(500)
+
+    def appendResults_(self, maxResults):
+        start = len(self.w.unicodeList)
         unicodeItems = [dict(char=chr(uni),
                              unicode=f"U+{uni:04X}",
-                             name=unicodedata.name(chr(uni), "")) for uni in results]
-        if len(unicodeItems) > 500:
-            unicodeItems = unicodeItems[:500] + [dict(name="...more...")]
-        self.w.unicodeList.set(unicodeItems)
+                             name=unicodedata.name(chr(uni), ""))
+                        for uni in self.searchResults[start:start+maxResults]]
+        if len(self.searchResults) > start + maxResults:
+            unicodeItems.append(dict(name="...more..."))
+        self.w.unicodeList.extend(unicodeItems)
 
     def listSelectionChanged_(self, sender):
-        chars = "".join(chr(self.searchResults[i]) for i in sender.getSelection())
+        sel = sender.getSelection()
+        if sel and sender[max(sel)]["name"] == "...more...":
+            del sender[len(sender) - 1]
+            self.appendResults_(500)
+            sender.setSelection(sel)
+        chars = "".join(chr(self.searchResults[i]) for i in sel)
         self.w.copyButton.enable(bool(chars))
         self.selectedChars = chars
         self.w.unicodeText.set(chars)
