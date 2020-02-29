@@ -4,6 +4,7 @@
 
 - Sort axis sliders more logically: sort registered axes first, then
   by name.
+- The Unicode Picker can now show more than 500 search results.
 
 ## [0.9.8] - 2020-02-28
 
