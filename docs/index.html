@@ -245,6 +245,14 @@ These are examples of valid Unicode literal search terms:</p>
 <li><code>u1F63B</code></li>
 <li><code>uni1234</code></li>
 </ul>
+<h2>Frequently asked questions</h2>
+<ul>
+<li>Q: Can glyph names be used as text input?</li>
+<li><em>A: No. FontGoggles uses HarfBuzz for text shaping, and for it to do
+  its work correctly, the input has to be Unicode text. For example, to
+  do correct shaping for the Arabic script, Unicode character attributes
+  are needed, which are not available from glyph name input.</em></li>
+</ul>
 <h2>Implementation notes</h2>
 <ul>
 <li>HarfBuzz is used for text shaping, not CoreText</li>
