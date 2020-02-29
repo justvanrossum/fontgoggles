@@ -466,6 +466,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         """This loads fonts that aren't yet loaded, and updates all information
         regarding features, scripts/languages and variations.
         """
+        if not hasattr(self, "fontList"):
+            # Window closed before we got to run
+            return ()
         coros = []
         for fontItemInfo, fontItem in self.iterFontItemInfoAndItems():
             if fontItemInfo.font is None or fontItemInfo.wantsReload:
@@ -687,7 +690,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @asyncTaskAutoCancel
     async def updateCharacterList(self, selection=None, delay=0):
-        if not hasattr(self, "showBiDiCheckBox"):
+        if not hasattr(self, "project"):
             # Window closed before we got to run
             return
         if delay:
