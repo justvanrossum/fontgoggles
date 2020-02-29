@@ -1,7 +1,8 @@
 # Changelog for FontGoggles
 
-## [0.9.9] - 2020-0?-??
+## [1.0] - 2020-02-29
 
+- One! Oh! Let's go!
 - Sort axis sliders more logically: sort registered axes first, then
   by name.
 - The Unicode Picker can now show more than 500 search results.
