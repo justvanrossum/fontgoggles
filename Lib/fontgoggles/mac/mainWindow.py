@@ -143,6 +143,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         (x, y), (w, h) = self.w._window.frame()
         uiSettings.windowPosition = [x, y, w, h]
         uiSettings.fontListItemSize = self.fontList.itemSize
+        uiSettings.fontListShowFontFileName = self.fontList.showFontFileName
 
         uiSettings.characterListVisible = self.w.mainSplitView.isPaneReallyVisible("characterList")
         uiSettings.characterListSize = self.w.mainSplitView.paneSize("characterList")
@@ -1026,7 +1027,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     def showFontFileName_(self, sender):
         self.fontList.showFontFileName = not self.fontList.showFontFileName
-        self.project.uiSettings.fontListShowFontFileName = self.fontList.showFontFileName
 
     @suppressAndLogException
     def validateMenuItem_(self, sender):
