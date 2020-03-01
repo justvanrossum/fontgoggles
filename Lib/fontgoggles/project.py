@@ -190,20 +190,23 @@ class FontLoader:
 
 @dataclass
 class TextSettings:
+    # Content settings
     text: str = "ABC abc 0123 :;?"  # TODO: From user defaults?
     textFilePath: PathLike = None
     textFileIndex: int = 0
+    # Text settings
+    shouldApplyBiDi: bool = True
+    direction: typing.Union[None, str] = None
+    script: typing.Union[None, str] = None
+    language: typing.Union[None, str] = None
+    alignment: typing.Union[None, str] = None
+    # Formatting settings
     features: dict = field(default_factory=dict)
     varLocation: dict = field(default_factory=dict)
     relativeFontSize: float = 0.7
     relativeHBaseline: float = 0.25
     relativeVBaseline: float = 0.5
     relativeMargin: float = 0.1
-    shouldApplyBiDi: bool = True
-    direction: typing.Union[None, str] = None
-    script: typing.Union[None, str] = None
-    language: typing.Union[None, str] = None
-    alignment: typing.Union[None, str] = None
     enableColor: bool = True
 
 
