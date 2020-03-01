@@ -256,7 +256,8 @@ class FontList(Group):
 
     def __init__(self, project, projectProxy, width, itemSize, vertical=False,
                  relativeFontSize=0.7, relativeHBaseline=0.25,
-                 relativeVBaseline=0.5, relativeMargin=0.1, selectionChangedCallback=None,
+                 relativeVBaseline=0.5, relativeMargin=0.1,
+                 showFontFileName=True, selectionChangedCallback=None,
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
         self.project = None  # Dummy, so we can set up other attrs first
@@ -275,6 +276,7 @@ class FontList(Group):
         self.project = project
         self.projectProxy = projectProxy
         self.setupFontItems()
+        self.showFontFileName = showFontFileName
 
     def _glyphSelectionChanged(self):
         if self._glyphSelectionChangedCallback is not None:
@@ -364,6 +366,12 @@ class FontList(Group):
             if atLeft or atCenter:
                 clipBounds.origin.x = sizeDiff
         clipView.setBounds_(clipBounds)
+
+    def showFontFileName(self):
+        for fontItem in self.iterFontItems():
+            fontItem.fileNameLabel.show(self.showFontFileName)
+
+    showFontFileName = hookedProperty(showFontFileName, default=True)
 
     def iterFontItems(self):
         if self.project is None:

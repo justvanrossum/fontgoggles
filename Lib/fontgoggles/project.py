@@ -211,6 +211,7 @@ class TextSettings:
 class UISettings:
     windowPosition: typing.Union[None, list] = None
     fontListItemSize: float = 150
+    fontListShowFontFileName: bool = True
     showBiDi: bool = False
     characterListVisible: bool = True
     characterListSize: float = 100

@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.0.1] - 2020-03-??
+
+- Added View -> Show/hide Font File name menu
+
 ## [1.0] - 2020-02-29
 
 - One! Oh! Let's go!

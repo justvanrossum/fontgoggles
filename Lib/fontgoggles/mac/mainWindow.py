@@ -237,6 +237,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                  relativeHBaseline=self.project.textSettings.relativeHBaseline,
                                  relativeVBaseline=self.project.textSettings.relativeVBaseline,
                                  relativeMargin=self.project.textSettings.relativeMargin,
+                                 showFontFileName=self.project.uiSettings.fontListShowFontFileName,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
@@ -1023,6 +1024,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def showFormattingOptions_(self, sender):
         self.w.mainSplitView.togglePane("formattingOptions")
 
+    def showFontFileName_(self, sender):
+        self.fontList.showFontFileName = not self.fontList.showFontFileName
+        self.project.uiSettings.fontListShowFontFileName = self.fontList.showFontFileName
+
     @suppressAndLogException
     def validateMenuItem_(self, sender):
         action = sender.action()
@@ -1037,6 +1042,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isVisible = self.fontListSplitView.isPaneReallyVisible("compileOutput")
         elif action == "showFormattingOptions:":
             isVisible = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
+        elif action == "showFontFileName:":
+            isVisible = self.fontList.showFontFileName
         elif action in ("previousTextLine:", "nextTextLine:"):
             return bool(self.textEntry.textFilePath)
         elif action == "copy:":
