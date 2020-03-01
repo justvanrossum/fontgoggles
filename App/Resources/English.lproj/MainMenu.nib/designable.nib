@@ -268,8 +268,7 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="392"/>
-                            <menuItem title="Show Font File name" id="pWG-xt-g3o">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Show Font File name" keyEquivalent="5" id="pWG-xt-g3o">
                                 <connections>
                                     <action selector="showFontFileName:" target="-1" id="Ppi-rz-b6J"/>
                                 </connections>
