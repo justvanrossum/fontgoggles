@@ -49,8 +49,15 @@ Thomas Thiemich: _“The most impressive feature of this tool so far is its
 speed — it’s quite impressive how fast it handles multiple fonts or variable
 fonts.”_
 
+Ben Mitchell: _“I especially like the ability to scale text within the samples
+and adjust the baseline, wish other apps were this intuitive.”_
+
 Petr van Blokland: _“FontGoggles works really well. Truly live feature
 source code debugging for many masters simultaneously. Awesome.”_
+
+Paul van der Laan (Bold Monday): _“Really impressive! Love the uncluttered
+interface. Support for UFO files is fantastic. Being able to instantly
+preview a variable font by dropping a designspace file is a BIG help.”_
 
 Arthur Reinders Folmer (Typearture): _“These goggles need no prescription!
 FontGoggles shows and compares complex color and variable fonts fast and
