@@ -1,7 +1,7 @@
 import re
 import unicodedata
 import AppKit
-from vanilla import Button, EditText, FloatingWindow, List, TextBox
+from vanilla import Button, EditText, FloatingWindow, List, TextBox, HorizontalLine
 from ..misc.unicodeNameList import findPrefix
 from .misc import makeTextCell
 
@@ -20,12 +20,12 @@ class UnicodePicker(AppKit.NSWindowController):
 
         self.w = FloatingWindow((300, 400), "Unicode Picker", minSize=(250, 300),
                                 autosaveName="UnicodePicker")
-        y = 15
-        self.w.searchField = EditText((20, y, -20, 25),
+        y = 8
+        self.w.searchField = EditText((10, y, -10, 25),
                                       placeholder="Search Unicode name or value",
                                       callback=self.searchTextChanged_)
 
-        y += 40
+        y = 40
         columnDescriptions = [
             dict(title="char", width=40,
                  cell=makeTextCell(align="center", font=AppKit.NSFont.systemFontOfSize_(14))),
@@ -36,8 +36,11 @@ class UnicodePicker(AppKit.NSWindowController):
                                   rowHeight=18,
                                   selectionCallback=self.listSelectionChanged_,
                                   doubleClickCallback=self.listDoubleClickCallback_)
+        self.w.unicodeList._nsObject.setBorderType_(AppKit.NSNoBorder)
 
-        y = -95
+        y = -100
+        self.w.divider = HorizontalLine((0, y, 0, 1))
+        y += 5
         self.w.unicodeText = TextBox((20, y, -10, 55), "")
         self.w.unicodeText._nsObject.cell().setFont_(AppKit.NSFont.systemFontOfSize_(36))
         self.w.unicodeText._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingMiddle)

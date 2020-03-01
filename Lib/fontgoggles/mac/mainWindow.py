@@ -11,7 +11,7 @@ import unicodedata
 import AppKit
 import objc
 from vanilla import (ActionButton, CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs,
-                     TextBox, TextEditor, VanillaBaseControl, Window)
+                     TextBox, TextEditor, VanillaBaseControl, Window, HorizontalLine)
 from vanilla.dialogs import getFile
 from fontTools.misc.arrayTools import offsetRect
 from fontgoggles.font import mergeAxes, mergeScriptsAndLanguages, mergeStylisticSetNames
@@ -182,7 +182,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                   selectionCallback=self.characterListSelectionChangedCallback)
         self.characterList._tableView.setAllowsColumnSelection_(True)
         self.characterList._tableView.setDelegate_(self)
-        self.showBiDiCheckBox = CheckBox((10, 8, -10, 20), "BiDi",
+        self.characterList._nsObject.setBorderType_(AppKit.NSNoBorder)
+        self.showBiDiCheckBox = CheckBox((12, 11, -10, 20), "BiDi",
                                          value=self.project.uiSettings.showBiDi,
                                          callback=self.showBiDiCheckBoxCallback)
         self.showBiDiCheckBox._nsObject.setToolTip_(
@@ -216,6 +217,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                               selectionCallback=self.glyphListSelectionChangedCallback)
         self.glyphList._tableView.setAllowsColumnSelection_(True)
         self.glyphList._tableView.setDelegate_(self)
+        self.glyphList._nsObject.setBorderType_(AppKit.NSNoBorder)
         group.glyphList = self.glyphList
         return group
 
@@ -227,7 +229,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if textFilePath and not os.path.exists(textFilePath):
             print("text file not found:", textFilePath)
             textFilePath = None
-        self.textEntry = TextEntryGroup((0, 0, 0, 45), textFilePath=textFilePath,
+        self.textEntry = TextEntryGroup((0, 0, 0, 40), textFilePath=textFilePath,
                                         callback=self.textEntryChangedCallback)
         if textFilePath and textFileIndex:
             self.textEntry.setTextFileIndex(textFileIndex, wrapAround=False)
@@ -242,10 +244,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
+        self._divider = HorizontalLine((0, 40, 0, 1))
         self._fontListScrollView = AligningScrollView((0, 0, 0, 0), self.fontList, drawBackground=True,
                                                       forwardDragAndDrop=True)
+        self._fontListScrollView._nsObject.setBorderType_(AppKit.NSNoBorder)
 
         self.compileOutput = OutputText((0, 0, 0, 0))
+        self.compileOutput._nsObject.setBorderType_(AppKit.NSNoBorder)
 
         compileOutputSize = self.project.uiSettings.compileOutputSize
         paneDescriptors = [
@@ -254,12 +259,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(view=self.compileOutput, identifier="compileOutput", canCollapse=True,
                  size=compileOutputSize, minSize=30, resizeFlexibility=False),
         ]
-        self.fontListSplitView = MySplitView((0, 40, 0, 0), paneDescriptors, dividerStyle="thin",
+        self.fontListSplitView = MySplitView((0, 41, 0, 0), paneDescriptors, dividerStyle="thin",
                                              isVertical=False)
         if not self.project.uiSettings.compileOutputVisible:
             self.fontListSplitView.togglePane("compileOutput")
 
         group.textEntry = self.textEntry
+        group.divider = self._divider
         group.fontListSplitView = self.fontListSplitView
         return group
 
