@@ -484,6 +484,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self._updateSidebarItems(*self._gatherSidebarInfo(self.project.fonts))
         if shouldRestoreSettings:
             self._updateSidebarSettings()
+        else:
+            self.setLanguagesFromScript()  # update the available languages
         self.fontListSelectionChangedCallback(self.fontList)
 
     @objc.python_method
