@@ -479,17 +479,17 @@ class FontList(Group):
         addedItems = []
         self.project.fontSelection = self.selection
         with recordChanges(self.projectProxy, title="Insert Fonts"):
-            for fontPath, fontNumber, fontItemIdentifier in items:
-                if fontNumber is None:
-                    subItems = sortedFontPathsAndNumbers([fontPath], defaultSortSpec)
-                else:
-                    subItems = [(fontPath, fontNumber)]
-                fontsProxy = self.projectProxy.fonts
-                for fontPath, fontNumber in subItems:
-                    fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
-                    fontsProxy.insert(index, fontItemInfo)
-                    addedItems.append(fontItemInfo.identifier)
-                    index += 1
+            pathsExternal = [fontPath for fontPath, fontNumber, fontItemIdentifier in items
+                                 if fontNumber is None]
+            pathsAndFontNumbers = [(fontPath, fontNumber) for fontPath, fontNumber, fontItemIdentifier in items
+                                       if fontNumber is not None]
+            items = sortedFontPathsAndNumbers(pathsExternal, defaultSortSpec) + pathsAndFontNumbers
+            fontsProxy = self.projectProxy.fonts
+            for fontPath, fontNumber in items:
+                fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
+                fontsProxy.insert(index, fontItemInfo)
+                addedItems.append(fontItemInfo.identifier)
+                index += 1
             self.projectProxy.fontSelection = self.selection
         self.scrollSelectionToVisible(addedItems)
 
