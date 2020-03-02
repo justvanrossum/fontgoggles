@@ -244,7 +244,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
-        self._divider = HorizontalLine((0, 40, 0, 1))
         self._fontListScrollView = AligningScrollView((0, 0, 0, 0), self.fontList, drawBackground=True,
                                                       forwardDragAndDrop=True)
         self._fontListScrollView._nsObject.setBorderType_(AppKit.NSNoBorder)
@@ -265,7 +264,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.fontListSplitView.togglePane("compileOutput")
 
         group.textEntry = self.textEntry
-        group.divider = self._divider
+        group.divider = HorizontalLine((0, 40, 0, 1))
         group.fontListSplitView = self.fontListSplitView
         return group
 
