@@ -203,7 +203,6 @@ For `GSUB` features, you can control-click (right-click) on a feature
 tag to get a contextual menu, allowing you to specify an alternate
 number for features that expose alternate glyphs, such as `aalt`.
 
-
 The _Variations_ panel shows sliders for all axes defined in the opened
 fonts. The minimum and maximum values for an axis are the lowest and
 highest values found in all opened fonts that have that axis.
