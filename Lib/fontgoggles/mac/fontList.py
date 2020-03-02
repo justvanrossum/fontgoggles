@@ -478,13 +478,13 @@ class FontList(Group):
     def insertFonts(self, items, index):
         addedItems = []
         self.project.fontSelection = self.selection
-        with recordChanges(self.projectProxy, title="Insert Fonts"):
-            pathsExternal = [fontPath for fontPath, fontNumber, fontItemIdentifier in items
-                             if fontNumber is None]
-            pathsAndFontNumbers = [(fontPath, fontNumber) for fontPath, fontNumber, fontItemIdentifier in items
-                                   if fontNumber is not None]
-            items = sortedFontPathsAndNumbers(pathsExternal, defaultSortSpec) + pathsAndFontNumbers
-            fontsProxy = self.projectProxy.fonts
+        pathsExternal = [fontPath for fontPath, fontNumber, fontItemIdentifier in items
+                         if fontNumber is None]
+        pathsAndFontNumbers = [(fontPath, fontNumber) for fontPath, fontNumber, fontItemIdentifier in items
+                               if fontNumber is not None]
+        items = sortedFontPathsAndNumbers(pathsExternal, defaultSortSpec) + pathsAndFontNumbers
+        fontsProxy = self.projectProxy.fonts
+        with recordChanges(fontsProxy, title="Insert Fonts"):
             for fontPath, fontNumber in items:
                 fontItemInfo = self.project.newFontItemInfo(fontPath, fontNumber)
                 fontsProxy.insert(index, fontItemInfo)
