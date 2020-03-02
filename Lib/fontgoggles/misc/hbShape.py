@@ -172,7 +172,7 @@ class HBShape:
         if language is not None:
             buf.language = language
         if script is not None:
-            buf.script = script  # ot_tag_to_script(script)
+            buf.script = ot_tag_to_script(script)
 
         hb.shape(self.font, buf, features)
 
