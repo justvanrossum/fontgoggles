@@ -233,6 +233,11 @@ panels:
 - Show/hide Compile output — ⌘-3
 - Show/hide Formatting options — ⌘-4
 
+With another “View” menu item you can hide or show the font file name labels
+in the Font list:
+
+- Show/hide Font File name — ⌘-5
+
 ![FontGoggles screenshot](images/screenshot_7_hindi.png)
 
 ## Load and navigate a text file
