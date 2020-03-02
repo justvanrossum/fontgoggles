@@ -26,7 +26,7 @@ openFontsTestData = [
         {},
         [],
         {},
-        "فعل", ['uni0644.fina', 'uni0639.medi', 'uni0641.init'], None),
+        "فعل", ['uni0644.fina', 'uni0639.medi', 'uni0641.init'], None, None),
     ("IBMPlexSans-Regular.ttf",
         {'familyName': 'IBM Plex Sans',
          'italicAngle': 0.0,
@@ -42,7 +42,7 @@ openFontsTestData = [
         {},
         [],
         {},
-        "Kofi", ["K", "o", "fi"], None),
+        "Kofi", ["K", "o", "fi"], None, None),
     ("IBMPlexSans-Regular.ttx",
         {},
         {'aalt', 'ccmp', 'dnom', 'frac', 'liga', 'numr', 'ordn',
@@ -53,7 +53,7 @@ openFontsTestData = [
         {},
         [],
         {},
-        "Kofi", ["K", "o", "fi"], None),
+        "Kofi", ["K", "o", "fi"], None, None),
     ("MutatorSans.ttf",
         {'familyName': 'MutatorMathTest',
          'italicAngle': 0.0,
@@ -74,7 +74,7 @@ openFontsTestData = [
                   'name': 'Weight'}},
         [],
         {},
-        "HI", ["H", "I.narrow"], None),
+        "HI", ["H", "I.narrow"], None, None),
     ("NotoNastaliqUrdu-Regular.ttf",
         {'familyName': 'Noto Nastaliq Urdu',
          'italicAngle': 0.0,
@@ -88,7 +88,21 @@ openFontsTestData = [
         {},
         [],
         {},
-        "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3'], None),
+        "فعل", ['LamFin', 'AinMed.inT3outT1', 'OneDotAboveNS', 'sp0', 'FehxIni.outT3'], None, None),
+    ("NotoSansMyanmar-Regular.ttf",
+        {'familyName': 'Noto Sans Myanmar',
+         'italicAngle': -0.0,
+         'styleName': 'Regular',
+         'suffix': 'ttf',
+         'weight': 400,
+         'width': 5},
+        {'abvs', 'blws', 'blwf'},
+        {'kern', 'mark', 'mkmk'},
+        {'mym2': {'KSW ', 'MON '}},
+        {},
+        [],
+        {},
+        "က္က", ['ka', 'ka.sub'], None, "mym2"),
     ("MutatorSansBoldWideMutated.ufo",
         {'familyName': 'MutatorMathTest',
          'italicAngle': 0,
@@ -100,7 +114,7 @@ openFontsTestData = [
         {},
         ['features_test.fea', 'features_test_nested.fea'],
         {},
-        "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"], None),
+        "HIiIII\u0100A\u0304", ["H", "I", ".notdef", "I", "I.narrow", "I", "A", "macroncmb", "A", "macroncmb"], None, None),
     ('MutatorSans.designspace',
         {},
         {'rvrn'},
@@ -119,7 +133,7 @@ openFontsTestData = [
          'MutatorSansLightCondensed.ufo',
          'MutatorSansLightWide.ufo'],
         {},
-        "A", ["A"], None),
+        "A", ["A"], None, None),
     ('MiniMutatorSans.designspace',
         {},
         set(),
@@ -132,10 +146,10 @@ openFontsTestData = [
         ['MiniMutatorSansBoldCondensed.ufo',
          'MiniMutatorSansBoldWide.ufo'],
         {'wdth': 400},
-        "TABC", ["T", "A", "B", "C"], [692, 850, 822, 932]),
+        "TABC", ["T", "A", "B", "C"], [692, 850, 822, 932], None),
 ]
 
-@pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,ext,location,text,glyphNames,ax",
+@pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,ext,location,text,glyphNames,ax,script",
                          openFontsTestData)
 @pytest.mark.asyncio
 async def test_openFonts(fileName,
@@ -148,7 +162,8 @@ async def test_openFonts(fileName,
                          location,
                          text,
                          glyphNames,
-                         ax):
+                         ax,
+                         script):
     fontPath = getFontPath(fileName)
     numFonts, opener, getSortInfo = getOpener(fontPath)
     assert numFonts(fontPath) == 1
@@ -160,7 +175,7 @@ async def test_openFonts(fileName,
     assert font.featuresGPOS == featuresGPOS
     assert font.scripts == scripts
     assert font.axes == axes
-    run = font.getGlyphRun(text, varLocation=location)
+    run = font.getGlyphRun(text, varLocation=location, script=script)
     assert [gi.name for gi in run] == glyphNames
     assert ext == [p.name for p in font.getExternalFiles()]
     if ax is not None:
