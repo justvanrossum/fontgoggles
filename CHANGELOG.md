@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.1.1] - 2020-03-??
+
+- Fixed minor UI glitch: update available language tags after reload.
+
 ## [1.1] - 2020-03-02
 
 - Added View -> Show/hide Font File name menu. [Issue #39](https://github.com/justvanrossum/fontgoggles/issues/39)
