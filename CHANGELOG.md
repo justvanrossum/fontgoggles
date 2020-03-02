@@ -5,6 +5,7 @@
 - Added View -> Show/hide Font File name menu. [Issue #39](https://github.com/justvanrossum/fontgoggles/issues/39)
 - Sort fonts that are dropped onto a window the same way as when they are dropped
   onto the application. [Issue #46](https://github.com/justvanrossum/fontgoggles/issues/46)
+- Small layout improvements. [PR #45](https://github.com/justvanrossum/fontgoggles/pull/45)
 
 ## [1.0] - 2020-02-29
 
