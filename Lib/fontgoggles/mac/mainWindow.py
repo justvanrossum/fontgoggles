@@ -92,7 +92,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         characterListSize = self.project.uiSettings.characterListSize
         paneDescriptors = [
             dict(view=characterListGroup, identifier="characterList", canCollapse=True,
-                 size=characterListSize, minSize=100, resizeFlexibility=False),
+                 size=characterListSize, minSize=95, resizeFlexibility=False),
             dict(view=subSplitView, identifier="subSplit", canCollapse=False),
             dict(view=sidebarGroup, identifier="formattingOptions", canCollapse=True,
                  size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth,

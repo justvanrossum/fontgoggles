@@ -217,9 +217,9 @@ class UISettings:
     fontListShowFontFileName: bool = True
     showBiDi: bool = False
     characterListVisible: bool = True
-    characterListSize: float = 100
+    characterListSize: float = 95
     glyphListVisible: bool = True
-    glyphListSize: float = 230
+    glyphListSize: float = 226
     compileOutputVisible: bool = False
     compileOutputSize: float = 80
     formattingOptionsVisible: bool = True
