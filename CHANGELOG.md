@@ -8,7 +8,7 @@
 - Small layout improvements. [PR #45](https://github.com/justvanrossum/fontgoggles/pull/45)
 - GSUB feature tags now have a contextual menu (control-click or right-click)
   that allows the "alternate number" to be specified. This is useful for features
-  that expose multiple alternates.
+  that expose multiple alternates. [Issue #42](https://github.com/justvanrossum/fontgoggles/issues/42)
 
 ## [1.0] - 2020-02-29
 
