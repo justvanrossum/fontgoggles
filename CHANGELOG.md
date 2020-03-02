@@ -9,6 +9,10 @@
 - GSUB feature tags now have a contextual menu (control-click or right-click)
   that allows the "alternate number" to be specified. This is useful for features
   that expose multiple alternates. [Issue #42](https://github.com/justvanrossum/fontgoggles/issues/42)
+- Fixed Script override for script codes that are different between OpenType and
+  ISO-15924. For example, when a font has `mym2` as a Script, it would render
+  incorrectly if the user actually selected `mym2` as a Script override. Thanks
+  to Ben Mitchell for reporting this.
 
 ## [1.0] - 2020-02-29
 
