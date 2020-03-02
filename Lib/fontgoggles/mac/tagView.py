@@ -10,9 +10,17 @@ class FGTagView(AppKit.NSView):
         self.setNeedsDisplay_(True)
 
     tag = hookedProperty(_scheduleRedraw)
-    state = hookedProperty(_scheduleRedraw)
     tracked = hookedProperty(_scheduleRedraw, default=False)
     allowsAlternateSelection = False
+
+    @hookedProperty
+    def state(self):
+        if self.state and self.state > 1:
+            tooltip = f"Selected alternate: {int(self.state)}"
+        else:
+            tooltip = ""
+        self.setToolTip_(tooltip)
+        self.setNeedsDisplay_(True)
 
     def mouseDown_(self, event):
         if self.allowsAlternateSelection and event.modifierFlags() & AppKit.NSEventModifierFlagControl:
