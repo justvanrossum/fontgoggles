@@ -480,9 +480,9 @@ class FontList(Group):
         self.project.fontSelection = self.selection
         with recordChanges(self.projectProxy, title="Insert Fonts"):
             pathsExternal = [fontPath for fontPath, fontNumber, fontItemIdentifier in items
-                                 if fontNumber is None]
+                             if fontNumber is None]
             pathsAndFontNumbers = [(fontPath, fontNumber) for fontPath, fontNumber, fontItemIdentifier in items
-                                       if fontNumber is not None]
+                                   if fontNumber is not None]
             items = sortedFontPathsAndNumbers(pathsExternal, defaultSortSpec) + pathsAndFontNumbers
             fontsProxy = self.projectProxy.fonts
             for fontPath, fontNumber in items:
