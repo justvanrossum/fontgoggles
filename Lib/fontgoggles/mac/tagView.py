@@ -1,5 +1,5 @@
 import AppKit
-from vanilla import Group
+from vanilla import EditText, Group, Popover, TextBox
 from fontgoggles.misc.properties import delegateProperty, hookedProperty, weakrefCallbackProperty
 from fontgoggles.mac.drawing import drawText
 
@@ -12,9 +12,59 @@ class FGTagView(AppKit.NSView):
     tag = hookedProperty(_scheduleRedraw)
     state = hookedProperty(_scheduleRedraw)
     tracked = hookedProperty(_scheduleRedraw, default=False)
+    allowsAlternateSelection = False
 
     def mouseDown_(self, event):
-        self.tracked = True
+        if self.allowsAlternateSelection and event.modifierFlags() & AppKit.NSEventModifierFlagControl:
+            menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
+            baseItems = [
+                ("Off", False),
+                ("Default", None),
+                ("On (Alternate 1)", True),
+            ]
+            altItems = [(f"Alternate {i}", i) for i in range(2, 11)]
+            items = baseItems + altItems
+            for index, (item, itemState) in enumerate(items):
+                menuItem = menu.insertItemWithTitle_action_keyEquivalent_atIndex_(
+                        item, "contextualAction:", "", index)
+                menuItem.setRepresentedObject_(itemState)
+                if self.state == itemState:
+                    menuItem.setState_(AppKit.NSControlStateValueOn)
+            if self.state and self.state > 10:
+                msg = f"Alternate {self.state}, Edit..."
+            else:
+                msg = "Enter alternate number..."
+            menuItem = menu.insertItemWithTitle_action_keyEquivalent_atIndex_(
+                    msg, "enterAlternateNumber:", "", len(items))
+            AppKit.NSMenu.popUpContextMenu_withEvent_forView_(menu, event, self)
+        else:
+            self.tracked = True
+
+    def contextualAction_(self, sender):
+        self.state = sender.representedObject()
+        self.vanillaWrapper()._callCallback()
+
+    def enterAlternateNumber_(self, sender):
+        self.popover = Popover((140, 80))
+        self.popover.open(parentView=self, preferredEdge='right')
+        self.popover.label = TextBox((20, 10, -20, 20), "Enter an Alt nr.:")
+        if self.state:
+            value = str(int(self.state))
+        else:
+            value = ""
+        self.popover.altNumber = EditText((20, 35, -20, 25), value, continuous=False,
+                                          callback=self.textEnteredCallback_)
+        self.window().makeFirstResponder_(self.popover.altNumber._nsObject)
+
+    def textEnteredCallback_(self, sender):
+        try:
+            altNumber = int(sender.get())
+        except ValueError:
+            pass
+        else:
+            self.state = altNumber
+            self.vanillaWrapper()._callCallback()
+        self.popover.close()
 
     def mouseDragged_(self, event):
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
@@ -58,7 +108,13 @@ class FGTagView(AppKit.NSView):
         path.fill()
 
         textColor = AppKit.NSColor.textBackgroundColor()
-        drawText(self.tag, (x + 12, y + 1), textColor, AppKit.NSFont.userFixedPitchFontOfSize_(14))
+        if self.state and self.state != 1:
+            offset = 9
+            text = self.tag + "*"
+        else:
+            offset = 12
+            text = self.tag
+        drawText(text, (x + offset, y + 1), textColor, AppKit.NSFont.userFixedPitchFontOfSize_(14))
 
 
 class TagView(Group):
@@ -66,12 +122,14 @@ class TagView(Group):
     nsViewClass = FGTagView
     tag = delegateProperty("_nsObject")
     state = delegateProperty("_nsObject")
+    allowsAlternateSelection = delegateProperty("_nsObject")
     _callback = weakrefCallbackProperty()
 
-    def __init__(self, posSize, tag, state, callback=None):
+    def __init__(self, posSize, tag, state, callback=None, allowsAlternateSelection=False):
         super().__init__(posSize)
         self.tag = tag
         self.state = state
+        self.allowsAlternateSelection = allowsAlternateSelection
         self._callback = callback
 
     def _callCallback(self):

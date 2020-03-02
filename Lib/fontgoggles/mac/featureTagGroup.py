@@ -37,7 +37,9 @@ class FeatureTagGroup(Group):
             setattr(self, f"label_{title}", titleLabel)
             y += 24
             for tag in sorted(tags):
-                tagView = TagView((margin, y, tagWidth, 20), tag, None, callback=self._tagStateChanged)
+                tagView = TagView((margin, y, tagWidth, 20), tag, None,
+                                  callback=self._tagStateChanged,
+                                  allowsAlternateSelection=(title == "GSUB"))
                 names = stylisticSetNames.get(tag)
                 if names:
                     if len(names) == 1:
