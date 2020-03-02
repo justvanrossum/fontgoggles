@@ -6,6 +6,9 @@
 - Sort fonts that are dropped onto a window the same way as when they are dropped
   onto the application. [Issue #46](https://github.com/justvanrossum/fontgoggles/issues/46)
 - Small layout improvements. [PR #45](https://github.com/justvanrossum/fontgoggles/pull/45)
+- GSUB feature tags now have a contextual menu (control-click or right-click)
+  that allows the "alternate number" to be specified. This is useful for features
+  that expose multiple alternates.
 
 ## [1.0] - 2020-02-29
 
