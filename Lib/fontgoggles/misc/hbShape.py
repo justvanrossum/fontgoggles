@@ -3,6 +3,7 @@ import functools
 import io
 import itertools
 from fontTools.ttLib import TTFont
+from fontTools.unicodedata import ot_tag_to_script
 import uharfbuzz as hb
 
 
@@ -171,7 +172,7 @@ class HBShape:
         if language is not None:
             buf.language = language
         if script is not None:
-            buf.script = script
+            buf.script = script  # ot_tag_to_script(script)
 
         hb.shape(self.font, buf, features)
 

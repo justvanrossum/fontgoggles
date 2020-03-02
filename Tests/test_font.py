@@ -191,6 +191,7 @@ def test_iterFontPathsAndNumbers():
         ('IBMPlexSansArabic-Regular.ttf', 0),
         ('MutatorSans.ttf', 0),
         ('NotoNastaliqUrdu-Regular.ttf', 0),
+        ('NotoSansMyanmar-Regular.ttf', 0),
         ('QuadTest-Regular.ttf', 0),
         ('MutatorSansIntermediateCondensed.ufo', 0),
         ('MutatorSansIntermediateWide.ufo', 0),
