@@ -3,6 +3,8 @@
 ## [1.1.1] - 2020-03-??
 
 - Fixed minor UI glitch: update available language tags after reload.
+- Update the used Unicode database to 12.1.0
+- Work around related Unicode bidi problem. [Issue #49](https://github.com/justvanrossum/fontgoggles/issues/49)
 
 ## [1.1] - 2020-03-02
 
