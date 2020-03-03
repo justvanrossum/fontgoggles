@@ -5,10 +5,10 @@ from fontgoggles.misc.unicodeNameList import findPrefix
 testData = [
     ("ROOTS", []),
     ("ROOT", [1542, 1543, 8730, 8731, 8732]),
-    ("ROO", 12),
-    ("RO", 352),
-    ("R", 3312),
-    ("", 131259),
+    ("ROO", 22),
+    ("RO", 407),
+    ("R", 3386),
+    ("", 131808),
 ]
 
 
