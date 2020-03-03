@@ -7,7 +7,7 @@ import os
 import pathlib
 import time
 import traceback
-import unicodedata
+import unicodedata2 as unicodedata
 import AppKit
 import objc
 from vanilla import (ActionButton, CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs,

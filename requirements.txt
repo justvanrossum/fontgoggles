@@ -11,3 +11,4 @@ git+git://github.com/justvanrossum/python-bidi.git@implement-L3
 git+git://github.com/justvanrossum/jundo.git
 ufo2ft
 numpy
+unicodedata2

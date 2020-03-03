@@ -1,5 +1,5 @@
 import re
-import unicodedata
+import unicodedata2 as unicodedata
 import AppKit
 from vanilla import Button, EditText, FloatingWindow, List, TextBox, HorizontalLine
 from ..misc.unicodeNameList import findPrefix
