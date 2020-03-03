@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [1.1.1] - 2020-03-??
+## [1.1.1] - 2020-03-03
 
 - Fixed minor UI glitch: update available language tags after reload.
 - Update the used Unicode database to 12.1.0
