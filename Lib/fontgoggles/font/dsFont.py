@@ -409,7 +409,6 @@ class VarGlyph:
                 self._points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
 
             if self.components:
-                # TODO catch endless recursion
                 allPoints = []
                 for (glyphName, transformation), offset in zip(self.components, self._points):
                     twoByTwo = transformation[:4]
