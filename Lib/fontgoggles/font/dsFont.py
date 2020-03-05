@@ -42,6 +42,7 @@ class DSFont(BaseFont):
 
     def resetCache(self):
         super().resetCache()
+        self._varGlyphs = {}
         del self.defaultInfo
         del self.defaultVerticalAdvance
         del self.defaultVerticalOriginY
@@ -181,7 +182,6 @@ class DSFont(BaseFont):
                     invalidateCaches = True
         if invalidateCaches:
             self.resetCache()
-            self._varGlyphs = {}
         return True
 
     @cachedProperty
@@ -221,44 +221,49 @@ class DSFont(BaseFont):
             if glyphName not in self._ufos[(self.doc.default.path, self.doc.default.layerName)].glyphSet:
                 varGlyph = NotDefGlyph(self.unitsPerEm)
             else:
-                tags = None
-                contours = None
-                masterPoints = []
-                for source in self.doc.sources:
-                    glyphSet = self._ufos[(source.path, source.layerName)].glyphSet
-                    if glyphName not in glyphSet:
-                        masterPoints.append(None)
-                        continue
-                    glyph = glyphSet[glyphName]
-                    coll = PointCollector(glyphSet)
-                    try:
-                        glyph.draw(coll)
-                    except Exception as e:
-                        print(f"Glyph '{glyphName}' could not be read from '{os.path.basename(source.path)}': {e!r}",
-                              file=sys.stderr)
-                        masterPoints.append(None)
-                    else:
-                        hAdvance = glyph.width
-                        vAdvance = glyph.height
-                        if vAdvance is None or vAdvance == 0:  # XXX default vAdv == 0 -> bad UFO spec
-                            vAdvance = self.defaultVerticalAdvance
-                        vOrgX = hAdvance / 2
-                        vOrgY = getattr(glyph, "lib", {}).get("public.verticalOrigin")
-                        if vOrgY is None:
-                            vOrgY = self.defaultVerticalOriginY
-                        phantomPoints = [(hAdvance, 0), (vOrgX, vOrgY), (vOrgX, vOrgY - vAdvance)]
-                        masterPoints.append(coll.points + phantomPoints)
-                        if source is self.doc.default:
-                            tags = coll.tags
-                            contours = coll.contours
-
-                if tags is None:
-                    print(f"Default master glyph '{glyphName}' could not be read", file=sys.stderr)
-                    varGlyph = NotDefGlyph(self.unitsPerEm)
-                else:
-                    varGlyph = VarGlyph(glyphName, self.masterModel, masterPoints, contours, tags)
+                varGlyph = self._getVarGlyphRaw(glyphName)
             self._varGlyphs[glyphName] = varGlyph
         varGlyph.setVarLocation(self._normalizedLocation)
+        return varGlyph
+
+    def _getVarGlyphRaw(self, glyphName):
+        isComposite = False
+        tags = None
+        contours = None
+        masterPoints = []
+        for source in self.doc.sources:
+            glyphSet = self._ufos[(source.path, source.layerName)].glyphSet
+            if glyphName not in glyphSet:
+                masterPoints.append(None)
+                continue
+            glyph = glyphSet[glyphName]
+            coll = PointCollector(glyphSet)
+            try:
+                glyph.draw(coll)
+            except Exception as e:
+                print(f"Glyph '{glyphName}' could not be read from '{os.path.basename(source.path)}': {e!r}",
+                      file=sys.stderr)
+                masterPoints.append(None)
+            else:
+                hAdvance = glyph.width
+                vAdvance = glyph.height
+                if vAdvance is None or vAdvance == 0:  # XXX default vAdv == 0 -> bad UFO spec
+                    vAdvance = self.defaultVerticalAdvance
+                vOrgX = hAdvance / 2
+                vOrgY = getattr(glyph, "lib", {}).get("public.verticalOrigin")
+                if vOrgY is None:
+                    vOrgY = self.defaultVerticalOriginY
+                phantomPoints = [(hAdvance, 0), (vOrgX, vOrgY), (vOrgX, vOrgY - vAdvance)]
+                masterPoints.append(coll.points + phantomPoints)
+                if source is self.doc.default:
+                    tags = coll.tags
+                    contours = coll.contours
+
+        if tags is None:
+            print(f"Default master glyph '{glyphName}' could not be read", file=sys.stderr)
+            varGlyph = NotDefGlyph(self.unitsPerEm)
+        else:
+            varGlyph = VarGlyph(glyphName, self.masterModel, masterPoints, contours, tags)
         return varGlyph
 
     def _getHorizontalAdvance(self, glyphName):
@@ -398,6 +403,7 @@ class PointCollector(BasePen):
         self.points = []
         self.tags = []
         self.contours = []
+        self.components = []
         self.contourStartPointIndex = None
 
     def moveTo(self, pt):
@@ -435,6 +441,9 @@ class PointCollector(BasePen):
         self.contourStartPointIndex = None
 
     endPath = closePath
+
+    def addComponent(self, glyphName, transformation):
+        self.components.append((glyphName, transformation))
 
 
 def normalizeLocation(doc, location):
