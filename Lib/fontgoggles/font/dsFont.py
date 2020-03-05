@@ -227,9 +227,10 @@ class DSFont(BaseFont):
         return varGlyph
 
     def _getVarGlyphRaw(self, glyphName):
-        isComposite = False
         tags = None
         contours = None
+        components = None
+        getSubGlyph = None
         masterPoints = []
         for source in self.doc.sources:
             glyphSet = self._ufos[(source.path, source.layerName)].glyphSet
@@ -259,16 +260,22 @@ class DSFont(BaseFont):
                 if vOrgY is None:
                     vOrgY = self.defaultVerticalOriginY
                 phantomPoints = [(hAdvance, 0), (vOrgX, vOrgY), (vOrgX, vOrgY - vAdvance)]
-                masterPoints.append(coll.points + phantomPoints)
+                if coll.components:
+                    masterPoints.append([t[4:6] for bgn, t in coll.components] + phantomPoints)
+                else:
+                    masterPoints.append(coll.points + phantomPoints)
                 if source is self.doc.default:
                     tags = coll.tags
                     contours = coll.contours
+                    components = coll.components
+                    getSubGlyph = self._getVarGlyph
 
         if tags is None:
             print(f"Default master glyph '{glyphName}' could not be read", file=sys.stderr)
             varGlyph = NotDefGlyph(self.unitsPerEm)
         else:
-            varGlyph = VarGlyph(glyphName, self.masterModel, masterPoints, contours, tags)
+            varGlyph = VarGlyph(glyphName, self.masterModel, masterPoints, contours, tags,
+                                components, getSubGlyph)
         return varGlyph
 
     def _getHorizontalAdvance(self, glyphName):
@@ -334,7 +341,7 @@ NUMPY_IN_PLACE = True  # dubious improvement
 
 class VarGlyph:
 
-    def __init__(self, glyphName, masterModel, masterPoints, contours, tags):
+    def __init__(self, glyphName, masterModel, masterPoints, contours, tags, components, getSubGlyph):
         self.model, masterPoints = masterModel.getSubModel(masterPoints)
         masterPoints = [numpy.array(pts, coordinateType) for pts in masterPoints]
         try:
@@ -343,8 +350,14 @@ class VarGlyph:
             # outlines are not compatible, fall back to the default master
             print(f"Glyph '{glyphName}' is not interpolatable", file=sys.stderr)
             self.deltas = [masterPoints[self.model.reverseMapping[0]]]
-        self.contours = numpy.array(contours, numpy.short)
-        self.tags = numpy.array(tags, numpy.byte)
+        if components:
+            self._contours = None
+            self._tags = None
+        else:
+            self._contours = numpy.array(contours, numpy.short)
+            self._tags = numpy.array(tags, numpy.byte)
+        self.components = components
+        self._getSubGlyph = getSubGlyph
         self.varLocation = {}
         self._points = None
 
@@ -356,12 +369,44 @@ class VarGlyph:
         self._points = None
         self.varLocation = varLocation
 
+    @property
+    def contours(self):
+        if self._contours is None:
+            firstPoint = 0
+            allContours = []
+            for glyphName, transformation in self.components:
+                subGlyph = self._getSubGlyph(glyphName)
+                allContours.append(subGlyph.contours + firstPoint)
+                firstPoint = subGlyph.contours[-1] + firstPoint + 1
+            self._contours = numpy.concatenate(allContours)
+        return self._contours
+
+    @property
+    def tags(self):
+        if self._tags is None:
+            allTags = []
+            for glyphName, transformation in self.components:
+                subGlyph = self._getSubGlyph(glyphName)
+                allTags.append(subGlyph.tags)
+            self._tags = numpy.concatenate(allTags)
+        return self._tags
+
     def getPoints(self):
         if self._points is None:
             if NUMPY_IN_PLACE:
                 self._points = interpolateFromDeltas(self.model, self.varLocation, self.deltas)
             else:
                 self._points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
+
+            if self.components:
+                # TODO catch endless recursion
+                allPoints = []
+                for (glyphName, transformation), offset in zip(self.components, self._points):
+                    subGlyph = self._getSubGlyph(glyphName)
+                    allPoints.append(subGlyph.getPoints()[:-3] + offset)  # skip phantom points
+                allPoints.append(self._points[-3:])  # add phantom points
+                self._points = numpy.concatenate(allPoints)
+
         return self._points
 
     @property
