@@ -26,6 +26,7 @@ def test_pointCollector():
     glyphSet["Aacute"].draw(pen)
     assert len(pen.points) == 20
     assert pen.contours == [3, 7, 11, 15, 19]
+    assert pen.components == []
 
     pen = PointCollector(glyphSet)
     glyphSet["O"].draw(pen)
