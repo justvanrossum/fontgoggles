@@ -261,9 +261,11 @@ class DSFont(BaseFont):
                     vOrgY = self.defaultVerticalOriginY
                 phantomPoints = [(hAdvance, 0), (vOrgX, vOrgY), (vOrgX, vOrgY - vAdvance)]
                 if coll.components:
-                    masterPoints.append([t[4:6] for bgn, t in coll.components] + phantomPoints)
+                    # Use the component offsets as points (the 2x2 matrix won't interpolate anyway)
+                    points = [t[4:6] for bgn, t in coll.components]
                 else:
-                    masterPoints.append(coll.points + phantomPoints)
+                    points = coll.points
+                masterPoints.append(points + phantomPoints)
                 if source is self.doc.default:
                     tags = coll.tags
                     contours = coll.contours
@@ -404,7 +406,7 @@ class VarGlyph:
                 for (glyphName, transformation), offset in zip(self.components, self._points):
                     twoByTwo = transformation[:4]
                     subGlyph = self._getSubGlyph(glyphName)
-                    subPoints = subGlyph.getPoints()[:-3]
+                    subPoints = subGlyph.getPoints()[:-3]  # strip phantom points
                     if twoByTwo != (1, 0, 0, 1):  # identity
                         m = [twoByTwo[:2], twoByTwo[2:]]
                         subPoints = subPoints @ m  # matrix multiply
