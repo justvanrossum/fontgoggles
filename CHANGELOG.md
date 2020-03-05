@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.1.2] - 2020-03-??
+
+- [designspace] Fixed issue with components not rendering correctly if a
+  base glyph uses a support layer. [Issue 53](https://github.com/justvanrossum/fontgoggles/issues/53)
+
 ## [1.1.1] - 2020-03-03
 
 - Fixed minor UI glitch: update available language tags after reload.
