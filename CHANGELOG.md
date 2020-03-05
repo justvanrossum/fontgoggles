@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [1.1.2] - 2020-03-??
+## [1.1.2] - 2020-03-05
 
 - [designspace] Fixed issue with composite glyphs not rendering correctly if a
   base glyph uses a support layer. [Issue 53](https://github.com/justvanrossum/fontgoggles/issues/53)
