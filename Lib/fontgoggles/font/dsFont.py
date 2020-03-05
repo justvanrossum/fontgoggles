@@ -240,6 +240,9 @@ class DSFont(BaseFont):
             coll = PointCollector(glyphSet)
             try:
                 glyph.draw(coll)
+                if coll.points and coll.components:
+                    print(f"FontGoggles NotImplemented: Glyph '{glyphName}' mixes outlines and components.",
+                          file=sys.stderr)
             except Exception as e:
                 print(f"Glyph '{glyphName}' could not be read from '{os.path.basename(source.path)}': {e!r}",
                       file=sys.stderr)
