@@ -294,8 +294,12 @@ class DSFont(BaseFont):
         return True, vOrgX, vOrgY
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
-        varGlyph = self._getVarGlyph(glyphName)
-        return GlyphDrawing([(varGlyph.getOutline(), None)])
+        try:
+            varGlyph = self._getVarGlyph(glyphName)
+            return GlyphDrawing([(varGlyph.getOutline(), None)])
+        except Exception as e:
+            print(f"Can't get outline for '{glyphName}': {e!r}", file=sys.stderr)
+            return GlyphDrawing([])
 
     def _getUnicodesAndAnchors(self, sourcePath):
         f = io.BytesIO(self._sourceFontData[sourcePath])
@@ -378,6 +382,8 @@ class VarGlyph:
             allContours = []
             for glyphName, transformation in self.components:
                 subGlyph = self._getSubGlyph(glyphName)
+                if isinstance(subGlyph, NotDefGlyph):
+                    continue
                 allContours.append(subGlyph.contours + firstPoint)
                 firstPoint = subGlyph.contours[-1] + firstPoint + 1
             self._contours = numpy.concatenate(allContours)
@@ -389,6 +395,8 @@ class VarGlyph:
             allTags = []
             for glyphName, transformation in self.components:
                 subGlyph = self._getSubGlyph(glyphName)
+                if isinstance(subGlyph, NotDefGlyph):
+                    continue
                 allTags.append(subGlyph.tags)
             self._tags = numpy.concatenate(allTags)
         return self._tags
@@ -406,6 +414,9 @@ class VarGlyph:
                 for (glyphName, transformation), offset in zip(self.components, self._points):
                     twoByTwo = transformation[:4]
                     subGlyph = self._getSubGlyph(glyphName)
+                    if isinstance(subGlyph, NotDefGlyph):
+                        print(f"Composite base glyph '{glyphName}' not found", file=sys.stderr)
+                        continue
                     subPoints = subGlyph.getPoints()[:-3]  # strip phantom points
                     if twoByTwo != (1, 0, 0, 1):  # identity
                         m = [twoByTwo[:2], twoByTwo[2:]]
