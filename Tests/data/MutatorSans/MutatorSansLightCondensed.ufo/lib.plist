@@ -87,6 +87,8 @@
     <integer>0</integer>
     <key>com.typemytype.robofont.compileSettings.releaseMode</key>
     <false/>
+    <key>com.typemytype.robofont.fontIdentifier</key>
+    <string>3WMJxtcksQIxJzalc66hzl6CU5hdAT0hq5oLoTu44Ac</string>
     <key>com.typemytype.robofont.foreground.layerStrokeColor</key>
     <array>
       <real>0.5</real>
@@ -675,6 +677,7 @@
       <string>space</string>
       <string>IJ</string>
       <string>em</string>
+      <string>Sacute</string>
     </array>
     <key>testLibItemKey</key>
     <array>

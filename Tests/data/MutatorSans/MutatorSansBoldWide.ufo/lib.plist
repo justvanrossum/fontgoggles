@@ -87,6 +87,8 @@
     <integer>0</integer>
     <key>com.typemytype.robofont.compileSettings.releaseMode</key>
     <false/>
+    <key>com.typemytype.robofont.fontIdentifier</key>
+    <string>MtZ6opUCmU6h9uH3b4osvtlPHgDNxBof5s_bG7kbRsQ</string>
     <key>com.typemytype.robofont.foreground.layerStrokeColor</key>
     <array>
       <real>0.5</real>
@@ -392,6 +394,7 @@
       <string>arrowright</string>
       <string>arrowup</string>
       <string>em</string>
+      <string>Sacute</string>
     </array>
   </dict>
 </plist>

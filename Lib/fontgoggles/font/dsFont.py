@@ -42,6 +42,7 @@ class DSFont(BaseFont):
 
     def resetCache(self):
         super().resetCache()
+        self._varGlyphs = {}
         del self.defaultInfo
         del self.defaultVerticalAdvance
         del self.defaultVerticalOriginY
@@ -181,7 +182,6 @@ class DSFont(BaseFont):
                     invalidateCaches = True
         if invalidateCaches:
             self.resetCache()
-            self._varGlyphs = {}
         return True
 
     @cachedProperty
@@ -221,44 +221,63 @@ class DSFont(BaseFont):
             if glyphName not in self._ufos[(self.doc.default.path, self.doc.default.layerName)].glyphSet:
                 varGlyph = NotDefGlyph(self.unitsPerEm)
             else:
-                tags = None
-                contours = None
-                masterPoints = []
-                for source in self.doc.sources:
-                    glyphSet = self._ufos[(source.path, source.layerName)].glyphSet
-                    if glyphName not in glyphSet:
-                        masterPoints.append(None)
-                        continue
-                    glyph = glyphSet[glyphName]
-                    coll = PointCollector(glyphSet)
-                    try:
-                        glyph.draw(coll)
-                    except Exception as e:
-                        print(f"Glyph '{glyphName}' could not be read from '{os.path.basename(source.path)}': {e!r}",
-                              file=sys.stderr)
-                        masterPoints.append(None)
-                    else:
-                        hAdvance = glyph.width
-                        vAdvance = glyph.height
-                        if vAdvance is None or vAdvance == 0:  # XXX default vAdv == 0 -> bad UFO spec
-                            vAdvance = self.defaultVerticalAdvance
-                        vOrgX = hAdvance / 2
-                        vOrgY = getattr(glyph, "lib", {}).get("public.verticalOrigin")
-                        if vOrgY is None:
-                            vOrgY = self.defaultVerticalOriginY
-                        phantomPoints = [(hAdvance, 0), (vOrgX, vOrgY), (vOrgX, vOrgY - vAdvance)]
-                        masterPoints.append(coll.points + phantomPoints)
-                        if source is self.doc.default:
-                            tags = coll.tags
-                            contours = coll.contours
-
-                if tags is None:
-                    print(f"Default master glyph '{glyphName}' could not be read", file=sys.stderr)
-                    varGlyph = NotDefGlyph(self.unitsPerEm)
-                else:
-                    varGlyph = VarGlyph(glyphName, self.masterModel, masterPoints, contours, tags)
+                varGlyph = self._getVarGlyphRaw(glyphName)
             self._varGlyphs[glyphName] = varGlyph
         varGlyph.setVarLocation(self._normalizedLocation)
+        return varGlyph
+
+    def _getVarGlyphRaw(self, glyphName):
+        tags = None
+        contours = None
+        components = None
+        getSubGlyph = None
+        masterPoints = []
+        for source in self.doc.sources:
+            glyphSet = self._ufos[(source.path, source.layerName)].glyphSet
+            if glyphName not in glyphSet:
+                masterPoints.append(None)
+                continue
+            glyph = glyphSet[glyphName]
+            coll = PointCollector(glyphSet)
+            try:
+                glyph.draw(coll)
+                if coll.points and coll.components:
+                    # When the source mixes outlines and component we need
+                    # to decompose to match fontmake/TT behavior
+                    coll = PointCollector(glyphSet, decompose=True)
+                    glyph.draw(coll)
+            except Exception as e:
+                print(f"Glyph '{glyphName}' could not be read from '{os.path.basename(source.path)}': {e!r}",
+                      file=sys.stderr)
+                masterPoints.append(None)
+            else:
+                hAdvance = glyph.width
+                vAdvance = glyph.height
+                if vAdvance is None or vAdvance == 0:  # XXX default vAdv == 0 -> bad UFO spec
+                    vAdvance = self.defaultVerticalAdvance
+                vOrgX = hAdvance / 2
+                vOrgY = getattr(glyph, "lib", {}).get("public.verticalOrigin")
+                if vOrgY is None:
+                    vOrgY = self.defaultVerticalOriginY
+                phantomPoints = [(hAdvance, 0), (vOrgX, vOrgY), (vOrgX, vOrgY - vAdvance)]
+                if coll.components:
+                    # Use the component offsets as points (the 2x2 matrix won't interpolate anyway)
+                    points = [t[4:6] for bgn, t in coll.components]
+                else:
+                    points = coll.points
+                masterPoints.append(points + phantomPoints)
+                if source is self.doc.default:
+                    tags = coll.tags
+                    contours = coll.contours
+                    components = coll.components
+                    getSubGlyph = self._getVarGlyph
+
+        if tags is None:
+            print(f"Default master glyph '{glyphName}' could not be read", file=sys.stderr)
+            varGlyph = NotDefGlyph(self.unitsPerEm)
+        else:
+            varGlyph = VarGlyph(glyphName, self.masterModel, masterPoints, contours, tags,
+                                components, getSubGlyph)
         return varGlyph
 
     def _getHorizontalAdvance(self, glyphName):
@@ -275,8 +294,12 @@ class DSFont(BaseFont):
         return True, vOrgX, vOrgY
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
-        varGlyph = self._getVarGlyph(glyphName)
-        return GlyphDrawing([(varGlyph.getOutline(), None)])
+        try:
+            varGlyph = self._getVarGlyph(glyphName)
+            return GlyphDrawing([(varGlyph.getOutline(), None)])
+        except Exception as e:
+            print(f"Can't get outline for '{glyphName}': {e!r}", file=sys.stderr)
+            return GlyphDrawing([])
 
     def _getUnicodesAndAnchors(self, sourcePath):
         f = io.BytesIO(self._sourceFontData[sourcePath])
@@ -324,7 +347,7 @@ NUMPY_IN_PLACE = True  # dubious improvement
 
 class VarGlyph:
 
-    def __init__(self, glyphName, masterModel, masterPoints, contours, tags):
+    def __init__(self, glyphName, masterModel, masterPoints, contours, tags, components, getSubGlyph):
         self.model, masterPoints = masterModel.getSubModel(masterPoints)
         masterPoints = [numpy.array(pts, coordinateType) for pts in masterPoints]
         try:
@@ -333,8 +356,14 @@ class VarGlyph:
             # outlines are not compatible, fall back to the default master
             print(f"Glyph '{glyphName}' is not interpolatable", file=sys.stderr)
             self.deltas = [masterPoints[self.model.reverseMapping[0]]]
-        self.contours = numpy.array(contours, numpy.short)
-        self.tags = numpy.array(tags, numpy.byte)
+        if components:
+            self._contours = None
+            self._tags = None
+        else:
+            self._contours = numpy.array(contours, numpy.short)
+            self._tags = numpy.array(tags, numpy.byte)
+        self.components = components
+        self._getSubGlyph = getSubGlyph
         self.varLocation = {}
         self._points = None
 
@@ -346,12 +375,55 @@ class VarGlyph:
         self._points = None
         self.varLocation = varLocation
 
+    @property
+    def contours(self):
+        if self._contours is None:
+            firstPoint = 0
+            allContours = []
+            for glyphName, transformation in self.components:
+                subGlyph = self._getSubGlyph(glyphName)
+                if isinstance(subGlyph, NotDefGlyph):
+                    continue
+                allContours.append(subGlyph.contours + firstPoint)
+                firstPoint = subGlyph.contours[-1] + firstPoint + 1
+            self._contours = numpy.concatenate(allContours)
+        return self._contours
+
+    @property
+    def tags(self):
+        if self._tags is None:
+            allTags = []
+            for glyphName, transformation in self.components:
+                subGlyph = self._getSubGlyph(glyphName)
+                if isinstance(subGlyph, NotDefGlyph):
+                    continue
+                allTags.append(subGlyph.tags)
+            self._tags = numpy.concatenate(allTags)
+        return self._tags
+
     def getPoints(self):
         if self._points is None:
             if NUMPY_IN_PLACE:
                 self._points = interpolateFromDeltas(self.model, self.varLocation, self.deltas)
             else:
                 self._points = self.model.interpolateFromDeltas(self.varLocation, self.deltas)
+
+            if self.components:
+                allPoints = []
+                for (glyphName, transformation), offset in zip(self.components, self._points):
+                    twoByTwo = transformation[:4]
+                    subGlyph = self._getSubGlyph(glyphName)
+                    if isinstance(subGlyph, NotDefGlyph):
+                        print(f"Composite base glyph '{glyphName}' not found", file=sys.stderr)
+                        continue
+                    subPoints = subGlyph.getPoints()[:-3]  # strip phantom points
+                    if twoByTwo != (1, 0, 0, 1):  # identity
+                        m = [twoByTwo[:2], twoByTwo[2:]]
+                        subPoints = subPoints @ m  # matrix multiply
+                    allPoints.append(subPoints + offset)  # skip phantom points
+                allPoints.append(self._points[-3:])  # add phantom points
+                self._points = numpy.concatenate(allPoints)
+
         return self._points
 
     @property
@@ -393,11 +465,13 @@ class VarGlyph:
 
 class PointCollector(BasePen):
 
-    def __init__(self, glyphSet):
+    def __init__(self, glyphSet, decompose=False):
         super().__init__(glyphSet)
+        self.decompose = decompose
         self.points = []
         self.tags = []
         self.contours = []
+        self.components = []
         self.contourStartPointIndex = None
 
     def moveTo(self, pt):
@@ -435,6 +509,12 @@ class PointCollector(BasePen):
         self.contourStartPointIndex = None
 
     endPath = closePath
+
+    def addComponent(self, glyphName, transformation):
+        if self.decompose:
+            super().addComponent(glyphName, transformation)
+        else:
+            self.components.append((glyphName, transformation))
 
 
 def normalizeLocation(doc, location):
