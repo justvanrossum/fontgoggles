@@ -72,6 +72,8 @@
     <integer>0</integer>
     <key>com.typemytype.robofont.compileSettings.releaseMode</key>
     <false/>
+    <key>com.typemytype.robofont.fontIdentifier</key>
+    <string>gB4vgsgUqH7a9WhTEKTMMjv2zZFghNXKZWxu2ynBPfg</string>
     <key>com.typemytype.robofont.foreground.layerStrokeColor</key>
     <array>
       <real>0.5</real>
@@ -659,6 +661,7 @@
       <string>acute</string>
       <string>space</string>
       <string>IJ</string>
+      <string>Sacute</string>
     </array>
   </dict>
 </plist>

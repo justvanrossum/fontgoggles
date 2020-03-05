@@ -52,6 +52,8 @@
     <string>S_.glif</string>
     <key>S.closed</key>
     <string>S_.closed.glif</string>
+    <key>Sacute</key>
+    <string>S_acute.glif</string>
     <key>T</key>
     <string>T_.glif</string>
     <key>U</key>
