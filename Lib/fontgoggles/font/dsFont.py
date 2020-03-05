@@ -402,8 +402,13 @@ class VarGlyph:
                 # TODO catch endless recursion
                 allPoints = []
                 for (glyphName, transformation), offset in zip(self.components, self._points):
+                    twoByTwo = transformation[:4]
                     subGlyph = self._getSubGlyph(glyphName)
-                    allPoints.append(subGlyph.getPoints()[:-3] + offset)  # skip phantom points
+                    subPoints = subGlyph.getPoints()[:-3]
+                    if twoByTwo != (1, 0, 0, 1):  # identity
+                        m = [twoByTwo[:2], twoByTwo[2:]]
+                        subPoints = subPoints @ m  # matrix multiply
+                    allPoints.append(subPoints + offset)  # skip phantom points
                 allPoints.append(self._points[-3:])  # add phantom points
                 self._points = numpy.concatenate(allPoints)
 
