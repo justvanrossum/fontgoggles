@@ -241,8 +241,10 @@ class DSFont(BaseFont):
             try:
                 glyph.draw(coll)
                 if coll.points and coll.components:
-                    print(f"FontGoggles NotImplemented: Glyph '{glyphName}' mixes outlines and components.",
-                          file=sys.stderr)
+                    # When the source mixes outlines and component we need
+                    # to decompose to match fontmake/TT behavior
+                    coll = PointCollector(glyphSet, decompose=True)
+                    glyph.draw(coll)
             except Exception as e:
                 print(f"Glyph '{glyphName}' could not be read from '{os.path.basename(source.path)}': {e!r}",
                       file=sys.stderr)
@@ -401,8 +403,9 @@ class VarGlyph:
 
 class PointCollector(BasePen):
 
-    def __init__(self, glyphSet):
+    def __init__(self, glyphSet, decompose=False):
         super().__init__(glyphSet)
+        self.decompose = decompose
         self.points = []
         self.tags = []
         self.contours = []
@@ -446,7 +449,10 @@ class PointCollector(BasePen):
     endPath = closePath
 
     def addComponent(self, glyphName, transformation):
-        self.components.append((glyphName, transformation))
+        if self.decompose:
+            super().addComponent(glyphName, transformation)
+        else:
+            self.components.append((glyphName, transformation))
 
 
 def normalizeLocation(doc, location):
