@@ -502,11 +502,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             finally:
                 fontItem.setIsLoading(False)
         except CompilerError as e:
+            fontItemInfo.unload()  # ensure we start with a clean slate next time
             fontItem.glyphs = GlyphsRun(0, 1000, False)
             fontItem.writeCompileOutput(f"{e!r}\n")
         except asyncio.CancelledError:
+            fontItemInfo.unload()  # ensure we start with a clean slate next time
             raise
         except Exception:
+            fontItemInfo.unload()  # ensure we start with a clean slate next time
             fontItem.glyphs = GlyphsRun(0, 1000, False)
             fontItem.writeCompileOutput(traceback.format_exc())
         else:
