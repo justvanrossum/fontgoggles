@@ -17,7 +17,7 @@ from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
 from .glyphDrawing import GlyphDrawing
-from .ufoFont import NotDefGlyph, UFOState, extractIncludedFeatureFiles
+from .ufoFont import Glyph, NotDefGlyph, UFOState, extractIncludedFeatureFiles
 from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
 from ..compile.dsCompiler import getTTPaths
 from ..misc.hbShape import HBShape
@@ -72,6 +72,7 @@ class DSFont(BaseFont):
                 if ufoState is None:
                     reader = UFOReader(source.path, validate=False)
                     glyphSet = reader.getGlyphSet(layerName=source.layerName)
+                    glyphSet.glyphClass = Glyph
                     if source.layerName is None:
                         includedFeatureFiles = extractIncludedFeatureFiles(source.path, reader)
                         getUnicodesAndAnchors = functools.partial(self._getUnicodesAndAnchors, source.path)
