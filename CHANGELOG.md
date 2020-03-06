@@ -1,9 +1,10 @@
 # Changelog for FontGoggles
 
-## [1.1.3] - 2020-03-??
+## [1.1.3] - 2020-03-06
 
-- [designspace] fixed layer composite regression introduced in 1.1.2
-- Fixed automatic reloading issue [Issue 48](https://github.com/justvanrossum/fontgoggles/issues/48)
+- [designspace] fixed layer composite regression introduced in 1.1.2 with the
+  fix for [issue 53](https://github.com/justvanrossum/fontgoggles/issues/53).
+- Fixed automatic reloading snag. [Issue 48](https://github.com/justvanrossum/fontgoggles/issues/48)
 
 ## [1.1.2] - 2020-03-05
 
