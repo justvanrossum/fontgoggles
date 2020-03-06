@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.1.3] - 2020-03-??
+
+- [designspace] fixed layer composite regression introduced in 1.1.2
+
 ## [1.1.2] - 2020-03-05
 
 - [designspace] Fixed issue with composite glyphs not rendering correctly if a
