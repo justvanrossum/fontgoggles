@@ -3,6 +3,9 @@
 ## [1.1.4] - 2020-03-??
 
 - Added "Reload font" and "Clear error" contextual menus to font item.
+- If an error occurs while preparing a VF from a .designspace file, check if
+  it was caused within GSUB or GPOS, and try again without that table. This
+  allows us to at least see a partially working font.
 
 ## [1.1.3] - 2020-03-06
 
