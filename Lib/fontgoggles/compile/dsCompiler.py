@@ -1,9 +1,11 @@
 import os
 import pickle
+import sys
 from fontTools.designspaceLib import DesignSpaceDocument
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont, newTable
 from fontTools import varLib
+from fontTools.varLib.errors import VarLibError
 
 
 def compileDSToFont(dsPath, ttFolder):
@@ -32,7 +34,19 @@ def compileDSToFont(dsPath, ttFolder):
             if source.font is None:
                 source.font = font
 
-    ttFont, masterModel, _ = varLib.build(doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
+    try:
+        ttFont, masterModel, _ = varLib.build(doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'])
+    except VarLibError as e:
+        if 'GSUB' in e.args:
+            extraExclude = ['GSUB']
+        elif 'GPOS' in e.args:
+            extraExclude = ['GPOS', 'GDEF']
+        else:
+            raise
+        print(f"{e!r}", file=sys.stderr)
+        print(f"Error while building {extraExclude[0]} table, trying again without {' and '.join(extraExclude)}.",
+              file=sys.stderr)
+        ttFont, masterModel, _ = varLib.build(doc, exclude=['MVAR', 'HVAR', 'VVAR', 'STAT'] + extraExclude)
 
     # Our client needs the masterModel, so we save a pickle into the font
     ttFont["MPcl"] = newTable("MPcl")
