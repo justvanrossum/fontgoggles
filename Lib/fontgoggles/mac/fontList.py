@@ -826,12 +826,36 @@ class FGFontItemView(AppKit.NSView):
         workspace.selectFile_inFileViewerRootedAtPath_(fontPath, "")
 
     @suppressAndLogException
+    def reloadFont_(self, sender):
+        # Factorisation is suboptimal don't @ me
+        fontItem = self.vanillaWrapper()
+        fontList = self.superview().vanillaWrapper()
+        fontItemInfo = fontList.project.fonts[fontItem.fontListIndex]
+        fontItemInfo.unload()
+        self.window().windowController().loadFonts()
+
+    @suppressAndLogException
+    def clearCompileOutput_(self, sender):
+        fontItem = self.vanillaWrapper()
+        fontItem.clearCompileOutput()
+
+    def validateMenuItem_(self, sender):
+        if sender.action() == "clearCompileOutput:":
+            fontItem = self.vanillaWrapper()
+            return bool(fontItem.getCompileOutput())
+        return True
+
+    @suppressAndLogException
     def mouseDown_(self, event):
         if event.modifierFlags() & AppKit.NSEventModifierFlagControl:
-            fileName = self.vanillaWrapper().fontPath.name
             menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
-            menu.insertItemWithTitle_action_keyEquivalent_atIndex_(f"Reveal ‘{fileName}’ in Finder",
-                                                                   "revealInFinder:", "", 0)
+            items = [
+                ("Reveal font file in Finder", "revealInFinder:"),
+                ("Reload font", "reloadFont:"),
+                ("Clear error", "clearCompileOutput:"),
+            ]
+            for i, (title, action) in enumerate(items):
+                menu.insertItemWithTitle_action_keyEquivalent_atIndex_(title, action, "", i)
             AppKit.NSMenu.popUpContextMenu_withEvent_forView_(menu, event, self)
         else:
             super().mouseDown_(event)

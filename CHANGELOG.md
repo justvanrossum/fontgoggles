@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.1.4] - 2020-03-??
+
+- Added "Reload font" and "Clear error" contextual menus to font item.
+
 ## [1.1.3] - 2020-03-06
 
 - [designspace] fixed layer composite regression introduced in 1.1.2 with the
