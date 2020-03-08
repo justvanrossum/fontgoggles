@@ -16,4 +16,4 @@ def test_textInfo(org, bidi, dirOverride, result, runLengths, dir, align):
     ti.shouldApplyBiDi = bidi
     ti.directionOverride = dirOverride
     assert ti.text == result
-    assert ti.directionForShaper == dir
+    # assert ti.direction == dir
