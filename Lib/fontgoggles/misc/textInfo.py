@@ -8,7 +8,7 @@ class TextInfo:
 
     def __init__(self, text):
         self.text = text
-        self.shouldApplyBiDi = True
+        self.shouldApplyBiDi = True  # More like .shouldApplyBiDiAndSegmentation but that's looong
         self.directionOverride = None
         self.scriptOverride = None
         self.languageOverride = None
