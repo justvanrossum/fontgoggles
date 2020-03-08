@@ -776,7 +776,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             self.glyphList._nsObject.documentView().keyDown_(event)
         elif len(self.characterList) > 0:
             if not self.textInfo.shouldApplyBiDi:
-                # Either automatic direction (by bidi algo + HB) or explicit
+                # Either automatic direction (as detected by HB) or explicit
                 # reversal of direction
                 if self.textInfo.direction in ("RTL", "BTT"):
                     event = flipArrowKeyEvent(event)
