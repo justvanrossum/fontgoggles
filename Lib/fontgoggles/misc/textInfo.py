@@ -1,4 +1,4 @@
-from .bidi import textSegments
+from .segmenting import textSegments
 
 
 alignments = dict(LTR="left", RTL="right", TTB="top", BTT="bottom")

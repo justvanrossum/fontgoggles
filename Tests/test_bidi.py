@@ -1,6 +1,6 @@
 from collections import deque
 import pytest
-from fontgoggles.misc.bidi import getBiDiInfo, detectScript, textSegments
+from fontgoggles.misc.segmenting import getBiDiInfo, detectScript, textSegments
 
 
 testData = [
