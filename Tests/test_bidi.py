@@ -1,6 +1,6 @@
 from collections import deque
 import pytest
-from fontgoggles.misc.bidi import applyBiDi, getBiDiInfo, detectScript, textSegments
+from fontgoggles.misc.bidi import getBiDiInfo, detectScript, textSegments
 
 
 testData = [
@@ -114,27 +114,6 @@ def test_getBiDiInfo_ltr(testString, expectedString, expectedInfo):
     info, display = getBiDiInfo(testString)
     assert display == expectedString
     assert info == expectedInfo
-
-
-testDataApplyBiDi = [
-    ("Abc", "Abc", [3], "L",
-     [0, 1, 2], [0, 1, 2]),
-    ("\u062D\u062A\u064912", "12\u0649\u062A\u062D", [2, 3], "R",
-     [4, 3, 2, 0, 1], [3, 4, 2, 1, 0]),
-]
-
-
-@pytest.mark.parametrize("testString,expectedString,expectedRunLengths,expectedDir,expectedToBiDi,expectedFromBiDi",
-                         testDataApplyBiDi)
-def test_applyBiDi(testString, expectedString, expectedRunLengths, expectedDir, expectedToBiDi, expectedFromBiDi):
-    display, runLenghts, baseDirection, toBiDi, fromBiDi = applyBiDi(testString)
-    assert display == expectedString
-    assert runLenghts == expectedRunLengths
-    assert baseDirection == expectedDir
-    assert toBiDi == expectedToBiDi
-    assert fromBiDi == expectedFromBiDi
-    assert set(toBiDi) == set(range(len(toBiDi)))
-    assert set(toBiDi) == set(fromBiDi)
 
 
 testDataDetectScript = [
