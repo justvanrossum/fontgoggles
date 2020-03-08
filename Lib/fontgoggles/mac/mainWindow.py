@@ -170,11 +170,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def setupCharacterListGroup(self):
         group = Group((0, 0, 0, 0))
         columnDescriptions = [
-            # dict(title="index", width=34, cell=makeTextCell("right")),
             dict(title="char", width=30, typingSensitive=True, cell=makeTextCell("center")),
             dict(title="unicode", width=60, cell=makeTextCell("right")),
             dict(title="unicode name", width=200, minWidth=200, maxWidth=400, key="unicodeName",
                  cell=makeTextCell("left", "truncmiddle")),
+            dict(title="script", width=50),
+            dict(title="dir.", key="dir", width=36),
+            dict(title= "bidi lvl.", key="bidiLevel", width=40, cell=makeTextCell("right")),
+            dict(title="index", width=36, cell=makeTextCell("right")),
         ]
         self.characterList = List((0, 0, 0, 0), [],
                                   columnDescriptions=columnDescriptions,
@@ -709,11 +712,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
         uniListData = []
-        for index, char in enumerate(self.textInfo.text):
-            uniListData.append(
-                dict(index=index, char=char, unicode=f"U+{ord(char):04X}",
-                     unicodeName=unicodedata.name(char, "?"))
-            )
+        for segmentText, segmentScript, segmentBiDiLevel, firstCluster in self.textInfo._segments:
+            for index, char in enumerate(segmentText, firstCluster):
+                uniListData.append(
+                    dict(index=index, char=char, unicode=f"U+{ord(char):04X}",
+                         unicodeName=unicodedata.name(char, "?"), script=segmentScript,
+                         bidiLevel=segmentBiDiLevel, dir=["LTR", "RTL"][segmentBiDiLevel%2])
+                )
         self.characterList.set(uniListData)
         if selection is not None:
             self.characterList.setSelection(selection)
