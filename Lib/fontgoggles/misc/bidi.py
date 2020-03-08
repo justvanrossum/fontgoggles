@@ -19,6 +19,39 @@ from bidi.mirror import MIRRORED
 UNKNOWN_SCRIPT = {"Zinh", "Zyyy", "Zxxx"}
 
 
+def textSegments(txt):
+    scripts = detectScript(txt)
+    storage, _ = getBiDiInfo(txt)
+
+    levels = [None] * len(txt)
+    for ch in storage['chars']:
+        levels[ch['index']] = ch['level']
+
+    prevLevel = storage['base_level']
+    for i, level in enumerate(levels):
+        if level is None:
+            levels[i] = prevLevel
+        else:
+            prevLevel = level
+
+    chars = list(zip(txt, scripts, levels))
+
+    runLenghts = []
+    for value, sub in itertools.groupby(chars, key=lambda item: item[1:]):
+        runLenghts.append(len(list(sub)))
+
+    segments = []
+    pos = 0
+    for rl in runLenghts:
+        nextPos = pos + rl
+        segment = chars[pos:nextPos]
+        runChars = "".join(ch for ch, script, bidiLevel in segment)
+        _, script, bidiLevel = segment[0]
+        segments.append((runChars, script, bidiLevel))
+        pos = nextPos
+    return segments, storage['base_level']
+
+
 def detectScript(txt):
     charScript = [script(c) for c in txt]
 
