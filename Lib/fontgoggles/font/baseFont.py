@@ -92,8 +92,7 @@ class BaseFont:
 
     def getGlyphRunFromTextInfo(self, textInfo, colorPalettesIndex=0, **kwargs):
         text = textInfo.text
-        runLengths = textInfo.runLengths
-        direction = textInfo.directionForShaper
+        direction = textInfo.directionOverride
         script = textInfo.scriptOverride
         language = textInfo.languageOverride
 
@@ -103,19 +102,26 @@ class BaseFont:
             colorPalette = self.colorPalettes[colorPalettesIndex]
 
         glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"), colorPalette)
-        index = 0
-        for rl in runLengths:
-            seg = text[index:index + rl]
-            run = self.getGlyphRun(seg,
-                                   direction=direction,
-                                   script=script,
+        segments = textInfo.segments
+        if textInfo.baseDirection == "R":
+            segments = reversed(segments)
+
+        for segmentText, segmentScript, segmentBiDiLevel, firstCluster in segments:
+            if script is not None:
+                segmentScript = script
+            if direction is not None:
+                segmentDirection = direction
+            else:
+                segmentDirection = None  # Ignore segmentBiDiLevel, HarfBuzz will figure it out
+            run = self.getGlyphRun(segmentText,
+                                   direction=segmentDirection,
+                                   script=segmentScript,
                                    language=language,
                                    **kwargs)
             for gi in run:
-                gi.cluster += index
+                gi.cluster += firstCluster
             glyphs.extend(run)
-            index += rl
-        # assert index == len(text)
+
         x = y = 0
         for gi in glyphs:
             gi.pos = x + gi.dx, y + gi.dy
