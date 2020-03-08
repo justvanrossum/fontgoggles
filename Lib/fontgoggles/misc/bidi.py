@@ -47,7 +47,7 @@ def textSegments(txt):
         segment = chars[pos:nextPos]
         runChars = "".join(ch for ch, script, bidiLevel in segment)
         _, script, bidiLevel = segment[0]
-        segments.append((runChars, script, bidiLevel))
+        segments.append((runChars, script, bidiLevel, pos))
         pos = nextPos
     return segments, storage['base_level']
 
