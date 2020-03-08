@@ -176,21 +176,13 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             dict(title="unicode name", width=200, minWidth=200, maxWidth=400, key="unicodeName",
                  cell=makeTextCell("left", "truncmiddle")),
         ]
-        self.characterList = List((0, 40, 0, 0), [],
+        self.characterList = List((0, 0, 0, 0), [],
                                   columnDescriptions=columnDescriptions,
                                   allowsSorting=False, drawFocusRing=False, rowHeight=20,
                                   selectionCallback=self.characterListSelectionChangedCallback)
         self.characterList._tableView.setAllowsColumnSelection_(True)
         self.characterList._tableView.setDelegate_(self)
         self.characterList._nsObject.setBorderType_(AppKit.NSNoBorder)
-        self.showBiDiCheckBox = CheckBox((12, 11, -10, 20), "BiDi",
-                                         value=self.project.uiSettings.showBiDi,
-                                         callback=self.showBiDiCheckBoxCallback)
-        self.showBiDiCheckBox._nsObject.setToolTip_(
-            "If this option is on, you see the result of Bi-Directional processing "
-            "in the list below, instead of the original text. It does not affect "
-            "the rendered text.")
-        group.showBiDiCheckBox = self.showBiDiCheckBox
         group.characterList = self.characterList
         return group
 
@@ -210,7 +202,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             # dummy filler column so "glyph" doesn't get to wide:
             dict(title="", key="_dummy_", minWidth=0, maxWidth=1400),
         ]
-        self.glyphList = List((0, 40, 0, 0), [],
+        self.glyphList = List((0, 0, 0, 0), [],
                               columnDescriptions=columnDescriptions,
                               allowsSorting=False, drawFocusRing=False,
                               rowHeight=20,
@@ -588,11 +580,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def iterFontItemInfoAndItems(self):
         return self.fontList.iterFontItemInfoAndItems()
 
-    @objc.python_method
-    def showBiDiCheckBoxCallback(self, sender):
-        self.project.uiSettings.showBiDi = bool(sender.get())
-        self.updateCharacterList()
-
     @asyncTaskAutoCancel
     async def textEntryChangedCallback(self, sender, updateCharacterList=True):
         if not hasattr(self, "directionPopUp"):
@@ -794,10 +781,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 if self.textInfo.direction in ("RTL", "BTT"):
                     event = flipArrowKeyEvent(event)
                 self.characterList._nsObject.documentView().keyDown_(event)
-            elif self.project.uiSettings.showBiDi:
-                # We're showing post-BiDi characters, which should lign up
-                # with our glyphs
-                self.characterList._nsObject.documentView().keyDown_(event)
             else:
                 # BiDi processing is on, and we're looking at the original
                 # text sequence (before BiDi processing). We convert our
@@ -886,7 +869,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.project.textSettings.shouldApplyBiDi = popupValue == 0
         self.project.textSettings.direction = directionSettings[popupValue]
 
-        self.showBiDiCheckBox.enable(popupValue == 0)
         vertical = int(directionSettings[popupValue] in {"TTB", "BTT"})
         self.alignmentPopup.setItems([alignmentOptionsHorizontal, alignmentOptionsVertical][vertical])
         self.fontList.vertical = vertical
