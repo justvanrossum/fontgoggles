@@ -40,7 +40,7 @@ sidebarWidth = 300
 
 directionPopUpConfig = [
     ("Automatic, with BiDi and Segmentation", None),
-    ("Automatic, w/o  BiDi and Segmentation", None),
+    ("Automatic, w/o BiDi and Segmentation", None),
     ("Left-to-Right", "LTR"),
     ("Right-to-Left", "RTL"),
     (None, None),  # separator
