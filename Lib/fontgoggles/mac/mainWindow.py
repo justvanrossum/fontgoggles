@@ -785,7 +785,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 # BiDi processing is on, and we're looking at the original
                 # text sequence (before BiDi processing). We convert our
                 # selection to post-BiDi, base the new selection on that,
-                # then convert back to pre-BiDi. This way we should key
+                # then convert back to pre-BiDi. This way we can key
                 # through the glyphs by character, but in the order of the
                 # glyphs.
                 if event.characters() == AppKit.NSUpArrowFunctionKey:
