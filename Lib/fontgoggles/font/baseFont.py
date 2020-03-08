@@ -111,8 +111,10 @@ class BaseFont:
                 segmentScript = script
             if direction is not None:
                 segmentDirection = direction
+            elif segmentBiDiLevel is None:
+                segmentDirection = None  # Let HarfBuzz figure it out
             else:
-                segmentDirection = None  # Ignore segmentBiDiLevel, HarfBuzz will figure it out
+                segmentDirection = ["LTR", "RTL"][segmentBiDiLevel % 2]
             run = self.getGlyphRun(segmentText,
                                    direction=segmentDirection,
                                    script=segmentScript,
