@@ -1,5 +1,12 @@
 # Changelog for FontGoggles
 
+## [1.1.5] - 2020-03-??
+
+- Rewrote Bi-directional text support ([issue 35](https://github.com/justvanrossum/fontgoggles/issues/35), [PR 60](https://github.com/justvanrossum/fontgoggles/issues/60))
+- As an indirect consequence of the previous item, the "BiDi" checkbox above
+  the character list has been removed.
+- Fixed regression: dragging fonts between FontGoggles windows works again.
+
 ## [1.1.4] - 2020-03-07
 
 - Added "Reload font" and "Clear error" contextual menus to font item.
