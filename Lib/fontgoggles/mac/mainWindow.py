@@ -39,8 +39,8 @@ sidebarWidth = 300
 
 
 directionPopUpConfig = [
-    ("Automatic, with BiDi", None),
-    ("Automatic, without BiDi", None),
+    ("Automatic, with BiDi and Segmentation", None),
+    ("Automatic, w/o  BiDi and Segmentation", None),
     ("Left-to-Right", "LTR"),
     ("Right-to-Left", "RTL"),
     (None, None),  # separator
@@ -721,12 +721,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if delay:
             # add a slight delay, so we won't do a lot of work when there's fast typing
             await asyncio.sleep(delay)
-        if self.project.uiSettings.showBiDi:
-            txt = self.textInfo.text
-        else:
-            txt = self.textInfo.originalText
         uniListData = []
-        for index, char in enumerate(txt):
+        for index, char in enumerate(self.textInfo.text):
             uniListData.append(
                 dict(index=index, char=char, unicode=f"U+{ord(char):04X}",
                      unicodeName=unicodedata.name(char, "?"))
@@ -792,11 +788,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if len(self.glyphList) > 0:
             self.glyphList._nsObject.documentView().keyDown_(event)
         elif len(self.characterList) > 0:
-            if self.textInfo.text == self.textInfo.originalText:
+            if True:  ### XXXXX self.textInfo.text == self.textInfo.originalText:
                 # Either automatic direction (by bidi algo + HB) or explicit
                 # reversal of direction
-                if (self.textInfo.directionForShaper is None and self.textInfo.baseDirection == "R") \
-                        or self.textInfo.directionForShaper in ("RTL", "BTT"):
+                if self.textInfo.direction in ("RTL", "BTT"):
                     event = flipArrowKeyEvent(event)
                 self.characterList._nsObject.documentView().keyDown_(event)
             elif self.project.uiSettings.showBiDi:
@@ -821,12 +816,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     else:
                         newCharselection = [0]
                 else:
-                    charSelection = self.textInfo.mapToBiDi(charSelection)
                     if direction == -1:
                         newCharselection = [max(0, min(charSelection) - 1)]
                     else:
                         newCharselection = [min(len(self.characterList) - 1, max(charSelection) + 1)]
-                newCharselection = self.textInfo.mapFromBiDi(newCharselection)
                 if event.modifierFlags() & AppKit.NSEventModifierFlagShift:
                     newCharselection = set(newCharselection + self.characterList.getSelection())
                 self.characterList.setSelection(newCharselection)
@@ -865,10 +858,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if fontItem.glyphs is None:
             return
         charIndices = fontItem.glyphs.mapGlyphsToChars(fontItem.selection)
-
-        if self.textInfo.shouldApplyBiDi and not self.project.uiSettings.showBiDi:
-            charIndices = self.textInfo.mapFromBiDi(charIndices)
-
         with self.blockCallbackRecursion():
             self.characterList.setSelection(charIndices)
 
@@ -879,8 +868,6 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         selectedFontItem = self.fontList.getSingleSelectedItem()
 
         charIndices = set(sender.getSelection())
-        if self.textInfo.shouldApplyBiDi and not self.project.uiSettings.showBiDi:
-            charIndices = self.textInfo.mapToBiDi(charIndices)
 
         with self.blockCallbackRecursion():
             for fontItem in self.iterFontItems():
