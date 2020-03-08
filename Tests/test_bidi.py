@@ -1,6 +1,6 @@
 from collections import deque
 import pytest
-from fontgoggles.misc.bidi import applyBiDi, getBiDiInfo
+from fontgoggles.misc.bidi import applyBiDi, getBiDiInfo, detectScript
 
 
 testData = [
@@ -135,3 +135,18 @@ def test_applyBiDi(testString, expectedString, expectedRunLengths, expectedDir, 
     assert fromBiDi == expectedFromBiDi
     assert set(toBiDi) == set(range(len(toBiDi)))
     assert set(toBiDi) == set(fromBiDi)
+
+
+testDataDetectScript = [
+    (" ", ['Zxxx']),
+    ("abc", ['Latn', 'Latn', 'Latn']),
+    ("(abc)", ['Latn', 'Latn', 'Latn', 'Latn', 'Latn']),
+    ("\u0627\u064f\u0633", ['Arab', 'Arab', 'Arab']),
+    ("(\u0627\u064f\u0633)", ['Arab', 'Arab', 'Arab', 'Arab', 'Arab']),
+    ("a(\u0627\u064f\u0633)", ['Latn', 'Latn', 'Arab', 'Arab', 'Arab', 'Arab']),
+    ("a(\u0627\u064f\u0633)a", ['Latn', 'Latn', 'Arab', 'Arab', 'Arab', 'Latn', 'Latn']),
+    ("\u0627\u064f(a)\u0633", ['Arab', 'Arab', 'Arab', 'Latn', 'Arab', 'Arab']),
+]
+@pytest.mark.parametrize("testString,exceptedScripts", testDataDetectScript)
+def test_detectScript(testString, exceptedScripts):
+    assert detectScript(testString) == exceptedScripts

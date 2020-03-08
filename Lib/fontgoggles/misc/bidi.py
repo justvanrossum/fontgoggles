@@ -1,4 +1,6 @@
 import itertools
+from fontTools.unicodedata import script
+from unicodedata2 import category
 
 # Monkeypatch bidi to use unicodedata2
 import unicodedata2
@@ -6,12 +8,52 @@ import bidi.algorithm
 bidi.algorithm.bidirectional = unicodedata2.bidirectional
 bidi.algorithm.category = unicodedata2.category
 bidi.algorithm.mirrored = unicodedata2.mirrored
-
 from bidi.algorithm import (get_empty_storage, get_base_level, get_embedding_levels,
                             explicit_embed_and_overrides, resolve_weak_types,
                             resolve_neutral_types, resolve_implicit_levels,
                             reorder_resolved_levels, reorder_combining_marks, apply_mirroring,
                             PARAGRAPH_LEVELS)
+from bidi.mirror import MIRRORED
+
+
+UNKNOWN_SCRIPT = {"Zinh", "Zyyy", "Zxxx"}
+
+
+def detectScript(txt):
+    charScript = [script(c) for c in txt]
+
+    for i, ch in enumerate(txt):
+        scr = charScript[i]
+        if scr in UNKNOWN_SCRIPT:
+            if i:
+                scr = charScript[i-1]
+            else:
+                scr = None
+            cat = category(ch)
+            if ch in MIRRORED and cat == "Pe":
+                scr = None
+        charScript[i] = scr
+
+    # Any unknowns should be mapped to the _next_ script
+    prev = None
+    for i in range(len(txt) - 1, -1, -1):
+        if charScript[i] is None:
+            charScript[i] = prev
+        else:
+            prev = charScript[i]
+
+    # There may be unknowns at the end of the string, fall back to
+    # preceding script
+    prev = "Zxxx"  # last resort
+    for i in range(len(txt)):
+        if charScript[i] is None:
+            charScript[i] = prev
+        else:
+            prev = charScript[i]
+
+    assert None not in charScript
+
+    return charScript
 
 
 def applyBiDi(text):
