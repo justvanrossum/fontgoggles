@@ -147,6 +147,6 @@ testDataDetectScript = [
     ("a(\u0627\u064f\u0633)a", ['Latn', 'Latn', 'Arab', 'Arab', 'Arab', 'Latn', 'Latn']),
     ("\u0627\u064f(a)\u0633", ['Arab', 'Arab', 'Arab', 'Latn', 'Arab', 'Arab']),
 ]
-@pytest.mark.parametrize("testString,exceptedScripts", testDataDetectScript)
-def test_detectScript(testString, exceptedScripts):
-    assert detectScript(testString) == exceptedScripts
+@pytest.mark.parametrize("testString,expectedScripts", testDataDetectScript)
+def test_detectScript(testString, expectedScripts):
+    assert detectScript(testString) == expectedScripts
