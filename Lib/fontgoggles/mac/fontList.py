@@ -652,7 +652,9 @@ class FontList(Group):
     def scrollSelectionToVisible(self, selection=None):
         if selection is None:
             selection = self._selection
-        self._nsObject.scrollRectToVisible_(self._getSelectionRect(selection))
+        selRect = self._getSelectionRect(selection)
+        if selRect is not None:
+            self._nsObject.scrollRectToVisible_(selRect)
 
     def scrollGlyphSelectionToVisible(self):
         if self.selection:
