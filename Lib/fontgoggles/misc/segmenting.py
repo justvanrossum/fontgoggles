@@ -20,7 +20,7 @@ UNKNOWN_SCRIPT = {"Zinh", "Zyyy", "Zxxx"}
 
 def textSegments(txt):
     scripts = detectScript(txt)
-    storage, _ = getBiDiInfo(txt)
+    storage = getBiDiInfo(txt)
 
     levels = [None] * len(txt)
     for ch in storage['chars']:
@@ -124,6 +124,4 @@ def getBiDiInfo(text, *, upper_is_rtl=False, base_dir=None, debug=False):
     resolve_implicit_levels(storage, debug)
     reorder_resolved_levels(storage, debug)
 
-    chars = storage['chars']
-    display = ''.join([_ch['ch'] for _ch in chars])
-    return storage, display
+    return storage
