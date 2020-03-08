@@ -175,11 +175,12 @@ class FGFontListView(AppKit.NSView):
     @suppressAndLogException
     def performDragOperation_(self, draggingInfo):
         index, frame = self._getDropInsertionIndexAndRect_(draggingInfo)
+        items = list(self._iterateItemsFromDraggingInfo(draggingInfo))
         if draggingInfo.draggingSource() is self:
             # Local drag, just reorder
-            self.vanillaWrapper().moveFonts(self._iterateItemsFromDraggingInfo(draggingInfo), index)
+            self.vanillaWrapper().moveFonts(items, index)
         else:
-            self.vanillaWrapper().insertFonts(self._iterateItemsFromDraggingInfo(draggingInfo), index)
+            self.vanillaWrapper().insertFonts(items, index)
         return True
 
     @staticmethod
