@@ -41,14 +41,14 @@ def textSegments(txt):
         runLenghts.append(len(list(sub)))
 
     segments = []
-    pos = 0
+    index = 0
     for rl in runLenghts:
-        nextPos = pos + rl
-        segment = chars[pos:nextPos]
+        nextIndex = index + rl
+        segment = chars[index:nextIndex]
         runChars = "".join(ch for ch, script, bidiLevel in segment)
         _, script, bidiLevel = segment[0]
-        segments.append((runChars, script, bidiLevel, pos))
-        pos = nextPos
+        segments.append((runChars, script, bidiLevel, index))
+        index = nextIndex
     return segments, storage['base_level']
 
 
