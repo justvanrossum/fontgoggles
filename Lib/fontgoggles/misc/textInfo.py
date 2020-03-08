@@ -22,7 +22,7 @@ class TextInfo:
     def text(self, text):
         self._text = text
         self._segments, self.baseLevel = textSegments(text)
-        self.reorderedSegments = self.getReorderedSegments()
+        self.reorderedSegments = self._getReorderedSegments()
 
         toBiDi = {}
         fromBiDi = {}
@@ -50,7 +50,7 @@ class TextInfo:
         else:
             return [(self._text, None, None, 0)]
 
-    def getReorderedSegments(self):
+    def _getReorderedSegments(self):
         segments = []
         isRTL = self.baseLevel % 2
         for value, sub in itertools.groupby(self._segments, key=lambda item: item[2] % 2):
