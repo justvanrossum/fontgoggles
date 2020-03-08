@@ -102,11 +102,8 @@ class BaseFont:
             colorPalette = self.colorPalettes[colorPalettesIndex]
 
         glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"), colorPalette)
-        segments = textInfo.segments
-        if textInfo.shouldApplyBiDi and textInfo.baseDirection == "R":
-            segments = reversed(segments)
 
-        for segmentText, segmentScript, segmentBiDiLevel, firstCluster in segments:
+        for segmentText, segmentScript, segmentBiDiLevel, firstCluster in textInfo.segments:
             if script is not None:
                 segmentScript = script
             if direction is not None:

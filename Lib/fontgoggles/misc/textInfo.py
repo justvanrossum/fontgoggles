@@ -1,3 +1,4 @@
+import itertools
 from .segmenting import textSegments
 
 
@@ -21,29 +22,22 @@ class TextInfo:
     def text(self, text):
         self._text = text
         self._segments, self.baseLevel = textSegments(text)
-
-        indexedSegments = []
-        for segmentText, segmentScript, segmentBiDiLevel, firstCluster in self._segments:
-            charIndices = []
-            for index in range(firstCluster, firstCluster + len(segmentText)):
-                charIndices.append(index)
-            indexedSegments.append((charIndices, segmentBiDiLevel))
-
-        if text:
-            assert indexedSegments[-1][0][-1] == len(text) - 1
+        self.reorderedSegments = self.getReorderedSegments()
 
         toBiDi = {}
         fromBiDi = {}
-        if self.baseLevel % 2:
-            indexedSegments = reversed(indexedSegments)
         afterIndex = 0
-        for charIndices, segmentBiDiLevel in indexedSegments:
+        for segmentText, segmentScript, segmentBiDiLevel, firstCluster in self.reorderedSegments:
+            charIndices = [beforeIndex for beforeIndex in
+                                range(firstCluster, firstCluster + len(segmentText))]
             if segmentBiDiLevel % 2:
                 charIndices = reversed(charIndices)
+
             for beforeIndex in charIndices:
                 toBiDi[beforeIndex] = afterIndex
                 fromBiDi[afterIndex] = beforeIndex
                 afterIndex += 1
+
         assert len(toBiDi) == len(text)
         assert len(fromBiDi) == len(text)
         self._toBiDi = toBiDi
@@ -52,9 +46,22 @@ class TextInfo:
     @property
     def segments(self):
         if self.shouldApplyBiDi:
-            return self._segments
+            return self.reorderedSegments
         else:
             return [(self._text, None, None, 0)]
+
+    def getReorderedSegments(self):
+        segments = []
+        isRTL = self.baseLevel % 2
+        for value, sub in itertools.groupby(self._segments, key=lambda item: item[2] % 2):
+            if isRTL == value:
+                segments.extend(sub)
+            else:
+                segments.extend(reversed(list(sub)))
+        if isRTL:
+            segments = list(reversed(segments))
+        assert len(segments) == len(self._segments)
+        return segments
 
     def mapToBiDi(self, charIndices):
         toBiDi = self._toBiDi
