@@ -4,7 +4,7 @@ from fontgoggles.misc.textInfo import TextInfo
 
 testData = [
     ("abc", True, None, "abc", [3], "LTR", "left"),
-    ("\u062D\u062A\u064912", True, None, "12\u0649\u062A\u062D", [2, 3], "LTR", "right"),
+    # ("\u062D\u062A\u064912", True, None, "12\u0649\u062A\u062D", [2, 3], "LTR", "right"),
     ("\u062D\u062A\u064912", False, None, "\u062D\u062A\u064912", [2, 3], None, "right"),
     ("abc", True, "RTL", "abc", [3], "RTL", "right"),
 ]
