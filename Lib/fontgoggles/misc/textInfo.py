@@ -22,12 +22,47 @@ class TextInfo:
         self._text = text
         self._segments, self.baseLevel = textSegments(text)
 
+        indexedSegments = []
+        for segmentText, segmentScript, segmentBiDiLevel, firstCluster in self._segments:
+            charIndices = []
+            for index in range(firstCluster, firstCluster + len(segmentText)):
+                charIndices.append(index)
+            indexedSegments.append((charIndices, segmentBiDiLevel))
+
+        if text:
+            assert indexedSegments[-1][0][-1] == len(text) - 1
+
+        toBiDi = {}
+        fromBiDi = {}
+        if self.baseLevel % 2:
+            indexedSegments = reversed(indexedSegments)
+        afterIndex = 0
+        for charIndices, segmentBiDiLevel in indexedSegments:
+            if segmentBiDiLevel % 2:
+                charIndices = reversed(charIndices)
+            for beforeIndex in charIndices:
+                toBiDi[beforeIndex] = afterIndex
+                fromBiDi[afterIndex] = beforeIndex
+                afterIndex += 1
+        assert len(toBiDi) == len(text)
+        assert len(fromBiDi) == len(text)
+        self._toBiDi = toBiDi
+        self._fromBiDi = fromBiDi
+
     @property
     def segments(self):
         if self.shouldApplyBiDi:
             return self._segments
         else:
             return [(self._text, None, None, 0)]
+
+    def mapToBiDi(self, charIndices):
+        toBiDi = self._toBiDi
+        return [toBiDi[charIndex] for charIndex in charIndices]
+
+    def mapFromBiDi(self, charIndices):
+        fromBiDi = self._fromBiDi
+        return [fromBiDi[charIndex] for charIndex in charIndices]
 
     @property
     def baseDirection(self):

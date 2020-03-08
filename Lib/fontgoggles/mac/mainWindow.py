@@ -775,7 +775,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if len(self.glyphList) > 0:
             self.glyphList._nsObject.documentView().keyDown_(event)
         elif len(self.characterList) > 0:
-            if True:  ### XXXXX self.textInfo.text == self.textInfo.originalText:
+            if not self.textInfo.shouldApplyBiDi:
                 # Either automatic direction (by bidi algo + HB) or explicit
                 # reversal of direction
                 if self.textInfo.direction in ("RTL", "BTT"):
@@ -799,10 +799,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                     else:
                         newCharselection = [0]
                 else:
+                    charSelection = self.textInfo.mapToBiDi(charSelection)
                     if direction == -1:
                         newCharselection = [max(0, min(charSelection) - 1)]
                     else:
                         newCharselection = [min(len(self.characterList) - 1, max(charSelection) + 1)]
+                newCharselection = self.textInfo.mapFromBiDi(newCharselection)
                 if event.modifierFlags() & AppKit.NSEventModifierFlagShift:
                     newCharselection = set(newCharselection + self.characterList.getSelection())
                 self.characterList.setSelection(newCharselection)
