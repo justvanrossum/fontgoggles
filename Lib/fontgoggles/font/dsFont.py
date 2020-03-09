@@ -80,7 +80,7 @@ class DSFont(BaseFont):
                         includedFeatureFiles = []
                         # We're not compiling features nor do we need cmaps for these sparse layers,
                         # so we don't need need proper anchor or unicode data
-                        getUnicodesAndAnchors = lambda: ({}, {})
+                        def getUnicodesAndAnchors(): return ({}, {})
                     ufoState = UFOState(reader, glyphSet,
                                         getUnicodesAndAnchors=getUnicodesAndAnchors,
                                         includedFeatureFiles=includedFeatureFiles)
