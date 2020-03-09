@@ -4,7 +4,7 @@ from fontgoggles.misc.segmenting import getBiDiInfo, detectScript, textSegments
 
 
 testData = [
-    ("Abc", "Abc",
+    ("Abc",
      {'base_dir': 'L',
       'base_level': 0,
       'chars': [{'ch': 'A',
@@ -27,7 +27,7 @@ testData = [
                       'sor': 'L',
                       'start': 0,
                       'type': 'L'}])}),
-    ("\u062D\u062A\u0649", "\u0649\u062A\u062D",
+    ("\u062D\u062A\u0649",
      {'base_dir': 'R',
       'base_level': 1,
       'chars': [{'ch': '\u0649',
@@ -50,7 +50,7 @@ testData = [
                       'sor': 'R',
                       'start': 0,
                       'type': 'AL'}])}),
-    ("\u062D\u062A\u064912", "12\u0649\u062A\u062D",
+    ("\u062D\u062A\u064912",
      {'base_dir': 'R',
       'base_level': 1,
       'chars': [{'ch': '1',
@@ -83,7 +83,7 @@ testData = [
                       'sor': 'R',
                       'start': 0,
                       'type': 'EN'}])}),
-    ("\u0627\u064f\u0633", "\u0633\u0627\u064f",
+    ("\u0627\u064f\u0633",
      {'base_dir': 'R',
       'base_level': 1,
       'chars': [{'ch': 'س',
@@ -91,15 +91,15 @@ testData = [
                  'level': 1,
                  'orig': 'AL',
                  'type': 'R'},
-                {'ch': 'ا',
-                 'index': 0,
-                 'level': 1,
-                 'orig': 'AL',
-                 'type': 'R'},
                 {'ch': 'ُ',
                  'index': 1,
                  'level': 1,
                  'orig': 'NSM',
+                 'type': 'R'},
+                {'ch': 'ا',
+                 'index': 0,
+                 'level': 1,
+                 'orig': 'AL',
                  'type': 'R'}],
       'runs': deque([{'eor': 'R',
                       'length': 3,
@@ -109,10 +109,9 @@ testData = [
 ]
 
 
-@pytest.mark.parametrize("testString,expectedString,expectedInfo", testData)
-def test_getBiDiInfo_ltr(testString, expectedString, expectedInfo):
-    info, display = getBiDiInfo(testString)
-    assert display == expectedString
+@pytest.mark.parametrize("testString,expectedInfo", testData)
+def test_getBiDiInfo_ltr(testString, expectedInfo):
+    info = getBiDiInfo(testString)
     assert info == expectedInfo
 
 

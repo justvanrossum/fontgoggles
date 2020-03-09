@@ -7,7 +7,7 @@ git+https://github.com/robotools/vanilla
 fonttools[ufo,lxml,woff,unicode,type1]
 freetype-py
 uharfbuzz
-git+git://github.com/justvanrossum/python-bidi.git@implement-L3
+python-bidi
 git+git://github.com/justvanrossum/jundo.git
 ufo2ft
 numpy
