@@ -171,7 +171,7 @@ def callCallback(callback, sender):
 
 if __name__ == "__main__":
     from random import random
-    from vanilla import Button, Window
+    from vanilla import Window
 
     class SliderTest:
 

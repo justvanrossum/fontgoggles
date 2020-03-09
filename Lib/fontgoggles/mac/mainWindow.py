@@ -176,7 +176,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                  cell=makeTextCell("left", "truncmiddle")),
             dict(title="script", width=50),
             dict(title="dir.", key="dir", width=36),
-            dict(title= "bidi lvl.", key="bidiLevel", width=40, cell=makeTextCell("right")),
+            dict(title="bidi lvl.", key="bidiLevel", width=40, cell=makeTextCell("right")),
             dict(title="index", width=36, cell=makeTextCell("right")),
         ]
         self.characterList = List((0, 0, 0, 0), [],
@@ -717,7 +717,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 uniListData.append(
                     dict(index=index, char=char, unicode=f"U+{ord(char):04X}",
                          unicodeName=unicodedata.name(char, "?"), script=segmentScript,
-                         bidiLevel=segmentBiDiLevel, dir=["LTR", "RTL"][segmentBiDiLevel%2])
+                         bidiLevel=segmentBiDiLevel, dir=["LTR", "RTL"][segmentBiDiLevel % 2])
                 )
         self.characterList.set(uniListData)
         if selection is not None:

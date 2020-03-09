@@ -28,8 +28,8 @@ class TextInfo:
         fromBiDi = {}
         afterIndex = 0
         for segmentText, segmentScript, segmentBiDiLevel, firstCluster in self.reorderedSegments:
-            charIndices = [beforeIndex for beforeIndex in
-                                range(firstCluster, firstCluster + len(segmentText))]
+            charIndices = [beforeIndex
+                           for beforeIndex in range(firstCluster, firstCluster + len(segmentText))]
             if segmentBiDiLevel % 2:
                 charIndices = reversed(charIndices)
 
