@@ -637,13 +637,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             return
         stderr = io.StringIO()
         with contextlib.redirect_stderr(stderr):
-            glyphs = font.getGlyphRunFromTextInfo(self.textInfo,
+            glyphs, history = font.getGlyphRunFromTextInfo(self.textInfo,
                                                   features=self.project.textSettings.features,
                                                   varLocation=self.project.textSettings.varLocation,
                                                   colorLayers=self.project.textSettings.enableColor)
         stderr = stderr.getvalue()
         if stderr:
             fontItem.writeCompileOutput(stderr)
+        elif history:
+            fontItem.clearCompileOutput()
+            for msg in history:
+                fontItem.writeCompileOutput(msg+"\n")
 
         addBoundingBoxes(glyphs)
         fontItem.glyphs = glyphs
