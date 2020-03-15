@@ -163,8 +163,8 @@ The _Direction/orientation_ menu has six options:
   as perform segmentation of the string based on runs with the same script
   and the same BiDi level.
 - _Automatic, w/o BiDi and Segmentation_: let HarfBuzz guess the writing
-  direction of the text, do not applying the Unicode bidirectional
-  algorithm, and do not perform segmentation.
+  direction and the script of the text, do not applying the Unicode
+  bidirectional algorithm, and do not perform segmentation.
 - _Left-to-Right_: force the direction of the text to be Left-to-Right
 - _Right-to-Left_: force the direction of the text to be Right-to-Left
 - _Top-to-Bottom_: use vertical layout, Top-to-Bottom
