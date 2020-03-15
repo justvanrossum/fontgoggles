@@ -1,8 +1,8 @@
 # Changelog for FontGoggles
 
-## [1.1.5] - 2020-03-??
+## [1.1.5] - 2020-03-15
 
-- Rewrote Bi-directional text support ([issue 35](https://github.com/justvanrossum/fontgoggles/issues/35), [PR 60](https://github.com/justvanrossum/fontgoggles/issues/60))
+- Rewrote Bi-directional text support ([issue 35](https://github.com/justvanrossum/fontgoggles/issues/35), [PR 60](https://github.com/justvanrossum/fontgoggles/issues/60)). This also implements script segmentation.
 - As an indirect consequence of the previous item, the "BiDi" checkbox above
   the character list has been removed.
 - Fixed regression: dragging fonts between FontGoggles windows works again.
