@@ -83,12 +83,8 @@ the application, and drop some fonts onto the window.</p>
 <p>On the left hand side of the FontGoggles window there are two lists.</p>
 <p>The left-most one is the <em>Character list</em>, which shows the entered
 characters and their Unicode values.</p>
-<p>By default, characters are listed in logical order (first-to-last, in the
-natural writing direction of the script). However, when the “BiDi”
-checkbox is checked, it shows the entered characters <em>after</em> BiDirectional
-processing, which reorders them left-to-right. The “BiDi” checkbox
-does not affect the text display and is only available if BiDi processing
-is enabled (see the next section about “Text settings”).</p>
+<p>Characters are listed in logical order (first-to-last, in the
+natural writing direction of the script).</p>
 <p>The second list is the <em>Glyph list</em>, which can show information about
 the rendered glyphs, such as their names, advance values and positioning.
 Since this information is font-specific, it only shows information when
@@ -134,11 +130,13 @@ popup menus:</p>
 </ul>
 <p>The <em>Direction/orientation</em> menu has six options:</p>
 <ul>
-<li><em>Automatic, with BiDi</em>: apply the Unicode bidirectional algorithm,
-  which will determine the dominant writing direction</li>
-<li><em>Automatic, without BiDi</em>: let HarfBuzz figure out the writing
-  direction of the text, and do not applying the Unicode bidirectional
-  algorithm</li>
+<li><em>Automatic, with BiDi and Segmentation</em>: apply the Unicode bidirectional
+  algorithm, which will determine the dominant writing direction, as well
+  as perform segmentation of the string based on runs with the same script
+  and the same BiDi level.</li>
+<li><em>Automatic, w/o BiDi and Segmentation</em>: let HarfBuzz figure out the writing
+  direction of the text, do not applying the Unicode bidirectional
+  algorithm, and do not perform segmentation.</li>
 <li><em>Left-to-Right</em>: force the direction of the text to be Left-to-Right</li>
 <li><em>Right-to-Left</em>: force the direction of the text to be Right-to-Left</li>
 <li><em>Top-to-Bottom</em>: use vertical layout, Top-to-Bottom</li>

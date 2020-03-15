@@ -98,12 +98,8 @@ On the left hand side of the FontGoggles window there are two lists.
 The left-most one is the _Character list_, which shows the entered
 characters and their Unicode values.
 
-By default, characters are listed in logical order (first-to-last, in the
-natural writing direction of the script). However, when the “BiDi”
-checkbox is checked, it shows the entered characters _after_ BiDirectional
-processing, which reorders them left-to-right. The “BiDi” checkbox
-does not affect the text display and is only available if BiDi processing
-is enabled (see the next section about “Text settings”).
+Characters are listed in logical order (first-to-last, in the
+natural writing direction of the script).
 
 The second list is the _Glyph list_, which can show information about
 the rendered glyphs, such as their names, advance values and positioning.
@@ -162,11 +158,13 @@ popup menus:
 
 The _Direction/orientation_ menu has six options:
 
-- _Automatic, with BiDi_: apply the Unicode bidirectional algorithm,
-  which will determine the dominant writing direction
-- _Automatic, without BiDi_: let HarfBuzz figure out the writing
-  direction of the text, and do not applying the Unicode bidirectional
-  algorithm
+- _Automatic, with BiDi and Segmentation_: apply the Unicode bidirectional
+  algorithm, which will determine the dominant writing direction, as well
+  as perform segmentation of the string based on runs with the same script
+  and the same BiDi level.
+- _Automatic, w/o BiDi and Segmentation_: let HarfBuzz figure out the writing
+  direction of the text, do not applying the Unicode bidirectional
+  algorithm, and do not perform segmentation.
 - _Left-to-Right_: force the direction of the text to be Left-to-Right
 - _Right-to-Left_: force the direction of the text to be Right-to-Left
 - _Top-to-Bottom_: use vertical layout, Top-to-Bottom
