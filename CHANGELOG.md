@@ -3,7 +3,7 @@
 ## [1.1.6] - 2020-03-16
 
 - Updated uharfbuzz to latest version, which fixes a bug retrieving feature tags.
-  [issue 63](https://github.com/justvanrossum/fontgoggles/issues/63)
+  [Issue 63](https://github.com/justvanrossum/fontgoggles/issues/63)
 
 ## [1.1.5] - 2020-03-15
 
