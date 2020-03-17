@@ -903,6 +903,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     @objc.python_method
     def scriptsPopupCallback(self, sender):
         self.project.textSettings.script = self.setLanguagesFromScript()
+        self.project.textSettings.language = _tagFromMenuItem(self.languagesPopup.getItem(), "dflt")
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
     def setLanguagesFromScript(self):
