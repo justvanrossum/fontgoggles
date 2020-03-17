@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [1.1.7] - 2020-03-??
+## [1.1.7] - 2020-03-17
 
 - Fixed an update glitch where the language would not be properly reset after the
   user changed the script.
