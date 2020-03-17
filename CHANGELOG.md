@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.1.7] - 2020-03-??
+
+- Fixed an update glitch where the language would not be properly reset after the
+  user changed the script.
+
 ## [1.1.6] - 2020-03-16
 
 - Updated uharfbuzz to latest version, which fixes a bug retrieving feature tags.
