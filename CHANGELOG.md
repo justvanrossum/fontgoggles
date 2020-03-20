@@ -2,7 +2,7 @@
 
 ## [1.1.8] - 2020-03-20
 
-- Updated Unicode 13.0 (both internal database and the Unicode Picker).
+- Updated to Unicode 13.0 (both the internal database and the Unicode Picker).
 
 ## [1.1.7] - 2020-03-17
 
