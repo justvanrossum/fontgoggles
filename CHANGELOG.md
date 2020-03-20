@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.1.8] - 2020-03-20
+
+- Updated Unicode 13.0 (both internal database and the Unicode Picker).
+
 ## [1.1.7] - 2020-03-17
 
 - Fixed an update glitch where the language would not be properly reset after the
