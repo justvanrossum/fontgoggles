@@ -1,8 +1,12 @@
 # Changelog for FontGoggles
 
+## [1.1.9] - 2020-03-20
+
+- Updated fonttools to 4.5.0, which was updated to Unicode 13.0.0.
+
 ## [1.1.8] - 2020-03-20
 
-- Updated to Unicode 13.0 (both the internal database and the Unicode Picker).
+- Updated to Unicode 13.0.0 (both the internal database and the Unicode Picker).
 
 ## [1.1.7] - 2020-03-17
 
