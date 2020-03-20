@@ -170,11 +170,9 @@ class HBShape:
         if direction is not None:
             buf.direction = direction
         if language is not None:
-            buf.language = language
+            buf.set_ot_language(language)
         if script is not None:
-            script = ot_tag_to_script(script)
-            if script is not None:
-                buf.script = script
+            buf.set_ot_script(script)
 
         hb.shape(self.font, buf, features)
 
