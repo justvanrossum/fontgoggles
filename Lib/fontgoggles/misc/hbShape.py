@@ -3,7 +3,6 @@ import functools
 import io
 import itertools
 from fontTools.ttLib import TTFont
-from fontTools.unicodedata import ot_tag_to_script
 import uharfbuzz as hb
 
 
