@@ -2,7 +2,7 @@
 
 ## [1.1.10] - 2020-03-22
 
-- Fixed laguage override: for some languages the language popup menu did not
+- Fixed language override: for some languages the language popup menu did not
   work. ([Issue 68](https://github.com/justvanrossum/fontgoggles/issues/68),
   [PR 69](https://github.com/justvanrossum/fontgoggles/issues/69))
 
