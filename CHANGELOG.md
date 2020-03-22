@@ -1,5 +1,11 @@
 # Changelog for FontGoggles
 
+## [1.1.10] - 2020-03-22
+
+- Fixed laguage override: for some languages the language popup menu did not
+  work. ([Issue 68](https://github.com/justvanrossum/fontgoggles/issues/68),
+  [PR 69](https://github.com/justvanrossum/fontgoggles/issues/69))
+
 ## [1.1.9] - 2020-03-20
 
 - Updated fonttools to 4.5.0, which was updated to Unicode 13.0.0.
