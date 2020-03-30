@@ -2,7 +2,11 @@ import ctypes
 import pathlib
 
 import freetype
-import numpy
+try:
+    import numpy
+except ImportError:
+    # It's ok to not have numpy if makePathFromArrays() is not used.
+    numpy = None
 import objc
 import Foundation
 
