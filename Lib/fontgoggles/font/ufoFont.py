@@ -407,7 +407,7 @@ class UFOState:
             anchors = dict(prev.anchors)
             anchors.update(changedAnchors)
             self.anchors = {gn: anchorList for gn, anchorList in anchors.items() if anchorList}
-            needsFeaturesUpdate = prev.anchors != self.anchors
+            needsFeaturesUpdate = needsFeaturesUpdate or prev.anchors != self.anchors
 
             # Within the changed glyphs, let's see if their unicodes changed
             for gn in changedGlyphNames:

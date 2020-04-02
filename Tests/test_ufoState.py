@@ -1,7 +1,7 @@
 import pathlib
 import shutil
 from fontTools.pens.recordingPen import RecordingPointPen
-from fontTools.ufoLib import UFOReader
+from fontTools.ufoLib import UFOReader, UFOReaderWriter
 from fontTools.ufoLib.glifLib import Glyph
 from fontgoggles.font.ufoFont import UFOState
 from fontgoggles.compile.ufoCompiler import fetchCharacterMappingAndAnchors
@@ -11,7 +11,7 @@ from testSupport import getFontPath
 def test_getUpdateInfo(tmpdir):
     ufoSource = getFontPath("MutatorSansBoldWideMutated.ufo")
     ufoPath = shutil.copytree(ufoSource, tmpdir / "test.ufo")
-    reader = UFOReader(ufoPath, validate=False)
+    reader = UFOReaderWriter(ufoPath, validate=False)
     glyphSet = reader.getGlyphSet()
     cmap, unicodes, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
 
@@ -66,3 +66,20 @@ def test_getUpdateInfo(tmpdir):
     assert needsGlyphUpdate
     assert not needsInfoUpdate
     assert needsCmapUpdate
+
+    glyph = Glyph("A", None)
+    ppen = RecordingPointPen()
+    glyphSet.readGlyph("A", glyph, ppen)
+    glyph.width += 123
+    glyphSet.writeGlyph("A", glyph, ppen.replay)
+    kerning = reader.readKerning()
+    kerning["T", "comma"] = -123
+    reader.writeKerning(kerning)
+
+    state = state.newState()
+    (needsFeaturesUpdate, needsGlyphUpdate, needsInfoUpdate, needsCmapUpdate,
+     needsLibUpdate) = state.getUpdateInfo()
+    assert needsFeaturesUpdate
+    assert needsGlyphUpdate
+    assert not needsInfoUpdate
+    assert not needsCmapUpdate
