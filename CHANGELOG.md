@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.1.11] - 2020-04-02
+
+- Fixed UFO reload issue: if kerning _and_ glyphs changed, only the glyph changes
+  would show.
+
 ## [1.1.10] - 2020-03-22
 
 - Fixed language override: for some languages the language popup menu did not
