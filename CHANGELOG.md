@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.1.12] - 2020-04-03
+
+- Fixed app version info.
+
 ## [1.1.11] - 2020-04-02
 
 - Fixed UFO reload issue: if kerning _and_ glyphs changed, only the glyph changes
