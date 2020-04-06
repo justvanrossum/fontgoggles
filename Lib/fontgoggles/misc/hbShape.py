@@ -112,8 +112,14 @@ class HBShape:
         else:
             self._funcs = None
 
-    def getFeatures(self, tag):
-        return hb.ot_layout_language_get_feature_tags(self.face, tag)
+    def getFeatures(self, otTableTag):
+        features = set()
+        for scriptIndex, script in enumerate(hb.ot_layout_table_get_script_tags(self.face, otTableTag)):
+            langIdices = list(range(len(hb.ot_layout_script_get_language_tags(self.face, otTableTag, scriptIndex))))
+            langIdices.append(0xFFFF)
+            for langIndex in langIdices:
+                features.update(hb.ot_layout_language_get_feature_tags(self.face, otTableTag, scriptIndex, langIndex))
+        return features
 
     def getStylisticSetNames(self):
         tags = _stylisticSets & set(self.getFeatures("GSUB"))
