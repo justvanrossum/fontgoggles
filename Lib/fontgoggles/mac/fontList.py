@@ -848,17 +848,21 @@ class FGFontItemView(AppKit.NSView):
             return bool(fontItem.getCompileOutput())
         return True
 
+    def menuForEvent_(self, event):
+        menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
+        items = [
+            ("Reveal font file in Finder", "revealInFinder:"),
+            ("Reload font", "reloadFont:"),
+            ("Clear error", "clearCompileOutput:"),
+        ]
+        for i, (title, action) in enumerate(items):
+            menu.insertItemWithTitle_action_keyEquivalent_atIndex_(title, action, "", i)
+        return menu
+
     @suppressAndLogException
     def mouseDown_(self, event):
         if event.modifierFlags() & AppKit.NSEventModifierFlagControl:
-            menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
-            items = [
-                ("Reveal font file in Finder", "revealInFinder:"),
-                ("Reload font", "reloadFont:"),
-                ("Clear error", "clearCompileOutput:"),
-            ]
-            for i, (title, action) in enumerate(items):
-                menu.insertItemWithTitle_action_keyEquivalent_atIndex_(title, action, "", i)
+            menu = self.menuForEvent_(event)
             AppKit.NSMenu.popUpContextMenu_withEvent_forView_(menu, event, self)
         else:
             super().mouseDown_(event)
