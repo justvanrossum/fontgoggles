@@ -3,6 +3,9 @@
 ## [1.1.13] - 2020-04-??
 
 - Fixed contextual menu to also respond to right-click.
+- Fixed feature tag list: not all available features were always shown.
+  ([Issue 85](https://github.com/justvanrossum/fontgoggles/issues/85),
+  [PR 86](https://github.com/justvanrossum/fontgoggles/issues/86))
 
 ## [1.1.12] - 2020-04-03
 
