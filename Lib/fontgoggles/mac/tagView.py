@@ -22,28 +22,34 @@ class FGTagView(AppKit.NSView):
         self.setToolTip_(tooltip)
         self.setNeedsDisplay_(True)
 
+    def menuForEvent_(self, event):
+        if not self.allowsAlternateSelection:
+            return None
+        menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
+        baseItems = [
+            ("Off", False),
+            ("Default", None),
+            ("On (Alternate 1)", True),
+        ]
+        altItems = [(f"Alternate {i}", i) for i in range(2, 11)]
+        items = baseItems + altItems
+        for index, (item, itemState) in enumerate(items):
+            menuItem = menu.insertItemWithTitle_action_keyEquivalent_atIndex_(
+                    item, "contextualAction:", "", index)
+            menuItem.setRepresentedObject_(itemState)
+            if self.state == itemState:
+                menuItem.setState_(AppKit.NSControlStateValueOn)
+        if self.state and self.state > 10:
+            msg = f"Alternate {self.state}, Edit..."
+        else:
+            msg = "Enter alternate number..."
+        menuItem = menu.insertItemWithTitle_action_keyEquivalent_atIndex_(
+                msg, "enterAlternateNumber:", "", len(items))
+        return menu
+
     def mouseDown_(self, event):
         if self.allowsAlternateSelection and event.modifierFlags() & AppKit.NSEventModifierFlagControl:
-            menu = AppKit.NSMenu.alloc().initWithTitle_("Contextual Menu")
-            baseItems = [
-                ("Off", False),
-                ("Default", None),
-                ("On (Alternate 1)", True),
-            ]
-            altItems = [(f"Alternate {i}", i) for i in range(2, 11)]
-            items = baseItems + altItems
-            for index, (item, itemState) in enumerate(items):
-                menuItem = menu.insertItemWithTitle_action_keyEquivalent_atIndex_(
-                        item, "contextualAction:", "", index)
-                menuItem.setRepresentedObject_(itemState)
-                if self.state == itemState:
-                    menuItem.setState_(AppKit.NSControlStateValueOn)
-            if self.state and self.state > 10:
-                msg = f"Alternate {self.state}, Edit..."
-            else:
-                msg = "Enter alternate number..."
-            menuItem = menu.insertItemWithTitle_action_keyEquivalent_atIndex_(
-                    msg, "enterAlternateNumber:", "", len(items))
+            menu = self.menuForEvent_(event)
             AppKit.NSMenu.popUpContextMenu_withEvent_forView_(menu, event, self)
         else:
             self.tracked = True
