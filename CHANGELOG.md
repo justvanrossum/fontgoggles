@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.1.14] - 2020-04-??
+
+- Fixed contextual menu for feature tags to also respond to right-click.
+
 ## [1.1.13] - 2020-04-06
 
 - Fixed contextual menu to also respond to right-click.
