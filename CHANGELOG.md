@@ -1,7 +1,8 @@
 # Changelog for FontGoggles
 
-## [1.1.14] - 2020-04-??
+## [1.1.14] - 2020-04-30
 
+- Updated uharfbuzz to 0.10.0, which updates HarfBuzz to 2.6.5
 - Fixed contextual menu for feature tags to also respond to right-click.
 
 ## [1.1.13] - 2020-04-06
