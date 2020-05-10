@@ -195,7 +195,9 @@ language-specific lookups will be activated.
 
 The _Features_ panel shows the superset of GSUB and GPOS features of
 all opened fonts. You can click feature tags to enable them (green),
-disable them (red) or use their default setting (gray).
+disable them (red) or use their default setting (gray). Clicking the
+tags cycles through the modes (gray → green → red → gray). Holding the
+option key reverses the cycling direction (gray → red → green → gray).
 
 For `GSUB` features, you can control-click (right-click) on a feature
 tag to get a contextual menu, allowing you to specify an alternate

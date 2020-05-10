@@ -88,20 +88,21 @@ class FGTagView(AppKit.NSView):
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
         self.tracked = False
         if AppKit.NSPointInRect(point, self.bounds()):
-            self.toggleState()
+            self.toggleState_(event.modifierFlags() & AppKit.NSEventModifierFlagOption)
             self.vanillaWrapper()._callCallback()
 
-    def toggledState(self):
-        if self.state is None:
-            newState = True
-        elif self.state:
-            newState = False
-        else:
-            newState = None
-        return newState
-
-    def toggleState(self):
-        self.state = self.toggledState()
+    def toggleState_(self, optionKey):
+        optionKey = bool(optionKey)
+        table = {
+            # (oldState, optionKey): newState
+            (None, False): True,
+            (None, True): False,
+            (True, False): False,
+            (True, True): None,
+            (False, False): None,
+            (False, True): True,
+        }
+        self.state = table[self.state, optionKey]
 
     def drawRect_(self, rect):
         (x, y), (w, h) = self.bounds()

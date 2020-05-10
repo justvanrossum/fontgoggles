@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.1.15] - 2020-05-??
+
+- Feature tag UI: option-click reverses the cycle direction, making it
+  possible to enable/disable features with one click.
+
 ## [1.1.14] - 2020-04-30
 
 - Updated uharfbuzz to 0.10.0, which updates HarfBuzz to 2.6.5
