@@ -1,9 +1,11 @@
 # Changelog for FontGoggles
 
-## [1.1.15] - 2020-05-??
+## [1.1.15] - 2020-05-10
 
 - Feature tag UI: option-click reverses the cycle direction, making it
   possible to enable/disable features with one click.
+- Use setuptools_scm for version numbers.
+- Updated internal packages
 
 ## [1.1.14] - 2020-04-30
 
