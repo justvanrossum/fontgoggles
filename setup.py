@@ -21,6 +21,7 @@ with open('Lib/fontgoggles/__init__.py', "r") as fg_init:
 
 setup(
     name="fontgoggles",
+    use_scm_version={"write_to": "Lib/fontgoggles/_version.py"},
     version=fg_version,
     description="fontgoggles is the main library for the FontGoggles application.",
     author="Just van Rossum",
@@ -33,8 +34,7 @@ setup(
     ],
     extras_require={
     },
-    setup_requires=[
-    ],
+    setup_requires=["setuptools_scm"],
     python_requires=">=3.7",
     classifiers=[
     ],

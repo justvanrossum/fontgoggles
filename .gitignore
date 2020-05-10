@@ -108,3 +108,4 @@ venv.bak/
 # fontgoggles
 Vault
 *.dylib
+Lib/fontgoggles/_version.py
