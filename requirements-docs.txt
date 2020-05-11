@@ -1,2 +1,2 @@
-markdown==3.2.1
+markdown==3.2.2
 pillow==7.1.2
