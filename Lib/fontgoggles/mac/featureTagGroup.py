@@ -50,6 +50,7 @@ class FeatureTagGroup(Group):
                     description = features.get(tag, ["<unknown>"])[0]
                 friendlyName = TextBox((margin + tagWidth + 6, y + 1, -margin, 20), description)
                 friendlyName._nsObject.cell().setLineBreakMode_(AppKit.NSLineBreakByTruncatingTail)
+                friendlyName._nsObject.setAllowsExpansionToolTips_(True)
                 tagIdentifier = f"tag_{title}_{tag}"
                 self._tagIdentifiers[tag].append(tagIdentifier)
                 setattr(self, tagIdentifier, tagView)
