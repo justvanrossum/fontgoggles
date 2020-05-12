@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.1.16] - 2020-05-??
+
+- Show tooltip when feature description gets truncated. [Issue 94](https://github.com/justvanrossum/fontgoggles/issues/94)
+
 ## [1.1.15] - 2020-05-10
 
 - Feature tag UI: option-click reverses the cycle direction, making it
