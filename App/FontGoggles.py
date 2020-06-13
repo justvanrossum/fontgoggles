@@ -8,7 +8,7 @@ from fontgoggles.mac.appDelegate import FGAppDelegate  # noqa: F401
 
 
 if __name__ == "__main__":
-    objc.setVerbose(1)
+    objc.setVerbose(True)
     loop = CoreFoundationEventLoop()
     asyncio.set_event_loop(loop)
     try:
