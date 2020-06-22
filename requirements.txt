@@ -6,7 +6,7 @@ corefoundationasyncio==0.0.1
 git+https://github.com/robotools/vanilla
 fonttools[ufo,lxml,unicode,type1,woff]==4.12.1
 freetype-py==2.1.0.post1
-uharfbuzz==0.10.0
+uharfbuzz==0.11.0
 python-bidi==0.4.2
 git+git://github.com/justvanrossum/jundo.git
 ufo2ft==2.15.0
