@@ -112,13 +112,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.w.open()
         
         # this removes a one pixel border at the top of the list view headers
-        frame = self.glyphList._nsObject.frame()
-        frame.size.height += 1
-        self.glyphList._nsObject.setFrame_(frame)
-        frame = self.characterList._nsObject.frame()
-        frame.size.height += 1
-        self.characterList._nsObject.setFrame_(frame)
-        
+        _tweakFrameHeight(self.glyphList._nsObject)
+        _tweakFrameHeight(self.characterList._nsObject)
         
         self.w._window.setWindowController_(self)
         self.w._window.makeFirstResponder_(fontListGroup.textEntry.nsTextView)
@@ -1097,6 +1092,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             pb.clearContents()
             pb.declareTypes_owner_([AppKit.NSPasteboardTypeString], None)
             pb.setString_forType_(text, AppKit.NSPasteboardTypeString)
+
+
+def _tweakFrameHeight(view):
+    frame = view.frame()
+    frame.size.height += 1
+    view.setFrame_(frame)
 
 
 class LabeledView(Group):
