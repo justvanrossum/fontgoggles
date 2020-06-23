@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [1.1.16] - 2020-06-??
+## [1.1.16] - 2020-06-23
 
 - Show tooltip when feature description gets truncated.
   ([Issue 94](https://github.com/justvanrossum/fontgoggles/issues/94))
