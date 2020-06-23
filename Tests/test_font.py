@@ -280,6 +280,27 @@ async def test_getGlyphRunFromTextInfo(text, expectedGlyphNames, expectedPositio
 
 
 @pytest.mark.asyncio
+async def test_mapGlyphsToChars():
+    text = "عربي بِّ"
+    fontPath = getFontPath('Amiri-Regular.ttf')
+    numFonts, opener, getSortInfo = getOpener(fontPath)
+    font = opener(fontPath, 0)
+    await font.load(None)
+    textInfo = TextInfo(text)
+    glyphs = font.getGlyphRunFromTextInfo(textInfo)
+    charIndices = []
+    for glyphIndex in range(len(glyphs)):
+        charIndices.append(glyphs.mapGlyphsToChars({glyphIndex}))
+    expectedCharIndices = [{7}, {6}, {5}, {4}, {3}, {2}, {1}, {0}]
+    assert expectedCharIndices == charIndices
+    glyphIndices = []
+    for charIndex in range(len(text)):
+        glyphIndices.append(glyphs.mapCharsToGlyphs({charIndex}))
+    expectedGlyphIndices = [{7}, {6}, {5}, {4}, {3}, {2}, {1}, {0}]
+    assert expectedGlyphIndices == glyphIndices
+
+
+@pytest.mark.asyncio
 async def test_verticalGlyphMetricsFromUFO():
     fontPath = getFontPath('MutatorSansBoldWideMutated.ufo')
     numFonts, opener, getSortInfo = getOpener(fontPath)
