@@ -1,8 +1,12 @@
 # Changelog for FontGoggles
 
-## [1.1.16] - 2020-05-??
+## [1.1.16] - 2020-06-??
 
-- Show tooltip when feature description gets truncated. [Issue 94](https://github.com/justvanrossum/fontgoggles/issues/94)
+- Show tooltip when feature description gets truncated.
+  ([Issue 94](https://github.com/justvanrossum/fontgoggles/issues/94))
+- Use HarfBuzz cluster level 1 (MONOTONE_CHARACTERS) to get a better
+  mapping between glyphs and characters.
+  ([PR 91](https://github.com/justvanrossum/fontgoggles/pull/91))
 
 ## [1.1.15] - 2020-05-10
 
