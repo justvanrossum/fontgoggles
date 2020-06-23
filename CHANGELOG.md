@@ -5,8 +5,10 @@
 - Show tooltip when feature description gets truncated.
   ([Issue 94](https://github.com/justvanrossum/fontgoggles/issues/94))
 - Use HarfBuzz cluster level 1 (MONOTONE_CHARACTERS) to get a better
-  mapping between glyphs and characters.
+  mapping between glyphs and characters. Thanks Khaled Hosny!
   ([PR 91](https://github.com/justvanrossum/fontgoggles/pull/91))
+- Some small layout improvements. Thanks Georg Seifert!
+  ([PR 101](https://github.com/justvanrossum/fontgoggles/pull/101))
 
 ## [1.1.15] - 2020-05-10
 
