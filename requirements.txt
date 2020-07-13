@@ -4,7 +4,7 @@ py2app==0.19  # pyup: ignore  # keep at 0.19 until ronaldoussoren/py2app#281 is 
 pyobjc==6.2.2
 corefoundationasyncio==0.0.1
 git+https://github.com/robotools/vanilla
-fonttools[ufo,lxml,unicode,type1,woff]==4.12.1
+fonttools[unicode,ufo,type1,lxml,woff]==4.13.0
 freetype-py==2.1.0.post1
 uharfbuzz==0.12.0
 python-bidi==0.4.2
