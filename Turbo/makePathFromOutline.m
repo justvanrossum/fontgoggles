@@ -2,33 +2,11 @@
 #import <Cocoa/Cocoa.h>
 
 
-/* I'm lazy, I don't want to deal with requiring the freetype C header
-   files to be present, so I'll just copy what I need. */
-
-
-typedef signed long  FT_Pos;
-
-
-typedef struct  FT_Vector_
+typedef struct
 {
-  FT_Pos  x;
-  FT_Pos  y;
-
-} FT_Vector;
-
-
-typedef struct  FT_Outline_
-{
-  short       n_contours;      /* number of contours in glyph        */
-  short       n_points;        /* number of points in the glyph      */
-
-  FT_Vector*  points;          /* the outline's points               */
-  char*       tags;            /* the points flags                   */
-  short*      contours;        /* the contour end points             */
-
-  int         flags;           /* outline masks                      */
-
-} FT_Outline;
+  signed long x;
+  signed long y;
+} point_t;
 
 
 #define FT_CURVE_TAG( flag )  ( flag & 3 )
@@ -79,7 +57,7 @@ static void qCurveToOne(NSBezierPath* path, NSPoint pt0, NSPoint pt1, NSPoint pt
 
 static void drawSegment(NSBezierPath* path,
                         int n_points,
-                        FT_Vector* points,
+                        point_t* points,
                         int seg_start,
                         int seg_end,
                         char curve_type,
@@ -139,7 +117,7 @@ static void drawSegment(NSBezierPath* path,
 
 static void drawContour(NSBezierPath* path,
                         short n_points,
-                        FT_Vector* points,
+                        point_t* points,
                         char* tags)
 {
     int i, first_oncurve = -1;
@@ -174,7 +152,7 @@ static void drawContour(NSBezierPath* path,
     }
 }
 
-void* makePathFromArrays(short n_contours, short n_points, FT_Vector* points, char* tags, short* contours)
+void* makePathFromArrays(short n_contours, short n_points, point_t* points, char* tags, short* contours)
 {
     int i, j, c_start = 0;
 
@@ -187,13 +165,4 @@ void* makePathFromArrays(short n_contours, short n_points, FT_Vector* points, ch
         c_start = c_end;
     }
     return path;
-}
-
-void* makePathFromOutline(FT_Outline* outline)
-{
-    return makePathFromArrays(outline->n_contours,
-                              outline->n_points,
-                              outline->points,
-                              outline->tags,
-                              outline->contours);
 }

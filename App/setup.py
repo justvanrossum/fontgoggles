@@ -75,7 +75,6 @@ try:
             plist=infoplist,
             packages=[
                 "fontgoggles",
-                "freetype",
                 "pkg_resources",
             ],
             excludes=[
