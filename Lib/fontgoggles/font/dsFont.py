@@ -10,6 +10,7 @@ import tempfile
 from types import SimpleNamespace
 import numpy
 from fontTools.pens.basePen import BasePen
+from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.pens.pointPen import PointToSegmentPen
 from fontTools.designspaceLib import DesignSpaceDocument
 from fontTools.ttLib import TTFont
@@ -22,7 +23,6 @@ from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerE
 from ..compile.dsCompiler import getTTPaths
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
-from ..mac.makePathFromOutline import makePathFromArrays
 
 
 class DesignSpaceSourceError(CompilerError):
@@ -441,7 +441,9 @@ class VarGlyph:
         return self.getPoints()[-2]
 
     def getOutline(self):
-        return makePathFromArrays(self.getPoints(), self.tags, self.contours)
+        pen = CocoaPen(None)
+        self.draw(pen)
+        return pen.path
 
     def draw(self, pen):
         ppen = PointToSegmentPen(pen)
