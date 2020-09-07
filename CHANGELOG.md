@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.1.17] - 2020-09-07
+
+- Updated HarfBuzz to 2.7.2
+- Updated internal dependencies
+
 ## [1.1.16] - 2020-06-23
 
 - Show tooltip when feature description gets truncated.
