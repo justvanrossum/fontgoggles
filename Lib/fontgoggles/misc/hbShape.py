@@ -87,6 +87,7 @@ class HBShape:
             ttFont = TTFont(f, fontNumber=self._fontNumber, lazy=True)
         self._ttFont = ttFont
         self.glyphOrder = ttFont.getGlyphOrder()
+        self.glyphMap = ttFont.getReverseGlyphMap()
 
         if getGlyphNameFromCodePoint is None and getHorizontalAdvance is not None:
             def _getGlyphNameFromCodePoint(cmap, codePoint):
@@ -161,7 +162,6 @@ class HBShape:
             varLocation = {}
 
         self.font.scale = (self.face.upem, self.face.upem)
-        self.font.set_variations(varLocation)
 
         hb.ot_font_set_funcs(self.font)
 
