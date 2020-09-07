@@ -1,18 +1,15 @@
 import ctypes
 import pathlib
 
-import freetype
-try:
-    import numpy
-except ImportError:
-    # It's ok to not have numpy if makePathFromArrays() is not used.
-    numpy = None
 import objc
 import Foundation
 
 
-FT_Vector_p = ctypes.POINTER(freetype.ft_structs.FT_Vector)
-FT_Outline_p = ctypes.POINTER(freetype.ft_structs.FT_Outline)
+class FT_Vector(ctypes.Structure):
+    _fields_ = [('x', ctypes.c_long),
+                ('y', ctypes.c_long)]
+
+FT_Vector_p = ctypes.POINTER(FT_Vector)
 c_char_p = ctypes.POINTER(ctypes.c_char)
 c_short_p = ctypes.POINTER(ctypes.c_short)
 
@@ -28,10 +25,6 @@ if not _libPath.exists():
 
 _lib = ctypes.cdll.LoadLibrary(_libPath)
 
-_makePathFromOutline = _lib.makePathFromOutline
-_makePathFromOutline.argtypes = [FT_Outline_p]
-_makePathFromOutline.restype = ctypes.c_void_p
-
 _makePathFromArrays = _lib.makePathFromArrays
 _makePathFromArrays.argtypes = [ctypes.c_short,
                                 ctypes.c_short,
@@ -41,17 +34,9 @@ _makePathFromArrays.argtypes = [ctypes.c_short,
 _makePathFromArrays.restype = ctypes.c_void_p
 
 
-def makePathFromOutline(outline):
-    path = objc.objc_object(c_void_p=_makePathFromOutline(outline))
-    # Not sure why, but the path object comes back with a retain count too many.
-    # In _makePathFromOutline(), we do [[NSBezierPath alloc] init], so that's one.
-    # We pretty much take over that reference, but I think objc.objc_object()
-    # assumes it needs to own it, too.
-    path.release()
-    return path
-
-
 def makePathFromArrays(points, tags, contours):
+    import numpy
+
     n_contours = len(contours)
     n_points = len(tags)
     assert len(points) >= n_points
@@ -68,6 +53,9 @@ def makePathFromArrays(points, tags, contours):
             points.ctypes.data_as(FT_Vector_p),
             tags.ctypes.data_as(c_char_p),
             contours.ctypes.data_as(c_short_p)))
-    # See comment in makePathFromOutline()
+    # Not sure why, but the path object comes back with a retain count too many.
+    # In _makePathFromArrays(), we do [[NSBezierPath alloc] init], so that's one.
+    # We pretty much take over that reference, but I think objc.objc_object()
+    # assumes it needs to own it, too.
     path.release()
     return path

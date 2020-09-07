@@ -2,10 +2,6 @@
 #import <Cocoa/Cocoa.h>
 
 
-/* I'm lazy, I don't want to deal with requiring the freetype C header
-   files to be present, so I'll just copy what I need. */
-
-
 typedef signed long  FT_Pos;
 
 
@@ -15,20 +11,6 @@ typedef struct  FT_Vector_
   FT_Pos  y;
 
 } FT_Vector;
-
-
-typedef struct  FT_Outline_
-{
-  short       n_contours;      /* number of contours in glyph        */
-  short       n_points;        /* number of points in the glyph      */
-
-  FT_Vector*  points;          /* the outline's points               */
-  char*       tags;            /* the points flags                   */
-  short*      contours;        /* the contour end points             */
-
-  int         flags;           /* outline masks                      */
-
-} FT_Outline;
 
 
 #define FT_CURVE_TAG( flag )  ( flag & 3 )
@@ -190,13 +172,4 @@ void* makePathFromArrays(short n_contours, short n_points, FT_Vector* points, ch
         c_start = c_end;
     }
     return path;
-}
-
-void* makePathFromOutline(FT_Outline* outline)
-{
-    return makePathFromArrays(outline->n_contours,
-                              outline->n_points,
-                              outline->points,
-                              outline->tags,
-                              outline->contours);
 }
