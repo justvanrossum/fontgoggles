@@ -1,15 +1,7 @@
 #!/usr/bin/env python
-from distutils.command.build import build as _build
 import re
 from setuptools import setup, find_packages
 import subprocess
-
-
-class build(_build):
-    def run(self):
-        # Build our C library
-        subprocess.check_call(['./Turbo/build_lib.sh'])
-        _build.run(self)
 
 
 _versionRE = re.compile(r'__version__\s*=\s*\"([^\"]+)\"')
@@ -38,5 +30,4 @@ setup(
     python_requires=">=3.7",
     classifiers=[
     ],
-    cmdclass={'build': build},
 )

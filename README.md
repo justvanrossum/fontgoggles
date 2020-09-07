@@ -61,10 +61,7 @@ If you want to build and run the app from the source, follow these instructions.
 
 	```
 	$ pip install -e .
-	$ ./Turbo/build_lib.sh
 	```
-
-    (The latter step builds a required C library, that otherwise wouldn't get built in editable mode.)
 
 - Run some tests:
 
