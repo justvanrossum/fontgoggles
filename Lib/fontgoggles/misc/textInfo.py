@@ -22,7 +22,7 @@ class TextInfo:
     def text(self, text):
         self._text = text
         self._segments, self.baseLevel = textSegments(text)
-        self.reorderedSegments = self._getReorderedSegments()
+        self.reorderedSegments = self._getReorderedSegments(self._segments, self.baseLevel)
 
         toBiDi = {}
         fromBiDi = {}
@@ -50,18 +50,19 @@ class TextInfo:
         else:
             return [(self._text, None, None, 0)]
 
-    def _getReorderedSegments(self):
-        segments = []
-        isRTL = self.baseLevel % 2
-        for value, sub in itertools.groupby(self._segments, key=lambda item: item[2] % 2):
+    @staticmethod
+    def _getReorderedSegments(segments, baseLevel):
+        reorderedSegments = []
+        isRTL = baseLevel % 2
+        for value, sub in itertools.groupby(segments, key=lambda item: item[2] % 2):
             if isRTL == value:
-                segments.extend(sub)
+                reorderedSegments.extend(sub)
             else:
-                segments.extend(reversed(list(sub)))
+                reorderedSegments.extend(reversed(list(sub)))
         if isRTL:
-            segments = list(reversed(segments))
-        assert len(segments) == len(self._segments)
-        return segments
+            reorderedSegments = list(reversed(reorderedSegments))
+        assert len(reorderedSegments) == len(segments)
+        return reorderedSegments
 
     def mapToBiDi(self, charIndices):
         toBiDi = self._toBiDi
