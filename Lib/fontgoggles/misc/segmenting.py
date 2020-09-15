@@ -8,11 +8,13 @@ import bidi.algorithm
 bidi.algorithm.bidirectional = unicodedata2.bidirectional
 bidi.algorithm.category = unicodedata2.category
 bidi.algorithm.mirrored = unicodedata2.mirrored
-from bidi.algorithm import (get_empty_storage, get_base_level, get_embedding_levels,
-                            explicit_embed_and_overrides, resolve_weak_types,
-                            resolve_neutral_types, resolve_implicit_levels,
-                            reorder_resolved_levels, PARAGRAPH_LEVELS)
-from bidi.mirror import MIRRORED
+from bidi.algorithm import (  # noqa: ignore E402
+    get_empty_storage, get_base_level, get_embedding_levels,
+    explicit_embed_and_overrides, resolve_weak_types,
+    resolve_neutral_types, resolve_implicit_levels,
+    reorder_resolved_levels, PARAGRAPH_LEVELS,
+)
+from bidi.mirror import MIRRORED  # noqa: ignore E402
 
 
 UNKNOWN_SCRIPT = {"Zinh", "Zyyy", "Zxxx"}
