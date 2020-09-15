@@ -1,5 +1,4 @@
-import itertools
-from .segmenting import textSegments
+from .segmenting import textSegments, reorderedSegments
 
 
 alignments = dict(LTR="left", RTL="right", TTB="top", BTT="bottom")
@@ -22,7 +21,7 @@ class TextInfo:
     def text(self, text):
         self._text = text
         self._segments, self.baseLevel = textSegments(text)
-        self.reorderedSegments = self._getReorderedSegments(self._segments, self.baseLevel)
+        self.reorderedSegments = reorderedSegments(self._segments, self.baseLevel)
 
         toBiDi = {}
         fromBiDi = {}
@@ -49,20 +48,6 @@ class TextInfo:
             return self.reorderedSegments
         else:
             return [(self._text, None, None, 0)]
-
-    @staticmethod
-    def _getReorderedSegments(segments, baseLevel):
-        reorderedSegments = []
-        isRTL = baseLevel % 2
-        for value, sub in itertools.groupby(segments, key=lambda item: item[2] % 2):
-            if isRTL == value:
-                reorderedSegments.extend(sub)
-            else:
-                reorderedSegments.extend(reversed(list(sub)))
-        if isRTL:
-            reorderedSegments = list(reversed(reorderedSegments))
-        assert len(reorderedSegments) == len(segments)
-        return reorderedSegments
 
     def mapToBiDi(self, charIndices):
         toBiDi = self._toBiDi
