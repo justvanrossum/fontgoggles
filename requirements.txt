@@ -9,6 +9,6 @@ freetype-py==2.2.0
 uharfbuzz==0.13.2
 python-bidi==0.4.2
 git+git://github.com/justvanrossum/jundo.git
-ufo2ft==2.15.0
+ufo2ft==2.16.0
 numpy==1.19.2
 unicodedata2==13.0.0.post2
