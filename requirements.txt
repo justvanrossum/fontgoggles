@@ -1,6 +1,6 @@
 setuptools>=42.0.2
 wheel>=0.33.6
-py2app==0.19  # pyup: ignore  # keep at 0.19 until ronaldoussoren/py2app#281 is fixed
+py2app==0.23
 pyobjc==7.0.1
 corefoundationasyncio==0.0.1
 git+https://github.com/robotools/vanilla
