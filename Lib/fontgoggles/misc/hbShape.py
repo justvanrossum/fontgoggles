@@ -163,8 +163,6 @@ class HBShape:
         self.font.scale = (self.face.upem, self.face.upem)
         self.font.set_variations(varLocation)
 
-        hb.ot_font_set_funcs(self.font)
-
         if self._funcs is not None:
             self.font.funcs = self._funcs
 
