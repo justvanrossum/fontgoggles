@@ -160,7 +160,6 @@ class HBShape:
         if varLocation is None:
             varLocation = {}
 
-        self.font.scale = (self.face.upem, self.face.upem)
         self.font.set_variations(varLocation)
 
         if self._funcs is not None:
