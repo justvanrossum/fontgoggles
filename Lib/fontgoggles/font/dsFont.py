@@ -324,7 +324,7 @@ coordinateType = numpy.float
 def interpolateFromDeltas(model, varLocation, deltas):
     # This is a numpy-specific reimplementation of model.interpolateFromDeltas()
     # that avoids allocation of in-between results.
-    # However, so far this is achieving the speedup I had hoped...
+    # However, so far this is not achieving the speedup I had hoped...
     # Perhaps there'll be a better improvement if there are many deltas
     # and/or if the outlines are more complex.
     deltas = deltas
