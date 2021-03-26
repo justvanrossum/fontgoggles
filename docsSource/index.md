@@ -13,6 +13,8 @@ The main focus is text behavior, specifically text shaping and variation behavio
 
 You can download [the latest release here](https://github.com/justvanrossum/fontgoggles/releases/latest).
 
+Homebrew users can install the `fontgoggles` cask with the command `brew install --cask fontgoggles`.
+
 The following font formats are supported:
 
 - .ttf/.otf (including variable fonts and COLR/CPAL-based color fonts)
