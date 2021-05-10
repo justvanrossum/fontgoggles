@@ -1,7 +1,7 @@
 setuptools>=42.0.2
 wheel>=0.33.6
 py2app==0.24
-pyobjc==7.1
+pyobjc==7.2
 corefoundationasyncio==0.0.1
 git+https://github.com/robotools/vanilla
 fonttools[unicode,ufo,lxml,type1,woff]==4.22.1
