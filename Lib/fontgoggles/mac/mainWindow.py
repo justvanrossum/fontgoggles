@@ -92,7 +92,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         characterListSize = self.project.uiSettings.characterListSize
         paneDescriptors = [
             dict(view=characterListGroup, identifier="characterList", canCollapse=True,
-                 size=characterListSize, minSize=95, resizeFlexibility=False),
+                 size=characterListSize, minSize=98, resizeFlexibility=False),
             dict(view=subSplitView, identifier="subSplit", canCollapse=False),
             dict(view=sidebarGroup, identifier="formattingOptions", canCollapse=True,
                  size=sidebarWidth, minSize=sidebarWidth, maxSize=sidebarWidth,
@@ -176,7 +176,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group = Group((0, 0, 0, 0))
         columnDescriptions = [
             dict(title="char", width=30, typingSensitive=True, cell=makeTextCell("center")),
-            dict(title="unicode", width=60, cell=makeTextCell("right")),
+            dict(title="unicode", width=63, cell=makeTextCell("right")),
             dict(title="unicode name", width=200, minWidth=200, maxWidth=400, key="unicodeName",
                  cell=makeTextCell("left", "truncmiddle")),
             dict(title="script", width=50),

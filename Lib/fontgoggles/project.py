@@ -216,7 +216,7 @@ class UISettings:
     fontListItemSize: float = 150
     fontListShowFontFileName: bool = True
     characterListVisible: bool = True
-    characterListSize: float = 95
+    characterListSize: float = 98
     glyphListVisible: bool = True
     glyphListSize: float = 226
     compileOutputVisible: bool = False
