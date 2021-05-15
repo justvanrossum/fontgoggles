@@ -29,7 +29,7 @@ class UnicodePicker(AppKit.NSWindowController):
         columnDescriptions = [
             dict(title="char", width=40,
                  cell=makeTextCell(align="center", font=AppKit.NSFont.systemFontOfSize_(14))),
-            dict(title="unicode", width=60, cell=makeTextCell(align="right")),
+            dict(title="unicode", width=63, cell=makeTextCell(align="right")),
             dict(title="name"),
         ]
         self.w.unicodeList = List((0, y, 0, -100), [], columnDescriptions=columnDescriptions,
