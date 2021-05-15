@@ -1,7 +1,7 @@
 import pathlib
 import shutil
 from fontTools.pens.recordingPen import RecordingPointPen
-from fontTools.ufoLib import UFOReader, UFOReaderWriter
+from fontTools.ufoLib import UFOReaderWriter
 from fontTools.ufoLib.glifLib import Glyph
 from fontgoggles.font.ufoFont import UFOState
 from fontgoggles.compile.ufoCompiler import fetchCharacterMappingAndAnchors
