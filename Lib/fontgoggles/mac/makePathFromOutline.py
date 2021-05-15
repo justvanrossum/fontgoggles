@@ -56,9 +56,9 @@ def makePathFromArrays(points, tags, contours):
     n_points = len(tags)
     assert len(points) >= n_points
     assert points.shape[1:] == (2,)
-    if points.dtype != numpy.long:
+    if points.dtype != numpy.int64:
         points = numpy.floor(points + [0.5, 0.5])
-        points = points.astype(numpy.long)
+        points = points.astype(numpy.int64)
     assert tags.dtype == numpy.byte
     assert contours.dtype == numpy.short
     path = objc.objc_object(

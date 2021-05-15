@@ -73,3 +73,13 @@ async def test_DSFont():
     assert run[0].ay == -900
     assert run[0].dx == -370
     assert run[0].dy == -700
+
+
+@pytest.mark.asyncio
+async def test_DSFont_getOutline():
+    ufoPath = getFontPath("MutatorSans.designspace")
+    font = DSFont(ufoPath, 0)
+    await font.load(sys.stderr.write)
+    drawing, *_ = font.getGlyphDrawings(["A"])
+    path, _ = drawing.layers[0]
+    assert ((20, 0), (356, 700)) == path.bounds()

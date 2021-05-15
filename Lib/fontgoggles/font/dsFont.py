@@ -299,6 +299,7 @@ class DSFont(BaseFont):
             varGlyph = self._getVarGlyph(glyphName)
             return GlyphDrawing([(varGlyph.getOutline(), None)])
         except Exception as e:
+            raise
             print(f"Can't get outline for '{glyphName}': {e!r}", file=sys.stderr)
             return GlyphDrawing([])
 
@@ -318,7 +319,7 @@ FT_CURVE_TAG_CONIC = 0
 FT_CURVE_TAG_CUBIC = 2
 
 segmentTypes = {FT_CURVE_TAG_ON: "line", FT_CURVE_TAG_CONIC: "qcurve", FT_CURVE_TAG_CUBIC: "curve"}
-coordinateType = numpy.float
+coordinateType = float
 
 
 def interpolateFromDeltas(model, varLocation, deltas):
