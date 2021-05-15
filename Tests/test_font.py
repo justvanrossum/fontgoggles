@@ -179,6 +179,15 @@ openFontsTestData = [
          'MiniMutatorSansBoldWide.ufo'],
         {'wdth': 400},
         "TABC", ["T", "A", "B", "C"], [692, 850, 822, 932], None),
+    ('MutatorSansBoldWideMutated.ufoz',
+        {'familyName': 'MutatorMathTest', 'italicAngle': 0, 'styleName': 'BoldWide', 'suffix': 'ufoz'},
+        {'calt', 'ss01'},
+        {'kern', 'mark'},
+        {'DFLT': set()},
+        {},
+        ['features_test.fea', 'features_test_nested.fea'],
+        {},
+        "A", ["A"], [1290], None),
 ]
 
 @pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,ext,location,text,glyphNames,ax,script",

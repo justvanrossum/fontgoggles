@@ -50,11 +50,11 @@ class UFOFont(BaseFont):
         self.reader.readInfo(self.info)
         self.lib = self.reader.readLib()
         self._cachedGlyphs = {}
-        if self.ufoState is None:
-            includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
+        self.includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
+        if self.ufoState is None and self.reader.fileStructure == UFOFileStructure.PACKAGE:
             self.ufoState = UFOState(self.reader, self.glyphSet,
                                      getUnicodesAndAnchors=self._getUnicodesAndAnchors,
-                                     includedFeatureFiles=includedFeatureFiles)
+                                     includedFeatureFiles=self.includedFeatureFiles)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
@@ -68,7 +68,7 @@ class UFOFont(BaseFont):
         self._setupReaderAndGlyphSet()
 
     def getExternalFiles(self):
-        return self.ufoState.includedFeatureFiles
+        return self.includedFeatureFiles
 
     def canReloadWithChange(self, externalFilePath):
         if self.reader.fileStructure != UFOFileStructure.PACKAGE:
