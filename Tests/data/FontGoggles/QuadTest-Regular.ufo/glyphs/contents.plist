@@ -6,6 +6,8 @@
     <string>_notdef.glif</string>
     <key>a</key>
     <string>a.glif</string>
+    <key>b</key>
+    <string>b.glif</string>
     <key>space</key>
     <string>space.glif</string>
   </dict>
