@@ -20,6 +20,8 @@ def test_ufoCharacterMapping():
         "A": [("top", 645, 815)],
         "E": [("top", 582.5, 815)],
         "macroncmb": [("_top", 0, 815)],
+        "asteriskabovecmb": [("_top", 153, 808)],
+        "asteriskbelowcmb": [("_top", 153, 808)],
     }
 
 
