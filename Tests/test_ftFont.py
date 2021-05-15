@@ -51,4 +51,4 @@ def test_getOutlinePath_singleOffCurve():
 
     for glyphName in ["b"]:
         p = ftf.getOutlinePath(glyphName)
-        assert ((0, 50), (0, 0)) == p.bounds()
+        assert p.elementCount() == 0
