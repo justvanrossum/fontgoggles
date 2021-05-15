@@ -110,11 +110,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.w.mainSplitView = mainSplitView
         self.w.open()
-        
+
         # this removes a one pixel border at the top of the list view headers
         _tweakFrameHeight(self.glyphList._nsObject)
         _tweakFrameHeight(self.characterList._nsObject)
-        
+
         self.w._window.setWindowController_(self)
         self.w._window.makeFirstResponder_(fontListGroup.textEntry.nsTextView)
         self.setWindow_(self.w._window)
