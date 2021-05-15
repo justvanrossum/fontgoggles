@@ -44,3 +44,11 @@ def test_getOutlinePath():
         pen = CocoaPen(ttfGlyphSet)
         ttfGlyphSet[glyphName].draw(pen)
         assert _comparePaths(p, pen.path)
+
+
+def test_getOutlinePath_singleOffCurve():
+    ftf, ttfGlyphSet = _getFonts("QuadTest-Regular.ttf")
+
+    for glyphName in ["b"]:
+        p = ftf.getOutlinePath(glyphName)
+        assert p.elementCount() == 0

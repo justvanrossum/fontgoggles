@@ -228,6 +228,7 @@ def test_iterFontPathsAndNumbers():
     expectedResults = [
         ('IBMPlexSans-Regular.ttx', 0),
         ('MutatorSans.designspace', 0),
+        ('QuadTest-Regular.ttx', 0),
         ('IBMPlexSans-Regular.otf', 0),
         ('MutatorSans.ttc', 0),
         ('MutatorSans.ttc', 1),
