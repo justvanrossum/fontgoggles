@@ -50,11 +50,11 @@ class UFOFont(BaseFont):
         self.reader.readInfo(self.info)
         self.lib = self.reader.readLib()
         self._cachedGlyphs = {}
-        self.includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
-        if self.ufoState is None and self.reader.fileStructure == UFOFileStructure.PACKAGE:
+        if self.ufoState is None:
+            includedFeatureFiles = extractIncludedFeatureFiles(self.fontPath, self.reader)
             self.ufoState = UFOState(self.reader, self.glyphSet,
                                      getUnicodesAndAnchors=self._getUnicodesAndAnchors,
-                                     includedFeatureFiles=self.includedFeatureFiles)
+                                     includedFeatureFiles=includedFeatureFiles)
 
         fontData = await compileUFOToBytes(self.fontPath, outputWriter)
 
@@ -68,7 +68,7 @@ class UFOFont(BaseFont):
         self._setupReaderAndGlyphSet()
 
     def getExternalFiles(self):
-        return self.includedFeatureFiles
+        return self.ufoState.includedFeatureFiles
 
     def canReloadWithChange(self, externalFilePath):
         if self.reader.fileStructure != UFOFileStructure.PACKAGE:
@@ -355,8 +355,13 @@ class UFOState:
         self._anchors = anchors
         self._unicodes = unicodes
         self._getUnicodesAndAnchors = getUnicodesAndAnchors
-        self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
-        self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
+        if reader.fileStructure == UFOFileStructure.PACKAGE:
+            self.glyphModTimes, self.contentsModTime = getGlyphModTimes(glyphSet)
+            self.fileModTimes = getFileModTimes(reader.fs.getsyspath("/"), ufoFilesToTrack)
+        else:
+            self.glyphModTimes = set()
+            self.contentsModTime = None
+            self.fileModTimes = set()
         self.includedFeatureFiles = includedFeatureFiles
         self._previousState = previousState
 
