@@ -77,6 +77,7 @@ try:
                 "fontgoggles",
                 "freetype",
                 "pkg_resources",
+                "numpy",
             ],
             excludes=[
                 "cffsubr",
