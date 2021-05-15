@@ -1,8 +1,11 @@
 # Changelog for FontGoggles
 
-## [1.1.19] - 2021-05-15
+## [1.1.20] - 2021-05-15
 
-- Fix too-narrow Unicode column in character pane and Unicode Picker
+- Fixed non-crashing crash on TTF with single off-curve point
+  ([Issue 156](https://github.com/justvanrossum/fontgoggles/issues/156),
+  [PR 166](https://github.com/justvanrossum/fontgoggles/pull/166))
+- Fixed too-narrow Unicode column in character pane and Unicode Picker
   ([Issue 165](https://github.com/justvanrossum/fontgoggles/issues/165))
 
 ## [1.1.18] - 2021-05-15
