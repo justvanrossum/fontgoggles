@@ -186,6 +186,8 @@ class MinimalFontObject:
         self.groups = reader.readGroups()
         self.kerning = reader.readKerning()
         self.lib = reader.readLib()
+        self.info = SimpleNamespace()
+        reader.readInfo(self.info)
         self._glyphs = {}
 
     def keys(self):
