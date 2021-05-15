@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.1.19] - 2021-05-15
+
+- Fix too-narrow Unicode column in character pane and Unicode Picker
+  ([Issue 165](https://github.com/justvanrossum/fontgoggles/issues/165))
+
 ## [1.1.18] - 2021-05-15
 
 - Fixed an AttributeError during mark feature compilation
