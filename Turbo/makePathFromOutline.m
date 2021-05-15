@@ -153,8 +153,11 @@ static void drawContour(NSBezierPath* path,
         }
     }
     if (first_oncurve == -1) {
-        // There are no on-curve points, this is a quad blob
-        drawSegment(path, n_points, points, 0, n_points, curve_type, 1, 0);
+        // There are no on-curve points, this is a quad blob,
+        // but we need at least two points for a blob to form
+        if (n_points > 1) {
+            drawSegment(path, n_points, points, 0, n_points, curve_type, 1, 0);
+        }
     } else {
         [path moveToPoint:NSMakePoint(points[first_oncurve].x, points[first_oncurve].y)];
         seg_start = first_oncurve;
