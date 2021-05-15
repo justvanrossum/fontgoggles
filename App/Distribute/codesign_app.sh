@@ -13,7 +13,8 @@ find "$APP_PATH" -iname '*.so' -or -iname '*.dylib' |
                    --entitlements "$ENTITLEMENTS" \
                    --deep "${libfile}" \
                    --force \
-                   --options runtime;
+                   --options runtime \
+                   --timestamp;
     done;
 
 # Codesign the app
@@ -21,4 +22,5 @@ codesign --sign "$DEV_ID" \
          --entitlements "$ENTITLEMENTS" \
          --deep "$APP_PATH" \
          --force \
-         --options runtime;
+         --options runtime \
+         --timestamp;

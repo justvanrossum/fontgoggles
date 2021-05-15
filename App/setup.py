@@ -79,6 +79,7 @@ try:
                 "pkg_resources",
             ],
             excludes=[
+                "cffsubr",
                 "scipy",
                 "matplotlib",
                 "PIL",
