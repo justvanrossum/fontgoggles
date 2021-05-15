@@ -1,5 +1,12 @@
 # Changelog for FontGoggles
 
+## [1.1.18] - 2021-05-15
+
+- Fixed an AttributeError during mark feature compilation
+  ([PR 164](https://github.com/justvanrossum/fontgoggles/pull/164))
+- Updated HarfBuzz to 2.8.1
+- Updated internal dependencies
+
 ## [1.1.17] - 2020-09-07
 
 - Updated HarfBuzz to 2.7.2
