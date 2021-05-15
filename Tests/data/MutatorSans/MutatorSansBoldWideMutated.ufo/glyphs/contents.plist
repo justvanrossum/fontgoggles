@@ -76,6 +76,10 @@
     <string>arrowright.glif</string>
     <key>arrowup</key>
     <string>arrowup.glif</string>
+    <key>asteriskabovecmb</key>
+    <string>asteriskabovecmb.glif</string>
+    <key>asteriskbelowcmb</key>
+    <string>asteriskbelowcmb.glif</string>
     <key>colon</key>
     <string>colon.glif</string>
     <key>comma</key>

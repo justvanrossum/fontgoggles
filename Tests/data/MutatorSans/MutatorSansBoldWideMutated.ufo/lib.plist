@@ -100,6 +100,8 @@
     <string>curve</string>
     <key>com.typemytype.robofont.shouldAddPointsInSplineConversion</key>
     <integer>1</integer>
+    <key>com.typemytype.robofont.smartSets.uniqueKey</key>
+    <string>4751298192</string>
     <key>com.typesupply.defcon.sortDescriptor</key>
     <array>
       <dict>
@@ -393,6 +395,8 @@
       <string>arrowup</string>
       <string>em</string>
       <string>macroncmb</string>
+      <string>asteriskbelowcmb</string>
+      <string>asteriskabovecmb</string>
     </array>
   </dict>
 </plist>
