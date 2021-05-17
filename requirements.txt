@@ -10,5 +10,5 @@ uharfbuzz==0.16.0
 python-bidi==0.4.2
 jundo==0.1.2
 ufo2ft==2.21.0
-numpy==1.20.2
+numpy==1.20.3
 unicodedata2==13.0.0.post2
