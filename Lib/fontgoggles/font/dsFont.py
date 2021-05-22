@@ -299,7 +299,6 @@ class DSFont(BaseFont):
             varGlyph = self._getVarGlyph(glyphName)
             return GlyphDrawing([(varGlyph.getOutline(), None)])
         except Exception as e:
-            raise
             print(f"Can't get outline for '{glyphName}': {e!r}", file=sys.stderr)
             return GlyphDrawing([])
 
