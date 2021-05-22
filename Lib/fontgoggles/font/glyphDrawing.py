@@ -8,9 +8,6 @@ class GlyphDrawing:
     def __init__(self, layers=None):
         self.layers = layers
 
-    def appendPath(self, path, colorID=None):
-        self.layers.append((path, colorID))
-
     @cachedProperty
     def bounds(self):
         bounds = None
