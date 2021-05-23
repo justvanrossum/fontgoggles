@@ -1,5 +1,12 @@
 # Changelog for FontGoggles
 
+## [1.1.21] - 2021-05-23
+
+- Fixed UFOZ support ([Issue 147](https://github.com/justvanrossum/fontgoggles/issues/147),
+  [PR 167](https://github.com/justvanrossum/fontgoggles/pull/167),
+  [PR 168](https://github.com/justvanrossum/fontgoggles/pull/168))
+- Fixed small bug with error handling when building outlines from .designspace files
+
 ## [1.1.20] - 2021-05-15
 
 - Fixed non-crashing crash on TTF with single off-curve point
