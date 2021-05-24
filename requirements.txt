@@ -4,7 +4,7 @@ py2app==0.24
 pyobjc==7.2
 corefoundationasyncio==0.0.1
 git+https://github.com/robotools/vanilla
-fonttools[woff,ufo,type1,unicode,lxml]==4.24.0
+fonttools[woff,ufo,type1,unicode,lxml]==4.24.3
 freetype-py==2.2.0
 uharfbuzz==0.16.0
 python-bidi==0.4.2
