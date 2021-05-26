@@ -81,5 +81,4 @@ async def test_DSFont_getOutline():
     font = DSFont(ufoPath, 0)
     await font.load(sys.stderr.write)
     drawing, *_ = font.getGlyphDrawings(["A"])
-    path, _ = drawing.layers[0]
-    assert ((20, 0), (356, 700)) == path.bounds()
+    assert ((20, 0), (356, 700)) == drawing.path.bounds()

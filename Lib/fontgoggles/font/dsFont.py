@@ -16,7 +16,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
 from .baseFont import BaseFont
-from .glyphDrawing import GlyphDrawing
+from .glyphDrawing import EmptyDrawing, GlyphDrawing
 from .ufoFont import Glyph, NotDefGlyph, UFOState, extractIncludedFeatureFiles
 from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
 from ..compile.dsCompiler import getTTPaths
@@ -297,10 +297,10 @@ class DSFont(BaseFont):
     def _getGlyphDrawing(self, glyphName, colorLayers):
         try:
             varGlyph = self._getVarGlyph(glyphName)
-            return GlyphDrawing([(varGlyph.getOutline(), None)])
+            return GlyphDrawing(varGlyph.getOutline())
         except Exception as e:
             print(f"Can't get outline for '{glyphName}': {e!r}", file=sys.stderr)
-            return GlyphDrawing([])
+            return EmptyDrawing()
 
     def _getUnicodesAndAnchors(self, sourcePath):
         f = io.BytesIO(self._sourceFontData[sourcePath])
