@@ -544,6 +544,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                    allStylisticSetNames)
         sliderInfo = {}
         for tag, axis in allAxes.items():
+            if axis["hidden"]:
+                continue
             name = sorted(axis['name'])[0]
             label = f"{name} ({tag})"
             if len(axis['name']) > 1:
