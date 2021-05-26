@@ -11,9 +11,8 @@ from ..misc.properties import cachedProperty
 class _OTFBaseFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
-        if colorLayers and "COLR" in self.ttFont:
-            colorLayers = self.ttFont["COLR"].ColorLayers
-            layers = colorLayers.get(glyphName)
+        if colorLayers and self.colorLayers is not None:
+            layers = self.colorLayers.get(glyphName)
             if layers is not None:
                 drawingLayers = [(self.ftFont.getOutlinePath(layer.name), layer.colorID)
                                  for layer in layers]
@@ -23,6 +22,13 @@ class _OTFBaseFont(BaseFont):
 
     def varLocationChanged(self, varLocation):
         self.ftFont.setVarLocation(varLocation if varLocation else {})
+
+    @cachedProperty
+    def colorLayers(self):
+        colrTable = self.ttFont.get("COLR")
+        if colrTable is not None and colrTable.version == 0:
+            return colrTable.ColorLayers
+        return None
 
     @cachedProperty
     def colorPalettes(self):
