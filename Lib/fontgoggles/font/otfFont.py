@@ -32,9 +32,10 @@ class _OTFBaseFont(BaseFont):
 
     @cachedProperty
     def colorPalettes(self):
-        if "CPAL" in self.ttFont:
+        cpalTable = self.ttFont.get("CPAL")
+        if cpalTable is not None:
             palettes = []
-            for paletteRaw in self.ttFont["CPAL"].palettes:
+            for paletteRaw in cpalTable.palettes:
                 palette = [(color.red/255, color.green/255, color.blue/255, color.alpha/255)
                            for color in paletteRaw]
                 palettes.append(palette)
