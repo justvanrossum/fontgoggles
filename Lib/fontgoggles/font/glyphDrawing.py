@@ -75,8 +75,14 @@ class GlyphCOLRv1Drawing:
     def draw(self, colorPalette, defaultColor):
         from blackrenderer.backends.coregraphics import CoreGraphicsCanvas
 
+        palette = [
+            colorPalette[index].getRed_green_blue_alpha_(None, None, None, None)
+            for index in range(len(colorPalette))
+        ]
+
         cgContext = NSGraphicsContext.currentContext().CGContext()
-        self.colorFont.drawGlyph(self.glyphName, CoreGraphicsCanvas(cgContext))
+        with self.colorFont.pushPalette(palette):
+            self.colorFont.drawGlyph(self.glyphName, CoreGraphicsCanvas(cgContext))
 
     def pointInside(self, pt):
         return False  # TODO: implement
