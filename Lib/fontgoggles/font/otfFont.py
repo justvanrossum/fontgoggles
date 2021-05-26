@@ -52,7 +52,7 @@ class _OTFBaseFont(BaseFont):
     @cachedProperty
     def colorFont(self):
         colrTable = self.ttFont.get("COLR")
-        if colrTable.version == 1:
+        if colrTable is not None and colrTable.version == 1:
             from blackrenderer.font import BlackRendererFont
 
             return BlackRendererFont(self.fontPath, fontNumber=self.fontNumber)
