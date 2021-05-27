@@ -81,8 +81,11 @@ class GlyphCOLRv1Drawing:
         ]
 
         cgContext = NSGraphicsContext.currentContext().CGContext()
-        with self.colorFont.pushPalette(palette):
-            self.colorFont.drawGlyph(self.glyphName, CoreGraphicsCanvas(cgContext))
+        self.colorFont.drawGlyph(
+            self.glyphName,
+            CoreGraphicsCanvas(cgContext),
+            palette=palette,
+        )
 
     def pointInside(self, pt):
         return False  # TODO: implement
