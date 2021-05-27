@@ -1,6 +1,6 @@
-from AppKit import NSGraphicsContext, NSColorSpace
+from AppKit import NSGraphicsContext
 from fontTools.misc.arrayTools import unionRect
-from ..mac.drawing import rectFromNSRect
+from ..mac.drawing import rectFromNSRect, nsColorFromRGBA
 from ..misc.properties import cachedProperty
 
 
@@ -28,7 +28,7 @@ class GlyphDrawing:
         return bounds
 
     def draw(self, colorPalette, defaultColor):
-        defaultColor.set()
+        nsColorFromRGBA(defaultColor).set()
         self.path.fill()
 
     def pointInside(self, pt):
@@ -60,7 +60,7 @@ class GlyphLayersDrawing:
                 if colorID < len(colorPalette) else
                 defaultColor
             )
-            color.set()
+            nsColorFromRGBA(color).set()
             path.fill()
 
     def pointInside(self, pt):
@@ -79,18 +79,12 @@ class GlyphCOLRv1Drawing:
     def draw(self, colorPalette, defaultColor):
         from blackrenderer.backends.coregraphics import CoreGraphicsCanvas
 
-        palette = [
-            colorPalette[index].getRed_green_blue_alpha_(None, None, None, None)
-            for index in range(len(colorPalette))
-        ]
-        textColor = defaultColor.colorUsingColorSpace_(NSColorSpace.genericRGBColorSpace()).getRed_green_blue_alpha_(None, None, None, None)
-
         cgContext = NSGraphicsContext.currentContext().CGContext()
         self.colorFont.drawGlyph(
             self.glyphName,
             CoreGraphicsCanvas(cgContext),
-            palette=palette,
-            textColor=textColor,
+            palette=colorPalette,
+            textColor=defaultColor,
         )
 
     def pointInside(self, pt):
