@@ -1,4 +1,4 @@
-from AppKit import NSGraphicsContext
+from AppKit import NSGraphicsContext, NSColorSpace
 from fontTools.misc.arrayTools import unionRect
 from ..mac.drawing import rectFromNSRect
 from ..misc.properties import cachedProperty
@@ -79,12 +79,14 @@ class GlyphCOLRv1Drawing:
             colorPalette[index].getRed_green_blue_alpha_(None, None, None, None)
             for index in range(len(colorPalette))
         ]
+        textColor = defaultColor.colorUsingColorSpace_(NSColorSpace.genericRGBColorSpace()).getRed_green_blue_alpha_(None, None, None, None)
 
         cgContext = NSGraphicsContext.currentContext().CGContext()
         self.colorFont.drawGlyph(
             self.glyphName,
             CoreGraphicsCanvas(cgContext),
             palette=palette,
+            textColor=textColor,
         )
 
     def pointInside(self, pt):
