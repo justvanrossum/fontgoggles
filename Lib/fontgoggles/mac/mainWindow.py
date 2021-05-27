@@ -544,8 +544,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                    allStylisticSetNames)
         sliderInfo = {}
         for tag, axis in allAxes.items():
-            if axis["hidden"]:
-                continue
+            # TODO: this should be switchable:
+            # https://github.com/justvanrossum/fontgoggles/commit/b6876054d9fb6706059cb417a13c01c4ce3b1e66#commitcomment-51358756
+            # if axis["hidden"]:
+            #     continue
             name = sorted(axis['name'])[0]
             label = f"{name} ({tag})"
             if len(axis['name']) > 1:
