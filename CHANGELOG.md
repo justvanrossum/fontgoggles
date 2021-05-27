@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.2.0] - 2021-05-??
+
+- Added support for [COLRv1 fonts](https://github.com/googlefonts/colr-gradients-spec/) ([Issue 162](https://github.com/justvanrossum/fontgoggles/issues/162), [PR 171](https://github.com/justvanrossum/fontgoggles/pull/171))
+
 ## [1.1.21] - 2021-05-23
 
 - Fixed UFOZ support ([Issue 147](https://github.com/justvanrossum/fontgoggles/issues/147),
