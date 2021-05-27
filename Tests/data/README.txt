@@ -17,3 +17,6 @@ Noto:
 
 QuadTest:
 - Belongs to FontGoggles
+
+GoogleColorTestFonts:
+- https://github.com/googlefonts/color-fonts
