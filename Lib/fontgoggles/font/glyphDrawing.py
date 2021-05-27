@@ -55,7 +55,11 @@ class GlyphLayersDrawing:
 
     def draw(self, colorPalette, defaultColor):
         for path, colorID in self.layers:
-            color = colorPalette.get(colorID, defaultColor)
+            color = (
+                colorPalette[colorID]
+                if colorID < len(colorPalette) else
+                defaultColor
+            )
             color.set()
             path.fill()
 
