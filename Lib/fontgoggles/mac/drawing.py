@@ -42,6 +42,11 @@ def rgbColor(r, g, b, a=1.0):
     return AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(r, g, b, a)
 
 
+def rgbFromNSColor(color):
+    color = color.colorUsingColorSpace_(AppKit.NSColorSpace.genericRGBColorSpace())
+    return color.getRed_green_blue_alpha_(None, None, None, None)
+
+
 def grayColor(gray, a=1.0):
     return AppKit.NSColor.colorWithCalibratedWhite_alpha_(gray, a)
 
