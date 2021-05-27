@@ -1,5 +1,5 @@
 import pytest
-from AppKit import NSGraphicsContext, NSColor
+from AppKit import NSGraphicsContext
 from blackrenderer.backends.coregraphics import CoreGraphicsPixelSurface
 from fontgoggles.font import getOpener
 from fontgoggles.misc.textInfo import TextInfo
@@ -26,6 +26,6 @@ async def test_colrV1Font():
     savedContext = NSGraphicsContext.currentContext()
     try:
         NSGraphicsContext.setCurrentContext_(context)
-        glyphDrawing.draw(glyphs.colorPalette, NSColor.blackColor())
+        glyphDrawing.draw(glyphs.colorPalette, (0, 0, 0, 1))
     finally:
         NSGraphicsContext.setCurrentContext_(savedContext)
