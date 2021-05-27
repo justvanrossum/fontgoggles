@@ -1197,14 +1197,17 @@ class FGGlyphLineView(AppKit.NSView):
             return {}
         mainPalette = self._cachedColorPalettes.get(None)
         if mainPalette is None:
-            mainPalette = {}
-            for colorID, (r, g, b, a) in enumerate(self._glyphs.colorPalette):
-                mainPalette[colorID] = AppKit.NSColor.colorWithRed_green_blue_alpha_(r, g, b, a)
+            mainPalette = [
+                AppKit.NSColor.colorWithRed_green_blue_alpha_(r, g, b, a)
+                for r, g, b, a in self._glyphs.colorPalette
+            ]
             self._cachedColorPalettes[None] = mainPalette
         blendedPalette = self._cachedColorPalettes.get(blendColor)
         if blendedPalette is None:
-            blendedPalette = {colorID: color.blendedColorWithFraction_ofColor_(0.5, blendColor)
-                              for colorID, color in mainPalette.items()}
+            blendedPalette = [
+                color.blendedColorWithFraction_ofColor_(0.5, blendColor)
+                for color in mainPalette
+            ]
             self._cachedColorPalettes[blendColor] = blendedPalette
         return blendedPalette
 

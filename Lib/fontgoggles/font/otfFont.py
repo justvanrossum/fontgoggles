@@ -1,7 +1,7 @@
 import io
 from fontTools.ttLib import TTFont
 from .baseFont import BaseFont
-from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing
+from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing, GlyphCOLRv1Drawing
 from ..compile.compilerPool import compileTTXToBytes
 from ..misc.ftFont import FTFont
 from ..misc.hbShape import HBShape
@@ -11,17 +11,23 @@ from ..misc.properties import cachedProperty
 class _OTFBaseFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
-        if colorLayers and self.colorLayers is not None:
-            layers = self.colorLayers.get(glyphName)
-            if layers is not None:
-                drawingLayers = [(self.ftFont.getOutlinePath(layer.name), layer.colorID)
-                                 for layer in layers]
-                return GlyphLayersDrawing(drawingLayers)
+        if colorLayers:
+            if self.colorLayers is not None:
+                layers = self.colorLayers.get(glyphName)
+                if layers is not None:
+                    drawingLayers = [(self.ftFont.getOutlinePath(layer.name), layer.colorID)
+                                     for layer in layers]
+                    return GlyphLayersDrawing(drawingLayers)
+            elif self.colorFont is not None:
+                return GlyphCOLRv1Drawing(glyphName, self.colorFont)
+
         outline = self.ftFont.getOutlinePath(glyphName)
         return GlyphDrawing(outline)
 
     def varLocationChanged(self, varLocation):
         self.ftFont.setVarLocation(varLocation if varLocation else {})
+        if self.colorFont is not None:
+            self.colorFont.setLocation(varLocation)
 
     @cachedProperty
     def colorLayers(self):
@@ -42,6 +48,15 @@ class _OTFBaseFont(BaseFont):
             return palettes
         else:
             return None
+
+    @cachedProperty
+    def colorFont(self):
+        colrTable = self.ttFont.get("COLR")
+        if colrTable is not None and colrTable.version == 1:
+            from blackrenderer.font import BlackRendererFont
+
+            return BlackRendererFont(self.fontPath, fontNumber=self.fontNumber)
+        return None
 
 
 class OTFFont(_OTFBaseFont):
