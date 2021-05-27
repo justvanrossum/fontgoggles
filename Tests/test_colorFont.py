@@ -23,10 +23,9 @@ async def test_colrV1Font():
     h -= y
     surface = CoreGraphicsPixelSurface(x, y, w, h)
     context = NSGraphicsContext.graphicsContextWithCGContext_flipped_(surface.context, False)
-    palette = glyphDrawing.colorFont.palettes[0]
     savedContext = NSGraphicsContext.currentContext()
     try:
         NSGraphicsContext.setCurrentContext_(context)
-        glyphDrawing.draw(palette, NSColor.blackColor())
+        glyphDrawing.draw(glyphs.colorPalette, NSColor.blackColor())
     finally:
         NSGraphicsContext.setCurrentContext_(savedContext)
