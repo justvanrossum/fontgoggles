@@ -161,6 +161,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings.compileOutputSize = self.fontListSplitView.paneSize("compileOutput")
         uiSettings.formattingOptionsVisible = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
         uiSettings.feaVarTabSelection = feaVarTabValues[self.feaVarTabs.get()]
+        uiSettings.showHiddenAxes = self.variationsGroup.showHiddenAxes
 
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
@@ -287,7 +288,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                               borderType=AppKit.NSNoBorder)
 
         variationsTab = group.feaVarTabs[1]
-        self.variationsGroup = SliderGroup(sidebarWidth - 6, {}, callback=self.varLocationChanged)
+        self.variationsGroup = SliderGroup(sidebarWidth - 6, {}, callback=self.varLocationChanged,
+                                           showHiddenAxes=self.project.uiSettings.showHiddenAxes)
         variationsTab.main = AligningScrollView((0, 0, 0, 0), self.variationsGroup, drawBackground=False,
                                                 hasHorizontalScroller=False, autohidesScrollers=True,
                                                 borderType=AppKit.NSNoBorder)
