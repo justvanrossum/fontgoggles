@@ -1,5 +1,5 @@
 import asyncio
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 import contextlib
 import io
 import logging
@@ -58,6 +58,9 @@ alignmentValuesVertical = [None, "top", "bottom", "center"]
 
 feaVarTabLabels = ["Features", "Variations", "Options"]
 feaVarTabValues = [v.lower() for v in feaVarTabLabels]
+
+
+AxisSliderInfo = namedtuple("AxisSliderInfo", ["label", "minValue", "defaultValue", "maxValue", "hidden"])
 
 
 class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncrementer):
@@ -544,26 +547,28 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                    allStylisticSetNames)
         sliderInfo = {}
         for tag, axis in allAxes.items():
-            # TODO: this should be switchable:
-            # https://github.com/justvanrossum/fontgoggles/commit/b6876054d9fb6706059cb417a13c01c4ce3b1e66#commitcomment-51358756
-            # if axis["hidden"]:
-            #     continue
             name = sorted(axis['name'])[0]
-            label = f"{name} ({tag})"
+            if axis["hidden"]:
+                label = f"{name} ({tag}, hidden)"
+            else:
+                label = f"{name} ({tag})"
             if len(axis['name']) > 1:
                 label += " <multiple names>"
-            sliderInfo[tag] = (label,
-                               axis["minValue"],
-                               axis["defaultValue"],
-                               axis["maxValue"])
+            sliderInfo[tag] = AxisSliderInfo(
+                label,
+                axis["minValue"],
+                axis["defaultValue"],
+                axis["maxValue"],
+                axis["hidden"],
+            )
 
         # The axis order easily becomes a mess when multiple fonts are loaded.
         # Sort by (not isAxisRegistered, label.lower()), but keep it a dict.
         # Downside: we no longer see the axes in the order defined by the font.
         def sorter(keyValue):
-            tag, (label, minValue, defaultValue, maxValue) = keyValue
+            tag, axisInfo = keyValue
             isAxisRegistered = tag == tag.lower()  # all lowercase tags are registered axes
-            return not isAxisRegistered, label.lower()
+            return not isAxisRegistered, axisInfo.label.lower()
         sliderInfo = {k: v for k, v in sorted(sliderInfo.items(), key=sorter)}
         self.variationsGroup.setSliderInfo(sliderInfo)
         scriptTags = sorted(allScriptsAndLanguages)

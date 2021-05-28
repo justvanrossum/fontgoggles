@@ -28,12 +28,19 @@ class SliderGroup(Group):
         y = margin
         self._tags = []
         self._defaultValues = {}
-        for tag, (label, minValue, defaultValue, maxValue) in sliderInfo.items():
+        for tag, axisSliderInfo in sliderInfo.items():
             self._tags.append(tag)
-            self._defaultValues[tag] = defaultValue
+            self._defaultValues[tag] = axisSliderInfo.defaultValue
             attrName = f"slider_{tag}"
-            slider = SliderPlus((margin, y, -margin, 40), label, minValue, defaultValue, maxValue,
-                                continuous=self._continuous, callback=self._sliderChanged)
+            slider = SliderPlus(
+                (margin, y, -margin, 40),
+                axisSliderInfo.label,
+                axisSliderInfo.minValue,
+                axisSliderInfo.defaultValue,
+                axisSliderInfo.maxValue,
+                continuous=self._continuous,
+                callback=self._sliderChanged,
+            )
             setattr(self, attrName, slider)
             y += 50
 
