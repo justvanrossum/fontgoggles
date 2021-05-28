@@ -223,3 +223,4 @@ class UISettings:
     compileOutputSize: float = 80
     formattingOptionsVisible: bool = True
     feaVarTabSelection: str = "features"
+    showHiddenAxes: bool = False
