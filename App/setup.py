@@ -1,12 +1,47 @@
 from setuptools import setup
+import pkg_resources
 import os
 import datetime
+import importlib
+import pathlib
+import re
+import sys
 import fontgoggles.mac
 
 
-appFolder = os.path.dirname(os.path.abspath(__file__))
+appFolder = pathlib.Path(__file__).resolve().parent
 os.chdir(appFolder)  # make our parent dir the current dir
+creditsSource = appFolder / "Credits.rtf"
+creditsDest = appFolder / "Resources" / "English.lproj" / "Credits.rtf"
 
+
+markerPat = re.compile("<<<([^>]+)>>>")
+def fillInPackageVersions(creditsSource, creditsDest):
+    credits = creditsSource.read_text()
+    pos = 0
+    while True:
+        m = markerPat.search(credits, pos)
+        if m is None:
+            break
+        pos = m.endpos
+        startpos, endpos = m.span()
+        packageName = m.group(1)
+        if packageName == "python":
+            version = sys.version.split()[0]
+        elif "." in packageName:
+            moduleName = packageName.split(".", 1)[0]
+            module = importlib.import_module(moduleName)
+            version = eval(packageName, {moduleName: module})
+            if isinstance(version, tuple):
+                version = ".".join(str(p) for p in version)
+        else:
+            version = pkg_resources.get_distribution(packageName).version
+        credits = credits[:startpos] + f" ({version})" + credits[endpos:]
+        pos = startpos
+    creditsDest.write_text(credits)
+
+
+fillInPackageVersions(creditsSource, creditsDest)
 
 infoplist = dict(
     CFBundleDocumentTypes=[

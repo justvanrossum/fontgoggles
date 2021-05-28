@@ -109,3 +109,4 @@ venv.bak/
 Vault
 *.dylib
 Lib/fontgoggles/_version.py
+App/Resources/English.lproj/Credits.rtf
