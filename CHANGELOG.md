@@ -1,5 +1,11 @@
 # Changelog for FontGoggles
 
+## [1.3.0] - 2021-05-28
+
+- Don't show hidden axes by default, add button to show them ([PR 173](https://github.com/justvanrossum/fontgoggles/pull/173))
+- Added experimental support for variable components in two forms: fonts with a [VarC table](https://github.com/BlackFoundryCom/variable-components-spec), and fonts with an ["extended" COLRv1 table](https://github.com/fonttools/fonttools/pull/2302) ([PR 174](https://github.com/justvanrossum/fontgoggles/pull/174), [commit on master](https://github.com/justvanrossum/fontgoggles/commit/c347b8bc3736abb06142f35ed556f67d43af0ea5))
+- Show versions of all major dependencies in the About text
+
 ## [1.2.0] - 2021-05-27
 
 - Added support for [COLRv1 fonts](https://github.com/googlefonts/colr-gradients-spec/) ([Issue 162](https://github.com/justvanrossum/fontgoggles/issues/162), [PR 171](https://github.com/justvanrossum/fontgoggles/pull/171))
