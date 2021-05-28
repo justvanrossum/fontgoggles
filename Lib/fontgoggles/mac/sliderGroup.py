@@ -3,15 +3,19 @@ from vanilla import Button, EditText, Group, Slider, TextBox, VanillaBaseObject
 from fontgoggles.misc.properties import weakrefCallbackProperty
 
 
+showHiddenAxesButtonLabels = ["Show hidden axes", "Hide hidden axes"]
+
+
 class SliderGroup(Group):
 
     _callback = weakrefCallbackProperty()
 
-    def __init__(self, width, sliderInfo, continuous=True, callback=None):
+    def __init__(self, width, sliderInfo, continuous=True, callback=None, showHiddenAxes=True):
         super().__init__((0, 0, width, 0))
         self._callback = callback
         self._continuous = continuous
         self._tags = []
+        self.showHiddenAxes = showHiddenAxes
         self.setSliderInfo(sliderInfo)
 
     def _breakCycles(self):
@@ -19,6 +23,7 @@ class SliderGroup(Group):
         super()._breakCycles()
 
     def setSliderInfo(self, sliderInfo):
+        self._savedSliderInfo = sliderInfo
         savedState = self.get()
         # clear all subviews
         for attr, value in list(self.__dict__.items()):
@@ -28,17 +33,35 @@ class SliderGroup(Group):
         y = margin
         self._tags = []
         self._defaultValues = {}
-        for tag, (label, minValue, defaultValue, maxValue) in sliderInfo.items():
+        haveHiddenAxes = False
+        for tag, axisSliderInfo in sliderInfo.items():
+            if axisSliderInfo.hidden:
+                haveHiddenAxes = True
+                if not self.showHiddenAxes:
+                    continue
             self._tags.append(tag)
-            self._defaultValues[tag] = defaultValue
+            self._defaultValues[tag] = axisSliderInfo.defaultValue
             attrName = f"slider_{tag}"
-            slider = SliderPlus((margin, y, -margin, 40), label, minValue, defaultValue, maxValue,
-                                continuous=self._continuous, callback=self._sliderChanged)
+            slider = SliderPlus(
+                (margin, y, -margin, 40),
+                axisSliderInfo.label,
+                axisSliderInfo.minValue,
+                axisSliderInfo.defaultValue,
+                axisSliderInfo.maxValue,
+                continuous=self._continuous,
+                callback=self._sliderChanged,
+            )
             setattr(self, attrName, slider)
             y += 50
 
         self.resetAllButton = Button((10, y, 120, 25), "Reset all axes", self._resetAllButtonCallback)
         self.resetAllButton.enable(False)
+        if haveHiddenAxes:
+            self.showHiddenAxesButton = Button(
+                (140, y, 140, 25),
+                showHiddenAxesButtonLabels[self.showHiddenAxes],
+                self._showHiddenAxesButtonCallback,
+            )
         y += 35
 
         posSize = (0, 0, self.getPosSize()[2], y)
@@ -55,6 +78,12 @@ class SliderGroup(Group):
             attrName = f"slider_{tag}"
             slider = getattr(self, attrName)
             slider.set(self._defaultValues[tag])
+        callCallback(self._callback, self)
+
+    def _showHiddenAxesButtonCallback(self, sender):
+        self.showHiddenAxes = not self.showHiddenAxes
+        sender.setTitle(showHiddenAxesButtonLabels[self.showHiddenAxes])
+        self.setSliderInfo(self._savedSliderInfo)
         callCallback(self._callback, self)
 
     def get(self):

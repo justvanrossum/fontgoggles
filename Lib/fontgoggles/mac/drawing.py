@@ -38,8 +38,17 @@ def rectFromNSRect(nsRect):
     return x, y, x + w, y + h
 
 
-def rgbColor(r, g, b, a=1.0):
-    return AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(r, g, b, a)
+def nsColorFromRGBA(rgba):
+    return AppKit.NSColor.colorWithCalibratedRed_green_blue_alpha_(*rgba)
+
+
+def rgbaFromNSColor(color):
+    color = color.colorUsingColorSpace_(AppKit.NSColorSpace.genericRGBColorSpace())
+    return color.getRed_green_blue_alpha_(None, None, None, None)
+
+
+def blendRGBA(factor, rgba1, rgba2):
+    return tuple([ch1 + factor * (ch2 - ch1) for ch1, ch2 in zip(rgba1, rgba2)])
 
 
 def grayColor(gray, a=1.0):

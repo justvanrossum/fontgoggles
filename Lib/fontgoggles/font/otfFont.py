@@ -1,7 +1,7 @@
 import io
 from fontTools.ttLib import TTFont
 from .baseFont import BaseFont
-from .glyphDrawing import GlyphDrawing
+from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing, GlyphCOLRv1Drawing
 from ..compile.compilerPool import compileTTXToBytes
 from ..misc.ftFont import FTFont
 from ..misc.hbShape import HBShape
@@ -11,30 +11,65 @@ from ..misc.properties import cachedProperty
 class _OTFBaseFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
-        if colorLayers and "COLR" in self.ttFont:
-            colorLayers = self.ttFont["COLR"].ColorLayers
-            layers = colorLayers.get(glyphName)
-            if layers is not None:
-                drawingLayers = [(self.ftFont.getOutlinePath(layer.name), layer.colorID)
-                                 for layer in layers]
-                return GlyphDrawing(drawingLayers)
+        if "VarC" in self.ttFont:
+            from fontTools.pens.cocoaPen import CocoaPen
+            pen = CocoaPen(None)
+            location = self._currentVarLocation or {}
+            self.varcFont.drawGlyph(pen, glyphName, location)
+            return GlyphDrawing(pen.path)
+        if colorLayers:
+            if self.colorLayers is not None:
+                layers = self.colorLayers.get(glyphName)
+                if layers is not None:
+                    drawingLayers = [(self.ftFont.getOutlinePath(layer.name), layer.colorID)
+                                     for layer in layers]
+                    return GlyphLayersDrawing(drawingLayers)
+            elif self.colorFont is not None:
+                return GlyphCOLRv1Drawing(glyphName, self.colorFont)
+
         outline = self.ftFont.getOutlinePath(glyphName)
-        return GlyphDrawing([(outline, None)])
+        return GlyphDrawing(outline)
 
     def varLocationChanged(self, varLocation):
         self.ftFont.setVarLocation(varLocation if varLocation else {})
+        if self.colorFont is not None:
+            self.colorFont.setLocation(varLocation)
+
+    @cachedProperty
+    def colorLayers(self):
+        colrTable = self.ttFont.get("COLR")
+        if colrTable is not None and colrTable.version == 0:
+            return colrTable.ColorLayers
+        return None
 
     @cachedProperty
     def colorPalettes(self):
-        if "CPAL" in self.ttFont:
+        cpalTable = self.ttFont.get("CPAL")
+        if cpalTable is not None:
             palettes = []
-            for paletteRaw in self.ttFont["CPAL"].palettes:
+            for paletteRaw in cpalTable.palettes:
                 palette = [(color.red/255, color.green/255, color.blue/255, color.alpha/255)
                            for color in paletteRaw]
                 palettes.append(palette)
             return palettes
         else:
             return None
+
+    @cachedProperty
+    def colorFont(self):
+        colrTable = self.ttFont.get("COLR")
+        if colrTable is not None and colrTable.version == 1:
+            from blackrenderer.font import BlackRendererFont
+
+            return BlackRendererFont(self.fontPath, fontNumber=self.fontNumber)
+        return None
+
+    @cachedProperty
+    def varcFont(self):
+        from fontTools.ttLib import registerCustomTableClass
+        from rcjktools.ttVarCFont import TTVarCFont
+        registerCustomTableClass("VarC", "rcjktools.table_VarC", "table_VarC")
+        return TTVarCFont(None, ttFont=self.ttFont, hbFont=self.shaper.font)
 
 
 class OTFFont(_OTFBaseFont):

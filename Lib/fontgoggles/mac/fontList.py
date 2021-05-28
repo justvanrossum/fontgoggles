@@ -9,7 +9,15 @@ from vanilla import Group, ProgressSpinner, TextBox, VanillaBaseObject
 from jundo import UndoManager
 from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
 from fontgoggles.font import defaultSortSpec, sniffFontType, sortedFontPathsAndNumbers
-from fontgoggles.mac.drawing import nsRectFromRect, rectFromNSRect, scale, translate
+from fontgoggles.mac.drawing import (
+    blendRGBA,
+    nsColorFromRGBA,
+    nsRectFromRect,
+    rgbaFromNSColor,
+    rectFromNSRect,
+    scale,
+    translate
+)
 from fontgoggles.mac.misc import textAlignments
 from fontgoggles.misc.decorators import suppressAndLogException, asyncTaskAutoCancel
 from fontgoggles.misc.properties import delegateProperty, hookedProperty, cachedProperty
@@ -1175,16 +1183,25 @@ class FGGlyphLineView(AppKit.NSView):
         appearanceName = AppKit.NSAppearance.currentAppearance().name()
         if appearanceName != self._lastAppearanceName:
             self._lastAppearanceName = appearanceName
-            colors = SimpleNamespace()
-            colors.foregroundColor = AppKit.NSColor.textColor()
-            colors.selectedColor = colors.foregroundColor.blendedColorWithFraction_ofColor_(
+            foregroundColor = AppKit.NSColor.textColor()
+            selectedColor = foregroundColor.blendedColorWithFraction_ofColor_(
                 0.9, AppKit.NSColor.systemRedColor())
-            colors.selectedSpaceColor = colors.selectedColor.colorWithAlphaComponent_(0.2)
-            colors.hoverColor = AppKit.NSColor.systemBlueColor()
-            colors.hoverSelectedColor = colors.hoverColor.blendedColorWithFraction_ofColor_(
-                0.5, colors.selectedColor)
-            colors.hoverSpaceColor = colors.hoverColor.colorWithAlphaComponent_(0.2)
-            colors.hoverSelectedSpaceColor = colors.hoverSelectedColor.colorWithAlphaComponent_(0.2)
+            selectedSpaceColor = selectedColor.colorWithAlphaComponent_(0.2)
+            hoverColor = AppKit.NSColor.systemBlueColor()
+            hoverSelectedColor = hoverColor.blendedColorWithFraction_ofColor_(
+                0.5, selectedColor)
+            hoverSpaceColor = hoverColor.colorWithAlphaComponent_(0.2)
+            hoverSelectedSpaceColor = hoverSelectedColor.colorWithAlphaComponent_(0.2)
+
+            colors = SimpleNamespace(
+                foregroundColor=rgbaFromNSColor(foregroundColor),
+                selectedColor=rgbaFromNSColor(selectedColor),
+                selectedSpaceColor=rgbaFromNSColor(selectedSpaceColor),
+                hoverColor=rgbaFromNSColor(hoverColor),
+                hoverSelectedColor=rgbaFromNSColor(hoverSelectedColor),
+                hoverSpaceColor=rgbaFromNSColor(hoverSpaceColor),
+                hoverSelectedSpaceColor=rgbaFromNSColor(hoverSelectedSpaceColor),
+            )
             self._colors = colors
         return self._colors
 
@@ -1194,17 +1211,17 @@ class FGGlyphLineView(AppKit.NSView):
             self._glyphsColorPalette = self._glyphs.colorPalette
             self._cachedColorPalettes = {}
         if not self._glyphsColorPalette:
-            return {}
+            return []
         mainPalette = self._cachedColorPalettes.get(None)
         if mainPalette is None:
-            mainPalette = {}
-            for colorID, (r, g, b, a) in enumerate(self._glyphs.colorPalette):
-                mainPalette[colorID] = AppKit.NSColor.colorWithRed_green_blue_alpha_(r, g, b, a)
+            mainPalette = self._glyphs.colorPalette
             self._cachedColorPalettes[None] = mainPalette
         blendedPalette = self._cachedColorPalettes.get(blendColor)
         if blendedPalette is None:
-            blendedPalette = {colorID: color.blendedColorWithFraction_ofColor_(0.5, blendColor)
-                              for colorID, color in mainPalette.items()}
+            blendedPalette = [
+                blendRGBA(0.5, color, blendColor)
+                for color in mainPalette
+            ]
             self._cachedColorPalettes[blendColor] = blendedPalette
         return blendedPalette
 
@@ -1251,7 +1268,7 @@ class FGGlyphLineView(AppKit.NSView):
             if color is None:
                 continue
             if empty:
-                color.set()
+                nsColorFromRGBA(color).set()
                 AppKit.NSRectFillUsingOperation(nsRectFromRect(offsetRect(gi.bounds, -posX, -posY)),
                                                 AppKit.NSCompositeSourceOver)
             else:

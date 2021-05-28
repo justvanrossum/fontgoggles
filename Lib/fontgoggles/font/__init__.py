@@ -167,6 +167,7 @@ def mergeAxes(*axesList):
                 mergedAxis["defaultValue"].update(axis["defaultValue"])
                 mergedAxis["minValue"] = min(mergedAxis["minValue"], axis["minValue"])
                 mergedAxis["maxValue"] = max(mergedAxis["maxValue"], axis["maxValue"])
+                mergedAxis["hidden"] = mergedAxis["hidden"] and axis["hidden"]
             else:
                 merged[tag] = axis
     return merged

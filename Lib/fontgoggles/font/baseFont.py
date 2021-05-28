@@ -86,7 +86,8 @@ class BaseFont:
             axisDict = dict(name=str(name.getName(axis.axisNameID, 3, 1)),
                             minValue=axis.minValue,
                             defaultValue=axis.defaultValue,
-                            maxValue=axis.maxValue)
+                            maxValue=axis.maxValue,
+                            hidden=bool(axis.flags & 0x0001))
             axes[axis.axisTag] = axisDict
         return axes
 
