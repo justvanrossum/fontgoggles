@@ -16,6 +16,8 @@ creditsDest = appFolder / "Resources" / "English.lproj" / "Credits.rtf"
 
 
 markerPat = re.compile("<<<([^>]+)>>>")
+
+
 def fillInPackageVersions(creditsSource, creditsDest):
     credits = creditsSource.read_text()
     pos = 0
@@ -40,8 +42,6 @@ def fillInPackageVersions(creditsSource, creditsDest):
         pos = startpos
     creditsDest.write_text(credits)
 
-
-fillInPackageVersions(creditsSource, creditsDest)
 
 infoplist = dict(
     CFBundleDocumentTypes=[
@@ -96,6 +96,9 @@ appName = "FontGoggles"
 turboLibOriginalPath = os.path.join(os.path.dirname(fontgoggles.mac.__file__),
                                     "libmakePathFromOutline.dylib")
 turboLibPath = os.path.join(appFolder, "libmakePathFromOutline.dylib")
+
+fillInPackageVersions(creditsSource, creditsDest)
+
 
 try:
     # We don't want our dylib to be included in the library zip file, instead
