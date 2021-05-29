@@ -16,12 +16,9 @@ async def test_colrV1Font():
     glyphs = font.getGlyphRunFromTextInfo(textInfo)
     glyphNames = [g.name for g in glyphs]
     glyphDrawing, *_ = font.getGlyphDrawings(glyphNames, True)
-    bounds = glyphDrawing.bounds
-    assert (100, 0, 900, 1000) == bounds
-    x, y, w, h = bounds
-    w -= x
-    h -= y
-    surface = CoreGraphicsPixelSurface(x, y, w, h)
+    boundingBox = glyphDrawing.bounds
+    assert (100, 0, 900, 1000) == boundingBox
+    surface = CoreGraphicsPixelSurface(boundingBox)
     context = NSGraphicsContext.graphicsContextWithCGContext_flipped_(surface.context, False)
     savedContext = NSGraphicsContext.currentContext()
     try:
