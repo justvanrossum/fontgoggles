@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.3.1] - 2021-05-29
+
+- Updated blackrenderer to 0.3.1, adding support for the COLRv1/PaintComposite construct
+
 ## [1.3.0] - 2021-05-28
 
 - Don't show hidden axes by default, add button to show them ([PR 173](https://github.com/justvanrossum/fontgoggles/pull/173))
