@@ -18,7 +18,7 @@ from fontTools.ufoLib import (FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENA
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph, CONTENTS_FILENAME
 from ufo2ft.constants import COLOR_LAYER_MAPPING_KEY, COLOR_PALETTES_KEY
 from .baseFont import BaseFont
-from .glyphDrawing import GlyphDrawing
+from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing
 from ..compile.compilerPool import compileUFOToBytes
 from ..compile.ufoCompiler import fetchCharacterMappingAndAnchors
 from ..misc.hbShape import HBShape
@@ -205,8 +205,8 @@ class UFOFont(BaseFont):
                     if not isinstance(glyph, NotDefGlyph):
                         layers.append((glyph.outline, colorID))
                 if layers:
-                    return GlyphDrawing(layers)
-        return GlyphDrawing([(glyph.outline, None)])
+                    return GlyphLayersDrawing(layers)
+        return GlyphDrawing(glyph.outline)
 
     @cachedProperty
     def colorPalettes(self):
