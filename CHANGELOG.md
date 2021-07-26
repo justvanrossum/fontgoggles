@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.3.2] - 2021-07-26
+
+- Fixed bug where UFO's would not display ([Issue 185](https://github.com/justvanrossum/fontgoggles/issues/185) [PR 186](https://github.com/justvanrossum/fontgoggles/pull/186))
+
 ## [1.3.1] - 2021-05-29
 
 - Updated blackrenderer to 0.3.1, adding support for the COLRv1/PaintComposite construct
