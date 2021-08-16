@@ -7,7 +7,7 @@ git+https://github.com/robotools/vanilla
 blackrenderer==0.3.1
 # fonttools[woff,ufo,type1,unicode,lxml]==4.24.3
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
-fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
+fonttools[type1,ufo,woff,lxml,unicode]==4.26.2
 freetype-py==2.2.0
 uharfbuzz==0.16.1
 python-bidi==0.4.2
