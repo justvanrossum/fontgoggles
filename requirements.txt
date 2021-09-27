@@ -1,7 +1,7 @@
 setuptools>=42.0.2
 wheel>=0.33.6
 py2app==0.26
-pyobjc==7.2
+pyobjc==7.3
 corefoundationasyncio==0.0.1
 git+https://github.com/robotools/vanilla
 blackrenderer==0.3.1
