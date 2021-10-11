@@ -9,7 +9,7 @@ blackrenderer==0.4.1
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 fonttools[woff,type1,ufo,unicode,lxml]==4.27.1
 freetype-py==2.2.0
-uharfbuzz==0.16.1
+uharfbuzz==0.18.0
 python-bidi==0.4.2
 jundo==0.1.2
 ufo2ft==2.21.0
