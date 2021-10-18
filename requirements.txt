@@ -12,7 +12,7 @@ freetype-py==2.2.0
 uharfbuzz==0.18.0
 python-bidi==0.4.2
 jundo==0.1.2
-ufo2ft==2.21.0
+ufo2ft==2.25.1
 numpy==1.20.3
 unicodedata2==13.0.0.post2
 git+https://github.com/BlackFoundryCom/rcjk-tools/
