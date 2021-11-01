@@ -17,12 +17,13 @@ async def test_colrV1Font():
     glyphNames = [g.name for g in glyphs]
     glyphDrawing, *_ = font.getGlyphDrawings(glyphNames, True)
     boundingBox = glyphDrawing.bounds
-    assert (100, 0, 900, 1000) == boundingBox
-    surface = CoreGraphicsPixelSurface(boundingBox)
-    context = NSGraphicsContext.graphicsContextWithCGContext_flipped_(surface.context, False)
-    savedContext = NSGraphicsContext.currentContext()
-    try:
-        NSGraphicsContext.setCurrentContext_(context)
-        glyphDrawing.draw(glyphs.colorPalette, (0, 0, 0, 1))
-    finally:
-        NSGraphicsContext.setCurrentContext_(savedContext)
+    assert (0, 0, 1000, 1000) == boundingBox
+    surface = CoreGraphicsPixelSurface()
+    with surface.canvas(boundingBox) as canvas:
+        context = NSGraphicsContext.graphicsContextWithCGContext_flipped_(surface.context, False)
+        savedContext = NSGraphicsContext.currentContext()
+        try:
+            NSGraphicsContext.setCurrentContext_(context)
+            glyphDrawing.draw(glyphs.colorPalette, (0, 0, 0, 1))
+        finally:
+            NSGraphicsContext.setCurrentContext_(savedContext)
