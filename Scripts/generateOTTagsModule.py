@@ -11,11 +11,11 @@ def parse(data):
         parsedFields = []
         for field in fields:
             m = re.search(r'href="(.+?)"', field)
-            if m is not None:
+            if m is not None and m.group(1) != "#foot":
                 parsedFields.append(m.group(1))
             tagParts = field.split("&#39;")
             if len(tagParts) >= 2:
-                parsedFields.append(tagParts[1])
+                parsedFields.append(tagParts[1].replace("&nbsp;", " "))
             else:
                 parsedFields.append(field)
         if parsedFields:
