@@ -14,8 +14,12 @@ def getNotarizeInfo(requestUUID, user, passw):
         "-p", passw,
         "--output-format", "xml",
     ]
-
-    result = subprocess.run(infoCommand, check=True, capture_output=True)
+    try:
+        result = subprocess.run(infoCommand, check=True, capture_output=True)
+    except subprocess.CalledProcessError as error:
+        print("STDOUT", error.stdout)
+        print("STDERR", error.stderr)
+        raise
     return plistlib.loads(result.stdout)
 
 
