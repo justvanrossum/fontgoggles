@@ -1220,7 +1220,7 @@ class TextEntryGroup(Group):
 
     def __init__(self, posSize, textFilePath=None, callback=None):
         super().__init__(posSize)
-        textRightMargin = 70
+        textRightMargin = 76
         self.textEntry = EditText((10, 8, -textRightMargin, 25), "", callback=callback)
         self.textFileStepper = Stepper((-textRightMargin + 5, 8, 12, 25), 0, 0, 1, callback=self.stepperCallback)
         items = [
