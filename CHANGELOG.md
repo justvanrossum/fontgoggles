@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [1.4.0] - 2021-11-??
+## [1.4.0] - 2021-11-02
 
 - Fix cosmetic problem on macOS 11 ([Issue 202](https://github.com/justvanrossum/fontgoggles/issues/202) [PR 209](https://github.com/justvanrossum/fontgoggles/pull/209))
 - Update OpenType feature/language/script tag descriptions ([PR 208](https://github.com/justvanrossum/fontgoggles/pull/208))
