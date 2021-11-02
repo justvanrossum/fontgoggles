@@ -2,10 +2,10 @@
 
 ## [1.4.0] - 2021-11-02
 
-- Fix cosmetic problem on macOS 11 ([Issue 202](https://github.com/justvanrossum/fontgoggles/issues/202) [PR 209](https://github.com/justvanrossum/fontgoggles/pull/209))
+- Fix cosmetic problem on macOS 11 ([Issue 202](https://github.com/justvanrossum/fontgoggles/issues/202), [PR 209](https://github.com/justvanrossum/fontgoggles/pull/209))
 - Update OpenType feature/language/script tag descriptions ([PR 208](https://github.com/justvanrossum/fontgoggles/pull/208))
-- Fix build problem on macOS 11. Thanks Khaled Hosny! ([Issue 206](https://github.com/justvanrossum/fontgoggles/issues/206) [PR 207](https://github.com/justvanrossum/fontgoggles/pull/207))
-- COLRv1 spec update via blackrenderer 0.5.0a2 ([Issue197](https://github.com/justvanrossum/fontgoggles/issues/197) [PR 204](https://github.com/justvanrossum/fontgoggles/pull/204))
+- Fix build problem on macOS 11. Thanks Khaled Hosny! ([Issue 206](https://github.com/justvanrossum/fontgoggles/issues/206), [PR 207](https://github.com/justvanrossum/fontgoggles/pull/207))
+- COLRv1 spec update via blackrenderer 0.5.0a2 ([Issue197](https://github.com/justvanrossum/fontgoggles/issues/197), [PR 204](https://github.com/justvanrossum/fontgoggles/pull/204))
 
 ## [1.3.2] - 2021-07-26
 
