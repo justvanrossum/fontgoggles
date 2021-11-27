@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.4.1] - 2021-11-27
+
+- Fix crash with faulty COLRv1 font ([Issue 213](https://github.com/justvanrossum/fontgoggles/issues/213), [PR 214](https://github.com/justvanrossum/fontgoggles/pull/214), [blackrenderer PR 57](https://github.com/BlackFoundryCom/black-renderer/pull/57))
+
 ## [1.4.0] - 2021-11-02
 
 - Fix cosmetic problem on macOS 11 ([Issue 202](https://github.com/justvanrossum/fontgoggles/issues/202), [PR 209](https://github.com/justvanrossum/fontgoggles/pull/209))
@@ -9,7 +13,7 @@
 
 ## [1.3.2] - 2021-07-26
 
-- Fixed bug where UFO's would not display ([Issue 185](https://github.com/justvanrossum/fontgoggles/issues/185) [PR 186](https://github.com/justvanrossum/fontgoggles/pull/186))
+- Fixed bug where UFO's would not display ([Issue 185](https://github.com/justvanrossum/fontgoggles/issues/185), [PR 186](https://github.com/justvanrossum/fontgoggles/pull/186))
 
 ## [1.3.1] - 2021-05-29
 
