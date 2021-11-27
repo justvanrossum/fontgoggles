@@ -1,5 +1,6 @@
 import io
 import math
+import logging
 import os
 import pathlib
 from types import SimpleNamespace
@@ -1273,7 +1274,10 @@ class FGGlyphLineView(AppKit.NSView):
                                                 AppKit.NSCompositeSourceOver)
             else:
                 blendColor = None if color == colors.foregroundColor else color
-                gi.glyphDrawing.draw(self.getColorPalette(blendColor), color)
+                try:
+                    gi.glyphDrawing.draw(self.getColorPalette(blendColor), color)
+                except Exception as e:
+                    logging.error(e)
 
     def mouseMoved_(self, event):
         point = self.convertPoint_fromView_(event.locationInWindow(), None)
