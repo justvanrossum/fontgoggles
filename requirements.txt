@@ -1,7 +1,7 @@
 setuptools>=42.0.2
 wheel>=0.33.6
 py2app==0.26.1
-pyobjc==8.0
+pyobjc==8.1
 corefoundationasyncio==0.0.1
 cocoa-vanilla==0.2.1
 blackrenderer==0.5.0a3
