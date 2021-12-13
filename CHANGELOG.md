@@ -2,7 +2,7 @@
 
 ## [1.4.2] - 2021-12-13
 
-- Make FontGoggles work on 10.10, 10.11 and 10.12 again ([Issue 217](https://github.com/justvanrossum/fontgoggles/issues/217))
+- Make FontGoggles work on macOS 10.10, 10.11 and 10.12 again ([Issue 217](https://github.com/justvanrossum/fontgoggles/issues/217))
 
 ## [1.4.1] - 2021-11-27
 
