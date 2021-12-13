@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.4.2] - 2021-12-13
+
+- Make FontGoggles work on 10.10, 10.11 and 10.12 again [Issue 217](https://github.com/justvanrossum/fontgoggles/issues/217)
+
 ## [1.4.1] - 2021-11-27
 
 - Fix crash with faulty COLRv1 font ([Issue 213](https://github.com/justvanrossum/fontgoggles/issues/213), [PR 214](https://github.com/justvanrossum/fontgoggles/pull/214), [blackrenderer PR 57](https://github.com/BlackFoundryCom/black-renderer/pull/57))
