@@ -14,5 +14,5 @@ python-bidi==0.4.2
 jundo==0.1.2
 ufo2ft==2.25.1
 numpy==1.21.5
-unicodedata2==13.0.0.post2
+unicodedata2==14.0.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
