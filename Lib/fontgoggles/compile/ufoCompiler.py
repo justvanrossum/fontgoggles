@@ -69,7 +69,7 @@ def compileUFOToPath(ufoPath, ttPath):
 
 
 _unicodeOrAnchorGLIFPattern = re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)')
-_ufo2AnchorPattern = re.compile(rb"<contour>\s+(<point\s+[^>]+>)\s+</contour>")
+_ufo2AnchorPattern = re.compile(rb"<contour>\s+(<point\s+[^>]+move[^>]+name[^>]+>)\s+</contour>")
 _unicodeAttributeGLIFPattern = re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"')
 
 
