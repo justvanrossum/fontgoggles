@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.4.4] - 2022-??-??
+
+- Minor improvement for UFO 2 anchor handling
+
 ## [1.4.3] - 2022-01-17
 
 - Improve support for UFO 2, by adding support for UFO 2 anchors ([Issue 226](https://github.com/justvanrossum/fontgoggles/issues/226), [PR 227](https://github.com/justvanrossum/fontgoggles/pull/227))
