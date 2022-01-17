@@ -67,8 +67,8 @@ def compileUFOToPath(ufoPath, ttPath):
     ttFont.save(ttPath, reorderTables=False)
 
 
-_unicodeOrAnchorGLIFPattern = re.compile(re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)'))
-_unicodeAttributeGLIFPattern = re.compile(re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"'))
+_unicodeOrAnchorGLIFPattern = re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)')
+_unicodeAttributeGLIFPattern = re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"')
 
 
 def fetchCharacterMappingAndAnchors(glyphSet, ufoPath, glyphNames=None):
