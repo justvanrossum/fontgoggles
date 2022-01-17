@@ -69,7 +69,7 @@ def compileUFOToPath(ufoPath, ttPath):
 
 
 _unicodeOrAnchorGLIFPattern = re.compile(rb'(<\s*(anchor|unicode)\s+([^>]+)>)')
-_ufo2AnchorPatters = re.compile(rb"<contour>\s+(<point\s+[^>]+>)\s+</contour>")
+_ufo2AnchorPattern = re.compile(rb"<contour>\s+(<point\s+[^>]+>)\s+</contour>")
 _unicodeAttributeGLIFPattern = re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"')
 
 
@@ -102,7 +102,7 @@ def fetchCharacterMappingAndAnchors(glyphSet, ufoPath, glyphNames=None, ufo2=Fal
                     root = ET.fromstring(rawElement)
                     glyphAnchors.append(_parseAnchorAttrs(root.attrib))
             if ufo2:
-                for rawElement in _ufo2AnchorPatters.findall(data):
+                for rawElement in _ufo2AnchorPattern.findall(data):
                     root = ET.fromstring(rawElement)
                     glyphAnchors.append(_parseAnchorAttrs(root.attrib))
 
