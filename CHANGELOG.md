@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.4.3] - 2022-01-17
+
+- Improve support for UFO 2, by adding support for UFO 2 anchors ([Issue 226](https://github.com/justvanrossum/fontgoggles/issues/226), [PR 227](https://github.com/justvanrossum/fontgoggles/pull/227))
+
 ## [1.4.2] - 2021-12-13
 
 - Make FontGoggles work on macOS 10.10, 10.11 and 10.12 again ([Issue 217](https://github.com/justvanrossum/fontgoggles/issues/217))
