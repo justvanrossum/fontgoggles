@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [1.4.4] - 2022-??-??
+## [1.4.4] - 2022-01-20
 
 - Updated Unicode/unicodedata2 to 14.0.0
 - Minor improvement for UFO 2 anchor handling
