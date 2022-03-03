@@ -16,7 +16,7 @@ from fontTools.ufoLib import (FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENA
                               FEATURES_FILENAME, LIB_FILENAME)
 from fontTools.ufoLib.glifLib import Glyph as GLIFGlyph, CONTENTS_FILENAME
 from ufo2ft.constants import COLOR_LAYER_MAPPING_KEY, COLOR_PALETTES_KEY
-from .baseFont import BaseFont
+from .baseFont import BaseFont, FontMetrics
 from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing
 from ..compile.compilerPool import compileUFOToBytes
 from ..compile.ufoCompiler import fetchGlyphInfo
@@ -129,6 +129,15 @@ class UFOFont(BaseFont):
     def unitsPerEm(self):
         return self.info.unitsPerEm
 
+    @cachedProperty
+    def fontMetrics(self):
+        return FontMetrics(
+            xHeight = getattr(self.info, "xHeight", None),
+            capHeight = getattr(self.info, "capHeight", None),
+            ascender = getattr(self.info, "ascender", None),
+            descender= getattr(self.info, "descender", None)
+        )
+
     def _getGlyph(self, glyphName, layerName=None):
         glyph = self._cachedGlyphs.get((layerName, glyphName))
         if glyph is None:
@@ -161,8 +170,8 @@ class UFOFont(BaseFont):
 
     @cachedProperty
     def defaultVerticalAdvance(self):
-        ascender = getattr(self.info, "ascender", None)
-        descender = getattr(self.info, "descender", None)
+        ascender = self.fontMetrics.ascender
+        descender = self.fontMetrics.descender
         if ascender is None or descender is None:
             return self.info.unitsPerEm
         else:
@@ -170,7 +179,7 @@ class UFOFont(BaseFont):
 
     @cachedProperty
     def defaultVerticalOriginY(self):
-        ascender = getattr(self.info, "ascender", None)
+        ascender = self.fontMetrics.ascender
         if ascender is None:
             return self.info.unitsPerEm  # ???
         else:

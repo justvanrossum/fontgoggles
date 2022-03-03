@@ -17,7 +17,7 @@ from fontTools.designspaceLib.split import splitVariableFonts
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
-from .baseFont import BaseFont
+from .baseFont import BaseFont, FontMetrics
 from .glyphDrawing import EmptyDrawing, GlyphDrawing
 from .ufoFont import Glyph, NotDefGlyph, UFOState, extractIncludedFeatureFiles
 from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
@@ -225,9 +225,18 @@ class DSFont(BaseFont):
         return self.defaultInfo.unitsPerEm
 
     @cachedProperty
+    def fontMetrics(self):
+        return FontMetrics(
+            xHeight = getattr(self.defaultInfo, "xHeight", None),
+            capHeight = getattr(self.defaultInfo, "capHeight", None),
+            ascender = getattr(self.defaultInfo, "ascender", None),
+            descender= getattr(self.defaultInfo, "descender", None)
+        )
+
+    @cachedProperty
     def defaultVerticalAdvance(self):
-        ascender = getattr(self.defaultInfo, "ascender", None)
-        descender = getattr(self.defaultInfo, "descender", None)
+        ascender = self.fontMetrics.ascender
+        descender = self.fontMetrics.descender
         if ascender is None or descender is None:
             return self.defaultInfo.unitsPerEm
         else:
@@ -235,7 +244,7 @@ class DSFont(BaseFont):
 
     @cachedProperty
     def defaultVerticalOriginY(self):
-        ascender = getattr(self.defaultInfo, "ascender", None)
+        ascender = self.fontMetrics.ascender
         if ascender is None:
             return self.defaultInfo.unitsPerEm  # ???
         else:
