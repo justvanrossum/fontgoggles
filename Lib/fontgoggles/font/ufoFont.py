@@ -129,6 +129,15 @@ class UFOFont(BaseFont):
     def unitsPerEm(self):
         return self.info.unitsPerEm
 
+    @cachedProperty
+    def fontMetrics(self):
+        return FontMetrics(
+            xHeight = getattr(self.info, "xHeight", None),
+            capHeight = getattr(self.info, "capHeight", None),
+            ascender = getattr(self.info, "ascender", None),
+            descender= getattr(self.info, "descender", None)
+        )
+
     def _getGlyph(self, glyphName, layerName=None):
         glyph = self._cachedGlyphs.get((layerName, glyphName))
         if glyph is None:
@@ -161,8 +170,8 @@ class UFOFont(BaseFont):
 
     @cachedProperty
     def defaultVerticalAdvance(self):
-        ascender = getattr(self.info, "ascender", None)
-        descender = getattr(self.info, "descender", None)
+        ascender = self.fontMetrics.ascender
+        descender = self.fontMetrics.descender
         if ascender is None or descender is None:
             return self.info.unitsPerEm
         else:
@@ -170,7 +179,7 @@ class UFOFont(BaseFont):
 
     @cachedProperty
     def defaultVerticalOriginY(self):
-        ascender = getattr(self.info, "ascender", None)
+        ascender = self.fontMetrics.ascender
         if ascender is None:
             return self.info.unitsPerEm  # ???
         else:

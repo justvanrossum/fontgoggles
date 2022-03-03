@@ -1,6 +1,15 @@
+from typing import Any, NamedTuple
+
 from ..misc.properties import cachedProperty
 from ..misc.hbShape import characterGlyphMapping
 from . import mergeScriptsAndLanguages
+
+
+class FontMetrics(NamedTuple):
+    xHeight: int
+    capHeight: int
+    ascender: int
+    descender: int
 
 
 class BaseFont:
@@ -54,6 +63,15 @@ class BaseFont:
         return self.ttFont["head"].unitsPerEm
 
     @cachedProperty
+    def fontMetrics(self):
+        return FontMetrics(
+            xHeight=self.ttFont["OS/2"].sxHeight,
+            capHeight=self.ttFont["OS/2"].sCapHeight,
+            ascender=self.ttFont["hhea"].ascent,
+            descender=self.ttFont["hhea"].descent,
+        )
+
+    @cachedProperty
     def colorPalettes(self):
         return None
 
@@ -102,7 +120,7 @@ class BaseFont:
         else:
             colorPalette = self.colorPalettes[colorPalettesIndex]
 
-        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"), colorPalette)
+        glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"), self.fontMetrics, colorPalette)
 
         for segmentText, segmentScript, segmentBiDiLevel, firstCluster in textInfo.segments:
             if script is not None:
@@ -172,10 +190,11 @@ class BaseFont:
 
 class GlyphsRun(list):
 
-    def __init__(self, numChars, unitsPerEm, vertical, colorPalette=None):
+    def __init__(self, numChars, unitsPerEm, vertical, fontMetrics, colorPalette=None):
         self.numChars = numChars
         self.unitsPerEm = unitsPerEm
         self.vertical = vertical
+        self.fontMetrics = fontMetrics
         self._glyphToChars = None
         self._charToGlyphs = None
         self.endPos = (0, 0)
