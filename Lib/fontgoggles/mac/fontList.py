@@ -12,6 +12,7 @@ from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect
 from fontgoggles.font import defaultSortSpec, sniffFontType, sortedFontPathsAndNumbers
 from fontgoggles.mac.drawing import (
     blendRGBA,
+    drawLine,
     nsColorFromRGBA,
     nsRectFromRect,
     rgbaFromNSColor,
@@ -1018,6 +1019,7 @@ class FGGlyphLineView(AppKit.NSView):
     relativeHBaseline = hookedProperty(_scheduleRedraw, default=0.25)
     relativeVBaseline = hookedProperty(_scheduleRedraw, default=0.5)
     relativeMargin = hookedProperty(_scheduleRedraw, default=0.1)
+    showMetrics = hookedProperty(_scheduleRedraw, default=True)
 
     def init(self):
         self = super().init()
@@ -1250,6 +1252,18 @@ class FGGlyphLineView(AppKit.NSView):
         dx, dy = self.origin
 
         invScale = 1 / self.scaleFactor
+
+        if self.showMetrics:
+            xHeight = dy + self._glyphs.fontMetrics.xHeight * self.scaleFactor
+            capHeight = dy + self._glyphs.fontMetrics.capHeight * self.scaleFactor
+            ascender = dy + self._glyphs.fontMetrics.ascender * self.scaleFactor
+            descender = dy + self._glyphs.fontMetrics.descender * self.scaleFactor
+            drawLine((0,dy), (self.bounds().size.width, dy), colors.selectedSpaceColor, 2)
+            drawLine((0,xHeight), (self.bounds().size.width, xHeight), colors.hoverSpaceColor, 2)
+            drawLine((0,capHeight), (self.bounds().size.width, capHeight), colors.hoverSpaceColor, 2)
+            drawLine((0,ascender), (self.bounds().size.width, ascender), colors.hoverColor, 1)
+            drawLine((0,descender), (self.bounds().size.width, descender), colors.hoverColor, 1)
+
         rect = rectFromNSRect(rect)
         rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
 
