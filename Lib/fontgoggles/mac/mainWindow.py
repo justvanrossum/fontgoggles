@@ -152,6 +152,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings.windowPosition = [x, y, w, h]
         uiSettings.fontListItemSize = self.fontList.itemSize
         uiSettings.fontListShowFontFileName = self.fontList.showFontFileName
+        uiSettings.fontListShowMetrics = self.fontList.showMetrics
 
         uiSettings.characterListVisible = self.w.mainSplitView.isPaneReallyVisible("characterList")
         uiSettings.characterListSize = self.w.mainSplitView.paneSize("characterList")
@@ -245,6 +246,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                  relativeVBaseline=self.project.textSettings.relativeVBaseline,
                                  relativeMargin=self.project.textSettings.relativeMargin,
                                  showFontFileName=self.project.uiSettings.fontListShowFontFileName,
+                                 showMetrics=self.project.uiSettings.fontListShowMetrics,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
@@ -1031,6 +1033,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def showFontFileName_(self, sender):
         self.fontList.showFontFileName = not self.fontList.showFontFileName
 
+    def showMetrics_(self, sender):
+        self.fontList.showMetrics = not self.fontList.showMetrics
+
     @suppressAndLogException
     def validateMenuItem_(self, sender):
         action = sender.action()
@@ -1047,6 +1052,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isVisible = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
         elif action == "showFontFileName:":
             isVisible = self.fontList.showFontFileName
+        elif action == "showMetrics:":
+            isVisible = self.fontList.showMetrics
         elif action in ("previousTextLine:", "nextTextLine:"):
             return bool(self.textEntry.textFilePath)
         elif action == "copy:":

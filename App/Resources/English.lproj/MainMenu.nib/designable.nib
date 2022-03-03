@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment version="101000" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
@@ -271,6 +271,11 @@ CA
                             <menuItem title="Show Font File name" keyEquivalent="5" id="pWG-xt-g3o">
                                 <connections>
                                     <action selector="showFontFileName:" target="-1" id="Ppi-rz-b6J"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show Metrics" keyEquivalent="6" id="Xhr-L4-CtF">
+                                <connections>
+                                    <action selector="showMetrics:" target="-1" id="gZB-fy-wVh"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="Vef-M8-MyD"/>
