@@ -1,5 +1,5 @@
 markdown==3.3.6
 pillow==9.0.1
-fontTools==4.29.1
+fontTools==4.30.0
 fs==2.4.15
 brotli==1.0.9
