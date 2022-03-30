@@ -108,6 +108,7 @@ try:
     setup(
         data_files=['Resources/English.lproj', 'Resources/errorPatternImage.png'],
         app=[f"{appName}.py"],
+        packages=[],
         options=dict(py2app=dict(
             iconfile="Resources/fontgoggles.icns",
             plist=infoplist,
