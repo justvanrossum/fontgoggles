@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.4.5] - 2022-06-09
+
+- Updated blackrenderer to 0.5.1, which fixes a bug in COLRv1 handling ([blackrenderer issue 93](https://github.com/BlackFoundryCom/black-renderer/issues/93))
+
 ## [1.4.4] - 2022-01-20
 
 - Updated Unicode/unicodedata2 to 14.0.0
