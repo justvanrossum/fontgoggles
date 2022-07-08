@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.5.0] - 2022-07-08
+
+- Updated blackrenderer to 0.5.2, which implements variable COLRv1 ([blackrenderer issue 53](https://github.com/BlackFoundryCom/black-renderer/issues/53), [blackrenderer PR 88](https://github.com/BlackFoundryCom/black-renderer/pull/88))
+
 ## [1.4.5] - 2022-06-09
 
 - Updated blackrenderer to 0.5.1, which fixes a bug in COLRv1 handling ([blackrenderer issue 93](https://github.com/BlackFoundryCom/black-renderer/issues/93))
