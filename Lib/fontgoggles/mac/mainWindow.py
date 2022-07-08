@@ -163,6 +163,31 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings.feaVarTabSelection = feaVarTabValues[self.feaVarTabs.get()]
         uiSettings.showHiddenAxes = self.variationsGroup.showHiddenAxes
 
+    @suppressAndLogException
+    def syncFromProject(self):
+        print("sync!")
+
+        textSettings = self.project.textSettings
+        uiSettings = self.project.uiSettings
+
+        self.w.mainSplitView.showPaneReally("characterList", uiSettings.characterListVisible)
+        self.w.mainSplitView.setPaneSize("characterList", uiSettings.characterListSize)
+
+        self.restoreWindowPosition(uiSettings.windowPosition)
+        self.textEntry.set(textSettings.text)
+
+        self.fontList.itemSize = uiSettings.fontListItemSize
+        self.fontList.relativeFontSize = textSettings.relativeFontSize
+        self.fontList.relativeHBaseline = textSettings.relativeHBaseline
+        self.fontList.relativeVBaseline = textSettings.relativeVBaseline
+        self.fontList.relativeMargin = textSettings.relativeMargin
+
+        self.fontList.purgeFontItems()
+        self.project.purgeFonts()
+        self._projectFontsChanged([])
+        self.growOrShrinkFontList()
+        self.textEntryChangedCallback(self.textEntry)
+
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
         if not windowPosition:
@@ -1326,6 +1351,9 @@ class MySplitView(SplitView):
     def isPaneReallyVisible(self, paneIdentifier):
         return not self.isPaneVisible(paneIdentifier)
 
+    def showPaneReally(self, paneIdentifier, onOff):
+        self.showPane(paneIdentifier, not onOff)
+
     def paneSize(self, paneIdentifier):
         view = self._identifierToPane[paneIdentifier]["view"]
         w, h = view._nsObject.frame().size
@@ -1333,6 +1361,19 @@ class MySplitView(SplitView):
             return w
         else:
             return h
+
+    def setPaneSize(self, paneIdentifier, size):
+        view = self._identifierToPane[paneIdentifier]["view"]
+        (x, y), (w, h) = view._nsObject.frame()
+        print((x, y), (w, h))
+        if self._nsObject.isVertical():
+            w = size
+        else:
+            h = size
+        # XXXX not working
+        # print((x, y), (w, h))
+        # view._nsObject.setFrame_(((x, y), (w, h)))
+        # self._nsObject.adjustSubviews()
 
 
 _minimalSpaceBox = 12
