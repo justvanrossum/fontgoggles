@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 from distutils.command.build import build as _build
 import re
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension
+from Cython.Build import cythonize
 import subprocess
 
 
@@ -18,6 +19,17 @@ with open('Lib/fontgoggles/__init__.py', "r") as fg_init:
     assert match is not None, "fontgoggles.__version__ not found"
     fg_version = match.group(1)
 
+
+extensions = [
+    Extension(
+        name="fontgoggles.mac.makePath",
+        sources=[
+            "Lib/fontgoggles/mac/makePath.pyx",
+            "Lib/fontgoggles/mac/_makePath.m",
+        ],
+        extra_link_args=["-framework", "AppKit"],
+    )
+]
 
 setup(
     name="fontgoggles",
@@ -39,4 +51,5 @@ setup(
     classifiers=[
     ],
     cmdclass={'build': build},
+    ext_modules=cythonize(extensions),
 )
