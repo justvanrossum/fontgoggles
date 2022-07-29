@@ -1,5 +1,16 @@
 # Changelog for FontGoggles
 
+## [1.6.0] - 2022-07-29
+
+- [Issue 267](https://github.com/justvanrossum/fontgoggles/issues/267), [PR 269](https://github.com/justvanrossum/fontgoggles/pull/269) by Khaled Hosny:
+  - Use HarfBuzz for extracting outlines from binary fonts
+  - Update uharfbuzz to 0.29.0 (which updates HarfBuzz to 5.0.0)
+  - Remove FreeType dependency
+
+Practically, this means:
+- Support for [`avar` 2](https://github.com/harfbuzz/boring-expansion-spec/issues/14)
+- Support for more than 65536 glyphs in OTF/TTF
+
 ## [1.5.0] - 2022-07-08
 
 - Updated blackrenderer to 0.5.2, which implements variable COLRv1 ([blackrenderer issue 53](https://github.com/BlackFoundryCom/black-renderer/issues/53), [blackrenderer PR 88](https://github.com/BlackFoundryCom/black-renderer/pull/88))
