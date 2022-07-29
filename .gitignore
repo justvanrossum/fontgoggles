@@ -109,5 +109,4 @@ venv.bak/
 Vault
 *.dylib
 Lib/fontgoggles/_version.py
-Lib/fontgoggles/mac/makePath.c
 App/Resources/English.lproj/Credits.rtf

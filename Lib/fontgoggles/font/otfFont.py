@@ -3,7 +3,7 @@ from fontTools.ttLib import TTFont
 from .baseFont import BaseFont
 from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing, GlyphCOLRv1Drawing
 from ..compile.compilerPool import compileTTXToBytes
-from ..mac.makePath import makePathFromGlyph
+from ..mac.makePathFromOutline import makePathFromGlyph
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
 

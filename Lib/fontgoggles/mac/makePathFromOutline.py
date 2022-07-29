@@ -33,6 +33,18 @@ _makePathFromArrays.argtypes = [ctypes.c_short,
                                 c_short_p]
 _makePathFromArrays.restype = ctypes.c_void_p
 
+_makePath = _lib.makePath
+_makePath.restype = ctypes.c_void_p
+
+PyCapsule_New = ctypes.pythonapi.PyCapsule_New
+PyCapsule_New.restype = ctypes.py_object
+PyCapsule_New.argtypes = (ctypes.c_void_p, ctypes.c_char_p, ctypes.c_void_p)
+
+move_to_capsule = PyCapsule_New(_lib.move_to, None, None)
+line_to_capsule = PyCapsule_New(_lib.line_to, None, None)
+cubic_to_capsule = PyCapsule_New(_lib.cubic_to, None, None)
+close_path_capsule = PyCapsule_New(_lib.close_path, None, None)
+
 
 def makePathFromArrays(points, tags, contours):
     import numpy
@@ -57,4 +69,24 @@ def makePathFromArrays(points, tags, contours):
     # We pretty much take over that reference, but I think objc.objc_object()
     # assumes it needs to own it, too.
     path.release()
+    return path
+
+def makePathFromGlyph(font, gid):
+    from uharfbuzz import DrawFuncs
+
+    path_p = _makePath()
+    path_capsule = PyCapsule_New(path_p, None, None)
+
+    funcs = DrawFuncs()
+    funcs.set_move_to_func(move_to_capsule, path_capsule)
+    funcs.set_line_to_func(line_to_capsule, path_capsule)
+    funcs.set_cubic_to_func(cubic_to_capsule, path_capsule)
+    funcs.set_close_path_func(close_path_capsule, path_capsule)
+
+    funcs.get_glyph_shape(font, gid)
+
+    path = objc.objc_object(c_void_p=path_p)
+    # See comment in makePathFromArrays()
+    path.release()
+
     return path
