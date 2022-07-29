@@ -1,18 +1,15 @@
 import ctypes
 import pathlib
 
-import freetype
-try:
-    import numpy
-except ImportError:
-    # It's ok to not have numpy if makePathFromArrays() is not used.
-    numpy = None
 import objc
 import Foundation
 
 
-FT_Vector_p = ctypes.POINTER(freetype.ft_structs.FT_Vector)
-FT_Outline_p = ctypes.POINTER(freetype.ft_structs.FT_Outline)
+class NSPoint(ctypes.Structure):
+    _fields_ = [('x', ctypes.c_double),
+                ('y', ctypes.c_double)]
+
+NSPoint_p = ctypes.POINTER(NSPoint)
 c_char_p = ctypes.POINTER(ctypes.c_char)
 c_short_p = ctypes.POINTER(ctypes.c_short)
 
@@ -28,46 +25,68 @@ if not _libPath.exists():
 
 _lib = ctypes.cdll.LoadLibrary(_libPath)
 
-_makePathFromOutline = _lib.makePathFromOutline
-_makePathFromOutline.argtypes = [FT_Outline_p]
-_makePathFromOutline.restype = ctypes.c_void_p
-
 _makePathFromArrays = _lib.makePathFromArrays
 _makePathFromArrays.argtypes = [ctypes.c_short,
                                 ctypes.c_short,
-                                FT_Vector_p,
+                                NSPoint_p,
                                 c_char_p,
                                 c_short_p]
 _makePathFromArrays.restype = ctypes.c_void_p
 
+_makePath = _lib.makePath
+_makePath.restype = ctypes.c_void_p
 
-def makePathFromOutline(outline):
-    path = objc.objc_object(c_void_p=_makePathFromOutline(outline))
-    # Not sure why, but the path object comes back with a retain count too many.
-    # In _makePathFromOutline(), we do [[NSBezierPath alloc] init], so that's one.
-    # We pretty much take over that reference, but I think objc.objc_object()
-    # assumes it needs to own it, too.
-    path.release()
-    return path
+PyCapsule_New = ctypes.pythonapi.PyCapsule_New
+PyCapsule_New.restype = ctypes.py_object
+PyCapsule_New.argtypes = (ctypes.c_void_p, ctypes.c_char_p, ctypes.c_void_p)
+
+move_to_capsule = PyCapsule_New(_lib.move_to, None, None)
+line_to_capsule = PyCapsule_New(_lib.line_to, None, None)
+cubic_to_capsule = PyCapsule_New(_lib.cubic_to, None, None)
+close_path_capsule = PyCapsule_New(_lib.close_path, None, None)
 
 
 def makePathFromArrays(points, tags, contours):
+    import numpy
+
     n_contours = len(contours)
     n_points = len(tags)
     assert len(points) >= n_points
     assert points.shape[1:] == (2,)
-    if points.dtype != numpy.int64:
-        points = numpy.floor(points + [0.5, 0.5])
-        points = points.astype(numpy.int64)
+    if points.dtype != numpy.double:
+        points = points.astype(numpy.double)
     assert tags.dtype == numpy.byte
     assert contours.dtype == numpy.short
     path = objc.objc_object(
         c_void_p=_makePathFromArrays(
             n_contours,
             n_points,
-            points.ctypes.data_as(FT_Vector_p),
+            points.ctypes.data_as(NSPoint_p),
             tags.ctypes.data_as(c_char_p),
             contours.ctypes.data_as(c_short_p)))
-    # See comment in makePathFromOutline()
+    # Not sure why, but the path object comes back with a retain count too many.
+    # In _makePathFromArrays(), we do [[NSBezierPath alloc] init], so that's one.
+    # We pretty much take over that reference, but I think objc.objc_object()
+    # assumes it needs to own it, too.
     path.release()
+    return path
+
+def makePathFromGlyph(font, gid):
+    from uharfbuzz import DrawFuncs
+
+    path_p = _makePath()
+    path_capsule = PyCapsule_New(path_p, None, None)
+
+    funcs = DrawFuncs()
+    funcs.set_move_to_func(move_to_capsule, path_capsule)
+    funcs.set_line_to_func(line_to_capsule, path_capsule)
+    funcs.set_cubic_to_func(cubic_to_capsule, path_capsule)
+    funcs.set_close_path_func(close_path_capsule, path_capsule)
+
+    funcs.get_glyph_shape(font, gid)
+
+    path = objc.objc_object(c_void_p=path_p)
+    # See comment in makePathFromArrays()
+    path.release()
+
     return path

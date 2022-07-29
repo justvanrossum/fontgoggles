@@ -3,12 +3,15 @@ from fontTools.ttLib import TTFont
 from .baseFont import BaseFont
 from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing, GlyphCOLRv1Drawing
 from ..compile.compilerPool import compileTTXToBytes
-from ..misc.ftFont import FTFont
+from ..mac.makePathFromOutline import makePathFromGlyph
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
 
 
 class _OTFBaseFont(BaseFont):
+
+    def _getGlyphOutline(self, name):
+        return makePathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         if "VarC" in self.ttFont:
@@ -21,17 +24,16 @@ class _OTFBaseFont(BaseFont):
             if self.colorLayers is not None:
                 layers = self.colorLayers.get(glyphName)
                 if layers is not None:
-                    drawingLayers = [(self.ftFont.getOutlinePath(layer.name), layer.colorID)
+                    drawingLayers = [(self._getGlyphOutline(layer.name), layer.colorID)
                                      for layer in layers]
                     return GlyphLayersDrawing(drawingLayers)
             elif self.colorFont is not None:
                 return GlyphCOLRv1Drawing(glyphName, self.colorFont)
 
-        outline = self.ftFont.getOutlinePath(glyphName)
+        outline = self._getGlyphOutline(glyphName)
         return GlyphDrawing(outline)
 
     def varLocationChanged(self, varLocation):
-        self.ftFont.setVarLocation(varLocation if varLocation else {})
         if self.colorFont is not None:
             self.colorFont.setLocation(varLocation)
 
@@ -94,7 +96,6 @@ class OTFFont(_OTFBaseFont):
             f = io.BytesIO()
             self.ttFont.save(f, reorderTables=False)
             fontData = f.getvalue()
-        self.ftFont = FTFont(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
         self.shaper = HBShape(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
 
 
@@ -104,5 +105,4 @@ class TTXFont(_OTFBaseFont):
         fontData = await compileTTXToBytes(self.fontPath, outputWriter)
         f = io.BytesIO(fontData)
         self.ttFont = TTFont(f, fontNumber=self.fontNumber, lazy=True)
-        self.ftFont = FTFont(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)
         self.shaper = HBShape(fontData, fontNumber=self.fontNumber, ttFont=self.ttFont)

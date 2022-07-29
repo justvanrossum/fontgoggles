@@ -2,35 +2,6 @@
 #import <Cocoa/Cocoa.h>
 
 
-/* I'm lazy, I don't want to deal with requiring the freetype C header
-   files to be present, so I'll just copy what I need. */
-
-
-typedef signed long  FT_Pos;
-
-
-typedef struct  FT_Vector_
-{
-  FT_Pos  x;
-  FT_Pos  y;
-
-} FT_Vector;
-
-
-typedef struct  FT_Outline_
-{
-  short       n_contours;      /* number of contours in glyph        */
-  short       n_points;        /* number of points in the glyph      */
-
-  FT_Vector*  points;          /* the outline's points               */
-  char*       tags;            /* the points flags                   */
-  short*      contours;        /* the contour end points             */
-
-  int         flags;           /* outline masks                      */
-
-} FT_Outline;
-
-
 #define FT_CURVE_TAG( flag )  ( flag & 3 )
 
 #define FT_CURVE_TAG_ON            1
@@ -79,7 +50,7 @@ static void qCurveToOne(NSBezierPath* path, NSPoint pt0, NSPoint pt1, NSPoint pt
 
 static void drawSegment(NSBezierPath* path,
                         int n_points,
-                        FT_Vector* points,
+                        NSPoint* points,
                         int seg_start,
                         int seg_end,
                         char curve_type,
@@ -92,16 +63,16 @@ static void drawSegment(NSBezierPath* path,
 
     if (n_offcurves == 0) {
         if (!is_final_segment) {
-            [path lineToPoint:NSMakePoint(points[seg_end].x, points[seg_end].y)];
+            [path lineToPoint:points[seg_end]];
         }
     } else {
         if (curve_type == FT_CURVE_TAG_CUBIC) {
             // Cubic segment, assuming n_offcurves == 2 here
             int h1_index = PY_MODULO(seg_end - 2, n_points);
             int h2_index = PY_MODULO(seg_end - 1, n_points);
-            [path curveToPoint: NSMakePoint(points[seg_end].x, points[seg_end].y)
-                 controlPoint1: NSMakePoint(points[h1_index].x, points[h1_index].y)
-                 controlPoint2: NSMakePoint(points[h2_index].x, points[h2_index].y)
+            [path curveToPoint: points[seg_end]
+                 controlPoint1: points[h1_index]
+                 controlPoint2: points[h2_index]
             ];
         } else {
             // Quadratic segment
@@ -114,20 +85,20 @@ static void drawSegment(NSBezierPath* path,
                 n_offcurves++;
                 seg_start--;  // it will not be used as an index while negative
             } else {
-                prev_oncurve = NSMakePoint(points[seg_start].x, points[seg_start].y);
+                prev_oncurve = points[seg_start];
             }
             for (i = 0; i < n_offcurves; i++) {
                 if (i == n_offcurves - 1 && !is_quad_blob) {
                     int off_index = (seg_start + i + 1) % n_points;
                     qCurveToOne(path, prev_oncurve,
-                                      NSMakePoint(points[off_index].x, points[off_index].y),
-                                      NSMakePoint(points[seg_end].x, points[seg_end].y));
+                                      points[off_index],
+                                      points[seg_end]);
                 } else {
                     int off1_index = (seg_start + i + 1) % n_points;
                     int off2_index = (seg_start + i + 2) % n_points;
                     NSPoint implied = MIDPOINT(points[off1_index], points[off2_index]);
                     qCurveToOne(path, prev_oncurve,
-                                      NSMakePoint(points[off1_index].x, points[off1_index].y),
+                                      points[off1_index],
                                       implied);
                     prev_oncurve = implied;
                 }
@@ -139,7 +110,7 @@ static void drawSegment(NSBezierPath* path,
 
 static void drawContour(NSBezierPath* path,
                         short n_points,
-                        FT_Vector* points,
+                        NSPoint* points,
                         char* tags)
 {
     int i, first_oncurve = -1;
@@ -159,7 +130,7 @@ static void drawContour(NSBezierPath* path,
             drawSegment(path, n_points, points, 0, n_points, curve_type, 1, 0);
         }
     } else {
-        [path moveToPoint:NSMakePoint(points[first_oncurve].x, points[first_oncurve].y)];
+        [path moveToPoint:points[first_oncurve]];
         seg_start = first_oncurve;
         for (i = 1; i <= n_points; i++) {
             int index = (i + first_oncurve) % n_points;
@@ -177,7 +148,7 @@ static void drawContour(NSBezierPath* path,
     }
 }
 
-void* makePathFromArrays(short n_contours, short n_points, FT_Vector* points, char* tags, short* contours)
+void* makePathFromArrays(short n_contours, short n_points, NSPoint* points, char* tags, short* contours)
 {
     int i, j, c_start = 0;
 
@@ -192,11 +163,61 @@ void* makePathFromArrays(short n_contours, short n_points, FT_Vector* points, ch
     return path;
 }
 
-void* makePathFromOutline(FT_Outline* outline)
+void*
+makePath (void)
 {
-    return makePathFromArrays(outline->n_contours,
-                              outline->n_points,
-                              outline->points,
-                              outline->tags,
-                              outline->contours);
+  NSBezierPath *path = [[NSBezierPath alloc] init];
+  return path;
+}
+
+void
+move_to (void *funcs,
+         void *draw_data,
+         void *st,
+         float to_x,
+         float to_y,
+         void *user_data)
+{
+  NSBezierPath *path = (NSBezierPath *) user_data;
+  [path moveToPoint: NSMakePoint(to_x, to_y)];
+}
+
+void
+line_to (void *funcs,
+         void *draw_data,
+         void *st,
+         float to_x,
+         float to_y,
+         void *user_data)
+{
+  NSBezierPath *path = (NSBezierPath *) user_data;
+  [path lineToPoint: NSMakePoint(to_x, to_y)];
+}
+
+void
+cubic_to (void *funcs,
+          void *draw_data,
+          void *st,
+          float control1_x,
+          float control1_y,
+          float control2_x,
+          float control2_y,
+          float to_x,
+          float to_y,
+          void *user_data)
+{
+  NSBezierPath *path = (NSBezierPath *) user_data;
+  [path curveToPoint: NSMakePoint(to_x, to_y)
+       controlPoint1: NSMakePoint(control1_x, control1_y)
+       controlPoint2: NSMakePoint(control2_x, control2_y)
+  ];
+}
+
+void close_path (void *funcs,
+                 void *draw_data,
+                 void *st,
+                 void *user_data)
+{
+  NSBezierPath *path = (NSBezierPath *) user_data;
+  [path closePath];
 }
