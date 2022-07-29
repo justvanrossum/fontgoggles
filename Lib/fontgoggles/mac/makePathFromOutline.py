@@ -5,11 +5,11 @@ import objc
 import Foundation
 
 
-class FT_Vector(ctypes.Structure):
-    _fields_ = [('x', ctypes.c_long),
-                ('y', ctypes.c_long)]
+class NSPoint(ctypes.Structure):
+    _fields_ = [('x', ctypes.c_double),
+                ('y', ctypes.c_double)]
 
-FT_Vector_p = ctypes.POINTER(FT_Vector)
+NSPoint_p = ctypes.POINTER(NSPoint)
 c_char_p = ctypes.POINTER(ctypes.c_char)
 c_short_p = ctypes.POINTER(ctypes.c_short)
 
@@ -28,7 +28,7 @@ _lib = ctypes.cdll.LoadLibrary(_libPath)
 _makePathFromArrays = _lib.makePathFromArrays
 _makePathFromArrays.argtypes = [ctypes.c_short,
                                 ctypes.c_short,
-                                FT_Vector_p,
+                                NSPoint_p,
                                 c_char_p,
                                 c_short_p]
 _makePathFromArrays.restype = ctypes.c_void_p
@@ -41,16 +41,15 @@ def makePathFromArrays(points, tags, contours):
     n_points = len(tags)
     assert len(points) >= n_points
     assert points.shape[1:] == (2,)
-    if points.dtype != numpy.int64:
-        points = numpy.floor(points + [0.5, 0.5])
-        points = points.astype(numpy.int64)
+    if points.dtype != numpy.double:
+        points = points.astype(numpy.double)
     assert tags.dtype == numpy.byte
     assert contours.dtype == numpy.short
     path = objc.objc_object(
         c_void_p=_makePathFromArrays(
             n_contours,
             n_points,
-            points.ctypes.data_as(FT_Vector_p),
+            points.ctypes.data_as(NSPoint_p),
             tags.ctypes.data_as(c_char_p),
             contours.ctypes.data_as(c_short_p)))
     # Not sure why, but the path object comes back with a retain count too many.
