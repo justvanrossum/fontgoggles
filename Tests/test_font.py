@@ -227,7 +227,7 @@ async def test_openFonts(fileName,
     numFonts, opener, getSortInfo = getOpener(fontPath)
     assert numFonts(fontPath) == 1
     font = opener(fontPath, 0)
-    await font.load(None)
+    await font.load(print)
     sortInfo = getSortInfo(fontPath, 0)
     assert sortInfo == expectedSortInfo
     assert font.featuresGSUB == featuresGSUB
