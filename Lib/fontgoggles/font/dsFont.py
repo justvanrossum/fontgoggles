@@ -386,7 +386,8 @@ class VarGlyph:
                 if isinstance(subGlyph, NotDefGlyph):
                     continue
                 allContours.append(subGlyph.contours + firstPoint)
-                firstPoint = subGlyph.contours[-1] + firstPoint + 1
+                if len(subGlyph.contours):
+                    firstPoint = subGlyph.contours[-1] + firstPoint + 1
             self._contours = numpy.concatenate(allContours)
         return self._contours
 
