@@ -91,7 +91,7 @@ jobs:
         GITHUB_REF: ${{ github.ref }}
       run: |
         source venv/bin/activate
-        echo "::set-output name=body::$(python App/Distribute/extract_changes.py)"
+        echo "changelog_contents=$(python App/Distribute/extract_changes.py)" >>$GITHUB_OUTPUT
 
     - name: Create Release
       id: create_release
@@ -101,7 +101,7 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
-        body: ${{ steps.changelog.outputs.body }}
+        body: ${{ steps.changelog.outputs.changelog_contents }}
         draft: true
         prerelease: false
 
