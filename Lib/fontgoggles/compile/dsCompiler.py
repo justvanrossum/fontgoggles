@@ -2,15 +2,17 @@ import os
 import pickle
 import sys
 from fontTools.designspaceLib import DesignSpaceDocument
+from fontTools.designspaceLib.split import splitVariableFonts
 from fontTools.fontBuilder import FontBuilder
 from fontTools.ttLib import TTFont, newTable
 from fontTools import varLib
 from fontTools.varLib.errors import VarLibError
 
 
-def compileDSToFont(dsPath, ttFolder):
-    doc = DesignSpaceDocument.fromfile(dsPath)
-    doc.findDefault()
+def compileDSToFont(dsPath, fontNumber, ttFolder):
+    fontNumber = int(fontNumber)
+    docs = list(splitVariableFonts(DesignSpaceDocument.fromfile(dsPath)))
+    _, doc = docs[fontNumber]
 
     ufoPathToTTPath = getTTPaths(doc, ttFolder)
 
@@ -55,8 +57,8 @@ def compileDSToFont(dsPath, ttFolder):
     return ttFont
 
 
-def compileDSToPath(dsPath, ttFolder, ttPath):
-    ttFont = compileDSToFont(dsPath, ttFolder)
+def compileDSToPath(dsPath, fontNumber, ttFolder, ttPath):
+    ttFont = compileDSToFont(dsPath, fontNumber, ttFolder)
     ttFont.save(ttPath, reorderTables=False)
 
 
