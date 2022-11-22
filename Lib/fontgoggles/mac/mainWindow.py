@@ -195,6 +195,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.characterList._tableView.setAllowsColumnSelection_(True)
         self.characterList._tableView.setDelegate_(self)
         self.characterList._nsObject.setBorderType_(AppKit.NSNoBorder)
+        if hasattr(AppKit, "NSTableViewStylePlain"):
+            self.characterList.getNSTableView().setStyle_(AppKit.NSTableViewStylePlain)
+            self.characterList.getNSTableView().setIntercellSpacing_((3, 2))
         group.characterList = self.characterList
         return group
 
@@ -222,6 +225,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.glyphList._tableView.setAllowsColumnSelection_(True)
         self.glyphList._tableView.setDelegate_(self)
         self.glyphList._nsObject.setBorderType_(AppKit.NSNoBorder)
+        if hasattr(AppKit, "NSTableViewStylePlain"):
+            self.glyphList.getNSTableView().setStyle_(AppKit.NSTableViewStylePlain)
+            self.glyphList.getNSTableView().setIntercellSpacing_((3, 2))
         group.glyphList = self.glyphList
         return group
 
