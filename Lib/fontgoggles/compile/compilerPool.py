@@ -27,20 +27,21 @@ async def compileUFOToBytes(ufoPath, outputWriter):
     return fontData
 
 
-async def compileDSToPath(dsPath, ttFolder, ttPath, outputWriter):
+async def compileDSToPath(dsPath, fontNumber, ttFolder, ttPath, outputWriter):
     pool = getCompilerPool()
     func = "fontgoggles.compile.dsCompiler.compileDSToPath"
     args = [
         os.fspath(dsPath),
+        str(fontNumber),
         os.fspath(ttFolder),
         os.fspath(ttPath),
     ]
     return await pool.callFunction(func, args, outputWriter)
 
 
-async def compileDSToBytes(dsPath, ttFolder, outputWriter):
+async def compileDSToBytes(dsPath, fontNumber, ttFolder, outputWriter):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
-        await compileDSToPath(dsPath, ttFolder, tmp.name, outputWriter)
+        await compileDSToPath(dsPath, fontNumber, ttFolder, tmp.name, outputWriter)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:
