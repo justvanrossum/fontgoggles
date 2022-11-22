@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.7.1] - 2022-11-22
+
+- Fixed cosmetic layout issue on macOS 11 an up. Thanks to Frederik Berlaen. ([Issue 293](https://github.com/justvanrossum/fontgoggles/issues/293), [PR 294](https://github.com/justvanrossum/fontgoggles/pull/294))
+
 ## [1.7.0] - 2022-11-22
 
 - Add support for DesignSpace format 5 (Discrete axes and multiple Variable Font definitions) ([Issue 291](https://github.com/justvanrossum/fontgoggles/issues/291), [PR 292](https://github.com/justvanrossum/fontgoggles/pull/292))
