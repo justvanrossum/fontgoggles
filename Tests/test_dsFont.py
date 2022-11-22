@@ -76,9 +76,14 @@ async def test_DSFont():
 
 
 @pytest.mark.asyncio
-async def test_DSFont_getOutline():
-    ufoPath = getFontPath("MutatorSans.designspace")
-    font = DSFont(ufoPath, 0)
+@pytest.mark.parametrize("ufoFileName, fontNumber, expectedBounds", [
+    ("MutatorSans.designspace", 0, ((20, 0), (356, 700))),
+    ("MutatorSansDS5.designspace", 0, ((20, 0), (356, 700))),
+    ("MutatorSansDS5.designspace", 1, ((50, 0), (1090, 700))),
+])
+async def test_DSFont_getOutline(ufoFileName, fontNumber, expectedBounds):
+    ufoPath = getFontPath(ufoFileName)
+    font = DSFont(ufoPath, fontNumber)
     await font.load(sys.stderr.write)
     drawing, *_ = font.getGlyphDrawings(["A"])
-    assert ((20, 0), (356, 700)) == drawing.path.bounds()
+    assert expectedBounds == drawing.path.bounds()
