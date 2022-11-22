@@ -225,7 +225,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.glyphList._tableView.setAllowsColumnSelection_(True)
         self.glyphList._tableView.setDelegate_(self)
         self.glyphList._nsObject.setBorderType_(AppKit.NSNoBorder)
-        if hasattr(AppKit, "NSTableViewStylePlain") and hasattr(self.characterList.getNSTableView(), "setStyle_"):
+        if hasattr(AppKit, "NSTableViewStylePlain") and hasattr(self.glyphList.getNSTableView(), "setStyle_"):
             self.glyphList.getNSTableView().setStyle_(AppKit.NSTableViewStylePlain)
             self.glyphList.getNSTableView().setIntercellSpacing_((3, 2))
         group.glyphList = self.glyphList
