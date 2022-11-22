@@ -65,6 +65,12 @@ def numFontsTTC(fontPath: PathLike):
     return header.numFonts
 
 
+def numFontsDesignSpace(fontPath: PathLike):
+    from fontTools.designspaceLib import DesignSpaceDocument
+    doc = DesignSpaceDocument.fromfile(fontPath)
+    return len(doc.getVariableFonts())
+
+
 defaultSortInfo = dict(familyName="", styleName="", weight=400, width=5, italicAngle=0, suffix="")
 
 
@@ -116,7 +122,6 @@ def getSortInfoUFO(fontPath: PathLike, fontNum: int):
 
 
 def getSortInfoDS(fontPath: PathLike, fontNum: int):
-    assert fontNum == 0
     return {}  # TODO
 
 
@@ -134,7 +139,7 @@ fontOpeners = {
     "ufoz": (numFontsOne, "fontgoggles.font.ufoFont.UFOFont", getSortInfoUFO),
     "ttc": (numFontsTTC, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
     "otc": (numFontsTTC, "fontgoggles.font.otfFont.OTFFont", getSortInfoOTF),
-    "designspace": (numFontsOne, "fontgoggles.font.dsFont.DSFont", getSortInfoDS),
+    "designspace": (numFontsDesignSpace, "fontgoggles.font.dsFont.DSFont", getSortInfoDS),
     "ttx": (numFontsOne, "fontgoggles.font.otfFont.TTXFont", getSortInfoTTX),
 }
 
