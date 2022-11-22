@@ -934,10 +934,12 @@ class FontItem(Group):
             if not self._isLoadingCounter:
                 self.progressSpinner.stop()
 
-    def setFontKey(self, fontKey):
+    def setFontKey(self, fontKey, nameInCollection=None):
         fontPath, fontNumber = fontKey
         fileNameLabel = f"{fontPath.name}"
-        if fontNumber or fontPath.suffix.lower() in {".ttc", ".otc"}:
+        if nameInCollection:
+            fileNameLabel += f"#{nameInCollection}"
+        elif fontNumber or fontPath.suffix.lower() in {".ttc", ".otc"}:
             fileNameLabel += f"#{fontNumber}"
         self.fileNameLabel.set(fileNameLabel, tooltip=str(fontPath))
         self.fontPath = fontPath
