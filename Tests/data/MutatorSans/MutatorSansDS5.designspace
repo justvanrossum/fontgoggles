@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<designspace format="5.0">
+  <axes>
+    <axis tag="wdth" name="width" values="0 1000" default="0"/>
+    <axis tag="wght" name="weight" minimum="0" maximum="1000" default="0"/>
+  </axes>
+  <rules>
+    <rule name="fold_I_serifs">
+      <conditionset>
+        <condition name="width" minimum="0" maximum="328"/>
+      </conditionset>
+      <sub name="I" with="I.narrow"/>
+    </rule>
+    <rule name="fold_S_terminals">
+      <conditionset>
+        <condition name="width" minimum="0" maximum="1000"/>
+        <condition name="weight" minimum="0" maximum="500"/>
+      </conditionset>
+      <sub name="S" with="S.closed"/>
+    </rule>
+  </rules>
+  <sources>
+    <source filename="MutatorSansLightCondensed.ufo" familyname="MutatorMathTest" stylename="LightCondensed">
+      <lib copy="1"/>
+      <groups copy="1"/>
+      <features copy="1"/>
+      <info copy="1"/>
+      <location>
+        <dimension name="width" xvalue="0"/>
+        <dimension name="weight" xvalue="0"/>
+      </location>
+    </source>
+    <source filename="MutatorSansBoldCondensed.ufo" familyname="MutatorMathTest" stylename="BoldCondensed">
+      <location>
+        <dimension name="width" xvalue="0"/>
+        <dimension name="weight" xvalue="1000"/>
+      </location>
+    </source>
+    <source filename="MutatorSansLightWide.ufo" familyname="MutatorMathTest" stylename="LightWide">
+      <location>
+        <dimension name="width" xvalue="1000"/>
+        <dimension name="weight" xvalue="0"/>
+      </location>
+    </source>
+    <source filename="MutatorSansBoldWide.ufo" familyname="MutatorMathTest" stylename="BoldWide">
+      <location>
+        <dimension name="width" xvalue="1000"/>
+        <dimension name="weight" xvalue="1000"/>
+      </location>
+    </source>
+  </sources>
+ </designspace>

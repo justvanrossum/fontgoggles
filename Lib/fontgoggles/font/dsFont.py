@@ -12,6 +12,7 @@ import numpy
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.pointPen import PointToSegmentPen
 from fontTools.designspaceLib import DesignSpaceDocument
+from fontTools.designspaceLib.split import splitVariableFonts
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
@@ -49,8 +50,8 @@ class DSFont(BaseFont):
 
     async def load(self, outputWriter):
         if self.doc is None:
-            self.doc = DesignSpaceDocument.fromfile(self.fontPath)
-            self.doc.findDefault()
+            docs = list(splitVariableFonts(DesignSpaceDocument.fromfile(self.fontPath)))
+            self.nameInCollection, self.doc = docs[self.fontNumber]
 
         with tempfile.TemporaryDirectory(prefix="fontgoggles_temp") as ttFolder:
             sourcePathToTTPath = getTTPaths(self.doc, ttFolder)
@@ -132,7 +133,7 @@ class DSFont(BaseFont):
                 # self.ttFont and self.shaper are still up-to-date
                 return
 
-            vfFontData = await compileDSToBytes(self.fontPath, ttFolder, outputWriter)
+            vfFontData = await compileDSToBytes(self.fontPath, self.fontNumber, ttFolder, outputWriter)
 
         f = io.BytesIO(vfFontData)
         self.ttFont = TTFont(f, lazy=True)
