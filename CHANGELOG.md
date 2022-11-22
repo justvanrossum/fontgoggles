@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.7.2] - 2022-11-22
+
+- Fixed support for macOS <= 10.15
+
 ## [1.7.1] - 2022-11-22
 
 - Fixed cosmetic layout issue on macOS 11 an up. Thanks to Frederik Berlaen. ([Issue 293](https://github.com/justvanrossum/fontgoggles/issues/293), [PR 294](https://github.com/justvanrossum/fontgoggles/pull/294))
