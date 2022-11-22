@@ -545,6 +545,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         else:
             self.setFontItemText(fontItemInfo, fontItem)
             self.growFontListFromItem(fontItem)
+            fontItem.setFontKey(fontItemInfo.fontKey, fontItemInfo.font.nameInCollection)
 
     @staticmethod
     def _gatherSidebarInfo(fonts):
