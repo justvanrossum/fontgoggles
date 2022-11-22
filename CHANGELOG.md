@@ -3,7 +3,7 @@
 ## [1.7.0] - 2022-11-22
 
 - Add support for DesignSpace format 5 (Discrete axes and multiple Variable Font definitions) ([Issue 291](https://github.com/justvanrossum/fontgoggles/issues/291), [PR 292](https://github.com/justvanrossum/fontgoggles/pull/292))
-- Updated internal dependencies: notably fonttools==4.38.0 and uharfbuzz==0.32.0
+- Updated internal dependencies: `fonttools==4.38.0` and `uharfbuzz==0.32.0` among others.
 
 ## [1.6.0] - 2022-07-29
 
