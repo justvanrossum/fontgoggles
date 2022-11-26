@@ -36,6 +36,14 @@ fontItemMinimumSize = 60
 fontItemMaximumSize = 1500
 
 
+supportedFormatsString = """
+Supported formats:
+• .designspace, .ufo, .ufoz
+• .ttf, .otf, .woff, .woff2, .ttx
+• .ttc, .otc
+"""
+
+
 def makeUndoProxy(model, changeMonitor=None):
     um = UndoManager(changeMonitor)
     return um.setModel(model)
@@ -322,10 +330,28 @@ class FontList(Group):
 
     def setupDropFontsPlaceholder(self):
         color = AppKit.NSColor.systemGrayColor()
-        color = color.blendedColorWithFraction_ofColor_(0.5, AppKit.NSColor.textBackgroundColor())
-        self.dropFontsPlaceHolder = UnclickableTextBox((10, 10, -10, -10),
-                                                       "Drop some fonts here!", fontSize=24,
-                                                       textColor=color)
+
+        attrs = {
+            AppKit.NSForegroundColorAttributeName: color,
+            AppKit.NSFontAttributeName: AppKit.NSFont.systemFontOfSize_(24),
+        }
+        header = AppKit.NSAttributedString.alloc().initWithString_attributes_(
+            "Drop some fonts here!\n",
+            attrs,
+        )
+        attrs[AppKit.NSFontAttributeName] = AppKit.NSFont.systemFontOfSize_(16)
+        info = AppKit.NSAttributedString.alloc().initWithString_attributes_(
+            supportedFormatsString,
+            attrs,
+        )
+        text = AppKit.NSMutableAttributedString.alloc().init()
+        text.appendAttributedString_(header)
+        text.appendAttributedString_(info)
+
+        self.dropFontsPlaceHolder = UnclickableTextBox(
+            (10, 10, -10, -10), "", fontSize=22, textColor=color
+        )
+        self.dropFontsPlaceHolder._nsObject.setAttributedStringValue_(text)
 
     @property
     def width(self):
