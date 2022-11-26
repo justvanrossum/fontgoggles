@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.7.3] - 2022-11-26
+
+- Added the supported file formats to the drop placeholder text, so they are more discoverable ([PR 295](https://github.com/justvanrossum/fontgoggles/pull/295))
+
 ## [1.7.2] - 2022-11-22
 
 - Fixed support for macOS <= 10.15
