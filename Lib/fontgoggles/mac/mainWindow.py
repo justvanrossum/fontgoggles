@@ -163,7 +163,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings.compileOutputSize = self.fontListSplitView.paneSize("compileOutput")
         uiSettings.formattingOptionsVisible = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
         uiSettings.feaVarTabSelection = feaVarTabValues[self.feaVarTabs.get()]
-        uiSettings.showHiddenAxes = self.variationsGroup.showHiddenAxes
+        uiSettings.showHiddenAxes = self.variationsGroup.axisSliders.showHiddenAxes
 
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
@@ -289,19 +289,34 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.feaVarTabs = self.feaVarTabs
         group.feaVarTabs.set(feaVarTabValues.index(self.project.uiSettings.feaVarTabSelection))
 
+        # Sidebar first tab
         featuresTab = group.feaVarTabs[0]
         self.featuresGroup = FeatureTagGroup(sidebarWidth - 6, {}, callback=self.featuresChanged)
         featuresTab.main = AligningScrollView((0, 0, 0, 0), self.featuresGroup, drawBackground=False,
                                               hasHorizontalScroller=False, autohidesScrollers=True,
                                               borderType=AppKit.NSNoBorder)
 
+        # Sidebar second tab
         variationsTab = group.feaVarTabs[1]
-        self.variationsGroup = SliderGroup(sidebarWidth - 6, {}, callback=self.varLocationChanged,
-                                           showHiddenAxes=self.project.uiSettings.showHiddenAxes)
+        self.variationsGroup = Group((0, 0, 0, 0))
+
+        self.variationsGroup.axisSliders = SliderGroup(sidebarWidth - 6, {},
+                                                       callback=self.varLocationChanged,
+                                                       showHiddenAxes=self.project.uiSettings.showHiddenAxes)
+
+        self.variationsGroup.instances = LabeledView(
+            (0, 0, 0, 1),  # gets updated as axes are read
+            "Instances:",
+            PopUpButton, ["Instance One", "Instance Two"],
+            callback=self.varInstanceChanged,
+        )
+
+        # The content of the tab wrapping the axes sliders and instance dropdown
         variationsTab.main = AligningScrollView((0, 0, 0, 0), self.variationsGroup, drawBackground=False,
                                                 hasHorizontalScroller=False, autohidesScrollers=True,
                                                 borderType=AppKit.NSNoBorder)
 
+        # Sidebar third tab
         optionsTab = group.feaVarTabs[2]
         relativeFontSize = self.project.textSettings.relativeFontSize * 100
         relativeBaseline = self.getRelativeBaselineValueForSlider()
@@ -583,7 +598,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isAxisRegistered = tag == tag.lower()  # all lowercase tags are registered axes
             return not isAxisRegistered, axisInfo.label.lower()
         sliderInfo = {k: v for k, v in sorted(sliderInfo.items(), key=sorter)}
-        self.variationsGroup.setSliderInfo(sliderInfo)
+        self.variationsGroup.axisSliders.setSliderInfo(sliderInfo)
+        self.variationsGroup.instances.setPosSize((0, self.variationsGroup.axisSliders.getPosSize()[3], 0, 40)),
         scriptTags = sorted(allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
         selectedItem = self.scriptsPopup.getItem()
@@ -602,7 +618,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         languageTags = [_tagFromMenuItem(item, "dflt") for item in self.languagesPopup.getItems()]
         self.languagesPopup.set(languageTags.index(self.project.textSettings.language))
         self.featuresGroup.set(self.project.textSettings.features)
-        self.variationsGroup.set(self.project.textSettings.varLocation)
+        self.variationsGroup.axisSliders.set(self.project.textSettings.varLocation)
 
     def iterFontItems(self):
         return self.fontList.iterFontItems()
@@ -967,6 +983,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def varLocationChanged(self, sender):
+        self.project.textSettings.varLocation = {k: v for k, v in sender.get().items() if v is not None}
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
+
+    @objc.python_method
+    def varInstanceChanged(self, sender):
         self.project.textSettings.varLocation = {k: v for k, v in sender.get().items() if v is not None}
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
 
