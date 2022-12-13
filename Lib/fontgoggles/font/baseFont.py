@@ -1,3 +1,4 @@
+import logging
 from ..misc.properties import cachedProperty
 from ..misc.hbShape import characterGlyphMapping
 from . import mergeScriptsAndLanguages
@@ -91,6 +92,23 @@ class BaseFont:
                             hidden=bool(axis.flags & 0x0001))
             axes[axis.axisTag] = axisDict
         return axes
+
+    @cachedProperty
+    def instances(self):
+        fvar = self.ttFont.get("fvar")
+        if fvar is None:
+            return []
+        name = self.ttFont["name"]
+        instances = []
+        for i in fvar.instances:
+            try:
+                # Assuming VFs have ID 16 set; should this fallback to ID 1 or "" if not?
+                family_name = name.getDebugName(16)
+                instance_name = name.getDebugName(i.subfamilyNameID)
+                instances.append((f"{family_name} — {instance_name}", i.coordinates))
+            except Exception as e:
+                logging.error("Failed to parse instance name: %s" % str(e))
+        return instances
 
     def getGlyphRunFromTextInfo(self, textInfo, colorPalettesIndex=0, **kwargs):
         text = textInfo.text

@@ -305,9 +305,10 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                                        showHiddenAxes=self.project.uiSettings.showHiddenAxes)
 
         self.variationsGroup.instances = LabeledView(
-            (0, 0, 0, 1),  # gets updated as axes are read
+            # Position and instances gets updated as fonts are read
+            (0, 0, 0, 20),
             "Instances:",
-            PopUpButton, ["Instance One", "Instance Two"],
+            PopUpButton, [],
             callback=self.varInstanceChanged,
         )
 
@@ -552,6 +553,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         allFeatureTagsGSUB = set()
         allFeatureTagsGPOS = set()
         allAxes = []
+        allInstances = [("No instance selected", {})]
         allScriptsAndLanguages = []
         allStylisticSetNames = []
         for fontItemInfo in fonts:
@@ -563,13 +565,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             allAxes.append(font.axes)
             allScriptsAndLanguages.append(font.scripts)
             allStylisticSetNames.append(font.stylisticSetNames)
+            allInstances.extend(font.instances)
         allAxes = mergeAxes(*allAxes)
         allScriptsAndLanguages = mergeScriptsAndLanguages(*allScriptsAndLanguages)
         allStylisticSetNames = mergeStylisticSetNames(*allStylisticSetNames)
-        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages, allStylisticSetNames
+        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allInstances, \
+            allScriptsAndLanguages, allStylisticSetNames
 
     @objc.python_method
-    def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes,
+    def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allInstances,
                             allScriptsAndLanguages, allStylisticSetNames):
         self.featuresGroup.setTags({"GSUB": allFeatureTagsGSUB, "GPOS": allFeatureTagsGPOS},
                                    allStylisticSetNames)
@@ -598,8 +602,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isAxisRegistered = tag == tag.lower()  # all lowercase tags are registered axes
             return not isAxisRegistered, axisInfo.label.lower()
         sliderInfo = {k: v for k, v in sorted(sliderInfo.items(), key=sorter)}
+
         self.variationsGroup.axisSliders.setSliderInfo(sliderInfo)
         self.variationsGroup.instances.setPosSize((0, self.variationsGroup.axisSliders.getPosSize()[3], 0, 40)),
+        self.variationsGroup.instances.setItems([i[0] for i in allInstances])
+
         scriptTags = sorted(allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
         selectedItem = self.scriptsPopup.getItem()
@@ -983,13 +990,21 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def varLocationChanged(self, sender):
+        """Axis slider value changed"""
+        _, _, _, allInstances, _, _ = self._gatherSidebarInfo(self.project.fonts)
         self.project.textSettings.varLocation = {k: v for k, v in sender.get().items() if v is not None}
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
+        self.variationsGroup.instances.setItems([i[0] for i in allInstances])
+        # Reset instance popup
+        self.variationsGroup.instances.set(0)
 
     @objc.python_method
     def varInstanceChanged(self, sender):
-        self.project.textSettings.varLocation = {k: v for k, v in sender.get().items() if v is not None}
+        """Instance was selected from popup"""
+        _, _, _, allInstances, _, _ = self._gatherSidebarInfo(self.project.fonts)
+        self.project.textSettings.varLocation = {k: v for k, v in allInstances[sender.get()][1].items() if v is not None}
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
+        self.variationsGroup.axisSliders.set(self.project.textSettings.varLocation)
 
     @objc.python_method
     def relativeSizeChangedCallback(self, sender):
