@@ -565,7 +565,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             allAxes.append(font.axes)
             allScriptsAndLanguages.append(font.scripts)
             allStylisticSetNames.append(font.stylisticSetNames)
-            allInstances.extend(font.instances)
+            allInstances.extend([i for i in font.instances if i not in allInstances])
         allAxes = mergeAxes(*allAxes)
         allScriptsAndLanguages = mergeScriptsAndLanguages(*allScriptsAndLanguages)
         allStylisticSetNames = mergeStylisticSetNames(*allStylisticSetNames)
