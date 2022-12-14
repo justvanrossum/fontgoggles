@@ -102,8 +102,10 @@ class BaseFont:
         instances = []
         for i in fvar.instances:
             try:
-                # Assuming VFs have ID 16 set; should this fallback to ID 1 or "" if not?
-                family_name = name.getDebugName(16)
+                family_name = name.getBestFamilyName()
+                if family_name is None:
+                    # If not names are set (e.g. ds font) use same as font list
+                    family_name = self.nameInCollection
                 instance_name = name.getDebugName(i.subfamilyNameID)
                 instances.append((f"{family_name} — {instance_name}", i.coordinates))
             except Exception as e:
