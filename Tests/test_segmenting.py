@@ -159,6 +159,8 @@ testDataTextSegments = [
     ("\u0627123\u0627", 1, [("\u0627", "Arab", 1, 0), ("123", "Arab", 2, 1), ("\u0627", "Arab", 1, 4)]),
     ("123\u0627", 1, [("123", "Arab", 2, 0), ("\u0627", "Arab", 1, 3)]),
     ("a123\u0627", 0, [("a123", "Latn", 0, 0), ("\u0627", "Arab", 1, 4)]),
+    ("すペ", 0, [("すペ", "Hira", 0, 0)]),  # Kana is folded to Hira, see issue #310
+    ("ペす", 0, [("ペす", "Kana", 0, 0)]),  # Hira is folded to Kana, see issue #310
 ]
 
 
