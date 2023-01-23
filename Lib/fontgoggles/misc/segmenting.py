@@ -15,6 +15,7 @@ from bidi.algorithm import (  # noqa: ignore E402
     reorder_resolved_levels, PARAGRAPH_LEVELS,
 )
 from bidi.mirror import MIRRORED  # noqa: ignore E402
+from fontTools.unicodedata.OTTags import SCRIPT_EXCEPTIONS
 
 
 UNKNOWN_SCRIPT = {"Zinh", "Zyyy", "Zxxx"}
@@ -38,7 +39,10 @@ def textSegments(txt):
     chars = list(zip(txt, scripts, levels))
 
     runLenghts = []
-    for value, sub in itertools.groupby(chars, key=lambda item: item[1:]):
+    for value, sub in itertools.groupby(
+        chars,
+        key=lambda item: (SCRIPT_EXCEPTIONS.get(item[1], item[1].lower()), item[2]),
+    ):
         runLenghts.append(len(list(sub)))
 
     segments = []
