@@ -129,6 +129,7 @@ def getBiDiInfo(text, *, upper_is_rtl=False, base_dir=None, debug=False):
     storage['base_dir'] = ('L', 'R')[base_level]
 
     get_embedding_levels(text, storage, upper_is_rtl, debug)
+    fix_bidi_type_for_unknown_chars(storage)
     assert len(text) == len(storage["chars"])
     for index, (ch, chInfo) in enumerate(zip(text, storage["chars"])):
         assert ch == chInfo["ch"]
@@ -141,3 +142,9 @@ def getBiDiInfo(text, *, upper_is_rtl=False, base_dir=None, debug=False):
     reorder_resolved_levels(storage, debug)
 
     return storage
+
+
+def fix_bidi_type_for_unknown_chars(storage):
+    for _ch in storage['chars']:
+        if _ch['type'] == '':
+            _ch['type'] = 'L'
