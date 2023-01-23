@@ -134,6 +134,7 @@ def test_detectScript(testString, expectedScripts):
 
 testDataTextSegments = [
     ("a", 0, [("a", "Latn", 0, 0)]),
+    ("\u1FF0", 0, [("\u1FF0", "Zzzz", 0, 0)]),  # test char should *not* be defined in Unicode: issue #313
     ("\u0627", 1, [("\u0627", "Arab", 1, 0)]),
     ("a\u0627", 0, [("a", "Latn", 0, 0), ("\u0627", "Arab", 1, 1)]),
     ("\u0627123", 1, [("\u0627", "Arab", 1, 0), ("123", "Arab", 2, 1)]),
