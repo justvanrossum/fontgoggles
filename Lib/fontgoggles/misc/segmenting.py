@@ -145,6 +145,9 @@ def getBiDiInfo(text, *, upper_is_rtl=False, base_dir=None, debug=False):
 
 
 def fix_bidi_type_for_unknown_chars(storage):
+    """Set any bidi type of '' (symptom of a character not known by unicode)
+    to 'L', to prevent the other bidi code to fail (issue 313).
+    """
     for _ch in storage['chars']:
         if _ch['type'] == '':
             _ch['type'] = 'L'
