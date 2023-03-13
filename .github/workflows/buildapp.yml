@@ -7,111 +7,109 @@ on:
 
 jobs:
   build:
-
     runs-on: macos-latest
 
     steps:
+      - name: Install Certificates
+        run: |
+          echo ${{ secrets.CERTIFICATE_P12 }} | base64 --decode > certificate.p12
+          security import certificate.p12 -P ${{ secrets.CERTIFICATE_PASSWORD }}
+          security create-keychain -p fgKeychain fg.keychain
+          security default-keychain -s fg.keychain
+          security set-keychain-settings -l -u -t 8000
+          security unlock-keychain -p fgKeychain fg.keychain
+          security import certificate.p12 -k fg.keychain -P ${{ secrets.CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k fgKeychain fg.keychain
+          rm -fr *.p12
+          # security find-identity -v -p codesigning
 
-    - name: Install Certificates
-      run: |
-        echo ${{ secrets.CERTIFICATE_P12 }} | base64 --decode > certificate.p12
-        security import certificate.p12 -P ${{ secrets.CERTIFICATE_PASSWORD }}
-        security create-keychain -p fgKeychain fg.keychain
-        security default-keychain -s fg.keychain
-        security set-keychain-settings -l -u -t 8000
-        security unlock-keychain -p fgKeychain fg.keychain
-        security import certificate.p12 -k fg.keychain -P ${{ secrets.CERTIFICATE_PASSWORD }} -T /usr/bin/codesign
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k fgKeychain fg.keychain
-        rm -fr *.p12
-        # security find-identity -v -p codesigning
+      - name: Set up Python 3.9
+        run: |
+          curl https://www.python.org/ftp/python/3.9.13/python-3.9.13-macosx10.9.pkg --output pythonInstaller.pkg
+          sudo installer -pkg pythonInstaller.pkg -target /
 
-    - name: Set up Python 3.9
-      run: |
-        curl https://www.python.org/ftp/python/3.9.13/python-3.9.13-macosx10.9.pkg --output pythonInstaller.pkg
-        sudo installer -pkg pythonInstaller.pkg -target /
+      - name: Check Python
+        run: |
+          python3 --version
+          python3 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
 
-    - name: Check Python
-      run: |
-        python3 --version
-        python3 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
+      - name: Checkout
+        uses: actions/checkout@v1
 
-    - name: Checkout
-      uses: actions/checkout@v1
+      - name: Setup Virtual Environment
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          python -c "import sys; print('\n'.join(sys.path))"
 
-    - name: Setup Virtual Environment
-      run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        python -c "import sys; print('\n'.join(sys.path))"
+      - name: Install Dependencies
+        run: |
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          pip install .
+          ## Install custom wheels to workaround various problems, see App/CustomWheels/README.md
+          # pip install --upgrade App/CustomWheels/lxml-4.5.0-cp37-cp37m-macosx_10_9_x86_64.whl
 
-    - name: Install Dependencies
-      run: |
-        source venv/bin/activate
-        pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-dev.txt
-        pip install .
-        ## Install custom wheels to workaround various problems, see App/CustomWheels/README.md
-        # pip install --upgrade App/CustomWheels/lxml-4.5.0-cp37-cp37m-macosx_10_9_x86_64.whl
+      - name: Run Tests
+        run: |
+          source venv/bin/activate
+          pytest
 
-    - name: Run Tests
-      run: |
-        source venv/bin/activate
-        pytest
+      - name: Build Application
+        run: |
+          source venv/bin/activate
+          python App/setup.py py2app
 
-    - name: Build Application
-      run: |
-        source venv/bin/activate
-        python App/setup.py py2app
+      - name: Codesign and Notarize
+        run: |
+          source venv/bin/activate
+          App/Distribute/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" App/dist/FontGoggles.app App/Distribute/entitlements.xml
+          python App/Distribute/build_dmg.py "App/dist/FontGoggles.app" "App/dist/FontGoggles.dmg"
+          codesign --sign "${{ secrets.CODESIGN_NAME }}" "App/dist/FontGoggles.dmg"
+          xcrun altool --notarize-app --primary-bundle-id "com.github.justvanrossum.FontGoggles" \
+                       --username "${{ secrets.NOTARIZE_DEVELOPER }}" \
+                       --password "${{ secrets.NOTARIZE_PASSWORD }}" \
+                       --file App/dist/FontGoggles.dmg \
+                       --output-format xml \
+                       | python App/Distribute/await_notarization.py "${{ secrets.NOTARIZE_DEVELOPER }}" "${{ secrets.NOTARIZE_PASSWORD }}"
+          xcrun stapler staple App/dist/FontGoggles.dmg
 
-    - name: Codesign and Notarize
-      run: |
-        source venv/bin/activate
-        App/Distribute/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" App/dist/FontGoggles.app App/Distribute/entitlements.xml
-        python App/Distribute/build_dmg.py "App/dist/FontGoggles.app" "App/dist/FontGoggles.dmg"
-        codesign --sign "${{ secrets.CODESIGN_NAME }}" "App/dist/FontGoggles.dmg"
-        xcrun altool --notarize-app --primary-bundle-id "com.github.justvanrossum.FontGoggles" \
-                     --username "${{ secrets.NOTARIZE_DEVELOPER }}" \
-                     --password "${{ secrets.NOTARIZE_PASSWORD }}" \
-                     --file App/dist/FontGoggles.dmg \
-                     --output-format xml \
-                     | python App/Distribute/await_notarization.py "${{ secrets.NOTARIZE_DEVELOPER }}" "${{ secrets.NOTARIZE_PASSWORD }}"
-        xcrun stapler staple App/dist/FontGoggles.dmg
+      - name: Upload Notarization Log
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: notarize_log.txt
+          path: notarize_log.txt
 
-    - name: Upload Notarization Log
-      uses: actions/upload-artifact@v1
-      if: always()
-      with:
-        name: notarize_log.txt
-        path: notarize_log.txt
+      - name: Read CHANGELOG.md
+        id: changelog
+        env:
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          source venv/bin/activate
+          echo "changelog_contents=$(python App/Distribute/extract_changes.py)" >>$GITHUB_OUTPUT
 
-    - name: Read CHANGELOG.md
-      id: changelog
-      env:
-        GITHUB_REF: ${{ github.ref }}
-      run: |
-        source venv/bin/activate
-        echo "changelog_contents=$(python App/Distribute/extract_changes.py)" >>$GITHUB_OUTPUT
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: ${{ steps.changelog.outputs.changelog_contents }}
+          draft: true
+          prerelease: false
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: ${{ steps.changelog.outputs.changelog_contents }}
-        draft: true
-        prerelease: false
-
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: App/dist/FontGoggles.dmg
-        asset_name: FontGoggles.dmg
-        asset_content_type: application/octet-stream
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: App/dist/FontGoggles.dmg
+          asset_name: FontGoggles.dmg
+          asset_content_type: application/octet-stream
