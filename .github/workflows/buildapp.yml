@@ -49,8 +49,6 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
           pip install .
-          ## Install custom wheels to workaround various problems, see App/CustomWheels/README.md
-          # pip install --upgrade App/CustomWheels/lxml-4.5.0-cp37-cp37m-macosx_10_9_x86_64.whl
 
       - name: Run Tests
         run: |
