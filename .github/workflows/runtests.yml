@@ -12,6 +12,8 @@ on:
       - LICENSE.txt
       - README.md
 
+  pull_request:
+
 jobs:
   build:
     runs-on: macos-latest
