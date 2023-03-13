@@ -45,6 +45,13 @@ line_to_capsule = PyCapsule_New(_lib.line_to, None, None)
 cubic_to_capsule = PyCapsule_New(_lib.cubic_to, None, None)
 close_path_capsule = PyCapsule_New(_lib.close_path, None, None)
 
+from uharfbuzz import DrawFuncs
+funcs = DrawFuncs()
+funcs.set_move_to_func(move_to_capsule)
+funcs.set_line_to_func(line_to_capsule)
+funcs.set_cubic_to_func(cubic_to_capsule)
+funcs.set_close_path_func(close_path_capsule)
+
 
 def makePathFromArrays(points, tags, contours):
     import numpy
@@ -72,18 +79,11 @@ def makePathFromArrays(points, tags, contours):
     return path
 
 def makePathFromGlyph(font, gid):
-    from uharfbuzz import DrawFuncs
 
     path_p = _makePath()
     path_capsule = PyCapsule_New(path_p, None, None)
 
-    funcs = DrawFuncs()
-    funcs.set_move_to_func(move_to_capsule, path_capsule)
-    funcs.set_line_to_func(line_to_capsule, path_capsule)
-    funcs.set_cubic_to_func(cubic_to_capsule, path_capsule)
-    funcs.set_close_path_func(close_path_capsule, path_capsule)
-
-    funcs.get_glyph_shape(font, gid)
+    font.draw_glyph(gid, funcs, path_capsule)
 
     path = objc.objc_object(c_void_p=path_p)
     # See comment in makePathFromArrays()
