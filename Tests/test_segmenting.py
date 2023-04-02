@@ -106,6 +106,24 @@ testData = [
                       'sor': 'R',
                       'start': 0,
                       'type': 'AL'}])}),
+    (
+        "\u0639\u05b7\u0631\u05b7\u0628\u05b4",
+        {
+            "base_dir": "R",
+            "base_level": 1,
+            "chars": [
+                {"ch": "ִ", "index": 5, "level": 1, "orig": "NSM", "type": "R"},
+                {"ch": "ب", "index": 4, "level": 1, "orig": "AL", "type": "R"},
+                {"ch": "ַ", "index": 3, "level": 1, "orig": "NSM", "type": "R"},
+                {"ch": "ر", "index": 2, "level": 1, "orig": "AL", "type": "R"},
+                {"ch": "ַ", "index": 1, "level": 1, "orig": "NSM", "type": "R"},
+                {"ch": "ع", "index": 0, "level": 1, "orig": "AL", "type": "R"},
+            ],
+            "runs": deque(
+                [{"eor": "R", "length": 6, "sor": "R", "start": 0, "type": "NSM"}]
+            ),
+        },
+    ),
 ]
 
 
