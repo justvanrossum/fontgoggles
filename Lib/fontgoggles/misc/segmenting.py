@@ -72,12 +72,12 @@ def detectScript(txt):
 
     for i, ch in enumerate(txt):
         scr = charScript[i]
-        if scr in UNKNOWN_SCRIPT:
+        cat = category(ch)
+        if scr in UNKNOWN_SCRIPT or cat == "Mn":
             if i:
                 scr = charScript[i-1]
             else:
                 scr = None
-            cat = category(ch)
             if ch in MIRRORED and cat == "Pe":
                 scr = None
         charScript[i] = scr
