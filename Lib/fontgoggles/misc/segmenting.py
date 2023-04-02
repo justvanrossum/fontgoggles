@@ -73,6 +73,7 @@ def detectScript(txt):
     for i, ch in enumerate(txt):
         scr = charScript[i]
         cat = category(ch)
+        # Non-spacing mark (Mn) should always inherit script
         if scr in UNKNOWN_SCRIPT or cat == "Mn":
             if i:
                 scr = charScript[i-1]
