@@ -62,24 +62,31 @@ jobs:
 
       - name: Codesign and Notarize
         run: |
-          source venv/bin/activate
-          App/Distribute/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" App/dist/FontGoggles.app App/Distribute/entitlements.xml
-          python App/Distribute/build_dmg.py "App/dist/FontGoggles.app" "App/dist/FontGoggles.dmg"
-          codesign --sign "${{ secrets.CODESIGN_NAME }}" "App/dist/FontGoggles.dmg"
-          xcrun altool --notarize-app --primary-bundle-id "com.github.justvanrossum.FontGoggles" \
-                       --username "${{ secrets.NOTARIZE_DEVELOPER }}" \
-                       --password "${{ secrets.NOTARIZE_PASSWORD }}" \
-                       --file App/dist/FontGoggles.dmg \
-                       --output-format xml \
-                       | python App/Distribute/await_notarization.py "${{ secrets.NOTARIZE_DEVELOPER }}" "${{ secrets.NOTARIZE_PASSWORD }}"
-          xcrun stapler staple App/dist/FontGoggles.dmg
+          APP_PATH="App/dist/FontGoggles.app"
+          DMG_PATH="App/dist/FontGoggles.dmg"
+          ENTITLEMENTS_PATH="App/Distribute/entitlements.xml"
 
-      - name: Upload Notarization Log
-        uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: notarize_log.txt
-          path: notarize_log.txt
+          source venv/bin/activate
+          macos/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" "$APP_PATH" "$ENTITLEMENTS_PATH"
+          python macos/build_dmg.py "$APP_PATH" "$DMG_PATH"
+
+          codesign --sign "${{ secrets.CODESIGN_NAME }}" "$DMG_PATH"
+
+          echo "Run notarytool..."
+
+          xcrun notarytool submit \
+            --apple-id "${{ secrets.NOTARIZE_DEVELOPER }}" \
+            --team-id "${{ secrets.NOTARIZE_TEAM_ID }}" \
+            --password "${{ secrets.NOTARIZE_PASSWORD }}" \
+            --output-format json \
+            --wait \
+            $DMG_PATH \
+            | python macos/print_notarize_log.py \
+              "${{ secrets.NOTARIZE_DEVELOPER }}" \
+              "${{ secrets.NOTARIZE_TEAM_ID }}" \
+              "${{ secrets.NOTARIZE_PASSWORD }}"
+
+          xcrun stapler staple "$DMG_PATH"
 
       - name: Read CHANGELOG.md
         id: changelog
