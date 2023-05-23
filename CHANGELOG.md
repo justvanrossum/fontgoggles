@@ -1,5 +1,11 @@
 # Changelog for FontGoggles
 
+## [1.7.4] - 2023-05-23
+
+- Updated bundled versions of uharfbuzz and fonttools
+- Apply kerning between Hiragana and Katakana ([Issue 310](https://github.com/justvanrossum/fontgoggles/issues/310), [PR 311](https://github.com/justvanrossum/fontgoggles/pull/311))
+- Use Python 3.9
+
 ## [1.7.3] - 2022-11-26
 
 - Added the supported file formats to the drop placeholder text, so they are more discoverable ([PR 295](https://github.com/justvanrossum/fontgoggles/pull/295))
@@ -26,6 +32,7 @@
   - Remove FreeType dependency
 
 Practically, this means:
+
 - Support for [`avar` 2](https://github.com/harfbuzz/boring-expansion-spec/issues/14)
 - Support for more than 65536 glyphs in OTF/TTF
 
