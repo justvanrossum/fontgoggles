@@ -67,8 +67,8 @@ jobs:
           ENTITLEMENTS_PATH="App/Distribute/entitlements.xml"
 
           source venv/bin/activate
-          macos/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" "$APP_PATH" "$ENTITLEMENTS_PATH"
-          python macos/build_dmg.py "$APP_PATH" "$DMG_PATH"
+          App/Distribute/codesign_app.sh "${{ secrets.CODESIGN_NAME }}" "$APP_PATH" "$ENTITLEMENTS_PATH"
+          python App/Distribute/build_dmg.py "$APP_PATH" "$DMG_PATH"
 
           codesign --sign "${{ secrets.CODESIGN_NAME }}" "$DMG_PATH"
 
@@ -81,7 +81,7 @@ jobs:
             --output-format json \
             --wait \
             $DMG_PATH \
-            | python macos/print_notarize_log.py \
+            | python App/Distribute/print_notarize_log.py \
               "${{ secrets.NOTARIZE_DEVELOPER }}" \
               "${{ secrets.NOTARIZE_TEAM_ID }}" \
               "${{ secrets.NOTARIZE_PASSWORD }}"
