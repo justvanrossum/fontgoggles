@@ -12,6 +12,6 @@ uharfbuzz==0.37.0
 python-bidi==0.4.2
 jundo==0.1.2
 ufo2ft==2.32.0
-numpy==1.24.2
+numpy==1.25.0
 unicodedata2==15.0.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
