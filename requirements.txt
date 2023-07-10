@@ -5,7 +5,7 @@ pyobjc==9.0.1
 corefoundationasyncio==0.0.1
 cocoa-vanilla==0.2.4
 blackrenderer==0.6.0
-fonttools[ufo,unicode,woff,type1,lxml]==4.39.4
+fonttools[unicode,lxml,ufo,type1,woff]==4.40.0
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
 uharfbuzz==0.37.0
