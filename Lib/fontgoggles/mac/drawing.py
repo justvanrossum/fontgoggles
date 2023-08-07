@@ -59,3 +59,12 @@ def drawText(txt, pt, color, font):
     attrs = {AppKit.NSFontAttributeName: font,
              AppKit.NSForegroundColorAttributeName: color}
     AppKit.NSString.drawAtPoint_withAttributes_(txt, pt, attrs)
+
+
+def drawLine(pt1, pt2, color, width):
+    line = AppKit.NSBezierPath.bezierPath()
+    line.moveToPoint_(AppKit.NSMakePoint(*pt1))
+    line.lineToPoint_(AppKit.NSMakePoint(*pt2))
+    line.setLineWidth_(width)
+    nsColorFromRGBA(color).set()
+    line.stroke()
