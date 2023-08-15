@@ -1,4 +1,7 @@
-![FontGoggles Icon](docs/images/icon.png)
+<p align="center">
+	<img alt="FontGoggles Icon" width="320" src="docs/images/icon-dark-mode.png#gh-dark-mode-only">
+	<img alt="FontGoggles Icon" width="320" src="docs/images/icon-light-mode.png#gh-light-mode-only">
+</p>
 
 # FontGoggles
 
