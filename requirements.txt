@@ -11,7 +11,7 @@ fonttools[ufo,type1,unicode,woff,lxml]==4.43.1
 uharfbuzz==0.37.3
 python-bidi==0.4.2
 jundo==0.1.2
-ufo2ft==2.30.0
+ufo2ft==2.33.4
 numpy==1.24.2
 unicodedata2==15.0.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
