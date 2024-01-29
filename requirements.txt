@@ -3,7 +3,7 @@ wheel>=0.33.6
 py2app==0.28.7
 pyobjc==10.1
 corefoundationasyncio==0.0.1
-cocoa-vanilla==0.2.4
+cocoa-vanilla==0.5.0
 blackrenderer==0.6.0
 fonttools[lxml,type1,ufo,woff,unicode]==4.47.2
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
