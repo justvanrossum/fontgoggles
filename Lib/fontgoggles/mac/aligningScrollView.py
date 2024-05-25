@@ -1,6 +1,8 @@
 import objc
 import AppKit
 import vanilla
+from objc import super
+
 from ..misc.properties import hookedProperty
 
 
