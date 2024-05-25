@@ -64,7 +64,7 @@ jobs:
       - name: Build Application
         run: |
           source venv/bin/activate
-          python App/setup.py py2app --arch intel
+          python App/setup.py py2app
 
       - name: Codesign and Notarize
         run: |
