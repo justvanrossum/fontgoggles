@@ -89,8 +89,15 @@ jobs:
 
           xcrun stapler staple "$DMG_PATH"
 
+      - name: Storing macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FontGoggles
+          path: App/dist/FontGoggles.dmg
+
       - name: Read CHANGELOG.md
         id: changelog
+        if: github.ref == 'refs/heads/master'
         env:
           GITHUB_REF: ${{ github.ref }}
         run: |
@@ -99,6 +106,7 @@ jobs:
 
       - name: Create Release
         id: create_release
+        if: github.ref == 'refs/heads/master'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -111,6 +119,7 @@ jobs:
 
       - name: Upload Release Asset
         id: upload-release-asset
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
