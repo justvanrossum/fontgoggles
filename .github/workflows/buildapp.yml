@@ -40,7 +40,7 @@ jobs:
           $ourpython -c "import platform; print('macOS version:', platform.mac_ver()[0])"
           $ourpython -m venv venv
           source venv/bin/activate
-          python -c "print('venv')""
+          python -c "print('venv')"
           python -c "import sys; print('\n'.join(sys.path))"
           python -c "import platform; print('platform:', platform.platform())"
           python -c "import platform; print('macOS version:', platform.mac_ver()[0])"
