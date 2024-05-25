@@ -1,7 +1,7 @@
 setuptools>=42.0.2
 wheel>=0.33.6
-py2app==0.28.5
-pyobjc==9.0.1
+py2app==0.28.7
+pyobjc==10.2
 corefoundationasyncio==0.0.1
 cocoa-vanilla==0.2.4
 blackrenderer==0.6.0
@@ -11,7 +11,7 @@ fonttools[ufo,unicode,woff,type1,lxml]==4.52.1
 uharfbuzz==0.39.1
 python-bidi==0.4.2
 jundo==0.1.2
-ufo2ft==2.30.0
+ufo2ft==3.2.3
 numpy==1.24.2
-unicodedata2==15.0.0
+unicodedata2==15.1.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
