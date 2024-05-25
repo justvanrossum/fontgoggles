@@ -26,8 +26,8 @@ jobs:
 
       - name: Set up Python from python.org
         run: |
-          curl https://www.python.org/ftp/python/3.12.3/python-3.12.3-macosx10.9.pkg --output pythonInstaller.pkg
-          sudo installer -pkg pythonInstaller.pkg -target /
+          curl https://www.python.org/ftp/python/3.12.3/python-3.12.3-macos11.pkg --output python-installer.pkg
+          sudo installer -pkg python-installer.pkg -target /
 
       - name: Check Python
         run: |
