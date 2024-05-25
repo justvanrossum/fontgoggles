@@ -8,8 +8,8 @@
 - Miscellaneous maintainance
 - Updated OpenType feature tags, script tags and language tags
 - Upgraded to Python 3.12
-- Build “Universal” application, that runs natively on Apple Silicon as wel as Intel
-- Still backwards compatible with macOS 10.10
+- FontGoggles is now a “Universal” build, meaning it runs natively on Apple Silicon as wel as Intel
+- Still backwards compatible down to macOS 10.10
 
 ## [1.7.4] - 2023-05-23
 
