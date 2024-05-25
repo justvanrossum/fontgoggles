@@ -201,6 +201,11 @@ class MinimalFontObject:
     def keys(self):
         return self._glyphNames
 
+    def __iter__(self):
+        for glyphName in self._glyphNames:
+            glyph = self[glyphName]
+            yield glyph
+
     def __getitem__(self, glyphName):
         if glyphName not in self._glyphNames:
             raise KeyError(glyphName)
@@ -208,7 +213,7 @@ class MinimalFontObject:
         glyph = self._glyphs.get(glyphName)
         if glyph is None:
             glyph = MinimalGlyphObject(glyphName, self._revCmap.get(glyphName), self._anchors.get(glyphName, ()))
-            self._glyphs[glyphName] = glyphName
+            self._glyphs[glyphName] = glyph
         return glyph
 
 
