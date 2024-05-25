@@ -6,6 +6,8 @@ import pathlib
 from types import SimpleNamespace
 import objc
 import AppKit
+from objc import super
+
 from vanilla import Group, ProgressSpinner, TextBox, VanillaBaseObject
 from jundo import UndoManager
 from fontTools.misc.arrayTools import offsetRect, scaleRect, unionRect

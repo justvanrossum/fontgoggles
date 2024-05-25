@@ -25,7 +25,7 @@ with tempfile.TemporaryDirectory() as imgPath:
         try:
             createCommand = [
                 "hdiutil", "create", "-fs", "HFS+",
-                "-size", "200m",
+                "-size", "300m",
                 "-srcfolder", imgPath,
                 "-volname", appName,
                 "-format", "UDZO",

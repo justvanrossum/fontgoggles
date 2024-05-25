@@ -24,30 +24,35 @@ jobs:
           rm -fr *.p12
           # security find-identity -v -p codesigning
 
-      - name: Set up Python 3.9
-        run: |
-          curl https://www.python.org/ftp/python/3.9.13/python-3.9.13-macosx10.9.pkg --output pythonInstaller.pkg
-          sudo installer -pkg pythonInstaller.pkg -target /
+      - name: Git checkout
+        uses: actions/checkout@v4
 
-      - name: Check Python
+      - name: Set up Python from python.org
         run: |
-          python3 --version
-          python3 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
-
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Setup Virtual Environment
-        run: |
-          python3 -m venv venv
+          curl https://www.python.org/ftp/python/3.12.3/python-3.12.3-macos11.pkg --output python-installer.pkg
+          sudo installer -pkg python-installer.pkg -target /
+          # Somehow using plain "python3" gives us the runner's homebrew Python,
+          # so let's be explicit about the path:
+          ourpython=/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12
+          ls -l $ourpython
+          $ourpython --version
+          $ourpython -c "import platform; print('platform:', platform.platform())"
+          $ourpython -c "import platform; print('macOS version:', platform.mac_ver()[0])"
+          $ourpython -m venv venv
           source venv/bin/activate
+          python -c "print('venv')"
           python -c "import sys; print('\n'.join(sys.path))"
+          python -c "import platform; print('platform:', platform.platform())"
+          python -c "import platform; print('macOS version:', platform.mac_ver()[0])"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          python -m pip --version
+          pip install -r requirements.txt | tee pip_log.txt
+          python App/Distribute/ensure_universal_wheels.py pip_log.txt
+          pip install --force build/universal_wheels/*.whl
           pip install -r requirements-dev.txt
           pip install .
 
@@ -89,8 +94,15 @@ jobs:
 
           xcrun stapler staple "$DMG_PATH"
 
+      - name: Storing macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FontGoggles
+          path: App/dist/FontGoggles.dmg
+
       - name: Read CHANGELOG.md
         id: changelog
+        if: github.ref == 'refs/heads/master'
         env:
           GITHUB_REF: ${{ github.ref }}
         run: |
@@ -99,6 +111,7 @@ jobs:
 
       - name: Create Release
         id: create_release
+        if: github.ref == 'refs/heads/master'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -111,6 +124,7 @@ jobs:
 
       - name: Upload Release Asset
         id: upload-release-asset
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
