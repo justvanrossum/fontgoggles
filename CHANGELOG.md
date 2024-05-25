@@ -1,5 +1,16 @@
 # Changelog for FontGoggles
 
+## [1.8] - 2025-05-25
+
+- No new functionality
+- Updated bundled versions of all dependencies (See “About” window for embedded version numbers)
+- Updated to Unicode 15.1
+- Miscellaneous maintainance
+- Updated OpenType feature tags, script tags and language tags
+- Upgraded to Python 3.12
+- Build “Universal” application, that runs natively on Apple Silicon as wel as Intel
+- Still backwards compatible with macOS 10.10
+
 ## [1.7.4] - 2023-05-23
 
 - Updated bundled versions of uharfbuzz and fonttools
