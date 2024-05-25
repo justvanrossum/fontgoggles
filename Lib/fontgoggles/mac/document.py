@@ -2,6 +2,7 @@ import json
 import pathlib
 import objc
 import AppKit
+from objc import super
 
 from ..project import Project
 from .mainWindow import FGMainWindowController

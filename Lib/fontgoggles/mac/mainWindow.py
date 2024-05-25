@@ -128,6 +128,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.updateFileObservers()
         self.loadFonts(shouldRestoreSettings=True)
 
+    @objc.python_method
     @suppressAndLogException
     def _windowCloseCallback(self, sender):
         obs = getFileObserver()
@@ -448,6 +449,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                 self.observedPaths[path].append(fontItemInfo)
                 obs.addObserver(path, self._fileChanged)
 
+    @objc.python_method
     @suppressAndLogException
     def _fileChanged(self, oldPath, newPath, wasModified):
         # This gets called by the file observer, when a file changed on disk.
@@ -484,6 +486,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         if wasModified:
             self.loadFonts()
 
+    @objc.python_method
     @suppressAndLogException
     def _projectFontsChanged(self, changeSet):
         # This gets called by the undo manager, upon performing undo or redo.
@@ -631,6 +634,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def iterFontItemInfoAndItems(self):
         return self.fontList.iterFontItemInfoAndItems()
 
+    @objc.python_method
     @asyncTaskAutoCancel
     async def textEntryChangedCallback(self, sender, updateCharacterList=True):
         if not hasattr(self, "directionPopUp"):
@@ -730,6 +734,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         yield
         self._callbackRecursionLock -= 1
 
+    @objc.python_method
     @asyncTaskAutoCancel
     async def updateGlyphList(self, glyphs, delay=0):
         if not hasattr(self, "fontList"):
@@ -751,6 +756,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             if fontItem is not None:
                 self.glyphList.setSelection(fontItem.selection)
 
+    @objc.python_method
     @asyncTaskAutoCancel
     async def updateCharacterList(self, selection=None, delay=0):
         if not hasattr(self, "project"):
@@ -931,6 +937,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.textEntryChangedCallback(self.textEntry)
         self.relativeBaselineSlider.set(self.getRelativeBaselineValueForSlider())
 
+    @objc.python_method
     @suppressAndLogException
     def alignmentChangedCallback(self, sender):
         values = [alignmentValuesHorizontal,
@@ -1063,6 +1070,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def showFontFileName_(self, sender):
         self.fontList.showFontFileName = not self.fontList.showFontFileName
 
+    @objc.python_method
     @suppressAndLogException
     def validateMenuItem_(self, sender):
         action = sender.action()
