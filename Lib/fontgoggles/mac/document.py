@@ -1,5 +1,6 @@
 import pathlib
 import AppKit
+from objc import super
 
 from ..project import Project
 from .mainWindow import FGMainWindowController

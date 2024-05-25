@@ -10,6 +10,7 @@ def parse(data):
         fields = re.findall(r"<td>(.+?)</td>", chunk, re.DOTALL)
         parsedFields = []
         for field in fields:
+            field = field.split("<br>")[0]
             m = re.search(r'href="(.+?)"', field)
             if m is not None and m.group(1) != "#foot":
                 parsedFields.append(m.group(1))
@@ -39,13 +40,13 @@ def formatScripts(data):
     print("scripts = {")
     print("    # tag, friendly name")
     duplicates = {}
-    for i, (friendlyName, tag) in enumerate(data):
+    for i, (friendlyName, tag, *_) in enumerate(data):
         if tag in duplicates:
             duplicates[tag] = duplicates[tag] + ", " + friendlyName
             data[i] = (None, None)  # skip
         else:
             duplicates[tag] = friendlyName
-    for _, tag in data:
+    for _, tag, *_ in data:
         if tag is None:
             continue
         friendlyName = duplicates[tag]
@@ -62,7 +63,7 @@ def formatLanguages(data):
             tag += (4 - len(tag)) * " "
         assert len(tag) == 4, tag
         if len(fields) > 1:
-            assert len(fields) == 2
+            assert len(fields) == 2, fields
             isoCodes = [isoCode.strip() for isoCode in fields[1].split(",")]
         else:
             isoCodes = []
