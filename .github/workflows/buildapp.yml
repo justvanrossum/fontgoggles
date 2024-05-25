@@ -24,22 +24,22 @@ jobs:
           rm -fr *.p12
           # security find-identity -v -p codesigning
 
-      - name: Set up Python 3.9
+      - name: Set up Python from python.org
         run: |
-          curl https://www.python.org/ftp/python/3.9.13/python-3.9.13-macosx10.9.pkg --output pythonInstaller.pkg
+          curl https://www.python.org/ftp/python/3.12.3/python-3.12.3-macosx10.9.pkg --output pythonInstaller.pkg
           sudo installer -pkg pythonInstaller.pkg -target /
 
       - name: Check Python
         run: |
-          python3 --version
-          python3 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
+          python3-intel64 --version
+          python3-intel64 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
 
       - name: Checkout
         uses: actions/checkout@v1
 
       - name: Setup Virtual Environment
         run: |
-          python3 -m venv venv
+          python3-intel64 -m venv venv
           source venv/bin/activate
           python -c "import sys; print('\n'.join(sys.path))"
 
