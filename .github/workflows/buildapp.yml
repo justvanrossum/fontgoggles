@@ -34,12 +34,13 @@ jobs:
 
       - name: Check Python
         run: |
-          python3-intel64 --version
-          python3-intel64 -c "import platform; print('macOS version:', platform.mac_ver()[0], platform.platform())"
+          which python3.12-intel64
+          python3.12-intel64 --version
+          python3.12-intel64 -c "import platform; print('macOS version:', platform.mac_ver()[0], platform.platform())"
 
       - name: Setup Virtual Environment
         run: |
-          python3-intel64 -m venv venv
+          python3.12-intel64 -m venv venv
           source venv/bin/activate
           python -c "import sys; print('\n'.join(sys.path))"
           python -c "import platform; print('macOS version:', platform.mac_ver()[0], platform.platform())"
