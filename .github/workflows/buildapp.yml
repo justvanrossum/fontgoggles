@@ -29,28 +29,32 @@ jobs:
 
       - name: Set up Python from python.org
         run: |
-          curl https://www.python.org/ftp/python/3.10.11/python-3.10.11-macos11.pkg --output python-installer.pkg
+          curl https://www.python.org/ftp/python/3.12.3/python-3.12.3-macos11.pkg --output python-installer.pkg
           sudo installer -pkg python-installer.pkg -target /
-          python3.10-intel64 --version
-          python3.10-intel64 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
-
-          which python3.10-intel64
-          python3.10-intel64 --version
-          python3.10-intel64 -c "import platform; print('platform:', platform.platform())"
-          python3.10-intel64 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
-          python3.10-intel64 -m venv venv
+          # Somehow using plain "python3" gives us the runner's homebrew Python,
+          # so let's be explicit about the path:
+          ourpython=/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12
+          ls -l $ourpython
+          $ourpython --version
+          $ourpython -c "import platform; print('platform:', platform.platform())"
+          $ourpython -c "import platform; print('macOS version:', platform.mac_ver()[0])"
+          $ourpython -m venv venv
           source venv/bin/activate
-          python -c "import platform; print('(venv) platform:', platform.platform())"
-          python -c "import platform; print('(venv) macOS version:', platform.mac_ver()[0])"
+          python -c "print('venv')""
+          python -c "import sys; print('\n'.join(sys.path))"
+          python -c "import platform; print('platform:', platform.platform())"
+          python -c "import platform; print('macOS version:', platform.mac_ver()[0])"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           source venv/bin/activate
           python -m pip install --upgrade pip
           python -m pip --version
-          python -m pip install -r requirements.txt
-          python -m pip install -r requirements-dev.txt
-          python -m pip install .
+          pip install -r requirements.txt | tee pip_log.txt
+          python App/Distribute/ensure_universal_wheels.py pip_log.txt
+          pip install --force build/universal_wheels/*.whl
+          pip install -r requirements-dev.txt
+          pip install .
 
       - name: Run Tests
         run: |
