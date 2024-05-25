@@ -32,7 +32,7 @@ jobs:
       - name: Check Python
         run: |
           python3-intel64 --version
-          python3-intel64 -c "import platform; print('macOS version:', platform.mac_ver()[0])"
+          python3-intel64 -c "import platform; print('macOS version:', platform.mac_ver()[0], platform.platform())"
 
       - name: Checkout
         uses: actions/checkout@v1
@@ -59,7 +59,7 @@ jobs:
       - name: Build Application
         run: |
           source venv/bin/activate
-          python App/setup.py py2app
+          python App/setup.py py2app --arch intel
 
       - name: Codesign and Notarize
         run: |
