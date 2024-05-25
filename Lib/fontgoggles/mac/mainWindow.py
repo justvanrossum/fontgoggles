@@ -10,7 +10,7 @@ import traceback
 import unicodedata2 as unicodedata
 import AppKit
 import objc
-from vanilla import (ActionButton, CheckBox, EditText, Group, List, PopUpButton, SplitView, Tabs,
+from vanilla import (ActionButton, CheckBox, EditText, Group, List, PopUpButton, SplitView,
                      TextBox, TextEditor, VanillaBaseControl, Window, HorizontalLine)
 from vanilla.dialogs import getFile
 from fontTools.misc.arrayTools import offsetRect
@@ -22,6 +22,7 @@ from fontgoggles.mac.fileObserver import getFileObserver
 from fontgoggles.mac.fontList import FontList, fontItemMinimumSize, fontItemMaximumSize, makeUndoProxy
 from fontgoggles.mac.misc import ClassNameIncrementer, makeTextCell
 from fontgoggles.mac.sliderGroup import SliderGroup, SliderPlus
+from fontgoggles.mac.vanillaTabsOld import Tabs
 from fontgoggles.compile.compilerPool import CompilerError
 from fontgoggles.misc.decorators import asyncTaskAutoCancel, suppressAndLogException
 from fontgoggles.misc.textInfo import TextInfo
