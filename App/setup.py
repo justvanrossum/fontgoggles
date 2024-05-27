@@ -114,7 +114,6 @@ try:
             plist=infoplist,
             packages=[
                 "fontgoggles",
-                "fontTools",  # until https://github.com/fonttools/fonttools/pull/3529/files is released
                 "pkg_resources",
                 "numpy",
             ],
