@@ -306,7 +306,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
         self.variationsGroup.instances = LabeledView(
             # Position and instances gets updated as fonts are read
-            (0, 0, 0, 20),
+            (6, 0, sidebarWidth - 20, 20),
             "Instances:",
             PopUpButton, [],
             callback=self.varInstanceChanged,
@@ -359,7 +359,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         directions = [label if label is not None else AppKit.NSMenuItem.separatorItem() for label in directionOptions]
 
         self.directionPopUp = LabeledView(
-            (10, y, -10, 40), "Direction/orientation:",
+            (6, y, -6, 40), "Direction/orientation:",
             PopUpButton, directions,
             callback=self.directionPopUpCallback,
         )
@@ -379,7 +379,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             alignmentOptions = alignmentOptionsHorizontal
             alignmentValues = alignmentValuesHorizontal
         self.alignmentPopup = LabeledView(
-            (10, y, -10, 40), "Visual alignment:",
+            (6, y, -6, 40), "Visual alignment:",
             PopUpButton, alignmentOptions,
             callback=self.alignmentChangedCallback,
         )
@@ -389,7 +389,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y += 50
 
         self.scriptsPopup = LabeledView(
-            (10, y, -10, 40), "Script:",
+            (6, y, -6, 40), "Script:",
             PopUpButton, ['Automatic'],
             callback=self.scriptsPopupCallback,
         )
@@ -397,7 +397,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y += 50
 
         self.languagesPopup = LabeledView(
-            (10, y, -10, 40), "Language:",
+            (6, y, -6, 40), "Language:",
             PopUpButton, [],
             callback=self.languagesPopupCallback,
         )
@@ -1169,8 +1169,9 @@ class LabeledView(Group):
         super().__init__(posSize)
         x, y, w, h = posSize
         assert h > 0
-        self.label = TextBox((0, 0, 0, 0), label)
-        self.view = viewClass((0, 20, 0, 20), *args, **kwargs)
+        # Inherit posSize, but offset view by label height
+        self.label = TextBox((x, 0, w, 20), label)
+        self.view = viewClass((x, 20, w, 20), *args, **kwargs)
 
     def get(self):
         return self.view.get()
