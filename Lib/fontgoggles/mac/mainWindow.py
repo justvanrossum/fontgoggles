@@ -994,9 +994,33 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         _, _, _, allInstances, _, _ = self._gatherSidebarInfo(self.project.fonts)
         self.project.textSettings.varLocation = {k: v for k, v in sender.get().items() if v is not None}
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
-        self.variationsGroup.instances.setItems([i[0] for i in allInstances])
-        # Reset instance popup
-        self.variationsGroup.instances.set(0)
+        
+        # Select or reset instance popup:
+        # Try match an instance to the current set of axis values. If there are
+        # several variable fonts with different axes it is possible that for
+        # each font's axes the current axis values match an instance, in which
+        # case the dropdown value would be ambiguous, so simply reset the 
+        # dropdown.
+        select = 0
+        axisValues = sender.get()
+        matched_instances = []
+        for i, instance in enumerate(allInstances):
+            # Skip first dropdown entry with placeholder
+            if i == 0:
+                continue
+            all_axes_match = True
+            for axis, instancevalue in instance[1].items():
+                if axis not in axisValues or float(axisValues[axis]) != float(instancevalue):
+                    all_axes_match = False
+            if all_axes_match:
+                matched_instances.append(i)
+
+        # Of all open variable fonts only one had an instance for this exact
+        # axis location, so show it selected
+        if len(matched_instances) == 1:
+            select = matched_instances[0]
+
+        self.variationsGroup.instances.set(select)
 
     @objc.python_method
     def varInstanceChanged(self, sender):
