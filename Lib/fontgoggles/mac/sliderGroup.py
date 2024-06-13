@@ -93,8 +93,7 @@ class SliderGroup(Group):
             slider = getattr(self, attrName)
             value = slider.get()
             if value is not None:
-                if len(self._defaultValues[tag]) != 1 or value not in self._defaultValues[tag]:
-                    state[tag] = value
+                state[tag] = value
         return state
 
     def _updateState(self, state):
