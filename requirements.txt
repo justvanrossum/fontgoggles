@@ -1,4 +1,4 @@
-setuptools==70.0.0
+setuptools==70.1.0
 wheel>=0.33.6
 py2app==0.28.8
 pyobjc==10.3.1
