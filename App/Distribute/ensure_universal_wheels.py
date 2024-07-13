@@ -124,10 +124,10 @@ def main():
                     platform_wheels.append(file_descriptor["url"])
 
         if universal_wheels:
-            assert len(universal_wheels) == 1
+            assert len(universal_wheels) == 1, universal_wheels
             download_file(universal_wheels[0], wheels_dir)
         elif platform_wheels:
-            assert len(platform_wheels) == 2
+            assert len(platform_wheels) == 2, platform_wheels
             merge_wheels(platform_wheels[0], platform_wheels[1], wheels_dir)
         else:
             raise IncompatibleWheelError(
