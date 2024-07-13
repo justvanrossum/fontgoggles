@@ -127,6 +127,13 @@ def main():
             assert len(universal_wheels) == 1, universal_wheels
             download_file(universal_wheels[0], wheels_dir)
         elif platform_wheels:
+            if len(platform_wheels) > 2:
+                # There may be multiple wheels per platform. Pick the first of each from
+                # a sorted list.
+                platform_wheels = sorted(platform_wheels)
+                x86_64 = [pw for pw in platform_wheels if "x86_64" in pw.rsplit("/", 1)[-1]]
+                arm64 = [pw for pw in platform_wheels if "arm64" in pw.rsplit("/", 1)[-1]]
+                platform_wheels = [x86_64[0], arm64[1]]
             assert len(platform_wheels) == 2, platform_wheels
             merge_wheels(platform_wheels[0], platform_wheels[1], wheels_dir)
         else:
