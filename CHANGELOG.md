@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.8.1] - 2025-07-13
+
+- Add support for the [proposed `VARC` table](https://github.com/harfbuzz/boring-expansion-spec/blob/main/VARC.md) for variable components, via updated harfbuzz/uharfbuzz/fonttools dependencies
+
 ## [1.8] - 2025-05-25
 
 - No new functionality
