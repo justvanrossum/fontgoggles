@@ -9,7 +9,7 @@ fonttools[woff,lxml,unicode,ufo,type1]==4.53.1
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
 uharfbuzz==0.39.3
-python-bidi==0.4.2
+python-bidi==0.5.0
 jundo==0.1.2
 ufo2ft==3.2.5
 numpy==2.0.0
