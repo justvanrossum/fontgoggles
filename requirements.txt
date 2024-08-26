@@ -1,4 +1,4 @@
-setuptools==70.3.0
+setuptools==73.0.1
 wheel>=0.33.6
 py2app==0.28.8
 pyobjc==10.3.1
@@ -8,11 +8,11 @@ blackrenderer==0.6.0
 fonttools[woff,lxml,unicode,ufo,type1]==4.53.1
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
-uharfbuzz==0.39.3
-python-bidi==0.4.2
+uharfbuzz==0.39.5
+python-bidi==0.6.0
 jundo==0.1.2
-ufo2ft==3.2.5
-numpy==2.0.0
+ufo2ft==3.2.7
+numpy==2.1.0
 unicodedata2==15.1.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
 delocate==0.11.0
