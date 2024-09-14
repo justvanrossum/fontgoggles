@@ -4,7 +4,7 @@ from fontTools.pens.recordingPen import RecordingPointPen
 from fontTools.ufoLib import UFOReaderWriter
 from fontTools.ufoLib.glifLib import Glyph
 from fontgoggles.font.ufoFont import UFOState
-from fontgoggles.compile.ufoCompiler import fetchCharacterMappingAndAnchors
+from fontgoggles.compile.ufoCompiler import fetchGlyphInfo
 from testSupport import getFontPath
 
 
@@ -13,7 +13,7 @@ def test_getUpdateInfo(tmpdir):
     ufoPath = shutil.copytree(ufoSource, tmpdir / "test.ufo")
     reader = UFOReaderWriter(ufoPath, validate=False)
     glyphSet = reader.getGlyphSet()
-    cmap, unicodes, anchors = fetchCharacterMappingAndAnchors(glyphSet, ufoPath)
+    widths, cmap, unicodes, anchors = fetchGlyphInfo(glyphSet, ufoPath)
 
     state = UFOState(reader, glyphSet, getUnicodesAndAnchors=lambda: (unicodes, anchors))
 
