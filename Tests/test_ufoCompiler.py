@@ -2,7 +2,7 @@ import asyncio
 import os
 import pytest
 from fontTools.ufoLib import UFOReader
-from fontgoggles.compile.ufoCompiler import fetchCharacterMappingAndAnchors
+from fontgoggles.compile.ufoCompiler import fetchGlyphInfo
 from fontgoggles.compile.compilerPool import compileUFOToPath
 from testSupport import getFontPath
 
@@ -10,7 +10,9 @@ from testSupport import getFontPath
 def test_ufoCharacterMapping():
     ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
     reader = UFOReader(ufoPath)
-    cmap, revCmap, anchors = fetchCharacterMappingAndAnchors(reader.getGlyphSet(), ufoPath)
+    widths, cmap, revCmap, anchors = fetchGlyphInfo(reader.getGlyphSet(), ufoPath)
+    assert widths["A"] == 1290
+    assert widths["B"] == 1270
     assert cmap[0x0041] == "A"
     assert revCmap["A"] == [0x0041]
     # MutatorSansBoldWideMutated.ufo/glyphs/A_.glif contains a commented-out <unicode>
@@ -28,7 +30,7 @@ def test_ufoCharacterMapping():
 def test_ufoCharacterMapping_glyphNames():
     ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
     reader = UFOReader(ufoPath)
-    cmap, revCmap, anchors = fetchCharacterMappingAndAnchors(reader.getGlyphSet(), ufoPath, ["A"])
+    widths, cmap, revCmap, anchors = fetchGlyphInfo(reader.getGlyphSet(), ufoPath, ["A"])
     assert cmap[0x0041] == "A"
     assert revCmap["A"] == [0x0041]
     assert anchors == {"A": [("top", 645, 815)]}
