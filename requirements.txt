@@ -1,4 +1,4 @@
-setuptools==74.1.2
+setuptools==73.3.0  # pin for now: https://github.com/ronaldoussoren/py2app/issues/533
 wheel>=0.33.6
 py2app==0.28.8
 pyobjc==10.3.1
