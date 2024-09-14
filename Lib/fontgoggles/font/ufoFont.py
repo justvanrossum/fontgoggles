@@ -20,7 +20,7 @@ from ufo2ft.constants import COLOR_LAYER_MAPPING_KEY, COLOR_PALETTES_KEY
 from .baseFont import BaseFont
 from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing
 from ..compile.compilerPool import compileUFOToBytes
-from ..compile.ufoCompiler import fetchCharacterMappingAndAnchors
+from ..compile.ufoCompiler import fetchGlyphInfo
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
 
@@ -400,9 +400,11 @@ class UFOState:
             changedGlyphNames = {glyphName for glyphName, mtime in prev.glyphModTimes ^ self.glyphModTimes}
             deletedGlyphNames = {glyphName for glyphName in changedGlyphNames if glyphName not in self.glyphSet}
 
-            _, changedUnicodes, changedAnchors = fetchCharacterMappingAndAnchors(self.glyphSet,
-                                                                                 self.reader.fs.getsyspath("/"),
-                                                                                 changedGlyphNames - deletedGlyphNames)
+            _, _, changedUnicodes, changedAnchors = fetchGlyphInfo(
+                self.glyphSet,
+                self.reader.fs.getsyspath("/"),
+                changedGlyphNames - deletedGlyphNames,
+            )
 
             # Within the changed glyphs, let's see if their anchors changed
             for gn in changedGlyphNames:
