@@ -15,4 +15,4 @@ ufo2ft==3.3.0
 numpy==2.1.2
 unicodedata2==15.1.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
-delocate==0.11.0  # pin for now
+delocate==0.12.0  # pin for now
