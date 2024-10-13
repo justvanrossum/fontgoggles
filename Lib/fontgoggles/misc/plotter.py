@@ -69,8 +69,9 @@ def pathFromGlyph(font, gid):
     else:
         container = []
         font.draw_glyph(gid, rp_draw_funcs, container)
-        # set the container as the value on a RecordingPen?
-        return container
+        rp = RecordingPen()
+        rp.value = container
+        return rp
 
 
 def convertRect(r):
