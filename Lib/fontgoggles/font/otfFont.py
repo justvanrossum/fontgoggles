@@ -3,15 +3,15 @@ from fontTools.ttLib import TTFont
 from .baseFont import BaseFont
 from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing, GlyphCOLRv1Drawing
 from ..compile.compilerPool import compileTTXToBytes
-from ..mac.makePathFromOutline import makePathFromGlyph
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
+from ..misc.plotter import pathFromGlyph
 
 
 class _OTFBaseFont(BaseFont):
 
     def _getGlyphOutline(self, name):
-        return makePathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
+        return pathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         if "VarC" in self.ttFont:

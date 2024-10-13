@@ -1,6 +1,6 @@
 from AppKit import NSGraphicsContext
 from fontTools.misc.arrayTools import unionRect
-from ..mac.drawing import rectFromNSRect, nsColorFromRGBA
+from ..misc.plotter import convertRect, convertColor
 from ..misc.properties import cachedProperty
 
 
@@ -24,11 +24,11 @@ class GlyphDrawing:
     def bounds(self):
         bounds = None
         if self.path.elementCount():
-            bounds = rectFromNSRect(self.path.controlPointBounds())
+            bounds = convertRect(self.path.controlPointBounds())
         return bounds
 
     def draw(self, colorPalette, defaultColor):
-        nsColorFromRGBA(defaultColor).set()
+        convertColor(defaultColor).set()
         self.path.fill()
 
     def pointInside(self, pt):
@@ -46,7 +46,7 @@ class GlyphLayersDrawing:
         for path, colorID in self.layers:
             if not path.elementCount():
                 continue
-            pathBounds = rectFromNSRect(path.controlPointBounds())
+            pathBounds = convertRect(path.controlPointBounds())
             if bounds is None:
                 bounds = pathBounds
             else:
@@ -60,7 +60,7 @@ class GlyphLayersDrawing:
                 if colorID < len(colorPalette) else
                 defaultColor
             )
-            nsColorFromRGBA(color).set()
+            convertColor(color).set()
             path.fill()
 
     def pointInside(self, pt):
