@@ -15,11 +15,11 @@ class _OTFBaseFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         if "VarC" in self.ttFont:
-            from fontTools.pens.cocoaPen import CocoaPen
-            pen = CocoaPen(None)
+            from ..misc.plotter import Plotter
+            plotter = Plotter(None)
             location = self._currentVarLocation or {}
-            self.varcFont.drawGlyph(pen, glyphName, location)
-            return GlyphDrawing(pen.path)
+            self.varcFont.drawGlyph(plotter.pen, glyphName, location)
+            return GlyphDrawing(plotter.getOutline())
         if colorLayers:
             if self.colorLayers is not None:
                 layers = self.colorLayers.get(glyphName)
