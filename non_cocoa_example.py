@@ -1,6 +1,3 @@
-from os import environ
-environ["FONTGOGGLES_COCOA"] = "0"
-
 from fontgoggles.font import getOpener
 from fontgoggles.font.baseFont import BaseFont
 from fontgoggles.misc.textInfo import TextInfo
