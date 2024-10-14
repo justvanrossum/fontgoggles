@@ -7,10 +7,16 @@ from fontTools.pens.recordingPen import RecordingPen
 
 from fontgoggles.misc.plotter import Plotter
 
+font_paths = [
+    "MutatorSans.ttf",
+    "MutatorSansBoldWide.ufo",
+    "MutatorSans.designspace",
+]
+
 
 def test_cocoaAndNoCocoa():
-    def getDrawings():
-        fontPath = getFontPath("MutatorSans.ttf")
+    def getDrawings(path):
+        fontPath = getFontPath(path)
         _, opener, _ = getOpener(fontPath)
         font = opener(fontPath, 0)
         run(font.load(None)) # to test support for non-async
@@ -25,11 +31,14 @@ def test_cocoaAndNoCocoa():
 
         return glyphDrawings
 
-    glyphDrawings = getDrawings()
-    for g in glyphDrawings:
-        assert "NSBezierPath" in str(type(g.path))
+    for font_path in font_paths:
+        glyphDrawings = getDrawings(font_path)
+        for g in glyphDrawings:
+            assert "NSBezierPath" in str(type(g.path))
 
     Plotter.UseCocoa = False
-    glyphDrawings = getDrawings()
-    for g in glyphDrawings:
-        assert isinstance(g.path, RecordingPen)
+    
+    for font_path in font_paths:
+        glyphDrawings = getDrawings(font_path)
+        for g in glyphDrawings:
+            assert isinstance(g.path, RecordingPen)
