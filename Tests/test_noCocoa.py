@@ -5,7 +5,7 @@ from fontgoggles.misc.textInfo import TextInfo
 from testSupport import getFontPath
 from fontTools.pens.recordingPen import RecordingPen
 
-from fontgoggles.misc.plotter import Plotter
+from fontgoggles.misc.platform import Platform
 
 font_paths = [
     "MutatorSans.ttf",
@@ -36,7 +36,7 @@ def test_cocoaAndNoCocoa():
         for g in glyphDrawings:
             assert "NSBezierPath" in str(type(g.path))
 
-    Plotter.UseCocoa = False
+    Platform.UseCocoa = False
     
     for font_path in font_paths:
         glyphDrawings = getDrawings(font_path)
