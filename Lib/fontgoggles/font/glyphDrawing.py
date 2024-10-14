@@ -1,4 +1,3 @@
-from AppKit import NSGraphicsContext
 from fontTools.misc.arrayTools import unionRect
 from ..misc.plotter import Plotter
 from ..misc.properties import cachedProperty
@@ -77,15 +76,7 @@ class GlyphCOLRv1Drawing:
         return self.colorFont.getGlyphBounds(self.glyphName)
 
     def draw(self, colorPalette, defaultColor):
-        from blackrenderer.backends.coregraphics import CoreGraphicsCanvas
-
-        cgContext = NSGraphicsContext.currentContext().CGContext()
-        self.colorFont.drawGlyph(
-            self.glyphName,
-            CoreGraphicsCanvas(cgContext),
-            palette=colorPalette,
-            textColor=defaultColor,
-        )
+        Plotter.drawCOLRv1Glyph(self.colorFont, self.glyphName, colorPalette, defaultColor)
 
     def pointInside(self, pt):
         return False  # TODO: implement
