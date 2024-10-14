@@ -94,3 +94,19 @@ class Plotter():
         if Plotter.UseCocoa:
             from ..mac.drawing import nsColorFromRGBA
             return nsColorFromRGBA(c)
+        
+    @staticmethod
+    def drawCOLRv1Glyph(colorFont, glyphName, colorPalette, defaultColor):
+        if Plotter.UseCocoa:
+            from AppKit import NSGraphicsContext
+            from blackrenderer.backends.coregraphics import CoreGraphicsCanvas
+
+            cgContext = NSGraphicsContext.currentContext().CGContext()
+            colorFont.drawGlyph(
+                glyphName,
+                CoreGraphicsCanvas(cgContext),
+                palette=colorPalette,
+                textColor=defaultColor,
+            )
+        else:
+            raise NotImplementedError()
