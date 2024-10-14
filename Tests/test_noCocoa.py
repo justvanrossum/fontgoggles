@@ -1,4 +1,4 @@
-import pytest
+import pytest, sys
 from asyncio import run
 from fontgoggles.font import getOpener
 from fontgoggles.misc.textInfo import TextInfo
@@ -19,7 +19,7 @@ def test_cocoaAndNoCocoa():
         fontPath = getFontPath(path)
         _, opener, _ = getOpener(fontPath)
         font = opener(fontPath, 0)
-        run(font.load(None)) # to test support for non-async
+        run(font.load(sys.stderr.write)) # to test support for non-async
         
         textInfo = TextInfo("abc")
         glyphs = font.getGlyphRunFromTextInfo(textInfo)
