@@ -5,13 +5,13 @@ from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing, GlyphCOLRv1Drawing
 from ..compile.compilerPool import compileTTXToBytes
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
-from ..misc.plotter import pathFromGlyph
+from ..misc.plotter import Plotter
 
 
 class _OTFBaseFont(BaseFont):
 
     def _getGlyphOutline(self, name):
-        return pathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
+        return Plotter.pathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         if "VarC" in self.ttFont:
