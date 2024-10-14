@@ -48,7 +48,7 @@ class Plotter():
         if Plotter.UseCocoa:
             self.pen = CocoaPen(glyphSet, path=path)
         else:
-            self.pen = RecordingPen(glyphSet, path=path)
+            self.pen = RecordingPen()
         
     def draw(self, pen):
         self.pen.draw(pen)
