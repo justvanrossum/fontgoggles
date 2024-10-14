@@ -41,27 +41,12 @@ def build_draw_funcs():
     recordingPenDrawFuncs.set_close_path_func(close_path)
 
 
-class Plotter():
+class Platform():
     UseCocoa = CAN_COCOA
-
-    def __init__(self, glyphSet, path=None):
-        if Plotter.UseCocoa:
-            self.pen = CocoaPen(glyphSet, path=path)
-        else:
-            self.pen = RecordingPen()
-        
-    def draw(self, pen):
-        self.pen.draw(pen)
-    
-    def getOutline(self):
-        if isinstance(self.pen, CocoaPen):
-            return self.pen.path
-        else:
-            return self.pen
 
     @staticmethod
     def pathFromArrays(font, points, tags, contours):
-        if Plotter.UseCocoa:
+        if Platform.UseCocoa:
             from ..mac.makePathFromOutline import makePathFromArrays
             return makePathFromArrays(points, tags, contours)
         else:
@@ -71,7 +56,7 @@ class Plotter():
 
     @staticmethod
     def pathFromGlyph(font, gid):
-        if Plotter.UseCocoa:
+        if Platform.UseCocoa:
             from ..mac.makePathFromOutline import makePathFromGlyph
             return makePathFromGlyph(font, gid)
         else:
@@ -85,19 +70,19 @@ class Plotter():
 
     @staticmethod
     def convertRect(r):
-        if Plotter.UseCocoa:
+        if Platform.UseCocoa:
             from ..mac.drawing import rectFromNSRect
             return rectFromNSRect(r)
 
     @staticmethod
     def convertColor(c):
-        if Plotter.UseCocoa:
+        if Platform.UseCocoa:
             from ..mac.drawing import nsColorFromRGBA
             return nsColorFromRGBA(c)
         
     @staticmethod
     def drawCOLRv1Glyph(colorFont, glyphName, colorPalette, defaultColor):
-        if Plotter.UseCocoa:
+        if Platform.UseCocoa:
             from AppKit import NSGraphicsContext
             from blackrenderer.backends.coregraphics import CoreGraphicsCanvas
 
@@ -110,3 +95,20 @@ class Plotter():
             )
         else:
             raise NotImplementedError()
+
+
+class PlatformPenWrapper():
+    def __init__(self, glyphSet, path=None):
+        if Platform.UseCocoa:
+            self.pen = CocoaPen(glyphSet, path=path)
+        else:
+            self.pen = RecordingPen()
+        
+    def draw(self, pen):
+        self.pen.draw(pen)
+    
+    def getOutline(self):
+        if isinstance(self.pen, CocoaPen):
+            return self.pen.path
+        else:
+            return self.pen
