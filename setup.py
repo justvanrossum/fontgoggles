@@ -31,6 +31,13 @@ setup(
     packages=find_packages("Lib"),
     package_data={'fontgoggles.mac': ['*.dylib']},
     install_requires=[
+        "blackrenderer==0.6.0",
+        "fonttools[woff,lxml,unicode,ufo,type1]==4.53.1",
+        "uharfbuzz==0.39.5",
+        "python-bidi==0.4.2",
+        "ufo2ft==3.2.8",
+        "numpy",
+        "unicodedata2==15.1.0",
     ],
     extras_require={
     },
