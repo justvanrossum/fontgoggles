@@ -1,14 +1,14 @@
 # Changelog for FontGoggles
 
-## [1.8.2] - 2025-09-14
+## [1.8.2] - 2024-09-14
 
 - Fixed bug where feature compilation from UFO would fail ([Issue 432](https://github.com/justvanrossum/fontgoggles/issues/432), [Issue 433](https://github.com/justvanrossum/fontgoggles/issues/433), [PR 434](https://github.com/justvanrossum/fontgoggles/pull/434))
 
-## [1.8.1] - 2025-07-13
+## [1.8.1] - 2024-07-13
 
 - Add support for the [proposed `VARC` table](https://github.com/harfbuzz/boring-expansion-spec/blob/main/VARC.md) for variable components, via updated harfbuzz/uharfbuzz/fonttools dependencies
 
-## [1.8] - 2025-05-25
+## [1.8] - 2024-05-25
 
 - No new functionality
 - Updated bundled versions of all dependencies (See “About” window for embedded version numbers)
