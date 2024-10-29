@@ -3,13 +3,15 @@ from distutils.command.build import build as _build
 import re
 from setuptools import setup, find_packages
 import subprocess
+import platform
 
 
 class build(_build):
     def run(self):
-        # Build our C library
-        subprocess.check_call(['./Turbo/build_lib.sh'])
-        _build.run(self)
+        if platform.system() == "Darwin":
+            # Build our C library
+            subprocess.check_call(['./Turbo/build_lib.sh'])
+            _build.run(self)
 
 
 _versionRE = re.compile(r'__version__\s*=\s*\"([^\"]+)\"')
