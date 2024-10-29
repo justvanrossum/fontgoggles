@@ -27,7 +27,7 @@ When a font file changes on disk, FontGoggles will automatically reload it and s
 
 If you want to build and run the app from the source, follow these instructions.
 
-- Make sure you have Python 3.7 installed, preferably from python.org, but homebrew may work, too. (3.8 may work, but I didn't check whether all our dependencies are available.)
+- Make sure you have Python 3.10 or up installed, preferably from python.org, but homebrew may work, too.
 
 - Clone this repository.
 
@@ -35,7 +35,7 @@ If you want to build and run the app from the source, follow these instructions.
 
 - Setup a virtual environment:
 
-	`$ python3.7 -m venv venv --prompt=fontgoggles`
+	`$ python3 -m venv venv --prompt=fontgoggles`
 
 - Activate the environment:
 
