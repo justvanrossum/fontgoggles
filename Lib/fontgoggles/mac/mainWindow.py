@@ -163,7 +163,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings.compileOutputSize = self.fontListSplitView.paneSize("compileOutput")
         uiSettings.formattingOptionsVisible = self.w.mainSplitView.isPaneReallyVisible("formattingOptions")
         uiSettings.feaVarTabSelection = feaVarTabValues[self.feaVarTabs.get()]
-        uiSettings.showHiddenAxes = self.variationsGroup.showHiddenAxes
+        uiSettings.showHiddenAxes = self.variationsGroup.axisSliders.showHiddenAxes
 
     @objc.python_method
     def restoreWindowPosition(self, windowPosition):
@@ -289,19 +289,35 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.feaVarTabs = self.feaVarTabs
         group.feaVarTabs.set(feaVarTabValues.index(self.project.uiSettings.feaVarTabSelection))
 
+        # Sidebar first tab
         featuresTab = group.feaVarTabs[0]
         self.featuresGroup = FeatureTagGroup(sidebarWidth - 6, {}, callback=self.featuresChanged)
         featuresTab.main = AligningScrollView((0, 0, 0, 0), self.featuresGroup, drawBackground=False,
                                               hasHorizontalScroller=False, autohidesScrollers=True,
                                               borderType=AppKit.NSNoBorder)
 
+        # Sidebar second tab
         variationsTab = group.feaVarTabs[1]
-        self.variationsGroup = SliderGroup(sidebarWidth - 6, {}, callback=self.varLocationChanged,
-                                           showHiddenAxes=self.project.uiSettings.showHiddenAxes)
+        self.variationsGroup = Group((0, 0, 0, 0))
+
+        self.variationsGroup.axisSliders = SliderGroup(sidebarWidth - 6, {},
+                                                       callback=self.varLocationChanged,
+                                                       showHiddenAxes=self.project.uiSettings.showHiddenAxes)
+
+        self.variationsGroup.instances = LabeledView(
+            # Position and instances gets updated as fonts are read
+            (6, 0, sidebarWidth - 20, 20),
+            "Instances:",
+            PopUpButton, [],
+            callback=self.varInstanceChanged,
+        )
+
+        # The content of the tab wrapping the axes sliders and instance dropdown
         variationsTab.main = AligningScrollView((0, 0, 0, 0), self.variationsGroup, drawBackground=False,
                                                 hasHorizontalScroller=False, autohidesScrollers=True,
                                                 borderType=AppKit.NSNoBorder)
 
+        # Sidebar third tab
         optionsTab = group.feaVarTabs[2]
         relativeFontSize = self.project.textSettings.relativeFontSize * 100
         relativeBaseline = self.getRelativeBaselineValueForSlider()
@@ -343,7 +359,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         directions = [label if label is not None else AppKit.NSMenuItem.separatorItem() for label in directionOptions]
 
         self.directionPopUp = LabeledView(
-            (10, y, -10, 40), "Direction/orientation:",
+            (6, y, -6, 40), "Direction/orientation:",
             PopUpButton, directions,
             callback=self.directionPopUpCallback,
         )
@@ -363,7 +379,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             alignmentOptions = alignmentOptionsHorizontal
             alignmentValues = alignmentValuesHorizontal
         self.alignmentPopup = LabeledView(
-            (10, y, -10, 40), "Visual alignment:",
+            (6, y, -6, 40), "Visual alignment:",
             PopUpButton, alignmentOptions,
             callback=self.alignmentChangedCallback,
         )
@@ -373,7 +389,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y += 50
 
         self.scriptsPopup = LabeledView(
-            (10, y, -10, 40), "Script:",
+            (6, y, -6, 40), "Script:",
             PopUpButton, ['Automatic'],
             callback=self.scriptsPopupCallback,
         )
@@ -381,7 +397,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         y += 50
 
         self.languagesPopup = LabeledView(
-            (10, y, -10, 40), "Language:",
+            (6, y, -6, 40), "Language:",
             PopUpButton, [],
             callback=self.languagesPopupCallback,
         )
@@ -537,6 +553,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         allFeatureTagsGSUB = set()
         allFeatureTagsGPOS = set()
         allAxes = []
+        allInstances = [("No instance selected", {})]
         allScriptsAndLanguages = []
         allStylisticSetNames = []
         for fontItemInfo in fonts:
@@ -548,13 +565,15 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             allAxes.append(font.axes)
             allScriptsAndLanguages.append(font.scripts)
             allStylisticSetNames.append(font.stylisticSetNames)
+            allInstances.extend([i for i in font.instances if i not in allInstances])
         allAxes = mergeAxes(*allAxes)
         allScriptsAndLanguages = mergeScriptsAndLanguages(*allScriptsAndLanguages)
         allStylisticSetNames = mergeStylisticSetNames(*allStylisticSetNames)
-        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages, allStylisticSetNames
+        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allInstances, \
+            allScriptsAndLanguages, allStylisticSetNames
 
     @objc.python_method
-    def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes,
+    def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allInstances,
                             allScriptsAndLanguages, allStylisticSetNames):
         self.featuresGroup.setTags({"GSUB": allFeatureTagsGSUB, "GPOS": allFeatureTagsGPOS},
                                    allStylisticSetNames)
@@ -583,7 +602,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isAxisRegistered = tag == tag.lower()  # all lowercase tags are registered axes
             return not isAxisRegistered, axisInfo.label.lower()
         sliderInfo = {k: v for k, v in sorted(sliderInfo.items(), key=sorter)}
-        self.variationsGroup.setSliderInfo(sliderInfo)
+
+        self.variationsGroup.axisSliders.setSliderInfo(sliderInfo)
+        self.variationsGroup.instances.setPosSize((0, self.variationsGroup.axisSliders.getPosSize()[3], 0, 40)),
+        self.variationsGroup.instances.setItems([i[0] for i in allInstances])
+
         scriptTags = sorted(allScriptsAndLanguages)
         scriptMenuTitles = ['Automatic'] + [f"{tag} – {opentypeTags.scripts.get(tag, '?')}" for tag in scriptTags]
         selectedItem = self.scriptsPopup.getItem()
@@ -602,7 +625,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         languageTags = [_tagFromMenuItem(item, "dflt") for item in self.languagesPopup.getItems()]
         self.languagesPopup.set(languageTags.index(self.project.textSettings.language))
         self.featuresGroup.set(self.project.textSettings.features)
-        self.variationsGroup.set(self.project.textSettings.varLocation)
+        self.variationsGroup.axisSliders.set(self.project.textSettings.varLocation)
 
     def iterFontItems(self):
         return self.fontList.iterFontItems()
@@ -967,8 +990,45 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
 
     @objc.python_method
     def varLocationChanged(self, sender):
+        """Axis slider value changed"""
+        _, _, _, allInstances, _, _ = self._gatherSidebarInfo(self.project.fonts)
         self.project.textSettings.varLocation = {k: v for k, v in sender.get().items() if v is not None}
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
+        
+        # Select or reset instance popup:
+        # Try match an instance to the current set of axis values. If there are
+        # several variable fonts with different axes it is possible that for
+        # each font's axes the current axis values match an instance, in which
+        # case the dropdown value would be ambiguous, so simply reset the 
+        # dropdown.
+        select = 0
+        axisValues = sender.get()
+        matched_instances = []
+        for i, instance in enumerate(allInstances):
+            # Skip first dropdown entry with placeholder
+            if i == 0:
+                continue
+            all_axes_match = True
+            for axis, instancevalue in instance[1].items():
+                if axis not in axisValues or float(axisValues[axis]) != float(instancevalue):
+                    all_axes_match = False
+            if all_axes_match:
+                matched_instances.append(i)
+
+        # Of all open variable fonts only one had an instance for this exact
+        # axis location, so show it selected
+        if len(matched_instances) == 1:
+            select = matched_instances[0]
+
+        self.variationsGroup.instances.set(select)
+
+    @objc.python_method
+    def varInstanceChanged(self, sender):
+        """Instance was selected from popup"""
+        _, _, _, allInstances, _, _ = self._gatherSidebarInfo(self.project.fonts)
+        self.project.textSettings.varLocation = {k: v for k, v in allInstances[sender.get()][1].items() if v is not None}
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
+        self.variationsGroup.axisSliders.set(self.project.textSettings.varLocation)
 
     @objc.python_method
     def relativeSizeChangedCallback(self, sender):
@@ -1133,8 +1193,9 @@ class LabeledView(Group):
         super().__init__(posSize)
         x, y, w, h = posSize
         assert h > 0
-        self.label = TextBox((0, 0, 0, 0), label)
-        self.view = viewClass((0, 20, 0, 20), *args, **kwargs)
+        # Inherit posSize, but offset view by label height
+        self.label = TextBox((x, 0, w, 20), label)
+        self.view = viewClass((x, 20, w, 20), *args, **kwargs)
 
     def get(self):
         return self.view.get()
