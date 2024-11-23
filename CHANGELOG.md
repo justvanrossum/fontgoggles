@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.8.3] - 2024-11-08
+
+- Update `HarfBuzz` to 10.1.0
+- Update `uharfbuzz` to 0.42.0
+
 ## [1.8.2] - 2024-09-14
 
 - Fixed bug where feature compilation from UFO would fail ([Issue 432](https://github.com/justvanrossum/fontgoggles/issues/432), [Issue 433](https://github.com/justvanrossum/fontgoggles/issues/433), [PR 434](https://github.com/justvanrossum/fontgoggles/pull/434))
