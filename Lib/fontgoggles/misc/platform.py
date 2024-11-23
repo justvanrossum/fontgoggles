@@ -15,32 +15,6 @@ except ImportError:
     CAN_COCOA = False
 
 
-recordingPenDrawFuncs = None
-
-def build_draw_funcs():
-    from uharfbuzz import DrawFuncs
-
-    global recordingPenDrawFuncs
-    recordingPenDrawFuncs = DrawFuncs()
-
-    def move_to(x,y,c):
-        c.append(("moveTo", ((x,y),)))
-    def line_to(x,y,c):
-        c.append(("lineTo", ((x,y),)))
-    def cubic_to(c1x,c1y,c2x,c2y,x,y,c):
-        c.append(("curveTo", ((c1x,c1y),(c2x,c2y),(x,y))))
-    def quadratic_to(c1x,c1y,x,y,c):
-        c.append(("qCurveTo", ((c1x,c1y),(x,y))))
-    def close_path(c):
-        c.append(("closePath", ()))
-
-    recordingPenDrawFuncs.set_move_to_func(move_to)
-    recordingPenDrawFuncs.set_line_to_func(line_to)
-    recordingPenDrawFuncs.set_cubic_to_func(cubic_to)
-    recordingPenDrawFuncs.set_quadratic_to_func(quadratic_to)
-    recordingPenDrawFuncs.set_close_path_func(close_path)
-
-
 class Platform():
     UseCocoa = CAN_COCOA
 
@@ -60,12 +34,8 @@ class Platform():
             from ..mac.makePathFromOutline import makePathFromGlyph
             return makePathFromGlyph(font, gid)
         else:
-            container = []
-            if recordingPenDrawFuncs is None:
-                build_draw_funcs()
-            font.draw_glyph(gid, recordingPenDrawFuncs, container)
             rp = RecordingPen()
-            rp.value = container
+            font.draw_glyph_with_pen(gid, rp)
             return rp
 
     @staticmethod
