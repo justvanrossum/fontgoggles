@@ -8,7 +8,7 @@ import platform
 
 class build(_build):
     def run(self):
-        if platform.system() == "Darwin":
+        if platform.system() == "Darwin" and False:
             # Build our C library
             subprocess.check_call(['./Turbo/build_lib.sh'])
             _build.run(self)
