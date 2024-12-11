@@ -8,10 +8,13 @@ import platform
 
 class build(_build):
     def run(self):
-        if platform.system() == "Darwin" and False:
-            # Build our C library
-            subprocess.check_call(['./Turbo/build_lib.sh'])
-            _build.run(self)
+        if platform.system() == "Darwin":
+            try:
+                # Build our C library
+                subprocess.check_call(['./Turbo/build_lib.sh'])
+                _build.run(self)
+            except:
+                print("! Could not build turbo")
 
 
 _versionRE = re.compile(r'__version__\s*=\s*\"([^\"]+)\"')
