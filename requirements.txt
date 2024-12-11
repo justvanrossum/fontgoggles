@@ -4,15 +4,15 @@ py2app==0.28.8
 pyobjc==10.3.1
 corefoundationasyncio==0.0.1
 cocoa-vanilla==0.6.0
-### blackrenderer==0.6.0 # moved to setup.py
-### fonttools[woff,lxml,unicode,ufo,type1]==4.53.1 # moved to setup.py
+blackrenderer==0.6.0
+fonttools[woff,lxml,unicode,ufo,type1]==4.53.1
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
-### uharfbuzz==0.42.0 # moved to setup.py
-### python-bidi==0.4.2  # pin for now # moved to setup.py
+uharfbuzz==0.42.0
+python-bidi==0.4.2  # pin for now
 jundo==0.1.2
-### ufo2ft==3.2.8 # moved to setup.py
-### numpy==2.1.1 # moved to setup.py
-### unicodedata2==15.1.0
+ufo2ft==3.2.8
+numpy==2.1.1
+unicodedata2==15.1.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
 delocate==0.11.0  # pin for now

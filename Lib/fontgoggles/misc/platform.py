@@ -10,73 +10,76 @@ CAN_COCOA = True
 
 try:
     from fontTools.pens.cocoaPen import CocoaPen
+
     # TODO some other feature detection?
 except ImportError:
     CAN_COCOA = False
 
-
-class Platform():
-    UseCocoa = CAN_COCOA
-
-    @staticmethod
-    def pathFromArrays(font, points, tags, contours):
-        if Platform.UseCocoa:
-            from ..mac.makePathFromOutline import makePathFromArrays
-            return makePathFromArrays(points, tags, contours)
-        else:
-            rp = RecordingPen()
-            font.draw(rp)
-            return rp
-
-    @staticmethod
-    def pathFromGlyph(font, gid):
-        if Platform.UseCocoa:
-            from ..mac.makePathFromOutline import makePathFromGlyph
-            return makePathFromGlyph(font, gid)
-        else:
-            rp = RecordingPen()
-            font.draw_glyph_with_pen(gid, rp)
-            return rp
-
-    @staticmethod
-    def convertRect(r):
-        if Platform.UseCocoa:
-            from ..mac.drawing import rectFromNSRect
-            return rectFromNSRect(r)
-
-    @staticmethod
-    def convertColor(c):
-        if Platform.UseCocoa:
-            from ..mac.drawing import nsColorFromRGBA
-            return nsColorFromRGBA(c)
-        
-    @staticmethod
-    def drawCOLRv1Glyph(colorFont, glyphName, colorPalette, defaultColor):
-        if Platform.UseCocoa:
-            from AppKit import NSGraphicsContext
-            from blackrenderer.backends.coregraphics import CoreGraphicsCanvas
-
-            cgContext = NSGraphicsContext.currentContext().CGContext()
-            colorFont.drawGlyph(
-                glyphName,
-                CoreGraphicsCanvas(cgContext),
-                palette=colorPalette,
-                textColor=defaultColor,
-            )
-        else:
-            raise NotImplementedError()
+USE_COCOA = CAN_COCOA
 
 
-class PlatformPenWrapper():
+def pathFromArrays(font, points, tags, contours):
+    if USE_COCOA:
+        from ..mac.makePathFromOutline import makePathFromArrays
+
+        return makePathFromArrays(points, tags, contours)
+    else:
+        rp = RecordingPen()
+        font.draw(rp)
+        return rp
+
+
+def pathFromGlyph(font, gid):
+    if USE_COCOA:
+        from ..mac.makePathFromOutline import makePathFromGlyph
+
+        return makePathFromGlyph(font, gid)
+    else:
+        rp = RecordingPen()
+        font.draw_glyph_with_pen(gid, rp)
+        return rp
+
+
+def convertRect(r):
+    if USE_COCOA:
+        from ..mac.drawing import rectFromNSRect
+
+        return rectFromNSRect(r)
+
+
+def convertColor(c):
+    if USE_COCOA:
+        from ..mac.drawing import nsColorFromRGBA
+
+        return nsColorFromRGBA(c)
+
+
+def drawCOLRv1Glyph(colorFont, glyphName, colorPalette, defaultColor):
+    if USE_COCOA:
+        from AppKit import NSGraphicsContext
+        from blackrenderer.backends.coregraphics import CoreGraphicsCanvas
+
+        cgContext = NSGraphicsContext.currentContext().CGContext()
+        colorFont.drawGlyph(
+            glyphName,
+            CoreGraphicsCanvas(cgContext),
+            palette=colorPalette,
+            textColor=defaultColor,
+        )
+    else:
+        raise NotImplementedError()
+
+
+class PlatformPenWrapper:
     def __init__(self, glyphSet, path=None):
-        if Platform.UseCocoa:
+        if USE_COCOA:
             self.pen = CocoaPen(glyphSet, path=path)
         else:
             self.pen = RecordingPen()
-        
+
     def draw(self, pen):
         self.pen.draw(pen)
-    
+
     def getOutline(self):
         if isinstance(self.pen, CocoaPen):
             return self.pen.path

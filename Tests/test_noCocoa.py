@@ -5,7 +5,7 @@ from fontgoggles.misc.textInfo import TextInfo
 from testSupport import getFontPath
 from fontTools.pens.recordingPen import RecordingPen
 
-from fontgoggles.misc.platform import Platform
+import fontgoggles.misc.platform as platform
 
 font_paths = [
     "MutatorSans.ttf",
@@ -19,8 +19,8 @@ def test_cocoaAndNoCocoa():
         fontPath = getFontPath(path)
         _, opener, _ = getOpener(fontPath)
         font = opener(fontPath, 0)
-        run(font.load(sys.stderr.write)) # to test support for non-async
-        
+        run(font.load(sys.stderr.write))  # to test support for non-async
+
         textInfo = TextInfo("abc")
         glyphs = font.getGlyphRunFromTextInfo(textInfo)
         glyphNames = [g.name for g in glyphs]
@@ -36,8 +36,8 @@ def test_cocoaAndNoCocoa():
         for g in glyphDrawings:
             assert "NSBezierPath" in str(type(g.path))
 
-    Platform.UseCocoa = False
-    
+    platform.USE_COCOA = False
+
     for font_path in font_paths:
         glyphDrawings = getDrawings(font_path)
         for g in glyphDrawings:
