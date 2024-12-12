@@ -1,8 +1,8 @@
 import sys
 import pytest
-from fontTools.pens.cocoaPen import CocoaPen
 from fontTools.ttLib import TTFont
 from fontgoggles.font.otfFont import OTFFont
+from fontgoggles.misc.platform import PlatformPenWrapper
 from testSupport import getFontPath
 
 
@@ -19,12 +19,12 @@ async def test_getOutlinePath():
 
     for glyphName in ["a", "B", "O", "period", "bar", "aring"]:
         p = font._getGlyphOutline(glyphName)
-        pen = CocoaPen(ttfGlyphSet)
-        ttfGlyphSet[glyphName].draw(pen)
+        penwrapper = PlatformPenWrapper(ttfGlyphSet)
+        ttfGlyphSet[glyphName].draw(penwrapper.pen)
         # The paths are not identical, due to different rounding
         # of the implied points, and different closepath behavior,
         # so comparing is hard, so we'll settle for a bounding box.
-        assert p.controlPointBounds() == pen.path.controlPointBounds()
+        assert p.controlPointBounds() == penwrapper.pen.path.controlPointBounds()
 
 
 @pytest.mark.asyncio

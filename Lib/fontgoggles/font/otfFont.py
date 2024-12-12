@@ -3,23 +3,22 @@ from fontTools.ttLib import TTFont
 from .baseFont import BaseFont
 from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing, GlyphCOLRv1Drawing
 from ..compile.compilerPool import compileTTXToBytes
-from ..mac.makePathFromOutline import makePathFromGlyph
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
+from ..misc.platform import PlatformPenWrapper, pathFromGlyph
 
 
 class _OTFBaseFont(BaseFont):
 
     def _getGlyphOutline(self, name):
-        return makePathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
+        return pathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         if "VarC" in self.ttFont:
-            from fontTools.pens.cocoaPen import CocoaPen
-            pen = CocoaPen(None)
+            penwrapper = PlatformPenWrapper(None)
             location = self._currentVarLocation or {}
-            self.varcFont.drawGlyph(pen, glyphName, location)
-            return GlyphDrawing(pen.path)
+            self.varcFont.drawGlyph(penwrapper.pen, glyphName, location)
+            return GlyphDrawing(penwrapper.getOutline())
         if colorLayers:
             if self.colorLayers is not None:
                 layers = self.colorLayers.get(glyphName)
