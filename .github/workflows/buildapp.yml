@@ -29,7 +29,7 @@ jobs:
 
       - name: Set up Python from python.org
         run: |
-          curl https://www.python.org/ftp/python/3.12.3/python-3.12.3-macos11.pkg --output python-installer.pkg
+          curl https://www.python.org/ftp/python/3.12.8/python-3.12.8-macos11.pkg --output python-installer.pkg
           sudo installer -pkg python-installer.pkg -target /
           # Somehow using plain "python3" gives us the runner's homebrew Python,
           # so let's be explicit about the path:
