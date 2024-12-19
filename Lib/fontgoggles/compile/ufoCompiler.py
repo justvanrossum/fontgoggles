@@ -68,10 +68,12 @@ def compileUFOToPath(ufoPath, ttPath):
     ttFont.save(ttPath, reorderTables=False)
 
 
-_tagGLIFPattern = re.compile(rb'(<\s*(advance|anchor|unicode)\s+([^>]+)>)')
-_ufo2AnchorPattern = re.compile(rb"<contour>\s+(<point\s+[^>]+move[^>]+name[^>]+>)\s+</contour>")
-_unicodeAttributeGLIFPattern = re.compile(rb'hex\s*=\s*\"([0-9A-Fa-f]+)\"')
-_widthAttributeGLIFPattern = re.compile(rb'width\s*=\s*\"([0-9A-Fa-f]+)\"')
+_tagGLIFPattern = re.compile(rb"(<\s*(advance|anchor|unicode)\s+([^>]+)>)")
+_ufo2AnchorPattern = re.compile(
+    rb"<contour>\s+(<point\s+[^>]+move[^>]+name[^>]+>)\s+</contour>"
+)
+_unicodeAttributeGLIFPattern = re.compile(rb"hex\s*=\s*\"([0-9A-Fa-f]+)\"")
+_widthAttributeGLIFPattern = re.compile(rb"width\s*=\s*\"([0-9A-Fa-f]+)\"")
 
 
 def fetchGlyphInfo(glyphSet, ufoPath, glyphNames=None, ufo2=False):
@@ -131,11 +133,16 @@ def fetchGlyphInfo(glyphSet, ufoPath, glyphNames=None, ufo2=False):
             revCmap[glyphName] = uniqueUnicodes
 
     if duplicateUnicodes:
-        dupMessage = "; ".join(f"U+{codePoint:04X}:{','.join(glyphNames)}"
-                               for codePoint, glyphNames in sorted(duplicateUnicodes.items()))
+        dupMessage = "; ".join(
+            f"U+{codePoint:04X}:{','.join(glyphNames)}"
+            for codePoint, glyphNames in sorted(duplicateUnicodes.items())
+        )
         logger = logging.getLogger("fontgoggles.font.ufoFont")
-        logger.warning("Some code points in '%s' are assigned to multiple glyphs: %s",
-                       ufoPath, dupMessage)
+        logger.warning(
+            "Some code points in '%s' are assigned to multiple glyphs: %s",
+            ufoPath,
+            dupMessage,
+        )
     return widths, cmap, revCmap, anchors
 
 
@@ -159,7 +166,12 @@ def _parseNumber(s):
 
 
 def _parseAnchorAttrs(attrs):
-    return attrs.get("name"), _parseNumber(attrs.get("x")), _parseNumber(attrs.get("y"))
+    return (
+        attrs.get("name"),
+        _parseNumber(attrs.get("x")),
+        _parseNumber(attrs.get("y")),
+        attrs.get("identifier"),
+    )
 
 
 class FetchUnicodesAndAnchorsParser(BaseGlifParser):
@@ -241,7 +253,10 @@ class MinimalGlyphObject:
         self.name = name
         self.width = width
         self.unicodes = unicodes
-        self.anchors = [MinimalAnchorObject(name, x, y) for name, x, y in anchors]
+        self.anchors = [
+            MinimalAnchorObject(name, x, y, identifier)
+            for name, x, y, identifier in anchors
+        ]
 
     @property
     def unicode(self):
@@ -250,10 +265,11 @@ class MinimalGlyphObject:
 
 class MinimalAnchorObject:
 
-    def __init__(self, name, x, y):
+    def __init__(self, name, x, y, identifier):
         self.name = name
         self.x = x
         self.y = y
+        self.identifier = identifier
 
 
 class MinimalFeaturesObject:
