@@ -166,7 +166,12 @@ def _parseNumber(s):
 
 
 def _parseAnchorAttrs(attrs):
-    return attrs.get("name"), _parseNumber(attrs.get("x")), _parseNumber(attrs.get("y"))
+    return (
+        attrs.get("name"),
+        _parseNumber(attrs.get("x")),
+        _parseNumber(attrs.get("y")),
+        attrs.get("identifier"),
+    )
 
 
 class FetchUnicodesAndAnchorsParser(BaseGlifParser):
@@ -248,7 +253,10 @@ class MinimalGlyphObject:
         self.name = name
         self.width = width
         self.unicodes = unicodes
-        self.anchors = [MinimalAnchorObject(name, x, y) for name, x, y in anchors]
+        self.anchors = [
+            MinimalAnchorObject(name, x, y, identifier)
+            for name, x, y, identifier in anchors
+        ]
 
     @property
     def unicode(self):
@@ -257,10 +265,11 @@ class MinimalGlyphObject:
 
 class MinimalAnchorObject:
 
-    def __init__(self, name, x, y):
+    def __init__(self, name, x, y, identifier):
         self.name = name
         self.x = x
         self.y = y
+        self.identifier = identifier
 
 
 class MinimalFeaturesObject:
