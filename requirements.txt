@@ -1,4 +1,5 @@
-setuptools==70.2.0  # pin for now: https://github.com/ronaldoussoren/py2app/issues/533
+# pin for now: https://github.com/ronaldoussoren/py2app/issues/533
+setuptools==70.2.0  # pyup: ignore
 wheel>=0.33.6
 py2app==0.28.8
 pyobjc==10.3.2
@@ -9,7 +10,7 @@ fonttools[type1,woff,lxml,unicode,ufo]==4.55.3
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
 uharfbuzz==0.43.0
-python-bidi==0.6.3  # pin for now
+python-bidi==0.4.2  # pyup: ignore
 jundo==0.1.2
 ufo2ft==3.3.1
 numpy==2.2.0
