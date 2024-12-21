@@ -40,7 +40,7 @@ setup(
         "fonttools[woff,lxml,unicode,ufo,type1]>=4.53.1",
         "uharfbuzz>=0.42.0",
         "python-bidi==0.4.2", # pinned for non-forward-compatibility
-        "ufo2ft==3.2.8", # pinned for non-forward-compatibility
+        "ufo2ft>=3.2.8",
         "numpy",
         "unicodedata2>=15.1.0",
     ],
