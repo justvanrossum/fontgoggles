@@ -19,11 +19,11 @@ def test_ufoCharacterMapping():
     # tag, that must not be parsed, as well as a commented-out <anchor>.
     assert 0x1234 not in cmap
     assert anchors == {
-        "A": [("top", 645, 815)],
-        "E": [("top", 582.5, 815)],
-        "macroncmb": [("_top", 0, 815)],
-        "asteriskabovecmb": [("_top", 153, 808)],
-        "asteriskbelowcmb": [("_top", 153, 808)],
+        "A": [("top", 645, 815, None)],
+        "E": [("top", 582.5, 815, None)],
+        "macroncmb": [("_top", 0, 815, None)],
+        "asteriskabovecmb": [("_top", 153, 808, None)],
+        "asteriskbelowcmb": [("_top", 153, 808, None)],
     }
 
 
@@ -33,7 +33,7 @@ def test_ufoCharacterMapping_glyphNames():
     widths, cmap, revCmap, anchors = fetchGlyphInfo(reader.getGlyphSet(), ufoPath, ["A"])
     assert cmap[0x0041] == "A"
     assert revCmap["A"] == [0x0041]
-    assert anchors == {"A": [("top", 645, 815)]}
+    assert anchors == {"A": [("top", 645, 815, None)]}
 
 
 @pytest.mark.asyncio

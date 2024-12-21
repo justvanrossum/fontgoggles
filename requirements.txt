@@ -1,18 +1,20 @@
-setuptools==70.2.0  # pin for now: https://github.com/ronaldoussoren/py2app/issues/533
+# pin for now: https://github.com/ronaldoussoren/py2app/issues/533
+setuptools==70.2.0  # pyup: ignore
 wheel>=0.33.6
 py2app==0.28.8
-pyobjc==10.3.1
+pyobjc==10.3.2
 corefoundationasyncio==0.0.1
 cocoa-vanilla==0.6.0
 blackrenderer==0.6.0
-fonttools[woff,lxml,unicode,ufo,type1]==4.53.1
+fonttools[type1,woff,lxml,unicode,ufo]==4.55.3
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
-uharfbuzz==0.42.0
-python-bidi==0.4.2  # pin for now
+uharfbuzz==0.43.0
+# newer python-bidi is completely incompatible with how we use it
+python-bidi==0.4.2  # pyup: ignore
 jundo==0.1.2
-ufo2ft==3.2.8
-numpy==2.1.1
+ufo2ft==3.3.1
+numpy==2.2.0
 unicodedata2==15.1.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
-delocate==0.11.0  # pin for now
+delocate==0.12.0
