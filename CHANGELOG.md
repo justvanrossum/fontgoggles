@@ -1,5 +1,12 @@
 # Changelog for FontGoggles
 
+## [1.8.4] - 2025-01-11
+
+- Update to Unicode 16.0
+- Update to ufo2ft to 3.4.0
+- Update `HarfBuzz` to 10.2.0
+- Update `uharfbuzz` to 0.45.0
+
 ## [1.8.3] - 2024-11-08
 
 - Update `HarfBuzz` to 10.1.0
