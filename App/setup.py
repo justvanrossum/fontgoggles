@@ -80,7 +80,7 @@ infoplist = dict(
     ],
     CFBundleName="FontGoggles",
     CFBundleIdentifier="com.github.justvanrossum.FontGoggles",
-    LSMinimumSystemVersion="10.10",
+    LSMinimumSystemVersion="10.13",
     CFBundleShortVersionString=fontgoggles.__version__,
     CFBundleVersion=fontgoggles.__version__,
     CFBundleIconFile="fontgoggles.icns",
