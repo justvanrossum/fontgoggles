@@ -41,7 +41,7 @@ setup(
         "uharfbuzz>=0.42.0",
         "python-bidi==0.4.2", # pinned for non-forward-compatibility
         "ufo2ft>=3.2.8",
-        "numpy",
+        "numpy==2.1.1", # pin numpy for macOS 10.14 compatibility
         "unicodedata2>=15.1.0",
     ],
     extras_require={
