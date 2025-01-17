@@ -15,7 +15,7 @@ class _OTFBaseFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         if "VarC" in self.ttFont:
-            penwrapper = platform.PenWrapper(None)
+            penwrapper = platform.platform.PenWrapper(None)
             location = self._currentVarLocation or {}
             self.varcFont.drawGlyph(penwrapper.pen, glyphName, location)
             return GlyphDrawing(penwrapper.getOutline())
