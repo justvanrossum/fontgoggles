@@ -14,7 +14,8 @@ uharfbuzz==0.45.0
 python-bidi==0.4.2  # pyup: ignore
 jundo==0.1.2
 ufo2ft==3.4.0
-numpy==2.2.1
+# pin numpy for macOS 10.14 compatibility: https://github.com/justvanrossum/fontgoggles/issues/462
+numpy==2.1.1  # pyup: ignore
 unicodedata2==16.0.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
 delocate==0.12.0

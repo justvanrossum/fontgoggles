@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.8.5] - 2025-01-13
+
+- Fix UFO/designspace support for macOS 10.14 ([Issue 462](https://github.com/justvanrossum/fontgoggles/issues/462), [PR 463](https://github.com/justvanrossum/fontgoggles/issues/462))
+
 ## [1.8.4] - 2025-01-11
 
 - Update to Unicode 16.0
