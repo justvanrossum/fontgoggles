@@ -5,17 +5,17 @@ from .glyphDrawing import GlyphDrawing, GlyphLayersDrawing, GlyphCOLRv1Drawing
 from ..compile.compilerPool import compileTTXToBytes
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
-import fontgoggles.misc.platform as platform
+from ..misc.platform import platform
 
 
 class _OTFBaseFont(BaseFont):
 
     def _getGlyphOutline(self, name):
-        return platform.platform.pathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
+        return platform.pathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         if "VarC" in self.ttFont:
-            penwrapper = platform.platform.PenWrapper(None)
+            penwrapper = platform.PenWrapper(None)
             location = self._currentVarLocation or {}
             self.varcFont.drawGlyph(penwrapper.pen, glyphName, location)
             return GlyphDrawing(penwrapper.getOutline())

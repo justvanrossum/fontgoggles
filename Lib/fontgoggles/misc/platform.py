@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from fontTools.pens.recordingPen import RecordingPen
 
 """
@@ -101,14 +102,18 @@ class PlatformGeneric:
             return self.pen
 
 
-platform = PlatformCocoa if CAN_COCOA else PlatformGeneric
+platform = SimpleNamespace()
+
+_platform = PlatformCocoa if CAN_COCOA else PlatformGeneric
+platform.__dict__.update(**_platform.__dict__)
 
 
 def setUseCocoa(onOff):
     global platform
     if onOff:
         assert CAN_COCOA
-    platform = PlatformCocoa if onOff else PlatformGeneric
+    _platform = PlatformCocoa if onOff else PlatformGeneric
+    platform.__dict__.update(**_platform.__dict__)
 
 
 def getUseCocoa():
