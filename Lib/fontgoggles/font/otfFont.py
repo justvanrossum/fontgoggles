@@ -15,10 +15,10 @@ class _OTFBaseFont(BaseFont):
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
         if "VarC" in self.ttFont:
-            penwrapper = platform.PenWrapper(None)
+            pen = platform.Pen(None)
             location = self._currentVarLocation or {}
-            self.varcFont.drawGlyph(penwrapper.pen, glyphName, location)
-            return GlyphDrawing(penwrapper.getOutline())
+            self.varcFont.drawGlyph(pen, glyphName, location)
+            return GlyphDrawing(pen.path)
         if colorLayers:
             if self.colorLayers is not None:
                 layers = self.colorLayers.get(glyphName)

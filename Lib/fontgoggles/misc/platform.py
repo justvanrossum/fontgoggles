@@ -54,16 +54,8 @@ class PlatformCocoa:
             palette=colorPalette,
             textColor=defaultColor,
         )
-
-    class PenWrapper:
-        def __init__(self, glyphSet, path=None):
-            self.pen = CocoaPen(glyphSet, path=path)
-
-        def draw(self, pen):
-            self.pen.draw(pen)
-
-        def getOutline(self):
-            return self.pen.path
+    
+    Pen = CocoaPen
 
 
 class PlatformGeneric:
@@ -90,16 +82,14 @@ class PlatformGeneric:
     @staticmethod
     def drawCOLRv1Glyph(colorFont, glyphName, colorPalette, defaultColor):
         raise NotImplementedError()
-
-    class PenWrapper:
-        def __init__(self, glyphSet, path=None):
-            self.pen = RecordingPen()
-
-        def draw(self, pen):
-            self.pen.draw(pen)
-
-        def getOutline(self):
-            return self.pen
+    
+    class Pen(RecordingPen):
+        def __init__(self, glyphSet, path=None): # to match CocoaPen constructor
+            super().__init__()
+        
+        @property
+        def path(self):
+            return self
 
 
 platform = SimpleNamespace()
