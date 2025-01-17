@@ -1,5 +1,5 @@
 from fontTools.misc.arrayTools import unionRect
-from ..misc.platform import convertRect, convertColor, drawCOLRv1Glyph
+import fontgoggles.misc.platform as platform
 from ..misc.properties import cachedProperty
 
 
@@ -23,11 +23,11 @@ class GlyphDrawing:
     def bounds(self):
         bounds = None
         if self.path.elementCount():
-            bounds = convertRect(self.path.controlPointBounds())
+            bounds = platform.platform.convertRect(self.path.controlPointBounds())
         return bounds
 
     def draw(self, colorPalette, defaultColor):
-        convertColor(defaultColor).set()
+        platform.platform.convertColor(defaultColor).set()
         self.path.fill()
 
     def pointInside(self, pt):
@@ -45,7 +45,7 @@ class GlyphLayersDrawing:
         for path, colorID in self.layers:
             if not path.elementCount():
                 continue
-            pathBounds = convertRect(path.controlPointBounds())
+            pathBounds = platform.platform.convertRect(path.controlPointBounds())
             if bounds is None:
                 bounds = pathBounds
             else:
@@ -59,7 +59,7 @@ class GlyphLayersDrawing:
                 if colorID < len(colorPalette) else
                 defaultColor
             )
-            convertColor(color).set()
+            platform.platform.convertColor(color).set()
             path.fill()
 
     def pointInside(self, pt):
@@ -76,7 +76,7 @@ class GlyphCOLRv1Drawing:
         return self.colorFont.getGlyphBounds(self.glyphName)
 
     def draw(self, colorPalette, defaultColor):
-        drawCOLRv1Glyph(self.colorFont, self.glyphName, colorPalette, defaultColor)
+        platform.platform.drawCOLRv1Glyph(self.colorFont, self.glyphName, colorPalette, defaultColor)
 
     def pointInside(self, pt):
         return False  # TODO: implement

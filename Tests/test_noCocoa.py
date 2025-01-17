@@ -36,7 +36,7 @@ def test_cocoaAndNoCocoa():
         for g in glyphDrawings:
             assert "NSBezierPath" in str(type(g.path))
 
-    platform.USE_COCOA = False
+    platform.setUseCocoa(False)
 
     for font_path in font_paths:
         glyphDrawings = getDrawings(font_path)
