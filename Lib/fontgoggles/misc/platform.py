@@ -84,7 +84,7 @@ class PlatformGeneric:
         raise NotImplementedError()
     
     class Pen(RecordingPen):
-        def __init__(self, glyphSet, path=None): # to match CocoaPen constructor
+        def __init__(self, glyphSet): # to match CocoaPen constructor
             super().__init__()
         
         @property
