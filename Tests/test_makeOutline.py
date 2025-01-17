@@ -2,7 +2,7 @@ import sys
 import pytest
 from fontTools.ttLib import TTFont
 from fontgoggles.font.otfFont import OTFFont
-from fontgoggles.misc.platform import PlatformPenWrapper
+from fontgoggles.misc.platform import platform
 from testSupport import getFontPath
 
 
@@ -19,7 +19,7 @@ async def test_getOutlinePath():
 
     for glyphName in ["a", "B", "O", "period", "bar", "aring"]:
         p = font._getGlyphOutline(glyphName)
-        penwrapper = PlatformPenWrapper(ttfGlyphSet)
+        penwrapper = platform.PenWrapper(ttfGlyphSet)
         ttfGlyphSet[glyphName].draw(penwrapper.pen)
         # The paths are not identical, due to different rounding
         # of the implied points, and different closepath behavior,
