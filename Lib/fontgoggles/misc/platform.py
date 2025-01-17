@@ -20,26 +20,26 @@ class PlatformCocoa:
     @staticmethod
     def pathFromArrays(font, points, tags, contours):
         from ..mac.makePathFromOutline import makePathFromArrays
-        return makePathFromArrays(points, tags, contours)
 
+        return makePathFromArrays(points, tags, contours)
 
     @staticmethod
     def pathFromGlyph(font, gid):
         from ..mac.makePathFromOutline import makePathFromGlyph
-        return makePathFromGlyph(font, gid)
 
+        return makePathFromGlyph(font, gid)
 
     @staticmethod
     def convertRect(r):
         from ..mac.drawing import rectFromNSRect
-        return rectFromNSRect(r)
 
+        return rectFromNSRect(r)
 
     @staticmethod
     def convertColor(c):
         from ..mac.drawing import nsColorFromRGBA
-        return nsColorFromRGBA(c)
 
+        return nsColorFromRGBA(c)
 
     @staticmethod
     def drawCOLRv1Glyph(colorFont, glyphName, colorPalette, defaultColor):
@@ -53,7 +53,6 @@ class PlatformCocoa:
             palette=colorPalette,
             textColor=defaultColor,
         )
-
 
     class PenWrapper:
         def __init__(self, glyphSet, path=None):
@@ -73,28 +72,23 @@ class PlatformGeneric:
         font.draw(rp)
         return rp
 
-
     @staticmethod
     def pathFromGlyph(font, gid):
         rp = RecordingPen()
         font.draw_glyph_with_pen(gid, rp)
         return rp
 
-
     @staticmethod
     def convertRect(r):
         raise NotImplementedError()
-
 
     @staticmethod
     def convertColor(c):
         raise NotImplementedError()
 
-
     @staticmethod
     def drawCOLRv1Glyph(colorFont, glyphName, colorPalette, defaultColor):
         raise NotImplementedError()
-
 
     class PenWrapper:
         def __init__(self, glyphSet, path=None):
