@@ -2,10 +2,10 @@ import pytest, sys
 from asyncio import run
 from fontgoggles.font import getOpener
 from fontgoggles.misc.textInfo import TextInfo
+from fontgoggles.misc.platform import platform, setUseCocoa
 from testSupport import getFontPath
 from fontTools.pens.recordingPen import RecordingPen
 
-import fontgoggles.misc.platform as platform
 
 font_paths = [
     "MutatorSans.ttf",
@@ -36,7 +36,7 @@ def test_cocoaAndNoCocoa():
         for g in glyphDrawings:
             assert "NSBezierPath" in str(type(g.path))
 
-    platform.setUseCocoa(False)
+    setUseCocoa(False)
 
     for font_path in font_paths:
         glyphDrawings = getDrawings(font_path)

@@ -23,7 +23,7 @@ from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerE
 from ..compile.dsCompiler import getTTPaths
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
-import fontgoggles.misc.platform as platform
+from ..misc.platform import platform
 
 
 class DesignSpaceSourceError(CompilerError):
@@ -443,7 +443,7 @@ class VarGlyph:
         return self.getPoints()[-2]
 
     def getOutline(self):
-        return platform.platform.pathFromArrays(self, self.getPoints(), self.tags, self.contours)
+        return platform.pathFromArrays(self, self.getPoints(), self.tags, self.contours)
 
     def draw(self, pen):
         ppen = PointToSegmentPen(pen)
