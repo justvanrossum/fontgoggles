@@ -54,7 +54,7 @@ class PlatformCocoa:
             palette=colorPalette,
             textColor=defaultColor,
         )
-    
+
     Pen = CocoaPen
 
 
@@ -82,11 +82,11 @@ class PlatformGeneric:
     @staticmethod
     def drawCOLRv1Glyph(colorFont, glyphName, colorPalette, defaultColor):
         raise NotImplementedError()
-    
+
     class Pen(RecordingPen):
-        def __init__(self, glyphSet): # to match CocoaPen constructor
+        def __init__(self, glyphSet):  # to match CocoaPen constructor
             super().__init__()
-        
+
         @property
         def path(self):
             return self
@@ -99,7 +99,7 @@ platform.__dict__.update(**_platform.__dict__)
 
 
 def setUseCocoa(onOff):
-    global platform
+    global platform, _platform
     if onOff:
         assert CAN_COCOA
     _platform = PlatformCocoa if onOff else PlatformGeneric
@@ -107,4 +107,4 @@ def setUseCocoa(onOff):
 
 
 def getUseCocoa():
-    return platform is PlatformCocoa
+    return _platform is PlatformCocoa
