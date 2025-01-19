@@ -94,9 +94,6 @@ class PlatformGeneric:
 
 platform = SimpleNamespace()
 
-_platform = PlatformCocoa if CAN_COCOA else PlatformGeneric
-platform.__dict__.update(**_platform.__dict__)
-
 
 def setUseCocoa(onOff):
     global platform, _platform
@@ -108,3 +105,6 @@ def setUseCocoa(onOff):
 
 def getUseCocoa():
     return _platform is PlatformCocoa
+
+
+setUseCocoa(CAN_COCOA)
