@@ -2,7 +2,7 @@ import pytest, sys
 from asyncio import run
 from fontgoggles.font import getOpener
 from fontgoggles.misc.textInfo import TextInfo
-from fontgoggles.misc.platform import platform, setUseCocoa
+from fontgoggles.misc.platform import setUseCocoa, getUseCocoa
 from testSupport import getFontPath
 from fontTools.pens.recordingPen import RecordingPen
 
@@ -31,12 +31,16 @@ def test_cocoaAndNoCocoa():
 
         return glyphDrawings
 
+    assert getUseCocoa() == True
+
     for font_path in font_paths:
         glyphDrawings = getDrawings(font_path)
         for g in glyphDrawings:
             assert "NSBezierPath" in str(type(g.path))
 
     setUseCocoa(False)
+
+    assert getUseCocoa() == False
 
     for font_path in font_paths:
         glyphDrawings = getDrawings(font_path)
