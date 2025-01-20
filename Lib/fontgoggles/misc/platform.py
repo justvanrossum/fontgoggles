@@ -96,7 +96,7 @@ platform = SimpleNamespace()
 
 
 def setUseCocoa(onOff):
-    global platform, _platform
+    global _platform
     if onOff:
         assert CAN_COCOA
     _platform = PlatformCocoa if onOff else PlatformGeneric
