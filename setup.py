@@ -41,13 +41,13 @@ setup(
         "uharfbuzz>=0.42.0",
         "python-bidi==0.4.2", # pinned for non-forward-compatibility
         "ufo2ft>=3.2.8",
-        "numpy==2.1.1", # pin numpy for macOS 10.14 compatibility
+        "numpy",
         "unicodedata2>=15.1.0",
     ],
     extras_require={
     },
     setup_requires=["setuptools_scm<8.0.0"],
-    python_requires=">=3.7",
+    python_requires=">=3.10",
     classifiers=[
     ],
     cmdclass={'build': build},
