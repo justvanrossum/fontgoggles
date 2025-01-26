@@ -14,8 +14,6 @@ try:
 except ImportError:
     CAN_COCOA = False
 
-USE_COCOA = CAN_COCOA
-
 
 class PlatformCocoa:
     @staticmethod
