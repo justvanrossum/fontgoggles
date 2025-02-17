@@ -13,7 +13,7 @@ uharfbuzz==0.45.0
 # newer python-bidi is completely incompatible with how we use it
 python-bidi==0.4.2  # pyup: ignore
 jundo==0.1.2
-ufo2ft==3.4.0
+ufo2ft==3.4.2
 # pin numpy for macOS 10.14 compatibility: https://github.com/justvanrossum/fontgoggles/issues/462
 numpy==2.1.1  # pyup: ignore
 unicodedata2==16.0.0
