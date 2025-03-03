@@ -18,4 +18,4 @@ ufo2ft==3.4.2
 numpy==2.1.1  # pyup: ignore
 unicodedata2==16.0.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
-delocate==0.12.0
+delocate==0.13.0
