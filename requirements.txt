@@ -2,20 +2,20 @@
 setuptools==70.2.0  # pyup: ignore
 wheel>=0.33.6
 py2app==0.28.8
-pyobjc==10.3.2
+pyobjc==11.0
 corefoundationasyncio==0.0.1
 cocoa-vanilla==0.6.0
 blackrenderer==0.6.0
-fonttools[type1,woff,lxml,unicode,ufo]==4.55.3
+fonttools[lxml,type1,unicode,ufo,woff]==4.56.0
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
-uharfbuzz==0.45.0
+uharfbuzz==0.46.0
 # newer python-bidi is completely incompatible with how we use it
 python-bidi==0.4.2  # pyup: ignore
 jundo==0.1.2
-ufo2ft==3.4.0
+ufo2ft==3.4.2
 # pin numpy for macOS 10.14 compatibility: https://github.com/justvanrossum/fontgoggles/issues/462
 numpy==2.1.1  # pyup: ignore
 unicodedata2==16.0.0
 git+https://github.com/BlackFoundryCom/rcjk-tools/
-delocate==0.12.0
+delocate==0.13.0
