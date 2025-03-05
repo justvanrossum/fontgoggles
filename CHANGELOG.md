@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.8.8] - 2025-??-??
+
+- Made the core FontGoggles non-UI library code usable on platforms other than macOS. Contributed by Rob Stenson. ([PR 451](https://github.com/justvanrossum/fontgoggles/pull/451))
+
 ## [1.8.5] - 2025-01-13
 
 - Fix UFO/designspace support for macOS 10.14 ([Issue 462](https://github.com/justvanrossum/fontgoggles/issues/462), [PR 463](https://github.com/justvanrossum/fontgoggles/issues/462))
