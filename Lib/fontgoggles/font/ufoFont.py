@@ -10,7 +10,6 @@ from fontTools.feaLib.parser import Parser as FeatureParser
 from fontTools.feaLib.ast import IncludeStatement
 from fontTools.feaLib.error import FeatureLibError
 from fontTools.fontBuilder import FontBuilder
-from fontTools.pens.cocoaPen import CocoaPen  # TODO: factor out mac-specific code
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader, UFOFileStructure
 from fontTools.ufoLib import (FONTINFO_FILENAME, GROUPS_FILENAME, KERNING_FILENAME,
@@ -23,6 +22,7 @@ from ..compile.compilerPool import compileUFOToBytes
 from ..compile.ufoCompiler import fetchGlyphInfo
 from ..misc.hbShape import HBShape
 from ..misc.properties import cachedProperty
+from ..misc.platform import platform
 
 
 class UFOFont(BaseFont):
@@ -151,7 +151,7 @@ class UFOFont(BaseFont):
         return glyph
 
     def _addOutlinePathToGlyph(self, glyph):
-        pen = CocoaPen(self.glyphSet)
+        pen = platform.Pen(self.glyphSet)
         glyph.draw(pen)
         glyph.outline = pen.path
 
@@ -258,7 +258,7 @@ class NotDefGlyph:
         pass
 
     def getOutline(self):
-        pen = CocoaPen(None)  # by now there are no more composites
+        pen = platform.Pen(None)
         self.draw(pen)
         return pen.path
 

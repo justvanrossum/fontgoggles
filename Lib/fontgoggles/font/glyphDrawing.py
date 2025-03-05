@@ -1,6 +1,5 @@
-from AppKit import NSGraphicsContext
 from fontTools.misc.arrayTools import unionRect
-from ..mac.drawing import rectFromNSRect, nsColorFromRGBA
+from ..misc.platform import platform
 from ..misc.properties import cachedProperty
 
 
@@ -24,11 +23,11 @@ class GlyphDrawing:
     def bounds(self):
         bounds = None
         if self.path.elementCount():
-            bounds = rectFromNSRect(self.path.controlPointBounds())
+            bounds = platform.convertRect(self.path.controlPointBounds())
         return bounds
 
     def draw(self, colorPalette, defaultColor):
-        nsColorFromRGBA(defaultColor).set()
+        platform.convertColor(defaultColor).set()
         self.path.fill()
 
     def pointInside(self, pt):
@@ -46,7 +45,7 @@ class GlyphLayersDrawing:
         for path, colorID in self.layers:
             if not path.elementCount():
                 continue
-            pathBounds = rectFromNSRect(path.controlPointBounds())
+            pathBounds = platform.convertRect(path.controlPointBounds())
             if bounds is None:
                 bounds = pathBounds
             else:
@@ -60,7 +59,7 @@ class GlyphLayersDrawing:
                 if colorID < len(colorPalette) else
                 defaultColor
             )
-            nsColorFromRGBA(color).set()
+            platform.convertColor(color).set()
             path.fill()
 
     def pointInside(self, pt):
@@ -77,15 +76,7 @@ class GlyphCOLRv1Drawing:
         return self.colorFont.getGlyphBounds(self.glyphName)
 
     def draw(self, colorPalette, defaultColor):
-        from blackrenderer.backends.coregraphics import CoreGraphicsCanvas
-
-        cgContext = NSGraphicsContext.currentContext().CGContext()
-        self.colorFont.drawGlyph(
-            self.glyphName,
-            CoreGraphicsCanvas(cgContext),
-            palette=colorPalette,
-            textColor=defaultColor,
-        )
+        platform.drawCOLRv1Glyph(self.colorFont, self.glyphName, colorPalette, defaultColor)
 
     def pointInside(self, pt):
         return False  # TODO: implement
