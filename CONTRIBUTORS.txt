@@ -2,3 +2,12 @@
 # not listed in AUTHORS.txt
 
 Just van Rossum
+Khaled Hosny
+Rob Stenson
+Georg Seifert
+Dave Crossland
+Chris Simpkins
+Behdad Esfahbod
+Johannes Neumeier
+Dominik Röttsches
+一丝 yisibl
