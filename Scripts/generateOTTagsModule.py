@@ -64,14 +64,15 @@ def formatLanguages(data):
         if len(tag) < 4:
             tag += (4 - len(tag)) * " "
         assert len(tag) == 4, tag
-        if len(fields) > 1:
-            if len(fields) == 2:
-                isoCodes = [isoCode.strip() for isoCode in fields[1].split(",")]
-            else:
-                # This happens in three cases: APPH, IPPH and UPPH,
-                # where the page doesn't provide explicit ISO codes
-                isoCodes = []
+        if len(fields) == 2:
+            isoCodes = [isoCode.strip() for isoCode in fields[1].split(",")]
+        elif len(fields) == 1:
+            # This happens for Bible Cree, Garshuni, Moroccan, Nagari and Yi Classic,
+            # where the ISO code field is empty
+            isoCodes = []
         else:
+            # This happens in three cases: APPH, IPPH and UPPH, where the page
+            # doesn't provide explicit ISO codes but links to further info
             isoCodes = []
         t = (friendlyName,) + tuple(isoCodes)
         print(f"    {tag!r}: {t},")
