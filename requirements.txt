@@ -4,7 +4,8 @@ wheel>=0.33.6
 py2app==0.28.8
 pyobjc==11.0
 corefoundationasyncio==0.0.1
-cocoa-vanilla==0.7.0
+# pin vanilla for now, no real reason, just too lazy to test properly
+cocoa-vanilla==0.6.0  # pyup: ignore
 blackrenderer==0.6.0
 fonttools[lxml,woff,type1,ufo,unicode]==4.57.0
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
