@@ -1,7 +1,11 @@
 # Changelog for FontGoggles
 
-## [1.8.8] - 2025-??-??
+## [1.8.6] - 2025-04-14
 
+- Updated language, script and feature tags to OpenType 1.9.1. Thank you Denis Moyogo Jacquerye. ([PR 477](https://github.com/justvanrossum/fontgoggles/pull/477) and [PR 478](https://github.com/justvanrossum/fontgoggles/pull/478))
+- Updated `uharfbuzz` to 0.49.0 and `HarfBuzz` to 11.0.1. This reinstates support for the experimental `VARC` table, which accidentally got broken.
+- Updated `ufo2ft` to 3.4.2
+- Updated `fonttools` to 4.57.0
 - Made the core FontGoggles non-UI library code usable on platforms other than macOS. Contributed by Rob Stenson. ([PR 451](https://github.com/justvanrossum/fontgoggles/pull/451))
 
 ## [1.8.5] - 2025-01-13
@@ -11,7 +15,7 @@
 ## [1.8.4] - 2025-01-11
 
 - Update to Unicode 16.0
-- Update to ufo2ft to 3.4.0
+- Update `ufo2ft` to 3.4.0
 - Update `HarfBuzz` to 10.2.0
 - Update `uharfbuzz` to 0.45.0
 
