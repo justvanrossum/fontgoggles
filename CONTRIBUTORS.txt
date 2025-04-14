@@ -11,3 +11,4 @@ Behdad Esfahbod
 Johannes Neumeier
 Dominik Röttsches
 一丝 yisibl
+Denis Moyogo Jacquerye
