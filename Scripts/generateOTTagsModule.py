@@ -14,7 +14,7 @@ def parse(data):
             m = re.search(r'href="(.+?)"', field)
             if m is not None and m.group(1) != "#foot":
                 parsedFields.append(m.group(1))
-            tagParts = field.split("&#39;")
+            tagParts = field.split("'")
             if len(tagParts) >= 2:
                 parsedFields.append(tagParts[1].replace("&nbsp;", " "))
             else:
@@ -29,6 +29,8 @@ def formatFeatures(data, baseURL):
     for link, tag, friendlyName in data:
         if tag == 'cv01':
             tags = [f"cv{i:02d}" for i in range(1, 100)]
+        elif tag == 'ss01':
+            tags = [f"ss{i:02d}" for i in range(1, 21)]
         else:
             tags = [tag]
         for tag in tags:
@@ -62,24 +64,29 @@ def formatLanguages(data):
         if len(tag) < 4:
             tag += (4 - len(tag)) * " "
         assert len(tag) == 4, tag
-        if len(fields) > 1:
-            assert len(fields) == 2, fields
+        if len(fields) == 2:
             isoCodes = [isoCode.strip() for isoCode in fields[1].split(",")]
+        elif len(fields) == 1:
+            # This happens for Bible Cree, Garshuni, Moroccan, Nagari and Yi Classic,
+            # where the ISO code field is empty
+            isoCodes = []
         else:
+            # This happens in three cases: APPH, IPPH and UPPH, where the page
+            # doesn't provide explicit ISO codes but links to further info
             isoCodes = []
         t = (friendlyName,) + tuple(isoCodes)
         print(f"    {tag!r}: {t},")
     print("}")
 
 
-# https://docs.microsoft.com/en-us/typography/opentype/spec/featurelist
-# https://docs.microsoft.com/en-us/typography/opentype/spec/scripttags
-# https://docs.microsoft.com/en-us/typography/opentype/spec/languagetags
+# https://learn.microsoft.com/en-us/typography/opentype/spec/featurelist
+# https://learn.microsoft.com/en-us/typography/opentype/spec/scripttags
+# https://learn.microsoft.com/en-us/typography/opentype/spec/languagetags
 
 if __name__ == "__main__":
     import sys
     import time
-    baseURL = "https://docs.microsoft.com/en-us/typography/opentype/spec/"
+    baseURL = "https://learn.microsoft.com/en-us/typography/opentype/spec/"
     if len(sys.argv) > 1:
         with open(sys.argv[1]) as f:
             html = f.read()
