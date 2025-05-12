@@ -7,7 +7,7 @@ corefoundationasyncio==0.0.1
 # pin vanilla for now, no real reason, just too lazy to test properly
 cocoa-vanilla==0.6.0  # pyup: ignore
 blackrenderer==0.6.0
-fonttools[lxml,woff,type1,ufo,unicode]==4.57.0
+fonttools[type1,unicode,lxml,woff,ufo]==4.58.0
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
 uharfbuzz==0.49.0
