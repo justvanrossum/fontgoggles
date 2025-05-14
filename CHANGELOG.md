@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.8.7] - 2025-??-??
+
+- Default to "English" when retrieving a name for (say) a stylistic set. ([Issue 483](https://github.com/justvanrossum/fontgoggles/issues/483), [PR 484](https://github.com/justvanrossum/fontgoggles/pull/484))
+
 ## [1.8.6] - 2025-04-14
 
 - Updated language, script and feature tags to OpenType 1.9.1. Thank you Denis Moyogo Jacquerye. ([PR 477](https://github.com/justvanrossum/fontgoggles/pull/477) and [PR 478](https://github.com/justvanrossum/fontgoggles/pull/478))
