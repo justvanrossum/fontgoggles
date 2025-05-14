@@ -137,9 +137,11 @@ class HBShape:
             if tag in tags and tag not in names:
                 feaParams = feature.Feature.FeatureParams
                 if feaParams is not None:
-                    nameRecord = nameTable.getName(feaParams.UINameID, 3, 1)
-                    if nameRecord is not None:
-                        names[tag] = nameRecord.toUnicode()
+                    for langID in [0x0409, None]:
+                        nameRecord = nameTable.getName(feaParams.UINameID, 3, 1, langID)
+                        if nameRecord is not None:
+                            names[tag] = nameRecord.toUnicode()
+                            break
         return names
 
     def getScriptsAndLanguages(self, otTableTag):
