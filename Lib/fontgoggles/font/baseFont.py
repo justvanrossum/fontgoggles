@@ -103,6 +103,7 @@ class BaseFont:
         else:
             colorPalette = self.colorPalettes[colorPalettesIndex]
 
+        allhistories = []
         glyphs = GlyphsRun(len(text), self.unitsPerEm, direction in ("TTB", "BTT"), colorPalette)
 
         for segmentText, segmentScript, segmentBiDiLevel, firstCluster in textInfo.segments:
@@ -114,7 +115,7 @@ class BaseFont:
                 segmentDirection = None  # Let HarfBuzz figure it out
             else:
                 segmentDirection = ["LTR", "RTL"][segmentBiDiLevel % 2]
-            run = self.getGlyphRun(segmentText,
+            run,history = self.getGlyphRun(segmentText,
                                    direction=segmentDirection,
                                    script=segmentScript,
                                    language=language,
@@ -122,6 +123,7 @@ class BaseFont:
             for gi in run:
                 gi.cluster += firstCluster
             glyphs.extend(run)
+            allhistories.extend(history)
 
         x = y = 0
         for gi in glyphs:
@@ -129,18 +131,18 @@ class BaseFont:
             x += gi.ax
             y += gi.ay
         glyphs.endPos = (x, y)
-        return glyphs
+        return glyphs, allhistories
 
     def getGlyphRun(self, text, *, features=None, varLocation=None,
                     direction=None, language=None, script=None,
                     colorLayers=False):
         self.setVarLocation(varLocation)
-        glyphInfo = self.shaper.shape(text, features=features, varLocation=varLocation,
+        glyphInfo, history = self.shaper.shape(text, features=features, varLocation=varLocation,
                                       direction=direction, language=language, script=script)
         glyphNames = (gi.name for gi in glyphInfo)
         for glyph, glyphDrawing in zip(glyphInfo, self.getGlyphDrawings(glyphNames, colorLayers)):
             glyph.glyphDrawing = glyphDrawing
-        return glyphInfo
+        return glyphInfo, history
 
     def setVarLocation(self, varLocation):
         axes = self.axes
