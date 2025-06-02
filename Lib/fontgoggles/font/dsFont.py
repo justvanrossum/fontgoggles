@@ -104,7 +104,7 @@ class DSFont(BaseFont):
                     ttPaths.append(ttPath)
                     output = io.StringIO()
                     outputs.append(output)
-                    coros.append(compileUFOToPath(source.path, ttPath, output.write))
+                    coros.append(compileUFOToPath(source.path, ttPath, True, output.write))
 
             # print(f"compiling {len(coros)} fonts")
             errors = await asyncio.gather(*coros, return_exceptions=True)
