@@ -257,6 +257,7 @@ class MinimalGlyphObject:
             MinimalAnchorObject(name, x, y, identifier)
             for name, x, y, identifier in anchors
         ]
+        self.lib = {}
 
     @property
     def unicode(self):
