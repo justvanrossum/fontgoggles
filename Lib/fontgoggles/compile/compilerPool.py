@@ -7,19 +7,20 @@ import tempfile
 from .workServer import ERROR_MARKER, SUCCESS_MARKER
 
 
-async def compileUFOToPath(ufoPath, ttPath, outputWriter):
+async def compileUFOToPath(ufoPath, ttPath, shouldCompileFeatures, outputWriter):
     pool = getCompilerPool()
     func = "fontgoggles.compile.ufoCompiler.compileUFOToPath"
     args = [
         os.fspath(ufoPath),
         os.fspath(ttPath),
+        "true" if shouldCompileFeatures else "",
     ]
     return await pool.callFunction(func, args, outputWriter)
 
 
-async def compileUFOToBytes(ufoPath, outputWriter):
+async def compileUFOToBytes(ufoPath, shouldCompileFeatures, outputWriter):
     with tempfile.NamedTemporaryFile(prefix="fontgoggles_temp", suffix=".ttf") as tmp:
-        await compileUFOToPath(ufoPath, tmp.name, outputWriter)
+        await compileUFOToPath(ufoPath, tmp.name, shouldCompileFeatures, outputWriter)
         with open(tmp.name, "rb") as f:
             fontData = f.read()
             if not fontData:

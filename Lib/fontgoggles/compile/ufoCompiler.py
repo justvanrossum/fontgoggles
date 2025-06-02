@@ -15,7 +15,7 @@ from fontTools.ufoLib.glifLib import _BaseParser as BaseGlifParser
 from ufo2ft.featureCompiler import FeatureCompiler
 
 
-def compileUFOToFont(ufoPath):
+def compileUFOToFont(ufoPath, shouldCompileFeatures):
     """Compile the source UFO to a TTF with the smallest amount of tables
     needed to let HarfBuzz do its work. That would be 'cmap', 'post' and
     whatever OTL tables are needed for the features. Return the compiled
@@ -61,8 +61,8 @@ def compileUFOToFont(ufoPath):
     return ttFont, error
 
 
-def compileUFOToPath(ufoPath, ttPath):
-    ttFont, error = compileUFOToFont(ufoPath)
+def compileUFOToPath(ufoPath, ttPath, shouldCompileFeatures):
+    ttFont, error = compileUFOToFont(ufoPath, shouldCompileFeatures)
     if error:
         print(error, file=sys.stderr)
     ttFont.save(ttPath, reorderTables=False)
