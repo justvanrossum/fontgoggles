@@ -47,17 +47,18 @@ def compileUFOToFont(ufoPath, shouldCompileFeatures):
     ttFont["FGAx"] = newTable("FGAx")
     ttFont["FGAx"].data = pickle.dumps(anchors)
     ufo = MinimalFontObject(ufoPath, reader, widths, revCmap, anchors)
-    feaComp = FeatureCompiler(ufo, ttFont)
-    try:
-        feaComp.compile()
-    except FeatureLibError as e:
-        error = f"{e.__class__.__name__}: {e}"
-    except Exception:
-        # This is most likely a bug, and not an input error, so perhaps
-        # we shouldn't even catch it here.
-        error = traceback.format_exc()
-    else:
-        error = None
+
+    error = None
+    if shouldCompileFeatures:
+        feaComp = FeatureCompiler(ufo, ttFont)
+        try:
+            feaComp.compile()
+        except FeatureLibError as e:
+            error = f"{e.__class__.__name__}: {e}"
+        except Exception:
+            # This is most likely a bug, and not an input error, so perhaps
+            # we shouldn't even catch it here.
+            error = traceback.format_exc()
     return ttFont, error
 
 
