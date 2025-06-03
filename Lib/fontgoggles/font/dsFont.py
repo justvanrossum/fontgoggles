@@ -158,7 +158,9 @@ class DSFont(BaseFont):
                 # self.ttFont and self.shaper are still up-to-date
                 return
 
-            vfFontData = await compileDSToBytes(self.fontPath, self.fontNumber, ttFolder, outputWriter)
+            vfFontData = await compileDSToBytes(
+                self.fontPath, self.fontNumber, ttFolder, optimizeFeatureCompilation, outputWriter
+            )
 
         f = io.BytesIO(vfFontData)
         self.ttFont = TTFont(f, lazy=True)
