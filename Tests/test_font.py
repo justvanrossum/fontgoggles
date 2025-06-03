@@ -211,7 +211,7 @@ openFontsTestData = [
         {},
         set(),
         {'kern'},
-        {'DFLT': set()},
+        {'DFLT': set(), 'latn': set()},
         {'wght': {'defaultValue': 400.0,
                   'hidden': False,
                   'maxValue': 700.0,

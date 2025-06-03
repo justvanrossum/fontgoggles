@@ -1,6 +1,7 @@
 import os
 import pickle
 import sys
+from collections import defaultdict
 from fontTools.designspaceLib import DesignSpaceDocument
 from fontTools.designspaceLib.split import splitVariableFonts
 from fontTools.fontBuilder import FontBuilder
@@ -90,9 +91,14 @@ def compileVariableFeatures(dsDoc, ttFont):
     dsDoc = dsDoc.deepcopyExceptFonts()
     for source in dsDoc.sources:
         anchors = pickle.loads(source.font["FGAx"].data) if "FGAx" in source.font else {}
+
+        revCmap = getRevCmapFromTTFont(source.font)
+
         ufoPath = source.path
         reader = UFOReader(ufoPath, validate=False)
-        source.font = MinimalFontObject(ufoPath, reader, source.layerName, {}, {}, anchors)
+        source.font = MinimalFontObject(
+            ufoPath, reader, source.layerName, {}, revCmap, anchors
+        )
 
     defaultUFO = dsDoc.findDefault().font
 
@@ -107,3 +113,11 @@ def compileVariableFeatures(dsDoc, ttFont):
 
     # Add back feature variations, as the code above would overwrite them.
     varLib.addGSUBFeatureVariations(ttFont, dsDoc)
+
+
+def getRevCmapFromTTFont(ttFont):
+    cmap = ttFont.getBestCmap()
+    revCmap = defaultdict(list)
+    for codePoint, glyphName in cmap.items():
+        revCmap[glyphName].append(codePoint)
+    return dict(revCmap)
