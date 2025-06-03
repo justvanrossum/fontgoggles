@@ -42,7 +42,6 @@ def compileDSToFont(dsPath, fontNumber, ttFolder, shouldCompileFeatures):
             if source.font is None:
                 source.font = font
 
-
     exclude = ['MVAR', 'HVAR', 'VVAR', 'STAT']
     if shouldCompileFeatures:
         exclude.extend(['GSUB', 'GPOS', 'GDEF'])
