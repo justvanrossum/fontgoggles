@@ -46,7 +46,7 @@ def compileUFOToFont(ufoPath, shouldCompileFeatures):
     # changes.
     ttFont["FGAx"] = newTable("FGAx")
     ttFont["FGAx"].data = pickle.dumps(anchors)
-    ufo = MinimalFontObject(ufoPath, reader, widths, revCmap, anchors)
+    ufo = MinimalFontObject(ufoPath, reader, None, widths, revCmap, anchors)
 
     error = None
     if shouldCompileFeatures:
@@ -209,12 +209,13 @@ class MinimalFontObject:
     # unicodes and anchors, and at the font level, only features, groups,
     # kerning and lib are needed.
 
-    def __init__(self, ufoPath, reader, widths, revCmap, anchors):
+    def __init__(self, ufoPath, reader, layerName, widths, revCmap, anchors):
         self.path = ufoPath
+        self.layerName = layerName
         self._widths = widths
         self._revCmap = revCmap
         self._anchors = anchors
-        self._glyphNames = set(reader.getGlyphSet().contents.keys())
+        self._glyphNames = set(reader.getGlyphSet(layerName).contents.keys())
         self._glyphNames.add(".notdef")  # ensure we have .notdef
         self.features = MinimalFeaturesObject(reader.readFeatures())
         self.groups = reader.readGroups()
@@ -224,6 +225,10 @@ class MinimalFontObject:
         reader.readInfo(self.info)
         self._glyphs = {}
 
+    @property
+    def layers(self):
+        return FakeLayers(self)
+
     def keys(self):
         return self._glyphNames
 
@@ -231,6 +236,9 @@ class MinimalFontObject:
         for glyphName in self._glyphNames:
             glyph = self[glyphName]
             yield glyph
+
+    def __contains__(self, glyphName):
+        return glyphName in self._glyphNames
 
     def __getitem__(self, glyphName):
         if glyphName not in self._glyphNames:
@@ -246,6 +254,13 @@ class MinimalFontObject:
             )
             self._glyphs[glyphName] = glyph
         return glyph
+
+
+class FakeLayers:
+    def __init__(self, font):
+        self.font = font
+    def __getitem__(self, key):
+        return self.font
 
 
 class MinimalGlyphObject:
