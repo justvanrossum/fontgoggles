@@ -35,6 +35,7 @@ def compileDSToFont(dsPath, fontNumber, ttFolder, shouldCompileFeatures):
     if any(s.layerName is not None for s in doc.sources):
         fb = FontBuilder(unitsPerEm=doc.default.font["head"].unitsPerEm)
         fb.setupGlyphOrder(doc.default.font.getGlyphOrder())
+        fb.setupCharacterMap({})
         fb.setupPost()  # This makes sure we store the glyph names
         font = fb.font
         for source in doc.sources:
