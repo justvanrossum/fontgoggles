@@ -207,7 +207,7 @@ openFontsTestData = [
         ['features_test.fea', 'features_test_nested.fea'],
         {},
         "A", ["A"], [1290], None),
-    ('KernBug.designspace',
+    ('KernBug.designspace',  # https://github.com/justvanrossum/fontgoggles/issues/486
         {},
         set(),
         {'kern'},
