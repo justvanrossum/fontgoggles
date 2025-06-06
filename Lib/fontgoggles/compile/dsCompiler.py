@@ -110,7 +110,7 @@ def compileVariableFeatures(dsDoc, ttFont):
     )
     featureCompiler.compile()
 
-    # Add back feature variations, as the code above would overwrite them.
+    # Add feature variations from dsDoc.rules
     varLib.addGSUBFeatureVariations(ttFont, dsDoc)
 
 
