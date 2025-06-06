@@ -41,7 +41,7 @@ async def test_compileUFOToPath(tmpdir):
     ufoPath = getFontPath("MutatorSansBoldWideMutated.ufo")
     ttPath = tmpdir / "test.ttf"
     output = []
-    error = await compileUFOToPath(ufoPath, ttPath, output.append)
+    error = await compileUFOToPath(ufoPath, ttPath, True, output.append)
     output = "".join(output)
     assert ttPath.exists()
     assert os.stat(ttPath).st_size > 0
@@ -64,7 +64,7 @@ async def test_compileUFOToPathMultiple(tmpdir):
     ]
     ttPaths = [tmpdir / (u.name + ".ttf") for u in ufoPaths]
     output = []
-    coros = (compileUFOToPath(u, t, output.append) for u, t in zip(ufoPaths, ttPaths))
+    coros = (compileUFOToPath(u, t, True, output.append) for u, t in zip(ufoPaths, ttPaths))
     results = await asyncio.gather(*coros)
     assert results == [None] * len(results)
     assert [(os.stat(p).st_size > 0) for p in ttPaths] == [True] * len(results)

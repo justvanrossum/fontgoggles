@@ -1,3 +1,4 @@
+import sys
 import pytest
 from fontgoggles.font import getOpener, sniffFontType, sortedFontPathsAndNumbers
 from fontgoggles.misc.textInfo import TextInfo
@@ -206,6 +207,20 @@ openFontsTestData = [
         ['features_test.fea', 'features_test_nested.fea'],
         {},
         "A", ["A"], [1290], None),
+    ('KernBug.designspace',  # https://github.com/justvanrossum/fontgoggles/issues/486
+        {},
+        set(),
+        {'kern'},
+        {'DFLT': set(), 'latn': set()},
+        {'wght': {'defaultValue': 400.0,
+                  'hidden': False,
+                  'maxValue': 700.0,
+                  'minValue': 400.0,
+                  'name': 'Weight'}},
+        ['KernBug-Bold.ufo',
+         'KernBug-Regular.ufo'],
+        {'wght': 400},
+        ".o", ["period", "o"], [590, 600], None),
 ]
 
 @pytest.mark.parametrize("fileName,expectedSortInfo,featuresGSUB,featuresGPOS,scripts,axes,ext,location,text,glyphNames,ax,script",
@@ -227,7 +242,7 @@ async def test_openFonts(fileName,
     numFonts, opener, getSortInfo = getOpener(fontPath)
     assert numFonts(fontPath) == 1
     font = opener(fontPath, 0)
-    await font.load(print)
+    await font.load(sys.stderr.write)
     sortInfo = getSortInfo(fontPath, 0)
     assert sortInfo == expectedSortInfo
     assert font.featuresGSUB == featuresGSUB

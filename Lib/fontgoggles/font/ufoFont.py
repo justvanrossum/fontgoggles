@@ -56,7 +56,7 @@ class UFOFont(BaseFont):
                                      getUnicodesAndAnchors=self._getUnicodesAndAnchors,
                                      includedFeatureFiles=includedFeatureFiles)
 
-        fontData = await compileUFOToBytes(self.fontPath, outputWriter)
+        fontData = await compileUFOToBytes(self.fontPath, True, outputWriter)
 
         f = io.BytesIO(fontData)
         self.ttFont = TTFont(f, lazy=True)
