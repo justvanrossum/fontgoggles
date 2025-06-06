@@ -15,8 +15,7 @@ from .ufoCompiler import MinimalFontObject
 
 def compileDSToFont(dsPath, fontNumber, ttFolder, shouldCompileFeatures):
     fontNumber = int(fontNumber)
-    dsDoc = DesignSpaceDocument.fromfile(dsPath)
-    docs = list(splitVariableFonts(dsDoc))
+    docs = list(splitVariableFonts(DesignSpaceDocument.fromfile(dsPath)))
     _, doc = docs[fontNumber]
 
     ufoPathToTTPath = getTTPaths(doc, ttFolder)
