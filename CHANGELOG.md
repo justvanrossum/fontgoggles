@@ -2,6 +2,7 @@
 
 ## [1.8.7] - 2025-??-??
 
+- Synchronize feature compilation strategy with fontmake. This enables Variable Features, and fixes different behavior between fontmake and FontGoggles. ([Issue 486](https://github.com/justvanrossum/fontgoggles/issues/486), [PR 487](https://github.com/justvanrossum/fontgoggles/pull/487))
 - Default to "English" when retrieving a name for (say) a stylistic set. ([Issue 483](https://github.com/justvanrossum/fontgoggles/issues/483), [PR 484](https://github.com/justvanrossum/fontgoggles/pull/484))
 
 ## [1.8.6] - 2025-04-14
