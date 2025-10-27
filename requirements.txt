@@ -2,7 +2,7 @@
 setuptools==70.2.0  # pyup: ignore
 wheel>=0.33.6
 py2app==0.28.8
-pyobjc==11.1
+pyobjc==12.0
 corefoundationasyncio==0.0.1
 # pin vanilla for now, no real reason, just too lazy to test properly
 cocoa-vanilla==0.6.0  # pyup: ignore
@@ -10,7 +10,7 @@ blackrenderer==0.6.0
 fonttools[woff,ufo,lxml,unicode,type1]==4.60.1
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
-uharfbuzz==0.51.1
+uharfbuzz==0.52.0
 # newer python-bidi is completely incompatible with how we use it
 python-bidi==0.4.2  # pyup: ignore
 jundo==0.1.2
