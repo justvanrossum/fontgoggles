@@ -19,3 +19,4 @@ ufo2ft==3.6.6
 numpy==2.1.1  # pyup: ignore
 unicodedata2==17.0.0
 delocate==0.13.0
+ufoLib2==0.18.1
