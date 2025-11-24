@@ -14,11 +14,6 @@ class _OTFBaseFont(BaseFont):
         return platform.pathFromGlyph(self.shaper.font, self.shaper.glyphMap[name])
 
     def _getGlyphDrawing(self, glyphName, colorLayers):
-        if "VarC" in self.ttFont:
-            pen = platform.Pen(None)
-            location = self._currentVarLocation or {}
-            self.varcFont.drawGlyph(pen, glyphName, location)
-            return GlyphDrawing(pen.path)
         if colorLayers:
             if self.colorLayers is not None:
                 layers = self.colorLayers.get(glyphName)
@@ -64,13 +59,6 @@ class _OTFBaseFont(BaseFont):
 
             return BlackRendererFont(self.fontPath, fontNumber=self.fontNumber)
         return None
-
-    @cachedProperty
-    def varcFont(self):
-        from fontTools.ttLib import registerCustomTableClass
-        from rcjktools.ttVarCFont import TTVarCFont
-        registerCustomTableClass("VarC", "rcjktools.table_VarC", "table_VarC")
-        return TTVarCFont(None, ttFont=self.ttFont, hbFont=self.shaper.font)
 
 
 class OTFFont(_OTFBaseFont):
