@@ -58,4 +58,5 @@ def grayColor(gray, a=1.0):
 def drawText(txt, pt, color, font):
     attrs = {AppKit.NSFontAttributeName: font,
              AppKit.NSForegroundColorAttributeName: color}
-    AppKit.NSString.drawAtPoint_withAttributes_(txt, pt, attrs)
+    txt = AppKit.NSString(txt)
+    txt.drawAtPoint_withAttributes_(pt, attrs)
