@@ -341,7 +341,7 @@ These are examples of valid Unicode literal search terms:
 
 ## System requirements
 
-- macOS 10.10 and higher
+- macOS 10.13 and higher
 
 ## Found a bug or have a question?
 
