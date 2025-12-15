@@ -7,14 +7,14 @@ corefoundationasyncio==0.0.1
 # pin vanilla for now, no real reason, just too lazy to test properly
 cocoa-vanilla==0.6.0  # pyup: ignore
 blackrenderer==0.6.0
-fonttools[unicode,woff,type1,ufo,lxml]==4.61.0
+fonttools[type1,woff,unicode,ufo,lxml]==4.61.1
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
 uharfbuzz==0.52.0
 # newer python-bidi is completely incompatible with how we use it
 python-bidi==0.4.2  # pyup: ignore
 jundo==0.1.2
-ufo2ft==3.6.6
+ufo2ft==3.6.9
 # pin numpy for macOS 10.14 compatibility: https://github.com/justvanrossum/fontgoggles/issues/462
 numpy==2.1.1  # pyup: ignore
 unicodedata2==17.0.0
