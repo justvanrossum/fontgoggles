@@ -26,6 +26,12 @@ class Project:
     @classmethod
     def fromDict(cls, root, rootPath):
         self = cls()
+        self.updateFromDict(root, rootPath)
+        return self
+
+    def updateFromDict(self, root, rootPath):
+        self.fonts = []
+        self.fontSelection = set()  # not persistent
         for fontItemInfoDict in root["fonts"]:
             fontPath = pathlib.Path(os.path.normpath(os.path.join(rootPath, fontItemInfoDict["path"])))
             self.addFont(fontPath, fontItemInfoDict.get("fontNumber", 0))
@@ -34,7 +40,6 @@ class Project:
             # relative path -> absolute path
             self.textSettings.textFilePath = os.path.normpath(os.path.join(rootPath, self.textSettings.textFilePath))
         self.uiSettings.__dict__.update(root.get("uiSettings", {}))
-        return self
 
     def asJSON(self, rootPath):
         root = self.asDict(rootPath)
