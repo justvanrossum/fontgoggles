@@ -1293,16 +1293,21 @@ class FGGlyphLineView(AppKit.NSView):
 
         invScale = 1 / self.scaleFactor
 
-        if self.showMetrics:
-            xHeight = dy + self._glyphs.fontMetrics.xHeight * self.scaleFactor
-            capHeight = dy + self._glyphs.fontMetrics.capHeight * self.scaleFactor
-            ascender = dy + self._glyphs.fontMetrics.ascender * self.scaleFactor
-            descender = dy + self._glyphs.fontMetrics.descender * self.scaleFactor
+        if self.showMetrics and self._glyphs.fontMetrics:
             drawLine((0,dy), (self.bounds().size.width, dy), colors.selectedSpaceColor, 2)
-            drawLine((0,xHeight), (self.bounds().size.width, xHeight), colors.hoverSpaceColor, 2)
-            drawLine((0,capHeight), (self.bounds().size.width, capHeight), colors.hoverSpaceColor, 2)
-            drawLine((0,ascender), (self.bounds().size.width, ascender), colors.hoverColor, 1)
-            drawLine((0,descender), (self.bounds().size.width, descender), colors.hoverColor, 1)
+            metrics = self._glyphs.fontMetrics
+            if metrics.xHeight is not None:
+                xHeight = dy + metrics.xHeight * self.scaleFactor
+                drawLine((0, xHeight), (self.bounds().size.width, xHeight), colors.hoverSpaceColor, 2)
+            if metrics.capHeight is not None:
+                capHeight = dy + metrics.capHeight * self.scaleFactor
+                drawLine((0, capHeight), (self.bounds().size.width, capHeight), colors.hoverSpaceColor, 2)
+            if metrics.ascender is not None:
+                ascender = dy + metrics.ascender * self.scaleFactor
+                drawLine((0, ascender), (self.bounds().size.width, ascender), colors.hoverColor, 1)
+            if metrics.descender:
+                descender = dy + metrics.descender * self.scaleFactor
+                drawLine((0, descender), (self.bounds().size.width, descender), colors.hoverColor, 1)
 
         rect = rectFromNSRect(rect)
         rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
