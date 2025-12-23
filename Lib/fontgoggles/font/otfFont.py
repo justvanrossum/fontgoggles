@@ -28,6 +28,7 @@ class _OTFBaseFont(BaseFont):
         return GlyphDrawing(outline)
 
     def varLocationChanged(self, varLocation):
+        super().varLocationChanged(varLocation)
         if self.colorFont is not None:
             self.colorFont.setLocation(varLocation)
 

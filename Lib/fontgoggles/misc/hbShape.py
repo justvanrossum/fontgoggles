@@ -120,6 +120,9 @@ class HBShape:
         descender = self.font.get_metric_position(hb.OTMetricsTag.HORIZONTAL_DESCENDER)
         return xHeight, capHeight, ascender, descender
 
+    def setVarLocation(self, varLocation):
+        self.font.set_variations(varLocation)
+
     def getFeatures(self, otTableTag):
         features = set()
         for scriptIndex, script in enumerate(hb.ot_layout_table_get_script_tags(self.face, otTableTag)):

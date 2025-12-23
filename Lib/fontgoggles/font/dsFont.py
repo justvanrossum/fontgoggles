@@ -251,6 +251,7 @@ class DSFont(BaseFont):
             return ascender
 
     def varLocationChanged(self, varLocation):
+        super().varLocationChanged(varLocation)
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})
 
     def _getVarGlyph(self, glyphName):

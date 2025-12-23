@@ -180,8 +180,7 @@ class BaseFont:
         raise NotImplementedError()
 
     def varLocationChanged(self, varLocation):
-        # Optional override
-        pass
+        self.shaper.setVarLocation(varLocation)
 
 
 class GlyphsRun(list):
