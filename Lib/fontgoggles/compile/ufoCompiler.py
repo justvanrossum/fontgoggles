@@ -40,6 +40,19 @@ def compileUFOToFont(ufoPath, shouldCompileFeatures):
     fb.setupGlyphOrder(glyphOrder)
     fb.setupCharacterMap(cmap)
     fb.setupPost()  # This makes sure we store the glyph names
+    fb.setupOS2(
+        sxHeight=round(getattr(info, "xHeight", 0)),
+        sCapHeight=round(getattr(info, "capHeight", 0)),
+        sTypoAscender=round(
+            getattr(info, "openTypeOS2TypoAscender", getattr(info, "ascender", 0))
+        ),
+        sTypoDescender=round(
+            getattr(info, "openTypeOS2TypoDescender", getattr(info, "descender", 0))
+        ),
+        fsSelection=1 << 7,  # USE_TYPO_METRICS
+        version=4,  # To avoid warning about USE_TYPO_METRICS
+        xAvgCharWidth=0,  # To avoid dependency on hmtx table.
+    )
     ttFont = fb.font
     # Store anchors in the font as a private table: this is valuable
     # data that our parent process can use to do faster reloading upon

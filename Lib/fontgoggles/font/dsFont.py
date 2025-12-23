@@ -17,7 +17,7 @@ from fontTools.designspaceLib.split import splitVariableFonts
 from fontTools.ttLib import TTFont
 from fontTools.ufoLib import UFOReader
 from fontTools.varLib.models import normalizeValue
-from .baseFont import BaseFont, FontMetrics
+from .baseFont import BaseFont
 from .glyphDrawing import EmptyDrawing, GlyphDrawing
 from .ufoFont import Glyph, NotDefGlyph, UFOState, extractIncludedFeatureFiles
 from ..compile.compilerPool import compileUFOToPath, compileDSToBytes, CompilerError
@@ -223,15 +223,6 @@ class DSFont(BaseFont):
     @cachedProperty
     def unitsPerEm(self):
         return self.defaultInfo.unitsPerEm
-
-    @cachedProperty
-    def fontMetrics(self):
-        return FontMetrics(
-            xHeight = getattr(self.defaultInfo, "xHeight", None),
-            capHeight = getattr(self.defaultInfo, "capHeight", None),
-            ascender = getattr(self.defaultInfo, "ascender", None),
-            descender= getattr(self.defaultInfo, "descender", None)
-        )
 
     @cachedProperty
     def defaultVerticalAdvance(self):
