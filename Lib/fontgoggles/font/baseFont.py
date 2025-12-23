@@ -63,14 +63,9 @@ class BaseFont:
     def unitsPerEm(self):
         return self.ttFont["head"].unitsPerEm
 
-    @cachedProperty
+    @property
     def fontMetrics(self):
-        return FontMetrics(
-            xHeight=self.ttFont["OS/2"].sxHeight,
-            capHeight=self.ttFont["OS/2"].sCapHeight,
-            ascender=self.ttFont["hhea"].ascent,
-            descender=self.ttFont["hhea"].descent,
-        )
+        return FontMetrics(*self.shaper.getFontMetrics())
 
     @cachedProperty
     def colorPalettes(self):
