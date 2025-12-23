@@ -1293,7 +1293,7 @@ class FGGlyphLineView(AppKit.NSView):
 
         invScale = 1 / self.scaleFactor
 
-        if self.showMetrics and self._glyphs.fontMetrics:
+        if self.showMetrics and self._glyphs.fontMetrics and not self.vertical:
             drawLine((0,dy), (self.bounds().size.width, dy), colors.selectedSpaceColor, 2)
             metrics = self._glyphs.fontMetrics
             if metrics.xHeight is not None:
