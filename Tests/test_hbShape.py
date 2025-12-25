@@ -45,6 +45,23 @@ def test_shape_getStylisticSetNames():
     assert expected == ssNames
 
 
+getFontMetricsTestData = [
+    ("IBMPlexSans-Regular.ttf", dict(),          (516, 698, 780, -220)),
+    ("MutatorSans.ttf",         dict(),          (500, 700, 700, -200)),
+    ("MutatorSans.ttf",         dict(wght=100),  (500, 710, 700, -200)),
+    ("MutatorSans.ttf",         dict(wght=1000), (500, 800, 700, -200)),
+]
+
+
+@pytest.mark.parametrize("fileName,location,expected", getFontMetricsTestData)
+def test_shape_getFontMetrics(fileName, location, expected):
+    s = HBShape.fromPath(getFontPath(fileName))
+    if location:
+        s.setVarLocation(location)
+    metrics = s.getFontMetrics()
+    assert expected == metrics
+
+
 clusterTestData = [
     ([0, 1, 2, 5, 6, 8], 10,
      [[0], [1], [2, 3, 4], [5], [6, 7], [8, 9]],

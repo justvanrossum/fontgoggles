@@ -226,8 +226,8 @@ class DSFont(BaseFont):
 
     @cachedProperty
     def defaultVerticalAdvance(self):
-        ascender = getattr(self.defaultInfo, "ascender", None)
-        descender = getattr(self.defaultInfo, "descender", None)
+        ascender = self.fontMetrics.ascender
+        descender = self.fontMetrics.descender
         if ascender is None or descender is None:
             return self.defaultInfo.unitsPerEm
         else:
@@ -235,13 +235,14 @@ class DSFont(BaseFont):
 
     @cachedProperty
     def defaultVerticalOriginY(self):
-        ascender = getattr(self.defaultInfo, "ascender", None)
+        ascender = self.fontMetrics.ascender
         if ascender is None:
             return self.defaultInfo.unitsPerEm  # ???
         else:
             return ascender
 
     def varLocationChanged(self, varLocation):
+        super().varLocationChanged(varLocation)
         self._normalizedLocation = normalizeLocation(self.doc, varLocation or {})
 
     def _getVarGlyph(self, glyphName):
