@@ -302,6 +302,29 @@ def test_iterFontPathsAndNumbers():
     assert expectedResults == results
 
 
+fontMetricsTestData = [
+    ("MutatorSansBoldWideMutated.ufo", dict(),          (500, 800, 800, -200)),
+    ('MutatorSans.designspace',        dict(),          (500, 700, 700, -200)),
+    ('MutatorSans.designspace',        dict(wght=100),  (500, 710, 700, -200)),
+    ('MutatorSans.designspace',        dict(wght=1000), (500, 800, 700, -200)),
+    ("MutatorSans.ttf",                dict(),          (500, 700, 700, -200)),
+    ("MutatorSans.ttf",                dict(wght=100),  (500, 710, 700, -200)),
+    ("MutatorSans.ttf",                dict(wght=1000), (500, 800, 700, -200)),
+]
+
+
+@pytest.mark.parametrize("fileName,location,expected", fontMetricsTestData)
+@pytest.mark.asyncio
+async def test_fontMetrics(fileName, location, expected):
+    fontPath = getFontPath(fileName)
+    _, opener, _ = getOpener(fontPath)
+    font = opener(fontPath, 0)
+    await font.load(sys.stderr.write)
+    if location:
+        font.setVarLocation(location)
+    assert expected == font.fontMetrics
+
+
 testDataGetGlyphRun = [
     ("fit", ["fi", "t"],
      [(0, 0), (567, 0)]),
