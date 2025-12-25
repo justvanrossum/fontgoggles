@@ -273,7 +273,7 @@ CA
                                     <action selector="showFontFileName:" target="-1" id="Ppi-rz-b6J"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Metrics" keyEquivalent="6" id="Xhr-L4-CtF">
+                            <menuItem title="Show Font Metrics" keyEquivalent="6" id="Xhr-L4-CtF">
                                 <connections>
                                     <action selector="showMetrics:" target="-1" id="gZB-fy-wVh"/>
                                 </connections>
