@@ -63,6 +63,10 @@ def _getVerticalOriginFunc(font, glyphID, shaper):
 _stylisticSets = {f"ss{i:02}" for i in range(1, 21)}
 
 
+_HORIZONTAL_ASCENDER_OS2 = 1331786595  # HB_TAG ('O','a','s','c')
+_HORIZONTAL_DESCENDER_OS2 = 1331983203  # HB_TAG ('O','d','s','c')
+
+
 class HBShape:
 
     @classmethod
@@ -116,8 +120,8 @@ class HBShape:
     def getFontMetrics(self):
         xHeight = self.font.get_metric_position(hb.OTMetricsTag.X_HEIGHT)
         capHeight = self.font.get_metric_position(hb.OTMetricsTag.CAP_HEIGHT)
-        ascender = self.font.get_metric_position(hb.OTMetricsTag.HORIZONTAL_ASCENDER)
-        descender = self.font.get_metric_position(hb.OTMetricsTag.HORIZONTAL_DESCENDER)
+        ascender = self.font.get_metric_position(_HORIZONTAL_ASCENDER_OS2)
+        descender = self.font.get_metric_position(_HORIZONTAL_DESCENDER_OS2)
         return xHeight, capHeight, ascender, descender
 
     def setVarLocation(self, varLocation):

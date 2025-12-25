@@ -49,8 +49,6 @@ def compileUFOToFont(ufoPath, shouldCompileFeatures):
         sTypoDescender=round(
             getattr(info, "openTypeOS2TypoDescender", getattr(info, "descender", 0))
         ),
-        fsSelection=1 << 7,  # USE_TYPO_METRICS
-        version=4,  # To avoid warning about USE_TYPO_METRICS
         xAvgCharWidth=0,  # To avoid dependency on hmtx table.
     )
     ttFont = fb.font
