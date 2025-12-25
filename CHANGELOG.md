@@ -3,6 +3,8 @@
 ## [1.9.0] - 2025-12-25
 
 - Add option to show font metrics (ascender, descender, x-height, cap-height). There is a new menu item under “View”: Show Font Metrics (command-6). Contributed by Simon Cozens and Khaled Hosny ([Issue 235](https://github.com/justvanrossum/fontgoggles/issues/235), [PR 507](https://github.com/justvanrossum/fontgoggles/pull/507))
+- Updated to Unicode 17
+- Updated OpenType tag descriptions
 
 ## [1.8.7] - 2025-06-10
 
