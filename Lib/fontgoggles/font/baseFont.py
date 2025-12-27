@@ -97,12 +97,21 @@ class BaseFont:
         name = self.ttFont["name"]
         axes = {}
         for axis in fvar.axes:
-            axisDict = dict(name=str(name.getName(axis.axisNameID, 3, 1)),
-                            minValue=axis.minValue,
-                            defaultValue=axis.defaultValue,
-                            maxValue=axis.maxValue,
-                            hidden=bool(axis.flags & 0x0001))
-            axes[axis.axisTag] = axisDict
+            axisDict = axes.get(axis.axisTag)
+            if axisDict is None:
+                axisDict = dict(name=str(name.getName(axis.axisNameID, 3, 1)),
+                                minValue=axis.minValue,
+                                defaultValue=axis.defaultValue,
+                                maxValue=axis.maxValue,
+                                hidden=bool(axis.flags & 0x0001))
+                axes[axis.axisTag] = axisDict
+            else:
+                # We've seen this axis before, this font may use duplicate
+                # axis tags to get non-linear interpolation. We must assume
+                # all duplicate axes have the same range, but they may have
+                # different "hidden" settings. Our final axis should not be
+                # hidden unless all duplicates are hidden as well.
+                axisDict["hidden"] = axisDict["hidden"] and bool(axis.flags & 0x0001)
         return axes
 
     def getGlyphRunFromTextInfo(self, textInfo, colorPalettesIndex=0, **kwargs):
