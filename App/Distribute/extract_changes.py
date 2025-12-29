@@ -26,4 +26,4 @@ for line in changelog.splitlines():
     elif collecting:
         notes.append(line)
 
-print("\n".join(notes).strip().replace("\n", "%0A"))
+print("\n".join(notes).strip())
