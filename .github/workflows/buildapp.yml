@@ -105,7 +105,7 @@ jobs:
         if: startsWith(github.event.ref, 'refs/tags')
         run: |
           source venv/bin/activate
-          python App/Distribute/extract_changes.py ${{ github.ref_name }}" > tmp_latest_changes.txt
+          python App/Distribute/extract_changes.py ${{ github.ref_name }} > tmp_latest_changes.txt
 
       - name: Create Release
         if: startsWith(github.event.ref, 'refs/tags')
