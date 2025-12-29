@@ -1,17 +1,18 @@
 import os
 import pathlib
 import re
+import sys
 
 
 changelogVersionPattern = re.compile(r"## \[(.+)\]")
-githubRefPattern = re.compile(r"refs/tags/v(.*)")
 
 
 changelogPath = pathlib.Path(__file__).resolve().parent.parent.parent / "CHANGELOG.md"
 changelog = changelogPath.read_text("utf-8")
 
-m = githubRefPattern.match(os.getenv("GITHUB_REF"))
-version = m.group(1)
+version = sys.argv[1]
+assert version[0] == "v", "bad version tag"
+version = version[1:]
 
 notes = []
 

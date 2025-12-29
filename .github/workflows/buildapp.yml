@@ -103,16 +103,15 @@ jobs:
       - name: Read CHANGELOG.md
         id: changelog
         if: startsWith(github.event.ref, 'refs/tags')
-        env:
-          GITHUB_REF: ${{ github.ref }}
         run: |
           source venv/bin/activate
-          python App/Distribute/extract_changes.py > tmp_latest_changes.txt
+          python App/Distribute/extract_changes.py ${{ github.ref_name }}" > tmp_latest_changes.txt
 
       - name: Create Release
         if: startsWith(github.event.ref, 'refs/tags')
         uses: softprops/action-gh-release@v2
         with:
+          name: "Release ${{ github.ref_name }}"
           body_path: 'tmp_latest_changes.txt'
           token: ${{ secrets.GITHUB_TOKEN }}
           files: App/dist/FontGoggles.dmg
