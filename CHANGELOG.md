@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.9.1] - 2025-??-??
+
+- Improve "hidden axis" behavior when multiple axes exist with the same tag (for non-linear-interpolation purposes). [PR 510](https://github.com/justvanrossum/fontgoggles/pull/510)
+- Update HarfBuzz to 12.3.0 (via uharfbuzz 0.53.2)
+
 ## [1.9.0] - 2025-12-25
 
 - Add option to show font metrics (ascender, descender, x-height, cap-height). There is a new menu item under “View”: Show Font Metrics (command-6). Contributed by Simon Cozens and Khaled Hosny ([Issue 235](https://github.com/justvanrossum/fontgoggles/issues/235), [PR 507](https://github.com/justvanrossum/fontgoggles/pull/507))
