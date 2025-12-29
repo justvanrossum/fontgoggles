@@ -129,11 +129,11 @@ class HBShape:
 
     def getFeatures(self, otTableTag):
         features = set()
-        for scriptIndex, script in enumerate(hb.ot_layout_table_get_script_tags(self.face, otTableTag)):
-            langIdices = list(range(len(hb.ot_layout_script_get_language_tags(self.face, otTableTag, scriptIndex))))
+        for scriptIndex, script in enumerate(self.face.get_table_script_tags(otTableTag)):
+            langIdices = list(range(len(self.face.get_script_language_tags(otTableTag, scriptIndex))))
             langIdices.append(0xFFFF)
             for langIndex in langIdices:
-                features.update(hb.ot_layout_language_get_feature_tags(self.face, otTableTag, scriptIndex, langIndex))
+                features.update(self.face.get_language_feature_tags(otTableTag, scriptIndex, langIndex))
         return features
 
     def getStylisticSetNames(self):
@@ -160,8 +160,8 @@ class HBShape:
 
     def getScriptsAndLanguages(self, otTableTag):
         scriptsAndLanguages = {}
-        for scriptIndex, script in enumerate(hb.ot_layout_table_get_script_tags(self.face, otTableTag)):
-            scriptsAndLanguages[script] = set(hb.ot_layout_script_get_language_tags(self.face, otTableTag, scriptIndex))
+        for scriptIndex, script in enumerate(self.face.get_table_script_tags(otTableTag)):
+            scriptsAndLanguages[script] = set(self.face.get_script_language_tags(otTableTag, scriptIndex))
         return scriptsAndLanguages
 
     def getGlyphID(self, glyphName, default=0):
