@@ -1,6 +1,6 @@
 # Changelog for FontGoggles
 
-## [1.9.1] - 2025-??-??
+## [1.9.1] - 2025-12-29
 
 - Improve "hidden axis" behavior when multiple axes exist with the same tag (for non-linear-interpolation purposes). [PR 510](https://github.com/justvanrossum/fontgoggles/pull/510)
 - Update HarfBuzz to 12.3.0 (via uharfbuzz 0.53.2)
