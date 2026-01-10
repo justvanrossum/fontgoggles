@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.9.2] - 2026-01-??
+
+- Fixed "View" menu item titles: for toggle items, reflect the current state with Show/Hide. This fixes a regression that went unnoticed for quite a while. [Issue 513](https://github.com/justvanrossum/fontgoggles/issues/513), [PR 514](https://github.com/justvanrossum/fontgoggles/pull/514)
+
 ## [1.9.1] - 2025-12-29
 
 - Improve "hidden axis" behavior when multiple axes exist with the same tag (for non-linear-interpolation purposes). [PR 510](https://github.com/justvanrossum/fontgoggles/pull/510)
