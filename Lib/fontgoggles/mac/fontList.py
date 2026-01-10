@@ -278,7 +278,7 @@ class FontList(Group):
     def __init__(self, project, projectProxy, width, itemSize, vertical=False,
                  relativeFontSize=0.7, relativeHBaseline=0.25,
                  relativeVBaseline=0.5, relativeMargin=0.1,
-                 showFontFileName=True, showMetrics=True, showBaseline=True,
+                 showFontFileName=True, showMetrics=False, showBaseline=False,
                  selectionChangedCallback=None,
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
