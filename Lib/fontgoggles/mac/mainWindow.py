@@ -155,6 +155,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         uiSettings.fontListItemSize = self.fontList.itemSize
         uiSettings.fontListShowFontFileName = self.fontList.showFontFileName
         uiSettings.fontListShowMetrics = self.fontList.showMetrics
+        uiSettings.fontListShowBaseline = self.fontList.showBaseline
 
         uiSettings.characterListVisible = self.w.mainSplitView.isPaneReallyVisible("characterList")
         uiSettings.characterListSize = self.w.mainSplitView.paneSize("characterList")
@@ -255,6 +256,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
                                  relativeMargin=self.project.textSettings.relativeMargin,
                                  showFontFileName=self.project.uiSettings.fontListShowFontFileName,
                                  showMetrics=self.project.uiSettings.fontListShowMetrics,
+                                 showBaseline=self.project.uiSettings.fontListShowBaseline,
                                  selectionChangedCallback=self.fontListSelectionChangedCallback,
                                  glyphSelectionChangedCallback=self.fontListGlyphSelectionChangedCallback,
                                  arrowKeyCallback=self.fontListArrowKeyCallback)
@@ -1072,6 +1074,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             isVisible = self.fontList.showFontFileName
         elif action == "showMetrics:":
             isVisible = self.fontList.showMetrics
+        elif action == "showBaseline:":
+            isVisible = self.fontList.showBaseline
         elif action in ("previousTextLine:", "nextTextLine:"):
             return bool(self.textEntry.textFilePath)
         elif action == "copy:":
