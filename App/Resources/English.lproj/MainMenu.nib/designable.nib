@@ -278,6 +278,11 @@ CA
                                     <action selector="showMetrics:" target="-1" id="gZB-fy-wVh"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Show Baseline" keyEquivalent="7" id="TOx-WP-rtW">
+                                <connections>
+                                    <action selector="showBaseline:" target="-1" id="cyk-uf-cdh"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="Vef-M8-MyD"/>
                             <menuItem title="Zoom In" keyEquivalent="+" id="384">
                                 <connections>

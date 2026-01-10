@@ -278,7 +278,7 @@ class FontList(Group):
     def __init__(self, project, projectProxy, width, itemSize, vertical=False,
                  relativeFontSize=0.7, relativeHBaseline=0.25,
                  relativeVBaseline=0.5, relativeMargin=0.1,
-                 showFontFileName=True, showMetrics=True,
+                 showFontFileName=True, showMetrics=True, showBaseline=True,
                  selectionChangedCallback=None,
                  glyphSelectionChangedCallback=None, arrowKeyCallback=None):
         super().__init__((0, 0, width, 900))
@@ -298,6 +298,7 @@ class FontList(Group):
         self.project = project
         self.projectProxy = projectProxy
         self.showMetrics = showMetrics
+        self.showBaseline = showBaseline
         self.setupFontItems()
         self.showFontFileName = showFontFileName
 
@@ -325,7 +326,8 @@ class FontList(Group):
                     h = itemSize
                 fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index, self.vertical,
                                     self.align, self.relativeFontSize, self.relativeHBaseline,
-                                    self.relativeVBaseline, self.relativeMargin, self.showMetrics)
+                                    self.relativeVBaseline, self.relativeMargin, self.showMetrics,
+                                    self.showBaseline)
                 setattr(self, fontItemInfo.identifier, fontItem)
                 y += itemSize
         else:
@@ -476,6 +478,12 @@ class FontList(Group):
         for fontItem in self.iterFontItems():
             fontItem.showMetrics = self.showMetrics
 
+    @hookedProperty
+    @asyncTaskAutoCancel
+    async def showBaseline(self):
+        for fontItem in self.iterFontItems():
+            fontItem.showBaseline = self.showBaseline
+
     @suppressAndLogException
     def resizeFontItems(self, itemSize, centerPoint=None):
         if not self.project.fonts:
@@ -605,7 +613,8 @@ class FontList(Group):
                     h = itemSize
                 fontItem = FontItem((x, y, w, h), fontItemInfo.fontKey, index, self.vertical,
                                     self.align, self.relativeFontSize, self.relativeHBaseline,
-                                    self.relativeVBaseline, self.relativeMargin, self.showMetrics)
+                                    self.relativeVBaseline, self.relativeMargin, self.showMetrics,
+                                    self.showBaseline)
                 setattr(self, fontItemInfo.identifier, fontItem)
                 if fontItemInfo.font is not None:
                     # Font is already loaded, but the text needs to be updated.
@@ -937,9 +946,11 @@ class FontItem(Group):
     relativeVBaseline = delegateProperty("glyphLineView")
     relativeMargin = delegateProperty("glyphLineView")
     showMetrics = delegateProperty("glyphLineView")
+    showBaseline = delegateProperty("glyphLineView")
 
     def __init__(self, posSize, fontKey, fontListIndex, vertical, align,
-                 relativeSize, relativeHBaseline, relativeVBaseline, relativeMargin, showMetrics):
+                 relativeSize, relativeHBaseline, relativeVBaseline, relativeMargin, showMetrics,
+                 showBaseline):
         super().__init__(posSize)
         # self._nsObject.setWantsLayer_(True)
         # self._nsObject.setCanDrawSubviewsIntoLayer_(True)
@@ -953,6 +964,7 @@ class FontItem(Group):
         self.relativeVBaseline = relativeVBaseline
         self.relativeMargin = relativeMargin
         self.showMetrics = showMetrics
+        self.showBaseline = showBaseline
         self.align = align
         self.selected = False
         if vertical:
@@ -1060,6 +1072,7 @@ class FGGlyphLineView(AppKit.NSView):
     relativeVBaseline = hookedProperty(_scheduleRedraw, default=0.5)
     relativeMargin = hookedProperty(_scheduleRedraw, default=0.1)
     showMetrics = hookedProperty(_scheduleRedraw, default=True)
+    showBaseline = hookedProperty(_scheduleRedraw, default=True)
 
     def init(self):
         self = super().init()
@@ -1294,7 +1307,6 @@ class FGGlyphLineView(AppKit.NSView):
         invScale = 1 / self.scaleFactor
 
         if self.showMetrics and self._glyphs.fontMetrics and not self.vertical:
-            drawLine((0,dy), (self.bounds().size.width, dy), colors.selectedSpaceColor, 2)
             metrics = self._glyphs.fontMetrics
             if metrics.xHeight is not None:
                 xHeight = dy + metrics.xHeight * self.scaleFactor
@@ -1308,6 +1320,9 @@ class FGGlyphLineView(AppKit.NSView):
             if metrics.descender:
                 descender = dy + metrics.descender * self.scaleFactor
                 drawLine((0, descender), (self.bounds().size.width, descender), colors.hoverColor, 1)
+
+        if (self.showMetrics or self.showBaseline) and not self.vertical:
+            drawLine((0, dy), (self.bounds().size.width, dy), colors.selectedSpaceColor, 2)
 
         rect = rectFromNSRect(rect)
         rect = scaleRect(offsetRect(rect, -dx, -dy), invScale, invScale)
@@ -1431,6 +1446,7 @@ class GlyphLine(Group):
     relativeVBaseline = delegateProperty("_nsObject")
     relativeMargin = delegateProperty("_nsObject")
     showMetrics = delegateProperty("_nsObject")
+    showBaseline = delegateProperty("_nsObject")
 
 
 class FGUnclickableTextField(AppKit.NSTextField):

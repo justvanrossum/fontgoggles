@@ -1051,6 +1051,9 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def showMetrics_(self, sender):
         self.fontList.showMetrics = not self.fontList.showMetrics
 
+    def showBaseline_(self, sender):
+        self.fontList.showBaseline = not self.fontList.showBaseline
+
     @suppressAndLogException
     def validateMenuItem_(self, sender):
         action = sender.action()
