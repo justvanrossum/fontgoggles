@@ -171,7 +171,7 @@ class HBShape:
             return default
 
     def shape(self, text, *, features=None, varLocation=None,
-              direction=None, language=None, script=None):
+              direction=None, language=None, script=None, shaper="ot"):
         if features is None:
             features = {}
         if varLocation is None:
@@ -195,7 +195,7 @@ class HBShape:
         if script is not None:
             buf.set_script_from_ot_tag(script)
 
-        hb.shape(self.font, buf, features)
+        hb.shape(self.font, buf, features, shapers=[shaper])
 
         glyphOrder = self.glyphOrder
         infos = []
