@@ -1,4 +1,4 @@
-markdown==3.10
+markdown==3.10.1
 pillow==12.1.0
 fontTools==4.61.1
 fs==2.4.16
