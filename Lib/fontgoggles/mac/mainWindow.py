@@ -60,6 +60,8 @@ alignmentValuesVertical = [None, "top", "bottom", "center"]
 feaVarTabLabels = ["Features", "Variations", "Options"]
 feaVarTabValues = [v.lower() for v in feaVarTabLabels]
 
+shaperOptions = ["HarfBuzz", "CoreText"]
+shaperValues = ["ot", "coretext"]
 
 AxisSliderInfo = namedtuple("AxisSliderInfo", ["label", "minValue", "defaultValue", "maxValue", "hidden"])
 
@@ -392,6 +394,14 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         group.languagesPopup = self.languagesPopup
         y += 50
 
+        self.shaperPopup = LabeledView(
+            (10, y, -10, 40), "Shaper:",
+            PopUpButton, shaperOptions,
+            callback=self.shaperChangedCallback,
+        )
+        group.shaperPopup = self.shaperPopup
+        y += 50
+
         group.setPosSize((0, 0, 0, y))
         self.setLanguagesFromScript()
         return group
@@ -667,7 +677,8 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             glyphs = font.getGlyphRunFromTextInfo(self.textInfo,
                                                   features=self.project.textSettings.features,
                                                   varLocation=self.project.textSettings.varLocation,
-                                                  colorLayers=self.project.textSettings.enableColor)
+                                                  colorLayers=self.project.textSettings.enableColor,
+                                                  shaper=self.project.textSettings.shaper)
         stderr = stderr.getvalue()
         if stderr:
             fontItem.writeCompileOutput(stderr)
@@ -963,6 +974,11 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         tag = _tagFromMenuItem(self.languagesPopup.getItem(), "dflt")
         self.project.textSettings.language = tag
         self.textEntryChangedCallback(self.textEntry, updateCharacterList=False)
+
+    @objc.python_method
+    def shaperChangedCallback(self, sender):
+        self.project.textSettings.shaper = shaperValues[sender.get()]
+        self.textEntryChangedCallback(self.textEntry, updateCharacterList=True)
 
     @objc.python_method
     def featuresChanged(self, sender):
