@@ -136,29 +136,26 @@ class HBShape:
                 features.update(self.face.get_language_feature_tags(otTableTag, scriptIndex, langIndex))
         return features
 
-    def getStylisticSetNames(self):
-        tags = _stylisticSets & (set(self.getFeatures("GSUB")) | set(self.getFeatures("GPOS")))
+    def getStylisticSetNames(self, otTableTag):
+        tags = _stylisticSets & set(self.getFeatures(otTableTag))
         if not tags:
             return {}
+        otTable = self._ttFont.get(otTableTag)
         nameTable = self._ttFont.get("name")
-        if nameTable is None:
+        if otTable is None or nameTable is None:
             return {}
+        otTable = otTable.table
         names = {}
-        for otTableTag in ("GSUB", "GPOS"):
-            otTable = self._ttFont.get(otTableTag)
-            if otTable is None:
-                continue
-            otTable = otTable.table
-            for feature in otTable.FeatureList.FeatureRecord:
-                tag = feature.FeatureTag
-                if tag in tags and tag not in names:
-                    feaParams = feature.Feature.FeatureParams
-                    if feaParams is not None:
-                        for langID in [0x0409, None]:
-                            nameRecord = nameTable.getName(feaParams.UINameID, 3, 1, langID)
-                            if nameRecord is not None:
-                                names[tag] = nameRecord.toUnicode()
-                                break
+        for feature in otTable.FeatureList.FeatureRecord:
+            tag = feature.FeatureTag
+            if tag in tags and tag not in names:
+                feaParams = feature.Feature.FeatureParams
+                if feaParams is not None:
+                    for langID in [0x0409, None]:
+                        nameRecord = nameTable.getName(feaParams.UINameID, 3, 1, langID)
+                        if nameRecord is not None:
+                            names[tag] = nameRecord.toUnicode()
+                            break
         return names
 
     def getScriptsAndLanguages(self, otTableTag):
