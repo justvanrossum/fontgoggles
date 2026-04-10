@@ -15,13 +15,13 @@ class FeatureTagGroup(Group):
         super().__init__(posSize)
         self._callback = callback
         self._state = {}
-        self.setTags(tagGroups)
+        self.setTags(tagGroups, {})
 
     def _breakCycles(self):
         del self._callback
         super()._breakCycles()
 
-    def setTags(self, tagGroups):
+    def setTags(self, tagGroups, stylisticSetNames):
         # clear all subviews
         for attr, value in list(self.__dict__.items()):
             if isinstance(value, VanillaBaseObject):
@@ -32,7 +32,7 @@ class FeatureTagGroup(Group):
         tagWidth = 60
         y = margin
         tagCounter = 0
-        for title, (tags, stylisticSetNames) in tagGroups.items():
+        for title, tags in tagGroups.items():
             titleLabel = TextBox((margin, y, -margin, 20), title)
             setattr(self, f"label_{title}", titleLabel)
             y += 24
@@ -101,10 +101,8 @@ if __name__ == "__main__":
     class Test:
 
         def __init__(self):
-            gsubTags = {"aalt", "salt", "ss02", "ccmb", "ccmp", "liga", "dlig", "rvrn", "cpsp"}
-            gposTags = {"kern", "mark", "mkmk", "cpsp", "ZZZZ"}
-            tagGroups = {"GSUB": (gsubTags, {}),
-                         "GPOS": (gposTags, {})}
+            tagGroups = {"GSUB": {"aalt", "salt", "ss02", "ccmb", "ccmp", "liga", "dlig", "rvrn", "cpsp"},
+                         "GPOS": {"kern", "mark", "mkmk", "cpsp", "ZZZZ"}}
             self.w = Window((300, 500), "TagTest", minSize=(200, 200), autosaveName="TempTagTesttt")
             self.tags = FeatureTagGroup(300, tagGroups, callback=self.tagsChanged)
 

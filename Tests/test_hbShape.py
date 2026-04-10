@@ -36,7 +36,7 @@ def test_shape_getFeatures():
 
 def test_shape_getStylisticSetNames():
     s = HBShape.fromPath(getFontPath("IBMPlexSans-Regular.ttf"))
-    ssNames = s.getStylisticSetNames("GSUB")
+    ssNames = s.getStylisticSetNames()
     expected = {'ss01': 'simple lowercase a',
                 'ss02': 'simple lowercase g',
                 'ss03': 'slashed number zero',
@@ -47,14 +47,11 @@ def test_shape_getStylisticSetNames():
 
 def test_shape_getStylisticSetNames_GPOS():
     s = HBShape.fromPath(getFontPath("Stylisticsetnames-Regular.otf"))
-    assert s.getStylisticSetNames("GSUB") == {
-        'ss02': 'sub a a by b',
-        'ss03': 'sub b b by a',
-    }
-    assert s.getStylisticSetNames("GPOS") == {
-        'ss01': 'pos A A 100',
-        'ss03': 'pos B B 100',
-    }
+    ssNames = s.getStylisticSetNames()
+    expected = {'ss01': 'pos A A 100',
+                'ss02': 'sub a a by b',
+                'ss03': 'sub b b by a'}
+    assert expected == ssNames
 
 
 getFontMetricsTestData = [

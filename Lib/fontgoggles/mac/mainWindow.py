@@ -542,8 +542,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         allFeatureTagsGPOS = set()
         allAxes = []
         allScriptsAndLanguages = []
-        allStylisticSetNamesGSUB = []
-        allStylisticSetNamesGPOS = []
+        allStylisticSetNames = []
         for fontItemInfo in fonts:
             font = fontItemInfo.font
             if font is None:
@@ -552,19 +551,17 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
             allFeatureTagsGPOS.update(font.featuresGPOS)
             allAxes.append(font.axes)
             allScriptsAndLanguages.append(font.scripts)
-            allStylisticSetNamesGSUB.append(font.stylisticSetNamesGSUB)
-            allStylisticSetNamesGPOS.append(font.stylisticSetNamesGPOS)
+            allStylisticSetNames.append(font.stylisticSetNames)
         allAxes = mergeAxes(*allAxes)
         allScriptsAndLanguages = mergeScriptsAndLanguages(*allScriptsAndLanguages)
-        allStylisticSetNamesGSUB = mergeStylisticSetNames(*allStylisticSetNamesGSUB)
-        allStylisticSetNamesGPOS = mergeStylisticSetNames(*allStylisticSetNamesGPOS)
-        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages, allStylisticSetNamesGSUB, allStylisticSetNamesGPOS
+        allStylisticSetNames = mergeStylisticSetNames(*allStylisticSetNames)
+        return allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes, allScriptsAndLanguages, allStylisticSetNames
 
     @objc.python_method
     def _updateSidebarItems(self, allFeatureTagsGSUB, allFeatureTagsGPOS, allAxes,
-                            allScriptsAndLanguages, allStylisticSetNamesGSUB, allStylisticSetNamesGPOS):
-        self.featuresGroup.setTags({"GSUB": (allFeatureTagsGSUB, allStylisticSetNamesGSUB),
-                                    "GPOS": (allFeatureTagsGPOS, allStylisticSetNamesGPOS)})
+                            allScriptsAndLanguages, allStylisticSetNames):
+        self.featuresGroup.setTags({"GSUB": allFeatureTagsGSUB, "GPOS": allFeatureTagsGPOS},
+                                   allStylisticSetNames)
         sliderInfo = {}
         for tag, axis in allAxes.items():
             name = sorted(axis['name'])[0]
