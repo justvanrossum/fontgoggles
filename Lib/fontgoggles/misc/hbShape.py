@@ -137,25 +137,28 @@ class HBShape:
         return features
 
     def getStylisticSetNames(self):
-        tags = _stylisticSets & set(self.getFeatures("GSUB"))
+        tags = _stylisticSets & (set(self.getFeatures("GSUB")) | set(self.getFeatures("GPOS")))
         if not tags:
             return {}
-        gsubTable = self._ttFont.get("GSUB")
         nameTable = self._ttFont.get("name")
-        if gsubTable is None or nameTable is None:
+        if nameTable is None:
             return {}
-        gsubTable = gsubTable.table
         names = {}
-        for feature in gsubTable.FeatureList.FeatureRecord:
-            tag = feature.FeatureTag
-            if tag in tags and tag not in names:
-                feaParams = feature.Feature.FeatureParams
-                if feaParams is not None:
-                    for langID in [0x0409, None]:
-                        nameRecord = nameTable.getName(feaParams.UINameID, 3, 1, langID)
-                        if nameRecord is not None:
-                            names[tag] = nameRecord.toUnicode()
-                            break
+        for otTableTag in ("GSUB", "GPOS"):
+            otTable = self._ttFont.get(otTableTag)
+            if otTable is None:
+                continue
+            otTable = otTable.table
+            for feature in otTable.FeatureList.FeatureRecord:
+                tag = feature.FeatureTag
+                if tag in tags and tag not in names:
+                    feaParams = feature.Feature.FeatureParams
+                    if feaParams is not None:
+                        for langID in [0x0409, None]:
+                            nameRecord = nameTable.getName(feaParams.UINameID, 3, 1, langID)
+                            if nameRecord is not None:
+                                names[tag] = nameRecord.toUnicode()
+                                break
         return names
 
     def getScriptsAndLanguages(self, otTableTag):

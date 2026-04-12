@@ -45,6 +45,15 @@ def test_shape_getStylisticSetNames():
     assert expected == ssNames
 
 
+def test_shape_getStylisticSetNames_GPOS():
+    s = HBShape.fromPath(getFontPath("Stylisticsetnames-Regular.otf"))
+    ssNames = s.getStylisticSetNames()
+    expected = {'ss01': 'pos A A 100',
+                'ss02': 'sub a a by b',
+                'ss03': 'sub b b by a'}
+    assert expected == ssNames
+
+
 getFontMetricsTestData = [
     ("IBMPlexSans-Regular.ttf", dict(),          (516, 698, 780, -220)),
     ("MutatorSans.ttf",         dict(),          (500, 700, 700, -200)),
