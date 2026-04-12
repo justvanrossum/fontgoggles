@@ -1,8 +1,11 @@
 # Changelog for FontGoggles
 
-## [1.9.2] - 2026-04-12
+## [1.9.3] - 2026-04-12
 
 - Also read stylistic set names from GPOS, and not just from GSUB. ([Issue 529](https://github.com/justvanrossum/fontgoggles/issues/529), [PR 530](https://github.com/justvanrossum/fontgoggles/pull/530))
+
+## [1.9.2] - 2026-01-10
+
 - Added option to show the baseline, seperately from the other font metrics. Contributed by Khaled Hosny. ([PR 512](https://github.com/justvanrossum/fontgoggles/pull/512))
 - Fixed "View" menu item titles: for toggle items, reflect the current state with Show/Hide. This fixes a regression that went unnoticed for quite a while. ([Issue 513](https://github.com/justvanrossum/fontgoggles/issues/513), [PR 514](https://github.com/justvanrossum/fontgoggles/pull/514))
 
