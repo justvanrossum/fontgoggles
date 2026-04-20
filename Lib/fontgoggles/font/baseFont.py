@@ -155,10 +155,11 @@ class BaseFont:
 
     def getGlyphRun(self, text, *, features=None, varLocation=None,
                     direction=None, language=None, script=None,
-                    colorLayers=False):
+                    colorLayers=False, shaper="ot"):
         self.setVarLocation(varLocation)
         glyphInfo = self.shaper.shape(text, features=features, varLocation=varLocation,
-                                      direction=direction, language=language, script=script)
+                                      direction=direction, language=language, script=script,
+                                      shaper=shaper)
         glyphNames = (gi.name for gi in glyphInfo)
         for glyph, glyphDrawing in zip(glyphInfo, self.getGlyphDrawings(glyphNames, colorLayers)):
             glyph.glyphDrawing = glyphDrawing
