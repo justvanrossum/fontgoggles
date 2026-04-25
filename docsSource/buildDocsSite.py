@@ -22,6 +22,7 @@ htmlTemplate = """\
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FontGoggles — Interactive Previewing and Comparing</title>
 <link rel="stylesheet" href="markdown.css">
+<link rel="stylesheet" href="download-button.css">
 </style>
 </head>
 <body>
