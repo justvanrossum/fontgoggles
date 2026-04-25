@@ -1,0 +1,15 @@
+.download-button {
+  border-radius: 0.5em;
+  padding: 0.5em 1em 0.5em 1em;
+  background-color: #003973; /* matches icon shadow */
+  outline: none;
+  border: none;
+  font-size: 1.2em;
+  color: white;
+  text-decoration: unset;
+}
+
+.download-button:hover {
+  color: white;
+  background-color: #00468d;
+}

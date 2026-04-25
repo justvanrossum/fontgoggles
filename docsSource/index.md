@@ -4,6 +4,10 @@
 
 _Interactive Previewing and Comparing_
 
+<a class="download-button" href="https://github.com/justvanrossum/fontgoggles/releases/latest/download/FontGoggles.dmg">
+  Download for macOS
+</a>
+
 ## Overview
 
 FontGoggles is a font viewer for various font formats. It is a desktop
