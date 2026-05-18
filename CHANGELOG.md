@@ -1,5 +1,9 @@
 # Changelog for FontGoggles
 
+## [1.9.4] - 2026-05-18
+
+- [COLRv1] Fix sweep gradients and some other rendering problems. Contributed by Felix Herbst via [black-renderer](https://github.com/fontra/black-renderer). ([Issue 526](https://github.com/justvanrossum/fontgoggles/issues/526), [black-renderer PR 235](https://github.com/fontra/black-renderer/pull/235), [black-renderer PR 238](https://github.com/fontra/black-renderer/pull/238), [black-renderer PR 241](https://github.com/fontra/black-renderer/pull/241))
+
 ## [1.9.3] - 2026-04-12
 
 - Also read stylistic set names from GPOS, and not just from GSUB. ([Issue 529](https://github.com/justvanrossum/fontgoggles/issues/529), [PR 530](https://github.com/justvanrossum/fontgoggles/pull/530))
