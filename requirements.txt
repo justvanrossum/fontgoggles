@@ -10,7 +10,7 @@ blackrenderer==0.8.2
 fonttools[ufo,type1,lxml,unicode,woff]==4.63.0
 # Temporarily add support for experimental extensions to the not-yet-official COLRv1 format:
 # fonttools[woff,ufo,type1,unicode,lxml] @ git+https://github.com/justvanrossum/fonttools@colrv1-varco
-uharfbuzz==0.54.1
+uharfbuzz==0.56.0
 # newer python-bidi is completely incompatible with how we use it
 python-bidi==0.4.2  # pyup: ignore
 jundo==0.1.2
