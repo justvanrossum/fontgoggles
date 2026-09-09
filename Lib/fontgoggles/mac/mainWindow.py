@@ -1099,6 +1099,12 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
     def loadTextFile_(self, sender):
         self.textEntry.loadTextFileCallback(sender)
 
+    @suppressAndLogException
+    def refreshAllFonts_(self, sender):
+        for fontItemInfo in self.project.fonts:
+            fontItemInfo.unload()
+        self.loadFonts()
+
     def previousTextLine_(self, sender):
         self.textEntry.previousTextLine()
 
