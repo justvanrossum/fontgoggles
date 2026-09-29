@@ -1100,7 +1100,7 @@ class FGMainWindowController(AppKit.NSWindowController, metaclass=ClassNameIncre
         self.textEntry.loadTextFileCallback(sender)
 
     @suppressAndLogException
-    def refreshAllFonts_(self, sender):
+    def reloadAllFonts_(self, sender):
         for fontItemInfo in self.project.fonts:
             fontItemInfo.unload()
         self.loadFonts()

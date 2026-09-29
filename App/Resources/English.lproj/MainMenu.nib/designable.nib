@@ -312,12 +312,12 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="mrw-Sw-MCo"/>
-                            <menuItem title="Reload All Fonts" keyEquivalent="r" id="Rfr-All-Fnt">
+                            <menuItem title="Reload All Fonts" keyEquivalent="r" id="Rld-All-Fnt">
                                 <connections>
-                                    <action selector="refreshAllFonts:" target="-1" id="Rfr-All-Act"/>
+                                    <action selector="reloadAllFonts:" target="-1" id="Rld-All-Act"/>
                                 </connections>
                             </menuItem>
-                            <menuItem isSeparatorItem="YES" id="Rfr-All-Sep"/>
+                            <menuItem isSeparatorItem="YES" id="Rld-All-Sep"/>
                             <menuItem title="Customize toolbar..." id="382">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
