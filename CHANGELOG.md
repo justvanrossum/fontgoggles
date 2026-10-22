@@ -1,5 +1,10 @@
 # Changelog for FontGoggles
 
+## [1.9.5] - 2026-10-22
+
+- Update HarfBuzz to 14.6.0 (via uharfbuzz 0.56.3). This brings `VARC` table support up to spec.
+- Add cmd-R shortcut to the main menu to reload all fonts in the current window. Contributed by Frank Grießhammer. ([Issue 76](https://github.com/justvanrossum/fontgoggles/issues/76), [PR 559](https://github.com/justvanrossum/fontgoggles/pull/559))
+
 ## [1.9.4] - 2026-05-18
 
 - [COLRv1] Fixed sweep gradients, padding modes, and some other rendering problems. Contributed by Felix Herbst via [black-renderer](https://github.com/fontra/black-renderer). ([Issue 526](https://github.com/justvanrossum/fontgoggles/issues/526), [black-renderer PR 235](https://github.com/fontra/black-renderer/pull/235), [black-renderer PR 238](https://github.com/fontra/black-renderer/pull/238), [black-renderer PR 241](https://github.com/fontra/black-renderer/pull/241))
