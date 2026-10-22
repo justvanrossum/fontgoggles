@@ -208,6 +208,7 @@ class TextSettings:
     relativeVBaseline: float = 0.5
     relativeMargin: float = 0.1
     enableColor: bool = True
+    shaper: str = "ot"
 
 
 @dataclass
